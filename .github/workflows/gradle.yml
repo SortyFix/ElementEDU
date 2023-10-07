@@ -7,14 +7,16 @@
 name: Build and Test Java Spring Boot Application 
  
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
- 
+
+ # Events that will trigger this test
+ push:
+  branches: [ "main" ]
+ pull_request:
+  branches: [ "main" ]
+  
 jobs:
   build:
- 
+    # system to run on
     runs-on: ubuntu-latest
  
     steps:
