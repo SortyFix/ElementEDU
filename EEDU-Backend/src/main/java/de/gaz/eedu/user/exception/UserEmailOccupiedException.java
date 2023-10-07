@@ -1,0 +1,13 @@
+package de.gaz.eedu.user.exception;
+
+import de.gaz.eedu.exception.OccupiedException;
+import de.gaz.eedu.user.UserModel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+
+@Getter
+@AllArgsConstructor
+public class UserEmailOccupiedException extends OccupiedException {
+    private final UserModel user;
+}
