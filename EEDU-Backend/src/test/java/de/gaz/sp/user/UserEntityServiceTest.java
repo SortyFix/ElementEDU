@@ -1,6 +1,9 @@
 package de.gaz.sp.user;
 
-import de.gaz.sp.user.exception.UserEmailOccupiedException;
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.UserModel;
+import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.exception.UserEmailOccupiedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
