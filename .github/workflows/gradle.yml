@@ -4,23 +4,19 @@
 # documentation.
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
-
+name: Build and Test Java Spring Boot Application 
+ 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-permissions:
-  contents: read
-
+ 
 jobs:
   build:
-
+ 
     runs-on: ubuntu-latest
-
+ 
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -28,6 +24,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: gradle
+    
     - name: Build with Gradle
       working-directory: ./EEDU-Backend
       run: ./gradlew build
