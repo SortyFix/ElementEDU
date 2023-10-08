@@ -4,11 +4,12 @@
  * id, first_name, last_name, email, password, enabled and locked
  * These are required to test the userEntity system
  */
-CREATE TABLE users
+CREATE TABLE user_entity
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     first_name   VARCHAR(255),
     last_name    VARCHAR(255),
+    login_name    VARCHAR(255),
     email       VARCHAR(255),
     password    VARCHAR(255),
     enabled     BOOLEAN,

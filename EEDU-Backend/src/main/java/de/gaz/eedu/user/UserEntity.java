@@ -18,11 +18,15 @@ import java.util.stream.Collectors;
  * <p>
  * In this specific class the user is represented as an object.
  * It's noteworthy that this class is connected to a table in a database using jakarta.persistence.
+ * <p>
+ * This {@link UserEntity} can be a part of many {@link GroupEntity}s. These can have {@link de.gaz.eedu.user.privileges.PrivilegeEntity}s.
+ * This is important when authorizing this user as {@link de.gaz.eedu.user.privileges.PrivilegeEntity} cannot be directly added to a users account.
  *
  * @author ivo
+ * @see GroupEntity
+ * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
 @Entity
-@Table(name = "users")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,15 +37,16 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id; // ID is final
-    private String firstName, lastName, email, password;
+    private String firstName, lastName, loginName, email, password;
     private boolean enabled, locked;
 
     @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
+    @Setter(AccessLevel.PRIVATE)
     @JoinTable(name = "user_groups",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
-    private Set<GroupEntity> groups = new HashSet<>();
+    private Set<GroupEntity> groups;
 
     @Override
     public Set<? extends GrantedAuthority> getAuthorities() {
@@ -50,7 +55,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public @NotNull String getUsername() {
-        return lastName;
+        return loginName;
     }
 
     @Override

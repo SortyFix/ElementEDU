@@ -1,51 +1,67 @@
 package de.gaz.eedu.user.group;
 
+import de.gaz.eedu.EntityService;
+import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.exception.NameOccupiedException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
-public class GroupService {
+public class GroupService implements EntityService<GroupEntity, GroupModel> {
 
-    @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;
+    @Getter(AccessLevel.PROTECTED)
+    private final GroupRepository groupRepository;
 
-    public Optional<GroupModel> loadGroupByID(@NotNull Long id)
-    {
-        return getGroupRepository().findById(id).map(toModel());
+    @Override
+    public @NotNull Optional<GroupEntity> loadEntityByID(long id) {
+        return getGroupRepository().findById(id);
     }
 
-    public @NotNull Optional<GroupModel> loadGroupByName(@NotNull String name)
-    {
-        return getGroupRepository().findByName(name).map(toModel());
+    @Override
+    public @NotNull Optional<GroupEntity> loadEntityByName(@NotNull String name) {
+        return getGroupRepository().findByName(name);
     }
 
-    public @NotNull GroupModel createGroup(@NotNull GroupModel groupModel)
-    {
-        getGroupRepository().findByName(groupModel.name()).map(toModel()).ifPresent(model ->
+    @Override
+    public @Unmodifiable @NotNull List<GroupEntity> findAllEntities() {
+        return getGroupRepository().findAll();
+    }
+
+    @Override
+    public @NotNull GroupEntity createEntity(@NotNull GroupModel model) throws CreationException {
+        getGroupRepository().findByName(model.name()).map(toModel()).ifPresent(occupiedModel ->
         {
-            throw new NameOccupiedException(model.name());
+            throw new NameOccupiedException(occupiedModel.name());
         });
 
-        return toModel().apply(groupRepository.save(toGroup().apply(groupModel)));
+        return getGroupRepository().save(toEntity().apply(model));
     }
 
+    @Override
+    public @NotNull GroupEntity saveEntity(@NotNull GroupEntity entity) {
+        return getGroupRepository().save(entity);
+    }
+
+    @Override
     @Contract(pure = true)
-    private @NotNull Function<GroupModel, GroupEntity> toGroup()
-    {
+    public @NotNull Function<GroupModel, GroupEntity> toEntity() {
         return groupModel -> new GroupEntity(groupModel.id(), groupModel.name(), groupModel.userEntities(), groupModel.privilegeEntities());
     }
 
+    @Override
     @Contract(pure = true)
-    private @NotNull Function<GroupEntity, GroupModel> toModel()
-    {
+    public @NotNull Function<GroupEntity, GroupModel> toModel() {
         return groupEntity -> new GroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getUserEntities(), groupEntity.getPrivilegeEntities());
     }
+
 }

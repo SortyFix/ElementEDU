@@ -56,15 +56,16 @@ public class UserEntityServiceTest {
      * @see UserService
      */
     @Test public void createUserSuccessTest() {
-        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ENABLED, LOCKED, new HashSet<>());
-        UserModel userResponse = new UserModel(3L, FIRST_NAME, LAST_NAME, EMAIL, null, ENABLED, LOCKED, new HashSet<>());
+        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
+        UserModel userResponse = new UserModel(3L, FIRST_NAME, LAST_NAME, EMAIL, LOGIN_NAME, null, ENABLED, LOCKED, new HashSet<>());
 
-        Mockito.when(userService.createUser(userRequest)).thenReturn(userResponse);
+        Mockito.when(userService.create(userRequest)).thenReturn(userResponse);
 
-        UserModel result = userService.createUser(userRequest);
-        Mockito.verify(userService, Mockito.times(1)).createUser(userRequest);
+        UserModel result = userService.create(userRequest);
+        Mockito.verify(userService, Mockito.times(1)).create(userRequest);
 
         Assertions.assertEquals(result, userResponse);
+        Assertions.assertNull(result.password());
     }
 
     /**
@@ -79,19 +80,19 @@ public class UserEntityServiceTest {
      * @see UserService
      */
     @Test public void createUserEmailOccupied() {
-        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, "max.mustermann@example.com", PASSWORD, ENABLED, LOCKED, new HashSet<>());
+        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, LOGIN_NAME, "max.mustermann@example.com", PASSWORD, ENABLED, LOCKED, new HashSet<>());
 
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
-        UserModel userResponse = new UserModel(1L, null, null, null, null, false, false, null);
+        UserModel userResponse = new UserModel(1L, null, null, null, null, null, false, false, null);
 
-        Mockito.when(userService.createUser(userRequest)).thenThrow(new UserEmailOccupiedException(userResponse));
+        Mockito.when(userService.create(userRequest)).thenThrow(new UserEmailOccupiedException(userResponse));
 
         try {
-            userService.createUser(userRequest);
+            userService.create(userRequest);
             Assertions.fail("The email occupied exception has not been thrown.");
         } catch (UserEmailOccupiedException userEmailOccupiedException) {
             Assertions.assertEquals(userEmailOccupiedException.getUser(), userResponse);
-            Mockito.verify(userService, Mockito.times(1)).createUser(userRequest);
+            Mockito.verify(userService, Mockito.times(1)).create(userRequest);
         }
     }
 
@@ -108,6 +109,7 @@ public class UserEntityServiceTest {
     {
         static final String FIRST_NAME = "John";
         static final String LAST_NAME = "Doe";
+        static final String LOGIN_NAME = "john.doe";
         static final String EMAIL = "john.doe@example.com";
         static final String PASSWORD = "password123";
         static final boolean ENABLED = true;

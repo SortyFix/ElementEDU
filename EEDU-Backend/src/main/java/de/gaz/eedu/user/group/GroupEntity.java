@@ -23,6 +23,19 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * This class represents a database entry of a group.
+ * <p>
+ * This is the representation of a database entry of a group. It contains its id, name, userEntities and the privileges this group has.
+ * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by adding {@link PrivilegeEntity}s to
+ * this object and then assign users to it.
+ * <p>
+ * Note that a {@link UserEntity} can be part of multiple groups.
+ *
+ * @author ivo
+ * @see UserEntity
+ * @see PrivilegeEntity
+ */
 @Entity
 @Getter
 @AllArgsConstructor
@@ -51,6 +64,8 @@ public class GroupEntity {
      *
      * @param privilegeEntity which should be added to this method.
      * @return whether a {@link PrivilegeEntity} has been added to this method.
+     * @see #revokePrivilege(Long...)
+     * @see #getPrivilegeEntities()
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity) {
         // Filter already granted privileges out
@@ -68,12 +83,28 @@ public class GroupEntity {
      *
      * @param id of the {@link PrivilegeEntity} to remove from this group.
      * @return whether a privilege has been revoked from this group.
+     * @see #grantPrivilege(PrivilegeEntity...)
+     * @see #getPrivilegeEntities()
      */
     public boolean revokePrivilege(@NotNull Long... id) {
         Collection<Long> revokeIds = Arrays.asList(id);
         return privileges.removeIf(privilege -> revokeIds.contains(privilege.getId()));
     }
 
+    /**
+     * Returns {@link PrivilegeEntity} of this group.
+     * <p>
+     * This method returns a {@link Set} containing {@link PrivilegeEntity}.
+     * These define what privileges this group has.
+     * <p>
+     * Note that this method returns a {@link Unmodifiable} set as the list
+     * should not be edited here.
+     * To grant or revoke privileges the methods {@link #grantPrivilege(PrivilegeEntity...)} or {@link #revokePrivilege(Long...)} can be used.
+     *
+     * @return an unmodifiable list containing all privileges this group has.
+     * @see #grantPrivilege(PrivilegeEntity...)
+     * @see #revokePrivilege(Long...)
+     */
     public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivilegeEntities() {
         return Collections.unmodifiableSet(privileges);
     }
