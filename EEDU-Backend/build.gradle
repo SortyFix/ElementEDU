@@ -37,6 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.jetbrains:annotations:24.0.0'
+    implementation 'io.jsonwebtoken:jjwt:0.12.2'
 
     // Compiled code only
     compileOnly 'org.projectlombok:lombok'

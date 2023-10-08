@@ -1,7 +1,9 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.user.exception.UserEmailOccupiedException;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    @Getter(AccessLevel.PROTECTED)
     private final UserService userService;
 
 
@@ -44,5 +47,10 @@ public class UserController {
             logger.info("The email from the user create request was already taken.");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
+    }
+
+    @RequestMapping("/login") public @NotNull ResponseEntity<@Nullable String> createUser(@NotNull @RequestBody UserLoginRequest userLoginRequest)
+    {
+        return getUserService().login(userLoginRequest).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
     }
 }
