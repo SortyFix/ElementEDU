@@ -9,7 +9,10 @@ name: Build and Test Java Spring Boot Application
 on:
  # Events that will trigger this test
  push:
-  branches: [ "main" ]
+   paths:
+     - ./EEDU-Backend/src/main/java
+     - ./EEDU-Backend/src/test
+   branches: [ "main" ]
  pull_request:
   branches: [ "main" ]
   
