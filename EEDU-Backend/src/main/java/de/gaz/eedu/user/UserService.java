@@ -2,9 +2,8 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.user.encryption.EncryptionService;
 import de.gaz.eedu.user.exception.UserEmailOccupiedException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,10 +17,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.security.SecureRandom;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -43,11 +41,11 @@ import java.util.function.Function;
  * @author ivo
  */
 @Service
-@AllArgsConstructor
+@AllArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class UserService implements EntityService<UserEntity, UserModel>, UserDetailsService {
 
-    @Getter(AccessLevel.PROTECTED)
     private final UserRepository userRepository;
+    private final EncryptionService encryptionService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -83,7 +81,7 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     @Override
     @Contract(pure = true)
     public @NotNull Function<UserModel, UserEntity> toEntity() {
-        return userModel -> new UserEntity(userModel.id(), userModel.firstName(), userModel.lastName(), userModel.loginName(), userModel.email(), passwordEncoder.encode(userModel.password()), userModel.enabled(), userModel.locked(), userModel.groupEntities());
+        return userModel -> new UserEntity(userModel.id(), userModel.firstName(), userModel.lastName(), userModel.loginName(), userModel.email(), getPasswordEncoder().encode(userModel.password()), userModel.enabled(), userModel.locked(), userModel.groupEntities());
     }
 
     @Override
@@ -102,24 +100,16 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     {
         return loadEntityByName(userLoginRequest.loginName()).map(user ->
         {
-            if(passwordEncoder.matches(userLoginRequest.password(), user.getPassword()))
+            if (getPasswordEncoder().matches(userLoginRequest.password(), user.getPassword()))
             {
-                Key key = Keys.hmacShaKeyFor(generateSecret());
-                return Jwts.builder().subject(user.getLoginName())
-                        .issuedAt(new Date())
-                        .signWith(key).compact();
+                Map<String, String> data = new HashMap<>();
+                data.put("login_name", userLoginRequest.loginName());
+                return getEncryptionService().generateKey(userLoginRequest.loginName(), data);
             }
             return null; // Optional empty as password does not match.
         });
     }
 
-    private byte @NotNull [] generateSecret()
-    {
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] key = new byte[32];
-        secureRandom.nextBytes(key);
-        return key;
-    }
 
     /**
      * Deletes a {@link UserEntity} from the {@link #userRepository}.
