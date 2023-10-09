@@ -11,15 +11,14 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -46,7 +45,6 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
 
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public @NotNull Optional<UserEntity> loadEntityByID(long id) {
@@ -81,7 +79,7 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     @Override
     @Contract(pure = true)
     public @NotNull Function<UserModel, UserEntity> toEntity() {
-        return userModel -> new UserEntity(userModel.id(), userModel.firstName(), userModel.lastName(), userModel.loginName(), userModel.email(), getPasswordEncoder().encode(userModel.password()), userModel.enabled(), userModel.locked(), userModel.groupEntities());
+        return userModel -> new UserEntity(userModel.id(), userModel.firstName(), userModel.lastName(), userModel.loginName(), userModel.email(), getEncryptionService().getEncoder().encode(userModel.password()), userModel.enabled(), userModel.locked(), userModel.groupEntities());
     }
 
     @Override
@@ -100,14 +98,17 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     {
         return loadEntityByName(userLoginRequest.loginName()).map(user ->
         {
-            if (getPasswordEncoder().matches(userLoginRequest.password(), user.getPassword()))
+            if (getEncryptionService().getEncoder().matches(userLoginRequest.password(), user.getPassword()))
             {
-                Map<String, String> data = new HashMap<>();
-                data.put("login_name", userLoginRequest.loginName());
-                return getEncryptionService().generateKey(userLoginRequest.loginName(), data);
+                return getEncryptionService().generateKey(String.valueOf(user.getId()));
             }
             return null; // Optional empty as password does not match.
         });
+    }
+
+    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
+    {
+        return getEncryptionService().validate(token, (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
     }
 
 

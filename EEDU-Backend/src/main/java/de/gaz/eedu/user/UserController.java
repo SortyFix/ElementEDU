@@ -1,6 +1,7 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.user.exception.UserEmailOccupiedException;
+import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +41,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @RequestMapping("/create") public @NotNull ResponseEntity<@Nullable UserModel> createUser(@NotNull @RequestBody UserModel userModel)
+    @PreAuthorize("hasAuthority('ADMIN')") @RequestMapping("/create") public @NotNull ResponseEntity<@Nullable UserModel> createUser(@NotNull @RequestBody UserModel userModel)
     {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userModel));
@@ -49,7 +51,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/login") public @NotNull ResponseEntity<@Nullable String> createUser(@NotNull @RequestBody UserLoginRequest userLoginRequest)
+    @PermitAll @RequestMapping("/login") public @NotNull ResponseEntity<@Nullable String> createUser(@NotNull @RequestBody UserLoginRequest userLoginRequest)
     {
         return getUserService().login(userLoginRequest).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
     }
