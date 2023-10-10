@@ -44,7 +44,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')") @RequestMapping("/create") public @NotNull ResponseEntity<@Nullable UserModel> createUser(@NotNull @RequestBody UserModel userModel)
     {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(userModel));
+            return ResponseEntity.status(HttpStatus.CREATED).body(getUserService().create(userModel));
         } catch (UserEmailOccupiedException userEmailOccupiedException) {
             logger.info("The email from the user create request was already taken.");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
