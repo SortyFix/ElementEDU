@@ -15,7 +15,19 @@ public interface EntityService<E, M>
 {
 
     @Transactional(Transactional.TxType.SUPPORTS) @NotNull Optional<E> loadEntityByID(long id);
-
+    
+    /**
+     * Loads an {@link E} by a string.
+     * <p>
+     * This method loads an entity by a specific string.
+     * This string must be decided for each service and could variate therefore.
+     * <p>
+     * Note that this method has a Support {@link Transactional} which tells jarkata that this should be called in a
+     * support context.
+     *
+     * @param name of the entity to load.
+     * @return an optional, which is empty if no entity was found.
+     */
     @Transactional(Transactional.TxType.SUPPORTS) @NotNull Optional<E> loadEntityByName(@NotNull String name);
 
     @Transactional(Transactional.TxType.SUPPORTS) @Unmodifiable @NotNull List<E> findAllEntities();
