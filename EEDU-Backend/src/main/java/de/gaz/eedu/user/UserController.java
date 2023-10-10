@@ -51,7 +51,7 @@ public class UserController {
         }
     }
 
-    @PermitAll @RequestMapping("/login") public @NotNull ResponseEntity<@Nullable String> createUser(@NotNull @RequestBody UserLoginRequest userLoginRequest)
+    @PermitAll @RequestMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginRequest userLoginRequest)
     {
         return getUserService().login(userLoginRequest).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
     }
