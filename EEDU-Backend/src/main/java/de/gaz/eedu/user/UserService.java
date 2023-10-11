@@ -3,7 +3,7 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.encryption.EncryptionService;
-import de.gaz.eedu.user.exception.UserEmailOccupiedException;
+import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,8 +40,8 @@ import java.util.function.Function;
  * @author ivo
  */
 @Service
-@AllArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class UserService implements EntityService<UserEntity, UserModel>, UserDetailsService {
+@AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
+{
 
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
@@ -61,14 +61,15 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
         return userRepository.findAll();
     }
 
-    @Override
-    public @NotNull UserEntity createEntity(@NotNull UserModel model) throws CreationException {
-        userRepository.findUserByEmail(model.email()).map(toModel()).ifPresent(occupiedModel ->
+    @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    {
+        getUserRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
         {
-            throw new UserEmailOccupiedException(occupiedModel);
+            throw new LoginNameOccupiedException(occupiedModel);
         });
 
-        return saveEntity(toEntity().apply(model));
+        String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
+        return saveEntity(model.create(hashedPassword));
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
@@ -77,21 +78,30 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     }
 
     @Override
-    @Contract(pure = true)
-    public @NotNull Function<UserModel, UserEntity> toEntity() {
-        return userModel -> new UserEntity(userModel.id(), userModel.firstName(), userModel.lastName(), userModel.loginName(), userModel.email(), getEncryptionService().getEncoder().encode(userModel.password()), userModel.enabled(), userModel.locked(), userModel.groupEntities());
+    @Contract(pure = true) @Transactional(Transactional.TxType.REQUIRED) public @NotNull Function<UserModel, UserEntity> toEntity()
+    {
+        return userModel -> loadEntityByID(userModel.id()).orElseThrow(NullPointerException::new);
     }
 
     @Override
     @Contract(pure = true)
     public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel() {
-        return user -> new UserModel(user.getId(), user.getFirstName(), user.getLastName(), user.getLoginName(), user.getEmail(), null /* safy safy yes yes */, user.isEnabled(), user.isLocked(), user.getGroups());
+        return user -> new UserModel(user.getId(), user.getFirstName(), user.getLastName(), user.getLoginName(), user.isEnabled(), user.isLocked(), user.getGroups());
     }
 
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    @Override public boolean delete(long id)
+    {
+        return getUserRepository().findById(id).map(userEntity ->
+        {
+            getUserRepository().deleteById(id);
+            return true;
+        }).orElse(false);
     }
 
     @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<String> login(@NotNull UserLoginRequest userLoginRequest)
@@ -109,25 +119,5 @@ public class UserService implements EntityService<UserEntity, UserModel>, UserDe
     @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
         return getEncryptionService().validate(token, (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
-    }
-
-
-    /**
-     * Deletes a {@link UserEntity} from the {@link #userRepository}.
-     * <p>
-     * With this method a user can be fully deleted from the system.
-     * Note that this is final and can not be undone. So use with caution (yonas).
-     * <p>
-     * The id can be received using the {@link UserEntity#getId()} or {@link UserModel#id()} method.
-     *
-     * @param id the id of the user to delete.
-     * @return whether a user was found which could be deleted.
-     */
-    @Transactional(Transactional.TxType.REQUIRED)
-    public boolean delete(@NotNull Long id) {
-        return userRepository.findById(id).map(userEntity -> {
-            userRepository.deleteById(id);
-            return true;
-        }).orElse(false);
     }
 }

@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
-public class PrivilegeService implements EntityService<PrivilegeEntity, PrivilegeModel> {
+public class PrivilegeService implements EntityService<PrivilegeEntity, PrivilegeModel, PrivilegeModel> {
 
     @Getter(AccessLevel.PROTECTED) private final PrivilegeRepository privilegeRepository;
 
@@ -44,6 +44,15 @@ public class PrivilegeService implements EntityService<PrivilegeEntity, Privileg
         });
 
         return getPrivilegeRepository().save(toEntity().apply(model));
+    }
+
+    @Override public boolean delete(long id)
+    {
+        return getPrivilegeRepository().findById(id).map(userEntity ->
+        {
+            getPrivilegeRepository().deleteById(id);
+            return true;
+        }).orElse(false);
     }
 
     @Override

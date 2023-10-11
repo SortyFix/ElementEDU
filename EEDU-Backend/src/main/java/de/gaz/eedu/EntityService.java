@@ -11,9 +11,21 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public interface EntityService<E, M>
+public interface EntityService<E, M, C>
 {
 
+    /**
+     * Loads an entity {@link E} by its id.
+     * <p>
+     * This method is an abstract method loading an entity portrayed by the generic type {@link E}.
+     * <p>
+     * Note that this entity can be ported into a {@link M} model using {@link #loadById(long)}.
+     * This {@link M} most likely represents a model of the actual entity which is json friendly.
+     *
+     * @param id of the entity to load.
+     * @return an optional containing the {@link E} object or an empty one.
+     * @see #loadById(long)
+     */
     @Transactional(Transactional.TxType.SUPPORTS) @NotNull Optional<E> loadEntityByID(long id);
     
     /**
@@ -32,7 +44,9 @@ public interface EntityService<E, M>
 
     @Transactional(Transactional.TxType.SUPPORTS) @Unmodifiable @NotNull List<E> findAllEntities();
 
-    @Transactional(Transactional.TxType.REQUIRED) @NotNull E createEntity(@NotNull M model) throws CreationException;
+    @Transactional(Transactional.TxType.REQUIRED) @NotNull E createEntity(@NotNull C model) throws CreationException;
+
+    @Transactional(Transactional.TxType.REQUIRED) boolean delete(long id);
 
     @NotNull E saveEntity(@NotNull E entity);
 
@@ -55,13 +69,13 @@ public interface EntityService<E, M>
         return findAllEntities().stream().map(toModel()).collect(Collectors.toSet());
     }
 
-    @Transactional(Transactional.TxType.REQUIRED) default @NotNull M create(@NotNull M model)
+    @Transactional(Transactional.TxType.REQUIRED) default @NotNull M create(@NotNull C model)
     {
         return toModel().apply(createEntity(model));
     }
 
-    @NotNull @Transactional(Transactional.TxType.REQUIRED) default M save(@NotNull E entiy)
+    @NotNull @Transactional(Transactional.TxType.REQUIRED) default M save(@NotNull E entity)
     {
-        return toModel().apply(saveEntity(entiy));
+        return toModel().apply(saveEntity(entity));
     }
 }

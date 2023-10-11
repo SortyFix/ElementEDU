@@ -1,6 +1,6 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.user.exception.UserEmailOccupiedException;
+import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +56,9 @@ public class UserEntityServiceTest {
      * @see UserService
      */
     @Test public void createUserSuccessTest() {
-        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
-        UserModel userResponse = new UserModel(3L, FIRST_NAME, LAST_NAME, EMAIL, LOGIN_NAME, null, ENABLED, LOCKED, new HashSet<>());
+
+        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, new HashSet<>());
+        UserModel userResponse = new UserModel(3L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
 
         Mockito.when(userService.create(userRequest)).thenReturn(userResponse);
 
@@ -65,14 +66,19 @@ public class UserEntityServiceTest {
         Mockito.verify(userService, Mockito.times(1)).create(userRequest);
 
         Assertions.assertEquals(result, userResponse);
-        Assertions.assertNull(result.password());
+        Assertions.assertEquals(userResponse.id(), result.id());
+        Assertions.assertEquals(userResponse.firstName(), result.firstName());
+        Assertions.assertEquals(userResponse.lastName(), result.lastName());
+        Assertions.assertEquals(userResponse.enabled(), result.enabled());
+        Assertions.assertEquals(userResponse.locked(), result.locked());
+        Assertions.assertEquals(userResponse.groupEntities(), result.groupEntities());
     }
 
     /**
      * Tests if the system rejects users with conflicting emails.
      * <p>
      * This method creates a new {@link UserModel} with an email that is already occupied in the database.
-     * It should throw an {@link UserEmailOccupiedException} therefore. If it doesn't the test fails.
+     * It should throw an {@link LoginNameOccupiedException} therefore. If it doesn't the test fails.
      * <p>
      * This is the direct contrast to the method {@link #createUserSuccessTest()} as it test if the user creation fails under this specific circumstance.
      *
@@ -80,18 +86,18 @@ public class UserEntityServiceTest {
      * @see UserService
      */
     @Test public void createUserEmailOccupied() {
-        UserModel userRequest = new UserModel(null, FIRST_NAME, LAST_NAME, LOGIN_NAME, "max.mustermann@example.com", PASSWORD, ENABLED, LOCKED, new HashSet<>());
+        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, "max.mustermann", PASSWORD, ENABLED, LOCKED, new HashSet<>());
 
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
-        UserModel userResponse = new UserModel(1L, null, null, null, null, null, false, false, null);
+        UserModel userResponse = new UserModel(1L, null, null, null, false, false, null);
 
-        Mockito.when(userService.create(userRequest)).thenThrow(new UserEmailOccupiedException(userResponse));
+        Mockito.when(userService.create(userRequest)).thenThrow(new LoginNameOccupiedException(userResponse));
 
         try {
             userService.create(userRequest);
             Assertions.fail("The email occupied exception has not been thrown.");
-        } catch (UserEmailOccupiedException userEmailOccupiedException) {
-            Assertions.assertEquals(userEmailOccupiedException.getUser(), userResponse);
+        } catch (LoginNameOccupiedException loginNameOccupiedException) {
+            Assertions.assertEquals(loginNameOccupiedException.getUser(), userResponse);
             Mockito.verify(userService, Mockito.times(1)).create(userRequest);
         }
     }
@@ -110,7 +116,6 @@ public class UserEntityServiceTest {
         static final String FIRST_NAME = "John";
         static final String LAST_NAME = "Doe";
         static final String LOGIN_NAME = "john.doe";
-        static final String EMAIL = "john.doe@example.com";
         static final String PASSWORD = "password123";
         static final boolean ENABLED = true;
         static final boolean LOCKED = false;

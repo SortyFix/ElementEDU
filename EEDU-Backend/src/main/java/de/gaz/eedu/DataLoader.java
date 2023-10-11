@@ -1,7 +1,7 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.user.UserCreateModel;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserModel;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupModel;
@@ -38,13 +38,13 @@ public class DataLoader implements CommandLineRunner {
 
     private void createDefaultUser() {
         String randomPassword = randomPassword(10);
-        UserModel userModel = new UserModel(null, "root", "root", "root", "root@email.com", randomPassword, true, false, new HashSet<>());
+        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, new HashSet<>());
         GroupModel groupModel = new GroupModel(null, "admin", new HashSet<>(), new HashSet<>());
         PrivilegeModel privilegeModel = new PrivilegeModel(null, "ADMIN", new HashSet<>());
 
         PrivilegeEntity privilegeEntity = privilegeService.loadEntityByName("ADMIN").orElse(privilegeService.createEntity(privilegeModel));
         GroupEntity groupEntity = groupService.loadEntityByName("admin").orElse(groupService.createEntity(groupModel));
-        UserEntity userEntity = userService.createEntity(userModel);
+        UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(privilegeEntity);
         groupService.saveEntity(groupEntity);

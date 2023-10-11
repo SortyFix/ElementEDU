@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
-public class GroupService implements EntityService<GroupEntity, GroupModel> {
+public class GroupService implements EntityService<GroupEntity, GroupModel, GroupModel> {
 
     @Getter(AccessLevel.PROTECTED)
     private final GroupRepository groupRepository;
@@ -45,6 +45,15 @@ public class GroupService implements EntityService<GroupEntity, GroupModel> {
         });
 
         return getGroupRepository().save(toEntity().apply(model));
+    }
+
+    @Override public boolean delete(long id)
+    {
+        return getGroupRepository().findById(id).map(userEntity ->
+        {
+            getGroupRepository().deleteById(id);
+            return true;
+        }).orElse(false);
     }
 
     @Override

@@ -2,8 +2,6 @@ package de.gaz.eedu.user.encryption;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +15,7 @@ import java.util.Optional;
 
 @Service public class EncryptionService
 {
-    @Getter(AccessLevel.NONE) @Value("${jwt.secret}") private String secret;
+    @Value("${jwt.secret}") private String secret;
 
     public @NotNull String generateKey(@NotNull String subject)
     {

@@ -8,6 +8,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserEmailOccupiedException extends OccupiedException {
+public class LoginNameOccupiedException extends OccupiedException {
     private final UserModel user;
 }

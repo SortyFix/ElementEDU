@@ -37,7 +37,7 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id; // ID is final
-    private String firstName, lastName, loginName, email, password;
+    private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
 
     @SuppressWarnings("JpaDataSourceORMInspection")
@@ -149,7 +149,6 @@ public class UserEntity implements UserDetails {
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", enabled=" + enabled +
                 ", locked=" + locked +
