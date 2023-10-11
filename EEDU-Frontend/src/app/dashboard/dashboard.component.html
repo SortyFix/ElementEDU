@@ -1,0 +1,17 @@
+<div class="grid-container">
+  <h1 class="mat-h1">Dashboard</h1>
+  <mat-grid-list cols="{{ ( cardLayout | async )?.columns }}" rowHeight="350px">
+      <mat-grid-tile rowspan="{{(cardLayout | async)?.stundenplan?.rows}}" colspan="{{(cardLayout | async)?.stundenplan?.cols}}">
+          <app-card title="Stundenplan"></app-card>
+      </mat-grid-tile>
+      <mat-grid-tile rowspan="{{(cardLayout | async)?.klausuren?.rows}}" colspan="{{(cardLayout | async)?.klausuren?.cols}}">
+          <app-klausuren-card title="Klausuren"></app-klausuren-card>
+      </mat-grid-tile>
+      <mat-grid-tile rowspan="{{(cardLayout | async)?.chat?.rows}}" colspan="{{(cardLayout | async)?.chat?.cols}}">
+          <app-chat-card title="Chat"></app-chat-card>
+      </mat-grid-tile>
+      <mat-grid-tile rowspan="{{(cardLayout | async)?.hausaufgaben?.rows}}" colspan="{{(cardLayout | async)?.hausaufgaben?.cols}}">
+          <app-hausaufgaben-card title="Hausaufgaben"></app-hausaufgaben-card>
+      </mat-grid-tile>
+  </mat-grid-list>
+</div>
