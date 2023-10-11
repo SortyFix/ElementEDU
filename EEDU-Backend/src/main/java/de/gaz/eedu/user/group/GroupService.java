@@ -70,7 +70,7 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
     @Override
     @Contract(pure = true)
     public @NotNull Function<GroupEntity, GroupModel> toModel() {
-        return groupEntity -> new GroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getUserEntities(), groupEntity.getPrivilegeEntities());
+        return groupEntity -> new GroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getUserEntities(), groupEntity.getPrivileges());
     }
 
 }

@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.privileges;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.user.group.GroupEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +26,7 @@ public class PrivilegeEntity {
     @Setter(AccessLevel.NONE) // ID is final
     private Long id;
     private String name;
+    @JsonBackReference
     @ManyToMany(mappedBy = "privileges")
     private Set<GroupEntity> groupEntities;
 }

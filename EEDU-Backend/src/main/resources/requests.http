@@ -1,0 +1,27 @@
+###
+GET http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+"loginName": "root",
+"password": "SafePassword123!!."
+}
+
+###
+GET http://localhost:8080/user/me/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3MDU0NTc0fQ.OVYdQByacd8Q-m2SEVoPVQsI908S9zcUgZirdRNAgOA
+
+###
+POST http://localhost:8080/user/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3MDQ4MzQwfQ.wjEHNtzJFVnLaJQ9hsnZmfkDKP3eBwGKqCIixuYvOI8
+
+{
+"firstName": "John",
+"lastName": "Doe",
+"loginName": "hallo",
+"password": "testpass",
+"enabled": true,
+"locked": false,
+"groupEntities": []
+}

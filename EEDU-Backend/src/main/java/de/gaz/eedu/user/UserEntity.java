@@ -1,5 +1,6 @@
 package de.gaz.eedu.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.user.group.GroupEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -42,6 +43,7 @@ public class UserEntity implements UserDetails {
 
     @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
+    @JsonManagedReference
     @Setter(AccessLevel.PRIVATE)
     @JoinTable(name = "user_groups",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
@@ -50,7 +52,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Set<? extends GrantedAuthority> getAuthorities() {
-        return groups.stream().flatMap(groupEntity -> groupEntity.getPrivilegeEntities().stream().map(privilege -> new SimpleGrantedAuthority(privilege.getName()))).collect(Collectors.toSet());
+        return groups.stream().flatMap(groupEntity -> groupEntity.getPrivileges().stream().map(privilege -> new SimpleGrantedAuthority(privilege.getName()))).collect(Collectors.toSet());
     }
 
     @Override

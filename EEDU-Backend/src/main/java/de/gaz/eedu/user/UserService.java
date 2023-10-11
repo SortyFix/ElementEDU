@@ -4,6 +4,10 @@ import de.gaz.eedu.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.encryption.EncryptionService;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.exception.InsecurePasswordException;
+import de.gaz.eedu.user.model.UserCreateModel;
+import de.gaz.eedu.user.model.UserLoginModel;
+import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -68,6 +72,12 @@ import java.util.function.Function;
             throw new LoginNameOccupiedException(occupiedModel);
         });
 
+        String password = model.password();
+        if(!password.matches("^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
+        {
+            throw new InsecurePasswordException();
+        }
+
         String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
         return saveEntity(model.create(hashedPassword));
     }
@@ -104,11 +114,11 @@ import java.util.function.Function;
         }).orElse(false);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<String> login(@NotNull UserLoginRequest userLoginRequest)
+    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<String> login(@NotNull UserLoginModel userLoginModel)
     {
-        return loadEntityByName(userLoginRequest.loginName()).map(user ->
+        return loadEntityByName(userLoginModel.loginName()).map(user ->
         {
-            if (getEncryptionService().getEncoder().matches(userLoginRequest.password(), user.getPassword()))
+            if (getEncryptionService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
             {
                 return getEncryptionService().generateKey(String.valueOf(user.getId()));
             }

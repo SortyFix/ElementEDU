@@ -1,6 +1,6 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.user.UserCreateModel;
+import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
@@ -17,7 +17,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.UUID;
 
 @Component
 @AllArgsConstructor
@@ -58,6 +57,6 @@ public class DataLoader implements CommandLineRunner {
     //TODO maybe better
     private @NotNull String randomPassword(@SuppressWarnings("SameParameterValue") int length)
     {
-        return UUID.randomUUID().toString().replace("-", "");
+        return "SafePassword123!!.";
     }
 }

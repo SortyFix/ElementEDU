@@ -1,6 +1,9 @@
 package de.gaz.eedu.user;
 
+import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.model.UserCreateModel;
+import de.gaz.eedu.user.model.UserModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,6 +105,14 @@ public class UserEntityServiceTest {
         }
     }
 
+    @Test public void createUserInsecurePassword() {
+        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, "password", ENABLED, LOCKED, new HashSet<>());
+
+        Mockito.when(userService.create(userRequest)).thenThrow(new InsecurePasswordException());
+        Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(userRequest));
+        Mockito.verify(userService, Mockito.times(1)).create(userRequest);
+    }
+
     /**
      * Provides test data that is required to use {@link #createUserSuccessTest()} and {@link #createUserEmailOccupied()}
      * <p>
@@ -116,7 +127,7 @@ public class UserEntityServiceTest {
         static final String FIRST_NAME = "John";
         static final String LAST_NAME = "Doe";
         static final String LOGIN_NAME = "john.doe";
-        static final String PASSWORD = "password123";
+        static final String PASSWORD = "Password123!";
         static final boolean ENABLED = true;
         static final boolean LOCKED = false;
     }

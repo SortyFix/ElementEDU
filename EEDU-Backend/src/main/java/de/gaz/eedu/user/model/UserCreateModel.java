@@ -1,5 +1,7 @@
-package de.gaz.eedu.user;
+package de.gaz.eedu.user.model;
 
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;

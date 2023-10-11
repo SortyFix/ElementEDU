@@ -1,7 +1,7 @@
 package de.gaz.eedu.user.exception;
 
 import de.gaz.eedu.exception.OccupiedException;
-import de.gaz.eedu.user.UserModel;
+import de.gaz.eedu.user.model.UserModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,6 +1,8 @@
 package de.gaz.eedu.user.group;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import jakarta.persistence.Entity;
@@ -47,9 +49,11 @@ public class GroupEntity {
     private Long id;
     private String name;
     @ManyToMany
+    @JsonBackReference
     private Set<UserEntity> userEntities;
     @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
+    @JsonManagedReference
     @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
     private Set<PrivilegeEntity> privileges;
 
@@ -59,13 +63,13 @@ public class GroupEntity {
      * This method can add multiple privileges to this group and therefore to all users being part of this group.
      * This uses an {@link Set#addAll(Collection)} and ignores privileges already added.
      * <p>
-     * Note that this method accesses the {@code privilegeEntities} set directly as the getter {@link #getPrivilegeEntities()}
+     * Note that this method accesses the {@code privilegeEntities} set directly as the getter {@link #getPrivileges()}
      * returns a {@link Unmodifiable} set.
      *
      * @param privilegeEntity which should be added to this method.
      * @return whether a {@link PrivilegeEntity} has been added to this method.
      * @see #revokePrivilege(Long...)
-     * @see #getPrivilegeEntities()
+     * @see #getPrivileges()
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity) {
         // Filter already granted privileges out
@@ -79,12 +83,12 @@ public class GroupEntity {
      * This method removes privileges from this group and therefore from all users having this group.
      * This uses the {@link Set#removeIf(Predicate)} method which gets rid of duplicated entries if there was some kind of error.
      * <p>
-     * Note that this method accesses the {@code privilegeEntities} set directly as the getter {@link #getPrivilegeEntities()} returns a {@link Unmodifiable} set.
+     * Note that this method accesses the {@code privilegeEntities} set directly as the getter {@link #getPrivileges()} returns a {@link Unmodifiable} set.
      *
      * @param id of the {@link PrivilegeEntity} to remove from this group.
      * @return whether a privilege has been revoked from this group.
      * @see #grantPrivilege(PrivilegeEntity...)
-     * @see #getPrivilegeEntities()
+     * @see #getPrivileges()
      */
     public boolean revokePrivilege(@NotNull Long... id) {
         Collection<Long> revokeIds = Arrays.asList(id);
@@ -105,7 +109,7 @@ public class GroupEntity {
      * @see #grantPrivilege(PrivilegeEntity...)
      * @see #revokePrivilege(Long...)
      */
-    public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivilegeEntities() {
+    public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges() {
         return Collections.unmodifiableSet(privileges);
     }
 }
