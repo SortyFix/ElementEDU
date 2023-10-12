@@ -1,4 +1,5 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-head-bar',
@@ -10,20 +11,14 @@ export class HeadBarComponent {
     today: Date = new Date();
     minutes: string = '';
 
-    constructor(private cdr: ChangeDetectorRef) {
+    constructor(private cdr: ChangeDetectorRef, private router: Router) {
         setInterval(() => {
+            // Show date on header
             this.today = new Date();
             this.time = parseNumber(this.today.getDate()) + "."
                 + parseNumber(this.today.getMonth() + 1) + "."
                 + parseNumber(this.today.getFullYear());
-            /*      // // Append a "0" if the minute counter is smaller than 10, stylistic reasoning.
-                  // if(this.today.getMinutes() < 10){
-                  //   this.minutes = "0" + this.today.getMinutes();
-                  // }
-                  // else{
-                  //   this.minutes = '' + this.today.getMinutes();
-                  // }
-                  // this.time = this.today.getHours() + ":" + this.minutes;*/
+            // Ensure date update
             this.cdr.detectChanges();
         }, 1000);
 
@@ -33,6 +28,8 @@ export class HeadBarComponent {
             }
             return date;
         }
-
+    }
+    switchPage(){
+        this.router.navigate(["/user-login"]).then(success => console.log('Successfully switched page.'));
     }
 }
