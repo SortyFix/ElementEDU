@@ -8,10 +8,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class GroupServiceMockitoTest
 {
     private GroupService groupService;

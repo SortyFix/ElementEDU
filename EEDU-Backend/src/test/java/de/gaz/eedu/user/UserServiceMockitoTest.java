@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 
@@ -26,6 +27,7 @@ import static de.gaz.eedu.user.UserTestData.*;
  * @see UserServiceTest
  */
 @SpringBootTest
+@ActiveProfiles("test")
 public class UserServiceMockitoTest
 {
     private UserService userService;
