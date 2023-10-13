@@ -2,8 +2,11 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static de.gaz.eedu.user.UserTestData.*;
 
@@ -46,10 +50,12 @@ import static de.gaz.eedu.user.UserTestData.*;
 public class UserServiceTest
 {
     private final UserService userService;
+    private final GroupService groupService;
 
-    public UserServiceTest(@Autowired UserService userService)
+    public UserServiceTest(@Autowired UserService userService, @Autowired GroupService groupService)
     {
         this.userService = userService;
+        this.groupService = groupService;
     }
 
     /**
@@ -130,6 +136,42 @@ public class UserServiceTest
                     new HashSet<>());
             Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(createModel));
         }
+    }
+
+    /**
+     * This method handles the test case scenarios for adding a user to a group.
+     * <p>
+     * This method aims at verifying the process of adding a user to a specific group. It checks the case for the user
+     * with userID 3 and 1. The user with userID 3 is expected to successfully get added to the group where as the userID 1
+     * is anticipated to fail. The users are present as declared in the data.sql file.
+     * <p>
+     * The {@link ParameterizedTest} with a custom name provides better distinction when a test fails as it looks like
+     * the following in the logs:
+     * <p>
+     *     0 => request=3   PASSED<br>
+     *     1 => request=1   PASSED (expected)
+     * </p>
+     * With this test format, identifying which specific test failed becomes simpler.
+     * <p>
+     * The {@link ValueSource} annotation is used to provide the input values for the tests, the userIDs in this case.
+     * The {@link Transactional} annotation is used for setting the transaction management to be used for the test cases,
+     * specifically, it sets the value to REQUIRES_NEW which means a new transaction would be initiated for every test case.
+     *
+     * @param userID the current user id that should be tested for the group addition. These can be modified inside the {@link ValueSource} annotation.
+     */
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 1}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserAddGroup(long userID)
+    {
+        boolean expect = userID == 3;
+
+        Optional<GroupEntity> request = groupService.loadEntityByID(1);
+        Assertions.assertTrue(request.isPresent(), "Group 1 does not exist.");
+
+        Optional<UserEntity> userEntity = userService.loadEntityByID(userID);
+        Assertions.assertTrue(userEntity.isPresent(), "User 3 does not exist.");
+
+        boolean result = userEntity.get().attachGroups(request.get());
+
+        Assertions.assertEquals(expect, result);
     }
 
     /**
