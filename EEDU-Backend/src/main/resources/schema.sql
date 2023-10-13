@@ -14,7 +14,7 @@ CREATE TABLE user_entity
 -- This table stores information about different groups
 CREATE TABLE group_entity
 (
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255)
 );
 

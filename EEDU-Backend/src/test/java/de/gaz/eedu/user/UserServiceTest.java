@@ -5,17 +5,18 @@ import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import static de.gaz.eedu.user.UserServiceTest.UserTestData.*;
+import static de.gaz.eedu.user.UserTestData.*;
 
 /**
  * Test for the {@link UserService}
@@ -29,28 +30,26 @@ import static de.gaz.eedu.user.UserServiceTest.UserTestData.*;
  * The annotation {@link ActiveProfiles} sets the current profile to {@code "test"} which tells
  * Spring Boot to use the {@code application-test.properties} files instead of the {@code application.properties} file.
  * This is necessary as the test properties override the settings for the database to use an H2 database instead, which is deleted after the test have been finished.
+ * <p>
+ * The {@link TestInstance} annotation uses the Lifecycle {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS}.
+ * This tells JUnit to create one instance of this class and reuse it for every method it contains. As a result, the {@link UserService} instance does not need to be recreated for each test method.
+ * <p>
+ * This class handles method testing with the aim to verify if the code still works as expected.
+ * {@link UserServiceMockitoTest} performs unit testing to verify the correct functionality flow within the {@link UserService}.
  *
  * @author ivo
+ * @see UserServiceMockitoTest
  */
 @SpringBootTest
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserServiceTest
 {
+    private final UserService userService;
 
-    private UserService userService;
-
-    /**
-     * Assigns an object to the {@link UserService} class.
-     * <p>
-     * This method is called before each test is executed and assigns the {@code userService} variable
-     * a value. This is necessary to test each userService function provided.
-     *
-     * @see Mockito#mock(Class)
-     * @see #userService
-     */
-    @BeforeEach public void initMock()
+    public UserServiceTest(@Autowired UserService userService)
     {
-        userService = Mockito.mock(UserService.class);
+        this.userService = userService;
     }
 
     /**
@@ -61,25 +60,20 @@ public class UserServiceTest
      *
      * @see UserService
      */
-    @Test public void createUserSuccessTest() {
+    @Test public void testCreateUserSuccessTest() {
 
-        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, new HashSet<>());
-        UserModel userResponse = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
+        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, new HashSet<>());
+        UserModel expected = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
 
+        UserModel result = userService.create(request);
 
-        Mockito.when(userService.create(userRequest)).thenReturn(userResponse);
-
-        UserModel result = userService.create(userRequest);
-        Mockito.verify(userService, Mockito.times(1)).create(userRequest);
-        LoggerFactory.getLogger(UserServiceTest.class).error(userService.findAll().stream().map(p -> p.toString() + ", ").collect(Collectors.toSet()).toString());
-
-        Assertions.assertEquals(result, userResponse);
-        Assertions.assertEquals(userResponse.id(), result.id());
-        Assertions.assertEquals(userResponse.firstName(), result.firstName());
-        Assertions.assertEquals(userResponse.lastName(), result.lastName());
-        Assertions.assertEquals(userResponse.enabled(), result.enabled());
-        Assertions.assertEquals(userResponse.locked(), result.locked());
-        Assertions.assertEquals(userResponse.groupEntities(), result.groupEntities());
+        Assertions.assertEquals(result, expected);
+        Assertions.assertEquals(expected.id(), result.id());
+        Assertions.assertEquals(expected.firstName(), result.firstName());
+        Assertions.assertEquals(expected.lastName(), result.lastName());
+        Assertions.assertEquals(expected.enabled(), result.enabled());
+        Assertions.assertEquals(expected.locked(), result.locked());
+        Assertions.assertEquals(expected.groupEntities(), result.groupEntities());
     }
 
     /**
@@ -88,52 +82,79 @@ public class UserServiceTest
      * This method creates a new {@link UserModel} with an email that is already occupied in the database.
      * It should throw an {@link LoginNameOccupiedException} therefore. If it doesn't the test fails.
      * <p>
-     * This is the direct contrast to the method {@link #createUserSuccessTest()} as it test if the user creation fails under this specific circumstance.
+     * This is the direct contrast to the method {@link #testCreateUserSuccessTest()} as it test if the user creation fails under this specific circumstance.
      *
-     * @see #createUserSuccessTest()
+     * @see #testCreateUserSuccessTest()
      * @see UserService
      */
-    @Test public void createUserLoginNameOccupied() {
-        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, "max.mustermann", PASSWORD, ENABLED, LOCKED, new HashSet<>());
-
+    @Test public void testCreateUserLoginNameOccupied() {
+        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, "max.mustermann", PASSWORD, ENABLED, LOCKED, new HashSet<>());
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
-        UserModel userResponse = new UserModel(1L, null, null, null, false, false, null);
-
-        Mockito.when(userService.create(userRequest)).thenThrow(new LoginNameOccupiedException(userResponse));
+        UserModel expected = new UserModel(1L, null, null, null, false, false, null);
 
         try {
-            userService.create(userRequest);
+            userService.create(request);
             Assertions.fail("The login name occupied exception has not been thrown.");
         } catch (LoginNameOccupiedException loginNameOccupiedException) {
-            Assertions.assertEquals(loginNameOccupiedException.getUser(), userResponse);
-            Mockito.verify(userService, Mockito.times(1)).create(userRequest);
+            Assertions.assertEquals(expected, loginNameOccupiedException.getUser());
         }
     }
 
-    @Test public void createUserInsecurePassword() {
-        UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, "password", ENABLED, LOCKED, new HashSet<>());
+    /**
+     * Test insecure password security.
+     * <p>
+     * This method tests if the {@link InsecurePasswordException} is thrown when the given password is too weak.
+     * Below are some passwords and their reasons why they should fail.
+     * <p>
+     * A secure password must contain at least one lowercase, one uppercase, one number, one special character, and it must be 6 characters long at least.
+     * Otherwise, the password will cause a {@link InsecurePasswordException} as mentioned above.
+     */
+    @Test public void testCreateUserInsecurePassword() {
 
-        Mockito.when(userService.create(userRequest)).thenThrow(new InsecurePasswordException());
-        Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(userRequest));
-        Mockito.verify(userService, Mockito.times(1)).create(userRequest);
+        for(String password : List.of(
+                "password", // no numbers + no uppercase + no special character
+                "Password123", // no special character
+                "password!", // no numbers + no uppercase
+                "password123!", // no uppercase
+                "PASSWORD123!", // no lowercase
+                "Pa1!!" // to short
+        ))
+        {
+            UserCreateModel createModel = new UserCreateModel(
+                    FIRST_NAME,
+                    LAST_NAME,
+                    LOGIN_NAME, // attach $ as the test already created $LOGIN_NAME. Otherwise, a LoginNameOccupied Exception would be thrown.
+                    password,
+                    ENABLED,
+                    LOCKED,
+                    new HashSet<>());
+            Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(createModel));
+        }
     }
 
     /**
-     * Provides test data that is required to use {@link #createUserSuccessTest()} and {@link #createUserLoginNameOccupied()}
+     * This method tests whether deleting a user works.
      * <p>
-     * This intern class provides some final values that are required to test the {@link UserService}.
-     * Note that these values are final and can be used differently from test to test.
-     * They just act as a general guideline to not have to write the same things over and over.
+     * This method verifies that deleting works as it should. It first tests deleting the user with the ID 1 which should be present
+     * as is declared in the data.sql. Then it tries deleting a user with the id 20 which should not exist.
+     * <p>
+     * The name in the {@link ParameterizedTest} provides better separation when a test fails as it looks like the following in the logs:
+     * <p>
+     *     0 => request=1   PASSED<br>
+     *     1 => request=20  PASSED
+     * </p>
+     * <p>
+     * Therefore, knowing what exactly failed gets easier.
+     * The {@link ValueSource} annotation provides the test values.
      *
-     * @author ivo
+     * @param request the current user id that should be deleted. These can be changed inside the {@link ValueSource} annotation.
      */
-    static final class UserTestData
+    @ParameterizedTest(name = "{index} => request={0}")
+    @ValueSource(longs = {1L, 20L})
+    public void testUserDelete(long request)
     {
-        static final String FIRST_NAME = "John";
-        static final String LAST_NAME = "Doe";
-        static final String LOGIN_NAME = "john.doe";
-        static final String PASSWORD = "Password123!";
-        static final boolean ENABLED = true;
-        static final boolean LOCKED = false;
+        boolean expected = request == 1;
+        boolean result = userService.delete(request);
+        Assertions.assertEquals(expected, result);
     }
 }
