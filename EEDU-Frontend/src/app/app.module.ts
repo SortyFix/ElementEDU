@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {HeadBarComponent} from './head-bar/head-bar.component';
@@ -16,6 +15,9 @@ import { CardComponent } from './card/card.component';
 import { KlausurenCardComponent } from './klausuren-card/klausuren-card.component';
 import { ChatCardComponent } from './chat-card/chat-card.component';
 import { HausaufgabenCardComponent } from './hausaufgaben-card/hausaufgaben-card.component';
+import { LoginPageComponent } from './login-page/login-page.component';
+import { HomePageComponent } from './home-page/home-page.component';
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
     declarations: [
@@ -26,7 +28,9 @@ import { HausaufgabenCardComponent } from './hausaufgaben-card/hausaufgaben-card
         CardComponent,
         KlausurenCardComponent,
         ChatCardComponent,
-        HausaufgabenCardComponent
+        HausaufgabenCardComponent,
+        LoginPageComponent,
+        HomePageComponent
     ],
     imports: [
         BrowserModule,
@@ -36,6 +40,7 @@ import { HausaufgabenCardComponent } from './hausaufgaben-card/hausaufgaben-card
         MatCardModule,
         MatMenuModule,
         MatIconModule,
+        HttpClientModule,
         MatButtonModule
     ],
     providers: [],
