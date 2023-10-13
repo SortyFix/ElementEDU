@@ -123,7 +123,7 @@ public class UserServiceTest
             UserCreateModel createModel = new UserCreateModel(
                     FIRST_NAME,
                     LAST_NAME,
-                    LOGIN_NAME, // attach $ as the test already created $LOGIN_NAME. Otherwise, a LoginNameOccupied Exception would be thrown.
+                    LOGIN_NAME + "$", // attach $ as the test already created $LOGIN_NAME. Otherwise, a LoginNameOccupied Exception would be thrown.
                     password,
                     ENABLED,
                     LOCKED,
