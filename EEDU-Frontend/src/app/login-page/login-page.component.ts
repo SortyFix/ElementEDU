@@ -11,6 +11,7 @@ export class LoginPageComponent {
     login(){
         const username = ((document.getElementById('username') as HTMLInputElement).value);
         const password = ((document.getElementById('password') as HTMLInputElement).value);
+
         if(!username || username == "" || !password || password == ""){
             console.log("No valid username given.");
             return;
