@@ -73,7 +73,7 @@ import java.util.function.Function;
         });
 
         String password = model.password();
-        if(!password.matches("^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
+        if(!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
         {
             throw new InsecurePasswordException();
         }
