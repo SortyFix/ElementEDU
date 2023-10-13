@@ -13,8 +13,10 @@ export class DashboardComponent {
         // If device is in portrait mode
         if (matches) {
             return {
+                marginTop: "margintop-mobile",
                 columns: 2,
-                stundenplan: { cols: 2, rows: 2 },
+                rowHeight: "300px",
+                stundenplan: { cols: 2, rows: 1 },
                 klausuren: { cols: 1, rows: 1 },
                 hausaufgaben: { cols: 1, rows: 1 },
                 chat: { cols: 0, rows: 0 }
@@ -22,7 +24,9 @@ export class DashboardComponent {
         }
         // If device is in landscape mode
         return{
+            marginTop: "margintop-desktop",
             columns: 2,
+            rowHeight: "350px",
             klausuren: { cols: 1, rows: 1 },
             stundenplan: { cols: 1, rows: 2 },
             hausaufgaben: { cols: 1, rows: 1 },
