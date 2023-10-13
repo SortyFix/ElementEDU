@@ -1,13 +1,13 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.user.group.GroupCreateModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.GroupModel;
 import de.gaz.eedu.user.group.GroupService;
+import de.gaz.eedu.user.privileges.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeModel;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -35,14 +35,26 @@ public class DataLoader implements CommandLineRunner {
         }
     }
 
+    /**
+     * Creates a default user.
+     * <p>
+     * This method creates a default user which is named root.
+     * This user can be accessed after a first time run and should provide
+     * a direct entrance into the system.
+     * <p>
+     * It creates the following objects: A user named root, a group named admin and a privilege named ADMIN.
+     * This {@link PrivilegeEntity} can then be added to the {@link GroupEntity}. Then the {@link UserEntity} is attached to the admin group.
+     * <p>
+     * TODO implement two factor, so this account can be secured right after it gets accessed
+     */
     private void createDefaultUser() {
         String randomPassword = randomPassword(10);
         UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, new HashSet<>());
-        GroupModel groupModel = new GroupModel(null, "admin", new HashSet<>(), new HashSet<>());
-        PrivilegeModel privilegeModel = new PrivilegeModel(null, "ADMIN", new HashSet<>());
+        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
+        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 
-        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByName("ADMIN").orElse(privilegeService.createEntity(privilegeModel));
-        GroupEntity groupEntity = groupService.loadEntityByName("admin").orElse(groupService.createEntity(groupModel));
+        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByName("ADMIN").orElse(privilegeService.createEntity(privilegeCreateModel));
+        GroupEntity groupEntity = groupService.loadEntityByName("admin").orElse(groupService.createEntity(groupCreateModel));
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(privilegeEntity);

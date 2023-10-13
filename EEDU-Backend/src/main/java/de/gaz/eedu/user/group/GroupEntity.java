@@ -11,9 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -40,17 +42,19 @@ import java.util.stream.Collectors;
  */
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupEntity {
 
     @Id
     @GeneratedValue
+    @Setter(AccessLevel.NONE)
     private Long id;
     private String name;
-    @ManyToMany
+    @ManyToMany(mappedBy = "groups")
     @JsonBackReference
-    private Set<UserEntity> userEntities;
+    private Set<UserEntity> users;
     @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
     @JsonManagedReference

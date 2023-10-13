@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
-public class GroupService implements EntityService<GroupEntity, GroupModel, GroupModel> {
+public class GroupService implements EntityService<GroupEntity, GroupModel, GroupCreateModel> {
 
     @Getter(AccessLevel.PROTECTED)
     private final GroupRepository groupRepository;
@@ -38,13 +38,13 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
     }
 
     @Override
-    public @NotNull GroupEntity createEntity(@NotNull GroupModel model) throws CreationException {
-        getGroupRepository().findByName(model.name()).map(toModel()).ifPresent(occupiedModel ->
+    public @NotNull GroupEntity createEntity(@NotNull GroupCreateModel createModel) throws CreationException {
+        getGroupRepository().findByName(createModel.name()).map(toModel()).ifPresent(occupiedModel ->
         {
             throw new NameOccupiedException(occupiedModel.name());
         });
 
-        return getGroupRepository().save(toEntity().apply(model));
+        return getGroupRepository().save(createModel.toEntity());
     }
 
     @Override public boolean delete(long id)
@@ -70,7 +70,7 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
     @Override
     @Contract(pure = true)
     public @NotNull Function<GroupEntity, GroupModel> toModel() {
-        return groupEntity -> new GroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getUserEntities(), groupEntity.getPrivileges());
+        return groupEntity -> new GroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getUsers(), groupEntity.getPrivileges());
     }
 
 }

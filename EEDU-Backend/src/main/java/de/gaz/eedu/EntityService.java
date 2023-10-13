@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+//Entity, Model, Create Model
 public interface EntityService<E, M, C>
 {
 

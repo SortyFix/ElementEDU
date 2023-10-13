@@ -9,6 +9,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
-public class PrivilegeService implements EntityService<PrivilegeEntity, PrivilegeModel, PrivilegeModel> {
+public class PrivilegeService implements EntityService<PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel> {
 
     @Getter(AccessLevel.PROTECTED) private final PrivilegeRepository privilegeRepository;
 
@@ -37,13 +39,13 @@ public class PrivilegeService implements EntityService<PrivilegeEntity, Privileg
     }
 
     @Override
-    public @NotNull PrivilegeEntity createEntity(@NotNull PrivilegeModel model) throws CreationException {
-        getPrivilegeRepository().findByName(model.name()).map(toModel()).ifPresent(occupiedName ->
+    public @NotNull PrivilegeEntity createEntity(@NotNull PrivilegeCreateModel privilegeCreateModel) throws CreationException {
+        getPrivilegeRepository().findByName(privilegeCreateModel.name()).ifPresent(occupiedName ->
         {
-            throw new NameOccupiedException(occupiedName.name());
+            throw new NameOccupiedException(occupiedName.getName());
         });
 
-        return getPrivilegeRepository().save(toEntity().apply(model));
+        return getPrivilegeRepository().save(privilegeCreateModel.toEntity());
     }
 
     @Override public boolean delete(long id)

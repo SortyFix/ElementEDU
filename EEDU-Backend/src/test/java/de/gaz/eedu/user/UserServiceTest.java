@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
-import static de.gaz.eedu.user.UserEntityServiceTest.UserTestData.*;
+import static de.gaz.eedu.user.UserServiceTest.UserTestData.*;
 
 /**
  * Test for the {@link UserService}
@@ -32,7 +34,8 @@ import static de.gaz.eedu.user.UserEntityServiceTest.UserTestData.*;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public class UserEntityServiceTest {
+public class UserServiceTest
+{
 
     private UserService userService;
 
@@ -61,12 +64,14 @@ public class UserEntityServiceTest {
     @Test public void createUserSuccessTest() {
 
         UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, new HashSet<>());
-        UserModel userResponse = new UserModel(3L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
+        UserModel userResponse = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
+
 
         Mockito.when(userService.create(userRequest)).thenReturn(userResponse);
 
         UserModel result = userService.create(userRequest);
         Mockito.verify(userService, Mockito.times(1)).create(userRequest);
+        LoggerFactory.getLogger(UserServiceTest.class).error(userService.findAll().stream().map(p -> p.toString() + ", ").collect(Collectors.toSet()).toString());
 
         Assertions.assertEquals(result, userResponse);
         Assertions.assertEquals(userResponse.id(), result.id());
@@ -88,7 +93,7 @@ public class UserEntityServiceTest {
      * @see #createUserSuccessTest()
      * @see UserService
      */
-    @Test public void createUserEmailOccupied() {
+    @Test public void createUserLoginNameOccupied() {
         UserCreateModel userRequest = new UserCreateModel(FIRST_NAME, LAST_NAME, "max.mustermann", PASSWORD, ENABLED, LOCKED, new HashSet<>());
 
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
@@ -98,7 +103,7 @@ public class UserEntityServiceTest {
 
         try {
             userService.create(userRequest);
-            Assertions.fail("The email occupied exception has not been thrown.");
+            Assertions.fail("The login name occupied exception has not been thrown.");
         } catch (LoginNameOccupiedException loginNameOccupiedException) {
             Assertions.assertEquals(loginNameOccupiedException.getUser(), userResponse);
             Mockito.verify(userService, Mockito.times(1)).create(userRequest);
@@ -114,7 +119,7 @@ public class UserEntityServiceTest {
     }
 
     /**
-     * Provides test data that is required to use {@link #createUserSuccessTest()} and {@link #createUserEmailOccupied()}
+     * Provides test data that is required to use {@link #createUserSuccessTest()} and {@link #createUserLoginNameOccupied()}
      * <p>
      * This intern class provides some final values that are required to test the {@link UserService}.
      * Note that these values are final and can be used differently from test to test.
