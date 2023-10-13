@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Table(name = "user_entity")
 public class UserEntity implements UserDetails {
 
     @Id
@@ -41,7 +42,6 @@ public class UserEntity implements UserDetails {
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
 
-    @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
     @JsonManagedReference
     @Setter(AccessLevel.PRIVATE)

@@ -7,10 +7,12 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,17 +47,17 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "group_entity")
 public class GroupEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id;
     private String name;
     @ManyToMany(mappedBy = "groups")
     @JsonBackReference
     private Set<UserEntity> users;
-    @SuppressWarnings("JpaDataSourceORMInspection")
     @ManyToMany
     @JsonManagedReference
     @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
