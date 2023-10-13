@@ -4,6 +4,7 @@ import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
+import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
@@ -97,7 +98,7 @@ public class UserController {
         return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         logger.info("The server has recognized a incoming login request.");
         return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));

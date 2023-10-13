@@ -7,6 +7,7 @@ import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
+import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -114,13 +115,13 @@ import java.util.function.Function;
         }).orElse(false);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<String> login(@NotNull UserLoginModel userLoginModel)
+    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<UserLoginVerificationModel> login(@NotNull UserLoginModel userLoginModel)
     {
         return loadEntityByName(userLoginModel.loginName()).map(user ->
         {
             if (getEncryptionService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
             {
-                return getEncryptionService().generateKey(String.valueOf(user.getId()));
+                return new UserLoginVerificationModel(user.getId(), getEncryptionService().generateKey(String.valueOf(user.getId())));
             }
             return null; // Optional empty as password does not match.
         });
