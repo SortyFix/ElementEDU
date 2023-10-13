@@ -97,7 +97,7 @@ public class UserController {
         return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    @PermitAll @GetMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         logger.info("The server has recognized a incoming login request.");
         return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
