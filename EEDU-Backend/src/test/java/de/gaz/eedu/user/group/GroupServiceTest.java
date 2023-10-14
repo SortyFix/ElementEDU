@@ -107,8 +107,8 @@ import java.util.Optional;
      */
     @Test public void testCreateGroupNameOccupied()
     {
-        GroupCreateModel request = new GroupCreateModel("Admins", new HashSet<>(), new HashSet<>());
-        String expected = "Admins";
+        GroupCreateModel request = new GroupCreateModel("Users", new HashSet<>(), new HashSet<>());
+        String expected = "Users";
 
         try
         {
