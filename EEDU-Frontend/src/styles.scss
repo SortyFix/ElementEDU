@@ -51,10 +51,16 @@ html {
 }
 
 @font-face {
-    font-family: 'YourFontName';
+    font-family: 'FreeSans';
     src: url('assets/fonts/FreeSansBold.otf') format('otf'),
     url('assets/fonts/FreeSansBold.otf') format('otf');
 }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// This class applies styles to make HTML elements unselectable
+.unselectable
+{
+    user-select: none;
+}
