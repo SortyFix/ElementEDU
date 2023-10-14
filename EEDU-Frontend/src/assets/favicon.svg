@@ -8,14 +8,15 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
-   sodipodi:docname="favicon2.svg"
+   sodipodi:docname="EEDU-Text.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      id="namedview1"
-     pagecolor="#000000"
+     pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
@@ -23,38 +24,205 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.2502642"
-     inkscape:cx="256.34582"
-     inkscape:cy="293.53796"
+     inkscape:zoom="0.84474249"
+     inkscape:cx="153.30116"
+     inkscape:cy="280.55887"
      inkscape:window-width="1920"
      inkscape:window-height="1032"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="g12"
+     showgrid="false">
+    <inkscape:grid
+       id="grid12"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+  </sodipodi:namedview>
   <defs
-     id="defs1" />
+     id="defs1">
+    <linearGradient
+       id="linearGradient10"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#002aff;stop-opacity:1;"
+         offset="0"
+         id="stop11" />
+      <stop
+         style="stop-color:#0025e2;stop-opacity:0;"
+         offset="1"
+         id="stop12" />
+    </linearGradient>
+    <linearGradient
+       id="swatch6"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#0025e2;stop-opacity:1;"
+         offset="0"
+         id="stop6" />
+    </linearGradient>
+    <filter
+       id="mask-powermask-path-effect4_inverse"
+       inkscape:label="filtermask-powermask-path-effect4"
+       style="color-interpolation-filters:sRGB"
+       height="100"
+       width="100"
+       x="-50"
+       y="-50">
+      <feColorMatrix
+         id="mask-powermask-path-effect4_primitive1"
+         values="1"
+         type="saturate"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         id="mask-powermask-path-effect4_primitive2"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
+         in="fbSourceGraphic" />
+    </filter>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask6">
+      <rect
+         style="fill:#eeeefa;fill-opacity:1;stroke-width:1.08138"
+         id="rect6"
+         width="503.90704"
+         height="434.52374"
+         x="3"
+         y="53"
+         ry="98.621941" />
+    </mask>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient10"
+       id="linearGradient12"
+       x1="22.819838"
+       y1="248.69112"
+       x2="496.25397"
+       y2="248.69112"
+       gradientUnits="userSpaceOnUse" />
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask15">
+      <path
+         style="display:inline;fill:#eeeefa;fill-opacity:1;stroke:none;stroke-width:5.48783;stroke-dasharray:none;stroke-opacity:1"
+         d="m 107.35492,492.42064 c 0,0 -60.873855,-10.69308 -82.741162,-71.28717 C 2.7464504,360.53938 6.2925002,117.65382 6.2925002,117.65382 L -86.495802,399.23813 0.97342551,500.56775 Z"
+         id="path15" />
+    </mask>
+  </defs>
   <g
-     inkscape:label="Layer 1"
+     inkscape:label="source"
      inkscape:groupmode="layer"
-     id="layer1">
-    <ellipse
-       style="opacity:1;fill:#222d65;fill-opacity:1;stroke:none;stroke-width:2"
-       id="path1"
-       cx="255.14607"
-       cy="255.54599"
-       rx="255.94591"
-       ry="255.54599" />
+     id="layer1"
+     transform="matrix(1.0014606,0,0,1.0014606,1.4508846,13.401856)"
+     style="display:inline">
+    <g
+       id="g6"
+       transform="matrix(1.0087415,0,0,1.17082,-3.7566491,-74.360919)"
+       style="stroke-width:1.00019;stroke-dasharray:none">
+      <rect
+         style="fill:#222d65;fill-opacity:1;stroke-width:1.00019;stroke-dasharray:none"
+         id="rect1-1"
+         width="503.90704"
+         height="434.52374"
+         x="3.745795"
+         y="53.151379"
+         ry="98.621941" />
+      <path
+         style="fill:#000c4e;fill-opacity:1;stroke:none;stroke-width:1.00019;stroke-dasharray:none;stroke-opacity:1"
+         d="m 407.94986,105.1571 c 0,0 105.9029,52.20565 115.59823,236.41701 9.69534,184.21137 -23.86544,204.34783 -23.86544,204.34783 l -286.38528,0.7458 c 0,0 -217.0263452,-109.63187 -190.92352,-284.89369 19.92208,-133.76253 89.4954,-155.87116 89.4954,-155.87116 z"
+         id="path3"
+         sodipodi:nodetypes="csccscc"
+         mask="url(#mask6)" />
+    </g>
     <text
        xml:space="preserve"
-       style="font-size:689.821px;font-family:Monospace;-inkscape-font-specification:Monospace;opacity:1;fill:#eeeefa;fill-opacity:1;stroke:#000000;stroke-width:6;stroke-opacity:1;stroke-dasharray:none"
-       x="22.961655"
-       y="496.75592"
-       id="text1"><tspan
+       style="font-size:509.228px;fill:#4e5784;fill-opacity:1;stroke:#4e5784;stroke-width:6.54721;stroke-dasharray:none;stroke-opacity:1"
+       x="-9.1386452"
+       y="414.42352"
+       id="text1"
+       transform="scale(0.92862823,1.0768572)"><tspan
          sodipodi:role="line"
          id="tspan1"
-         x="22.961655"
-         y="496.75592"
-         style="font-size:689.821px;fill:#eeeefa;fill-opacity:1;stroke-width:6;stroke:#000000;stroke-opacity:1;stroke-dasharray:none">∈</tspan></text>
+         x="-9.1386452"
+         y="414.42352"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:509.228px;font-family:Hack;-inkscape-font-specification:Hack;fill:#4e5784;fill-opacity:1;stroke:#4e5784;stroke-width:6.54721;stroke-dasharray:none;stroke-opacity:1">∈</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:509.228px;fill:#4e5784;fill-opacity:1;stroke:#4e5784;stroke-width:6.54721;stroke-dasharray:none;stroke-opacity:1"
+       x="-559.46631"
+       y="414.42352"
+       id="text1-5"
+       transform="scale(-0.92862823,1.0768572)"><tspan
+         sodipodi:role="line"
+         id="tspan1-0"
+         x="-559.46631"
+         y="414.42352"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:509.228px;font-family:Hack;-inkscape-font-specification:Hack;fill:#4e5784;fill-opacity:1;stroke:#4e5784;stroke-width:6.54721;stroke-dasharray:none;stroke-opacity:1">∈</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:294.868px;line-height:0;font-family:Hack;-inkscape-font-specification:Hack;display:inline;fill:#eeeefa;fill-opacity:1;stroke:none;stroke-width:6.3186;stroke-dasharray:none;stroke-opacity:1"
+       x="255.2151"
+       y="342.57108"
+       id="text6"
+       transform="scale(0.9790892,1.0213574)"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:294.868px;line-height:0px;font-family:Hack;-inkscape-font-specification:Hack;text-align:center;text-anchor:middle;fill:#eeeefa;fill-opacity:1;stroke:none;stroke-width:6.3186;stroke-dasharray:none;stroke-opacity:1"
+         x="255.2151"
+         y="342.57108">EDU</tspan></text>
+  </g>
+  <g
+     inkscape:label="compact"
+     inkscape:groupmode="layer"
+     id="g14"
+     transform="matrix(1.0014606,0,0,1.0014606,1.4508846,13.401856)"
+     style="display:inline">
+    <g
+       id="g12"
+       transform="matrix(1.0133556,0,0,1.1761755,-4.830801,-75.70335)"
+       style="stroke-width:1.00019;stroke-dasharray:none">
+      <rect
+         style="fill:#222d65;fill-opacity:1;stroke-width:1.00019;stroke-dasharray:none"
+         id="rect12"
+         width="503.90704"
+         height="434.52374"
+         x="3.745795"
+         y="53.151379"
+         ry="98.621941" />
+      <path
+         style="fill:#000c4e;fill-opacity:1;stroke:none;stroke-width:1.00019;stroke-dasharray:none;stroke-opacity:1"
+         d="m 390.21961,95.991607 c 0,0 142.54542,25.727563 159.33285,250.165253 13.7642,184.01895 -49.86981,199.76508 -49.86981,199.76508 l -286.38528,0.7458 c 0,0 -212.88928712,-80.60781 -189.150495,-271.65464 C 40.808796,140.92004 111.86925,105.90289 111.86925,105.90289 Z"
+         id="path12"
+         sodipodi:nodetypes="csccscc"
+         mask="url(#mask6)" />
+    </g>
+    <path
+       id="text12"
+       style="font-size:509.228px;fill:#4e5784;fill-opacity:1;stroke:#4e5784;stroke-width:6.54721;stroke-dasharray:none;stroke-opacity:1"
+       d="m 137.01891,38.214198 c -22.47426,0 -43.178608,9.10228 -62.112404,27.309721 C 55.972713,83.552856 40.96367,108.36681 29.880474,139.96207 18.797278,171.37884 13.256318,205.65175 13.256318,242.78064 c 0,36.41489 5.54096,70.32917 16.624156,101.74593 11.083196,31.41676 26.092239,56.2307 45.026032,74.43815 18.933796,18.20744 39.638144,27.30973 62.112404,27.30973 H 251.77512 V 384.69056 H 137.01891 c -12.62253,0 -24.39805,-6.33748 -35.32731,-19.0113 C 90.76234,353.00546 82.679497,337.8337 77.445766,320.16177 72.365967,302.31133 69.21059,286.60356 67.979124,273.03724 H 251.77512 V 211.45141 H 67.979124 c 1.693266,-14.81586 4.309398,-28.38157 7.849862,-40.69837 6.465198,-22.13453 15.087287,-39.44836 25.862614,-51.94367 10.92926,-12.6738 22.70478,-19.011293 35.32731,-19.011293 H 251.77512 V 38.214198 Z m 119.55975,0 v 61.583879 h 114.75816 c 12.62253,0 24.39805,6.337493 35.32731,19.011293 10.77533,12.49531 19.39547,29.80914 25.86066,51.94367 3.54047,12.3168 6.1566,25.88251 7.84987,40.69837 h -183.796 v 61.58583 h 183.796 c -1.23147,13.56632 -4.38685,29.27409 -9.46665,47.12453 -5.23373,17.67193 -13.31462,32.84369 -24.24388,45.51749 -10.92926,12.67382 -22.70478,19.0113 -35.32731,19.0113 H 256.57866 v 61.58389 h 114.75816 c 22.47426,0 43.17666,-9.10229 62.11045,-27.30973 18.9338,-18.20745 33.94284,-43.02139 45.02603,-74.43815 11.0832,-31.41676 16.62611,-65.33104 16.62611,-101.74593 0,-37.12889 -5.54291,-71.4018 -16.62611,-102.81857 C 467.39011,108.36681 452.38107,83.552856 433.44727,65.523919 414.51348,47.316478 393.81108,38.214198 371.33682,38.214198 Z" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:294.868px;line-height:0;font-family:Hack;-inkscape-font-specification:Hack;display:inline;fill:#eeeefa;fill-opacity:1;stroke:none;stroke-width:6.3186;stroke-dasharray:none;stroke-opacity:1"
+       x="255.2151"
+       y="342.57108"
+       id="text14"
+       transform="scale(0.9790892,1.0213574)"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:294.868px;line-height:0px;font-family:Hack;-inkscape-font-specification:Hack;text-align:center;text-anchor:middle;fill:#eeeefa;fill-opacity:1;stroke:none;stroke-width:6.3186;stroke-dasharray:none;stroke-opacity:1"
+         x="255.2151"
+         y="342.57108">EDU</tspan></text>
   </g>
 </svg>
