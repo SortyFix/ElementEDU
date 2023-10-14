@@ -38,18 +38,18 @@ import java.util.Optional;
  */
 @SpringBootTest @ActiveProfiles("test") @TestInstance(TestInstance.Lifecycle.PER_CLASS) public class GroupServiceTest
 {
-
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
 
     /**
-     * Constructor for GroupServiceTest.
+     * This is the main constructor for the GroupServiceTest class.
      * <p>
-     * This constructor uses Spring's {@link Autowired} annotation for dependency injection.
-     * It sets groupService and privilegeService for later use in test methods.
+     * It utilizes Spring's dependency injection capability via the {@link Autowired} annotation to instantiate and set the GroupService and PrivilegeService objects. These service objects are expected to be utilized in various test methods in this class.
+     * <p>
+     * The GroupService object is designed to handle all the operations and business logic associated with groups within the system, such as creating, updating, and deleting groups. The PrivilegeService object, on the other hand, primarily manages functionalities related to the privileges entities within the system, ensuring their proper assignment and revocation among groups.
      *
-     * @param groupService     Service to manage groups.
-     * @param privilegeService Service to manage privileges.
+     * @param groupService     A reference to the GroupService instance in order to perform group related operations.
+     * @param privilegeService A reference to the PrivilegeService instance to manage the allocation of privileges.
      */
     public GroupServiceTest(@Autowired GroupService groupService, @Autowired PrivilegeService privilegeService)
     {
@@ -58,12 +58,21 @@ import java.util.Optional;
     }
 
     /**
-     * This test method verifies that creating a new group works successfully.
+     * This test method is designed to verify the successful creation of a new group within the system.
      * <p>
-     * A GroupCreateModel instance is used to create a new group with the name "Test".
-     * The response of create method from groupService is captured and is expected to return the created group with all attributes as provided in the model.
-     * In the provided data.sql, there are two groups and therefore a new group is expected to have id 3.
-     * Assertion checks are made on all the values returned in the group model.
+     * The mechanism under test involves the use of a {@link GroupCreateModel} to forge a new group with the proposed name "Test".
+     * The execution of the 'create' method within the {@code groupService} is expected to yield the newly formed group, carrying attributes matching those provided in the initiating model.
+     * Considering the pre-set scenario in data.sql, that already includes two groups, the newly added group is anticipated to adopt the id value of 3.
+     * Thus, the test will employ a variety of assertions to examine the integrity of each datum returned in the generated group model.
+     * Each output value is compared to its equivalent in the pre-packaged expected model.
+     * <p>
+     * The verification phase includes assessments on:
+     * - the coherency of the returned group's id to the expected one.
+     * - the coherency of the returned group's name to the expected one.
+     * - the coherency of the returned group user entities collection and the expected entities.
+     * - the coherency of the returned group privilege entities collection and the expected entities.
+     * <p>
+     * The accurate behavior of this operation is critical in preserving the functionality of the group management module, thus, the importance of this test case.
      */
     @Test public void testCreateGroupSuccess()
     {
@@ -79,11 +88,22 @@ import java.util.Optional;
     }
 
     /**
-     * This test method checks if creating a group with a name that's already occupied throws an error.
+     * This method provides a test scenario for assessing the functionality of the system when it comes to creating a new group with a name that is already in use.
      * <p>
-     * A GroupCreateModel with the name "Admins" is used to simulate the creation of a group using a name that already exists in the data.sql.
-     * A try-catch block is used to catch the NameOccupiedException which is expected to be thrown. If it does not get thrown, that indicates a failure of the test and hence, an explicit fail is invoked.
-     * In the catch block, it asserts that the name returned in the exception matches the name that was used on creation.
+     * Specifically, this test aims to verify the system's response when confronted with the creation of a group under the same name as a pre-existing group within the system.
+     * The enforcement of unique names for each group is an essential part of maintaining a reliable and organized system.
+     * <p>
+     * The mechanism under test is a {@link GroupCreateModel} which is structured with the group name set to {@code Admins}.
+     * In the context of this test, such a group is already provided by the data.sql script, assuring that the tested use-case scenario is properly set-up.
+     * Therefore, an exception of type {@link NameOccupiedException} is anticipated and tested in the assertions provided in this method.
+     * The string {@code expected} contains the same value as the name of the attempted duplicate group.
+     * Consequently, the exception is expected to return a name that matches the {@code expected} string.
+     * <p>
+     * If the {@link NameOccupiedException} is not thrown as expected, then the test is marked as a failure. In such a case, an explicit failure message is thrown stating {@code The name occupied exception was not thrown.}.
+     * <p>
+     * This method is a companion to, and should be executed alongside the {@link #testCreateGroupSuccess()} test to ensure comprehensive coverage of group creation scenarios.
+     *
+     * @see #testCreateGroupSuccess()
      */
     @Test public void testCreateGroupNameOccupied()
     {
