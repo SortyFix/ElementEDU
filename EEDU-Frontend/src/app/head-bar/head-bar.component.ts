@@ -9,7 +9,6 @@ import {Router} from "@angular/router";
 export class HeadBarComponent {
     time: string = '';
     today: Date = new Date();
-    minutes: string = '';
 
     constructor(private cdr: ChangeDetectorRef, private router: Router) {
         setInterval(() => {
