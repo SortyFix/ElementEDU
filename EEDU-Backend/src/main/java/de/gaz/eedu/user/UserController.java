@@ -95,11 +95,11 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/me/{id}") public @NotNull ResponseEntity<@Nullable UserModel> getUserData(@NotNull @PathVariable Long id)
     {
-        logger.info("The server has recognized a incoming self receiving data request for user.");
+        logger.info("The server has recognized an incoming self receiving data request for user.");
         return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         logger.info("The server has recognized an incoming login request.");
         return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
