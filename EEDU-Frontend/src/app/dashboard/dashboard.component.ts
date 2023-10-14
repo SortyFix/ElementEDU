@@ -9,7 +9,7 @@ export class DashboardComponent {
     private breakpointObserver = inject(BreakpointObserver);
 
     /** Based on the screen size, switch from standard to one column per row */
-    cardLayout = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map(({matches}) => {
+    cardLayout = this.breakpointObserver.observe([Breakpoints.Small, Breakpoints.XSmall]).pipe(map(({matches}) => {
         // If device is in portrait mode
         if (matches) {
             return {

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -98,9 +99,9 @@ public class UserController {
         return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
-        logger.info("The server has recognized a incoming login request.");
+        logger.info("The server has recognized an incoming login request.");
         return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
     }
 }
