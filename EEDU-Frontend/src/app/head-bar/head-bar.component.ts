@@ -29,6 +29,6 @@ export class HeadBarComponent {
         }
     }
     switchPage(){
-        this.router.navigate(["/user-login"]).then(success => console.log('Successfully switched page.'));
+        this.router.navigate(["/user-login"]).then(() => console.log('Successfully switched page.'));
     }
 }
