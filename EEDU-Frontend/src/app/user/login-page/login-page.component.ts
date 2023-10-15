@@ -18,7 +18,7 @@ export class LoginPageComponent {
         }
         else{
             console.log("Attempting login with username: '" + username + "', and password '" + password + "'.");
-            return this.userService.requestLogin(username, password);
+            return this.userService.requestLogin((username), password);
         }
     }
 }

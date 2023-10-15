@@ -1,5 +1,8 @@
+<div *ngIf="showSettings">
+    <app-settings></app-settings>
+</div>
 <div class="grid-container {{ (cardLayout | async)?.marginTop }}">
-  <h1 class="mat-h1">Dashboard</h1>
+  <h1 class="mat-h1">Dashboard <button style="background-color: transparent; border: 0px;" class="bi bi-gear-fill fs-4 text-white" (click)="showSettings = !showSettings"></button></h1>
   <mat-grid-list cols="{{ ( cardLayout | async )?.columns }}" rowHeight="{{( cardLayout | async )?.rowHeight }}">
       <mat-grid-tile rowspan="{{(cardLayout | async)?.stundenplan?.rows}}" colspan="{{(cardLayout | async)?.stundenplan?.cols}}">
           <app-card title="Stundenplan"></app-card>

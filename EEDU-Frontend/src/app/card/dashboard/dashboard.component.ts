@@ -1,4 +1,5 @@
 import {Component, inject} from '@angular/core';
+import { Injectable } from "@angular/core";
 import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {map} from 'rxjs/operators';
 
@@ -7,7 +8,7 @@ import {map} from 'rxjs/operators';
 })
 export class DashboardComponent {
     private breakpointObserver = inject(BreakpointObserver);
-
+    showSettings: boolean = false;
     /** Based on the screen size, switch from standard to one column per row */
     cardLayout = this.breakpointObserver.observe([Breakpoints.Small, Breakpoints.XSmall]).pipe(map(({matches}) => {
         // If device is in portrait mode

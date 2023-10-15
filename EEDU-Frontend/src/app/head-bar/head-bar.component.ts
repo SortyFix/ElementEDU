@@ -21,7 +21,11 @@ export class HeadBarComponent {
         this.time = today.getDate().toString().padStart(2, '0') + "." + (today.getMonth() + 1).toString().padStart(2, '0') + "." + today.getFullYear();
     }
 
-    public switchPage() {
+    public switchLoginPage() {
         this.router.navigate(["/user-login"]).then(() => console.log('Successfully switched page.'));
+    }
+
+    public switchHomePage() {
+        this.router.navigate(["/home"]).then(() => console.log('Successfully switched page.'));
     }
 }

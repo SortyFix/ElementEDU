@@ -18,6 +18,8 @@ import { HausaufgabenCardComponent } from './card/hausaufgaben-card/hausaufgaben
 import { LoginPageComponent } from './user/login-page/login-page.component';
 import { HomePageComponent } from './card/home-page/home-page.component';
 import { HttpClientModule } from "@angular/common/http";
+import { SettingsComponent } from './settings/settings.component';
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
     declarations: [
@@ -30,7 +32,8 @@ import { HttpClientModule } from "@angular/common/http";
         ChatCardComponent,
         HausaufgabenCardComponent,
         LoginPageComponent,
-        HomePageComponent
+        HomePageComponent,
+        SettingsComponent
     ],
     imports: [
         BrowserModule,
@@ -41,7 +44,8 @@ import { HttpClientModule } from "@angular/common/http";
         MatMenuModule,
         MatIconModule,
         HttpClientModule,
-        MatButtonModule
+        MatButtonModule,
+        NgOptimizedImage
     ],
     providers: [],
     bootstrap: [AppComponent]
