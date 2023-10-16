@@ -1,8 +1,8 @@
 import {Component, inject} from '@angular/core';
-import {animate, state, style, transition, trigger} from "@angular/animations";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
-import {DashboardComponent} from "../card/dashboard/dashboard.component";
+import {DashboardComponent} from "../../card/dashboard/dashboard.component";
 import {map} from "rxjs/operators";
+import {animate, state, style, transition, trigger} from "@angular/animations";
 
 @Component({
     selector: 'app-settings',
@@ -12,7 +12,7 @@ import {map} from "rxjs/operators";
         trigger('Fade', [
             state('false', style({opacity: 0})),
             state('true', style({opacity: 1})),
-            transition(':enter', animate('150ms'))
+            transition(':enter', animate('150ms')),
         ])
     ]
 })
@@ -34,5 +34,6 @@ export class SettingsComponent {
             xSize: "50"
         }
     }));
+    protected readonly DashboardComponent = DashboardComponent;
 }
 

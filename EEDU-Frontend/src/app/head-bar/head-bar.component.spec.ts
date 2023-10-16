@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeadBarComponent } from './head-bar.component';
+import {AppRoutingModule} from "../app-routing.module";
 
 describe('HeadBarComponent', () => {
     let component: HeadBarComponent;
@@ -8,7 +9,10 @@ describe('HeadBarComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ HeadBarComponent ]
+            declarations: [ HeadBarComponent ],
+            imports: [
+                AppRoutingModule
+            ]
         })
             .compileComponents();
     });

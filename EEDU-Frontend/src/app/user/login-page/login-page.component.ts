@@ -14,11 +14,18 @@ export class LoginPageComponent {
 
         if(!username || username == "" || !password || password == ""){
             console.log("No valid username given.");
+            alert("Bitte fülle alle Felder aus.");
             return;
         }
         else{
             console.log("Attempting login with username: '" + username + "', and password '" + password + "'.");
-            return this.userService.requestLogin((username), password);
+            this.userService.requestLogin(username, password).subscribe(
+                error => {
+                    if(error == 401){
+                        console.log("Der eigegebenen Daten sind nicht korrekt. Bitte versuche es noch einmal.");
+                    }
+                }
+            )
         }
     }
 }

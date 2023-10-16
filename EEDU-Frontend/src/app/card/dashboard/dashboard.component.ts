@@ -4,7 +4,9 @@ import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
 import {map} from 'rxjs/operators';
 
 @Component({
-    selector: 'app-dashboard', templateUrl: './dashboard.component.html', styleUrls: ['./dashboard.component.scss']
+    selector: 'app-dashboard', templateUrl: './dashboard.component.html', styleUrls: ['./dashboard.component.scss'],
+    animations: [
+    ]
 })
 export class DashboardComponent {
     private breakpointObserver = inject(BreakpointObserver);
