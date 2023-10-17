@@ -1,6 +1,6 @@
 package de.gaz.eedu.user.privileges;
 
-import de.gaz.eedu.user.exception.NameOccupiedException;
+import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import org.junit.jupiter.api.Assertions;

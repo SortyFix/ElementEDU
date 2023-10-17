@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
 
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
-            referencedColumnName = "id")) private Set<GroupEntity> groups;
+            referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
