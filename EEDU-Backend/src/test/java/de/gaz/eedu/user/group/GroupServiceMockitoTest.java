@@ -1,6 +1,8 @@
 package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.user.exception.NameOccupiedException;
+import de.gaz.eedu.user.group.model.GroupCreateModel;
+import de.gaz.eedu.user.group.model.GroupModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +18,11 @@ import java.util.HashSet;
 @ActiveProfiles("test")
 public class GroupServiceMockitoTest
 {
-    private GroupService groupService;
+    private GroupEntityService groupService;
 
     @BeforeEach public void init()
     {
-        this.groupService = Mockito.mock(GroupService.class);
+        this.groupService = Mockito.mock(GroupEntityService.class);
     }
 
     @Test public void testCreatePrivilegeSuccess()

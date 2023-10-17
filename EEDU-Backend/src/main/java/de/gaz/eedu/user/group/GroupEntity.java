@@ -3,7 +3,9 @@ package de.gaz.eedu.user.group;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,8 +34,10 @@ import java.util.stream.Collectors;
 /**
  * This class represents a database entry of a group.
  * <p>
- * This is the representation of a database entry of a group. It contains its id, name, userEntities and the privileges this group has.
- * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by adding {@link PrivilegeEntity}s to
+ * This is the representation of a database entry of a group. It contains its id, name, userEntities and the
+ * privileges this group has.
+ * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by
+ * adding {@link PrivilegeEntity}s to
  * this object and then assign users to it.
  * <p>
  * Note that a {@link UserEntity} can be part of multiple groups.
@@ -42,26 +46,23 @@ import java.util.stream.Collectors;
  * @see UserEntity
  * @see PrivilegeEntity
  */
-@Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "group_entity")
-public class GroupEntity {
+@Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity") public class GroupEntity implements EntityModelRelation<GroupModel>
+{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
-    @ManyToMany(mappedBy = "groups")
-    @JsonBackReference
-    private Set<UserEntity> users;
-    @ManyToMany
-    @JsonManagedReference
-    @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private Set<PrivilegeEntity> privileges;
+    @ManyToMany(mappedBy = "groups") @JsonBackReference private Set<UserEntity> users;
+    @ManyToMany @JsonManagedReference @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
+            "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
+            referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
+
+    @Override public GroupModel toModel()
+    {
+        return new GroupModel(getId(),
+                getName(),
+                getUsers().stream().map(UserEntity::toSimpleModel).collect(Collectors.toSet()),
+                getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()));
+    }
 
     /**
      * Grants {@link PrivilegeEntity}s to this group.
@@ -77,9 +78,11 @@ public class GroupEntity {
      * @see #revokePrivilege(Long...)
      * @see #getPrivileges()
      */
-    public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity) {
+    public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
+    {
         // Filter already granted privileges out
-        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
+        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(
+                presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
         return privileges.addAll(Arrays.stream(privilegeEntity).filter(privilegeEntityPredicate).collect(Collectors.toSet()));
     }
 
@@ -87,16 +90,19 @@ public class GroupEntity {
      * Revokes {@link PrivilegeEntity}s from this group.
      * <p>
      * This method removes privileges from this group and therefore from all users having this group.
-     * This uses the {@link Set#removeIf(Predicate)} method which gets rid of duplicated entries if there was some kind of error.
+     * This uses the {@link Set#removeIf(Predicate)} method which gets rid of duplicated entries if there was some
+     * kind of error.
      * <p>
-     * Note that this method accesses the {@code privilegeEntities} set directly as the getter {@link #getPrivileges()} returns a {@link Unmodifiable} set.
+     * Note that this method accesses the {@code privilegeEntities} set directly as the getter
+     * {@link #getPrivileges()} returns a {@link Unmodifiable} set.
      *
      * @param id of the {@link PrivilegeEntity} to remove from this group.
      * @return whether a privilege has been revoked from this group.
      * @see #grantPrivilege(PrivilegeEntity...)
      * @see #getPrivileges()
      */
-    public boolean revokePrivilege(@NotNull Long... id) {
+    public boolean revokePrivilege(@NotNull Long... id)
+    {
         Collection<Long> revokeIds = Arrays.asList(id);
         return privileges.removeIf(privilege -> revokeIds.contains(privilege.getId()));
     }
@@ -109,24 +115,21 @@ public class GroupEntity {
      * <p>
      * Note that this method returns a {@link Unmodifiable} set as the list
      * should not be edited here.
-     * To grant or revoke privileges the methods {@link #grantPrivilege(PrivilegeEntity...)} or {@link #revokePrivilege(Long...)} can be used.
+     * To grant or revoke privileges the methods {@link #grantPrivilege(PrivilegeEntity...)} or
+     * {@link #revokePrivilege(Long...)} can be used.
      *
      * @return an unmodifiable list containing all privileges this group has.
      * @see #grantPrivilege(PrivilegeEntity...)
      * @see #revokePrivilege(Long...)
      */
-    public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges() {
+    public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges()
+    {
         return Collections.unmodifiableSet(privileges);
     }
 
     @Override public String toString()
     {
-        return "GroupEntity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", users=" + users +
-                ", privileges=" + privileges +
-                '}';
+        return "GroupEntity{" + "id=" + id + ", name='" + name + '\'' + ", users=" + users + ", privileges=" + privileges + '}';
     }
 
     @Override public boolean equals(Object object)

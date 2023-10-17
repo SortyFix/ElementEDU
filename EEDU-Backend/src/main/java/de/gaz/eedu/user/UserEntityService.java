@@ -1,15 +1,15 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.EntityService;
+import de.gaz.eedu.entity.EDUEntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.encryption.EncryptionService;
-import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
+import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,34 +40,33 @@ import java.util.function.Function;
  * Another important concept is, that all {@link UserEntity} related tasks occur here.
  * Outside the {@link UserModel} is the class to use.
  *
+ * @author ivo
  * @see UserRepository
  * @see Service
  * @see AllArgsConstructor
- * @author ivo
  */
-@Service
-@AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserEntityService implements EDUEntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
 
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
 
-    @Override
-    public @NotNull Optional<UserEntity> loadEntityByID(long id) {
+    @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
+    {
         return userRepository.findById(id);
     }
 
-    @Override
-    public @NotNull Optional<UserEntity> loadEntityByName(@NotNull String name) {
+    @Override public @NotNull Optional<UserEntity> loadEntityByName(@NotNull String name)
+    {
         return userRepository.findByLoginName(name);
     }
 
-    @Override
-    public @Unmodifiable @NotNull List<UserEntity> findAllEntities() {
+    @Override public @Unmodifiable @NotNull List<UserEntity> findAllEntities()
+    {
         return userRepository.findAll();
     }
 
-    @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
         getUserRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
         {
@@ -74,13 +74,14 @@ import java.util.function.Function;
         });
 
         String password = model.password();
-        if(!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
+        if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
         {
             throw new InsecurePasswordException();
         }
 
         String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
-        return saveEntity(model.create(hashedPassword));
+        model.setEncryptedPassword(hashedPassword);
+        return saveEntity(model.toEntity());
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
@@ -88,21 +89,18 @@ import java.util.function.Function;
         return getUserRepository().save(entity);
     }
 
-    @Override
-    @Contract(pure = true) @Transactional(Transactional.TxType.REQUIRED) public @NotNull Function<UserModel, UserEntity> toEntity()
+    @Transactional @Override public @NotNull Function<UserModel, UserEntity> toEntity()
     {
-        return userModel -> loadEntityByID(userModel.id()).orElseThrow(NullPointerException::new);
+        return userModel -> loadEntityByID(userModel.id()).orElseThrow(() -> new EntityUnknownException(userModel.id()));
     }
 
-    @Override
-    @Contract(pure = true)
-    public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel() {
-        return user -> new UserModel(user.getId(), user.getFirstName(), user.getLastName(), user.getLoginName(), user.isEnabled(), user.isLocked(), user.getGroups());
+    @Override @Contract(pure = true) public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel()
+    {
+        return UserEntity::toModel;
     }
 
-    @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    @Transactional @Override public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    {
         return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
@@ -115,20 +113,22 @@ import java.util.function.Function;
         }).orElse(false);
     }
 
-    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<UserLoginVerificationModel> login(@NotNull UserLoginModel userLoginModel)
+    @Transactional public @NotNull Optional<UserLoginVerificationModel> login(@NotNull UserLoginModel userLoginModel)
     {
         return loadEntityByName(userLoginModel.loginName()).map(user ->
         {
             if (getEncryptionService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
             {
-                return new UserLoginVerificationModel(user.getId(), getEncryptionService().generateKey(String.valueOf(user.getId())));
+                return new UserLoginVerificationModel(user.getId(),
+                        getEncryptionService().generateKey(String.valueOf(user.getId())));
             }
             return null; // Optional empty as password does not match.
         });
     }
 
-    @Transactional(Transactional.TxType.REQUIRED) public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
+    @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        return getEncryptionService().validate(token, (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
+        return getEncryptionService().validate(token,
+                (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
     }
 }

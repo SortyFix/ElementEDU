@@ -2,19 +2,19 @@
 -- It contains information about the user's id, first name, last name, login name, email, password status (if they're enabled or locked).
 CREATE TABLE user_entity
 (
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    first_name   VARCHAR(255),
-    last_name    VARCHAR(255),
-    login_name    VARCHAR(255),
-    password    VARCHAR(255),
-    enabled     BOOLEAN,
-    locked      BOOLEAN
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(255),
+    last_name  VARCHAR(255),
+    login_name VARCHAR(255),
+    password   VARCHAR(255),
+    enabled    BOOLEAN,
+    locked     BOOLEAN
 );
 
 -- This table stores information about different groups
 CREATE TABLE group_entity
 (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255)
 );
 

@@ -1,6 +1,6 @@
 package de.gaz.eedu.security;
 
-import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.UserEntityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,17 +21,20 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter
 {
 
-    private final UserService userService;
+    private final UserEntityService userService;
 
-    @Override protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException
+    @Override protected void doFilterInternal(@NotNull HttpServletRequest request,
+                                              @NotNull HttpServletResponse response,
+                                              @NotNull FilterChain filterChain) throws ServletException, IOException
     {
         String prefix = "Bearer ";
 
         String header = request.getHeader("Authorization");
-        if(header != null && header.startsWith(prefix))
+        if (header != null && header.startsWith(prefix))
         {
             String token = header.substring(prefix.length());
-            getUserService().validate(token).ifPresent((usernamePasswordAuthenticationToken -> SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken)));
+            getUserService().validate(token).ifPresent((usernamePasswordAuthenticationToken -> SecurityContextHolder.getContext().setAuthentication(
+                    usernamePasswordAuthenticationToken)));
         }
 
         filterChain.doFilter(request, response);

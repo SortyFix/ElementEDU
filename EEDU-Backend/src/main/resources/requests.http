@@ -1,5 +1,5 @@
 ###
-GET http://localhost:8080/user/login
+POST http://localhost:8080/user/login
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/user/me/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3MDU0NTc0fQ.OVYdQByacd8Q-m2SEVoPVQsI908S9zcUgZirdRNAgOA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTU2MjE0fQ.ioeshOQ1wRNrffB0zWUK5Y5ITZU6pKvpB0c6MYnjExY
 
 ###
 POST http://localhost:8080/user/create

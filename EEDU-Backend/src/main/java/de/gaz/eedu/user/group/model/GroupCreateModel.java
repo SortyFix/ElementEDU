@@ -1,7 +1,9 @@
-package de.gaz.eedu.user.group;
+package de.gaz.eedu.user.group.model;
 
 
+import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -9,9 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Set;
 
-public record GroupCreateModel(@NotNull String name, @NotNull Set<UserEntity> users, @NotNull Set<PrivilegeEntity> privileges)
+public record GroupCreateModel(@NotNull String name, @NotNull Set<UserEntity> users,
+                               @NotNull Set<PrivilegeEntity> privileges) implements CreationModel<GroupEntity>
 {
-    public @NotNull GroupEntity toEntity()
+    @Override public @NotNull GroupEntity toEntity()
     {
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setName(name());
