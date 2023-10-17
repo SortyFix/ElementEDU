@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class GroupService implements EDUEntityService<GroupEntity, GroupModel,
-        GroupCreateModel>
+@Service @AllArgsConstructor public class GroupService implements EDUEntityService<GroupEntity, GroupModel, GroupCreateModel>
 {
 
     @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;

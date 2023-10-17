@@ -10,7 +10,15 @@ import {map} from "rxjs/operators";
 export class UserService {
     constructor(private http: HttpClient, private router: Router) { }
 
-    // NOT SECURE; PROTOTYPE!
+    /**
+     * Passes a POST request with login name and password to the UserController's loginUser() method.
+     * <p>
+     * Returns the status code of the response as an <code>Observable<number></code>.
+     * Therefore, other components/classes need to subscribe to this function in order to
+     * access its return value.
+     * @param loginName
+     * @param password
+     */
     requestLogin(loginName: string, password: string): Observable<number> {
         const body: {loginName: string, password: string } = {loginName, password};
         const httpOptions = {
