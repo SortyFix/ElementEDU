@@ -9,7 +9,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/user/me/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTU2MjE0fQ.ioeshOQ1wRNrffB0zWUK5Y5ITZU6pKvpB0c6MYnjExY
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk3NTY5Nzg1fQ.1jxwoRVvKDIkJdmWN28HjXr7HsHs9XWsMn9E6Ja5TnI
 
 ###
 POST http://localhost:8080/user/create

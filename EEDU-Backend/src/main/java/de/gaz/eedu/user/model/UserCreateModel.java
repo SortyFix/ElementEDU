@@ -17,6 +17,7 @@ public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastN
         userEntity.setLoginName(loginName());
         userEntity.setEnabled(enabled());
         userEntity.setLocked(locked());
+
         return userEntity;
     }
 }

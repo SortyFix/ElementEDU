@@ -3,7 +3,7 @@ package de.gaz.eedu.user.privileges;
 import de.gaz.eedu.entity.EDUEntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.exception.NameOccupiedException;
+import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.AccessLevel;
