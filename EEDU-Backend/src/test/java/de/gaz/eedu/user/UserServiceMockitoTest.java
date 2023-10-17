@@ -22,18 +22,18 @@ import static de.gaz.eedu.user.UserTestData.PASSWORD;
 
 
 /**
- * Test class that uses Mockito to test the behavior of the {@link UserEntityService}.
+ * Test class that uses Mockito to test the behavior of the {@link UserService}.
  * <p>
  * This class leverages Mockito to create and configure mock objects that simulate the behavior of complex, real
  * objects and replace them within the context of the test environment. This way, Mockito provides the ability to
  * isolate the unit of code under examination and accurately specify its interactions. Therefore, this class tests
- * the behavior of {@link UserEntityService} under various controlled scenarios by defining specific inputs,
+ * the behavior of {@link UserService} under various controlled scenarios by defining specific inputs,
  * asserting the
  * expected results, and verifying correct interactions.
  * <p>
- * It's important to note that the individual functions within {@link UserEntityService} are tested in the
+ * It's important to note that the individual functions within {@link UserService} are tested in the
  * {@link UserServiceTest} class, while this class primarily focuses on testing the interaction and overall behavior
- * flow of the {@link UserEntityService}.
+ * flow of the {@link UserService}.
  *
  * @author Ivo
  * @see UserServiceTest
@@ -42,10 +42,10 @@ import static de.gaz.eedu.user.UserTestData.PASSWORD;
 @ActiveProfiles("test")
 public class UserServiceMockitoTest
 {
-    private UserEntityService userService;
+    private UserService userService;
 
     /**
-     * Assigns an object to the {@link UserEntityService} class.
+     * Assigns an object to the {@link UserService} class.
      * <p>
      * This method is called before each test is executed and assigns the {@code userService} variable
      * a value. This is necessary to test each userService function provided.
@@ -55,7 +55,7 @@ public class UserServiceMockitoTest
      */
     @BeforeEach public void initMock()
     {
-        userService = Mockito.mock(UserEntityService.class);
+        userService = Mockito.mock(UserService.class);
     }
 
     /**
@@ -64,7 +64,7 @@ public class UserServiceMockitoTest
      * In this test a completely new {@link UserEntity} is created using a defined {@link UserModel}.
      * If the user is not created for some reason the test fails.
      *
-     * @see UserEntityService
+     * @see UserService
      */
     @Test public void testCreateUserSuccessTest()
     {
@@ -87,7 +87,7 @@ public class UserServiceMockitoTest
      * fails under this specific circumstance.
      *
      * @see #testCreateUserSuccessTest()
-     * @see UserEntityService
+     * @see UserService
      */
     @Test public void testCreateUserLoginNameOccupied()
     {

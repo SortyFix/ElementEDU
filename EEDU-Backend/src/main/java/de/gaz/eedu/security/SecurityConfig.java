@@ -1,6 +1,6 @@
 package de.gaz.eedu.security;
 
-import de.gaz.eedu.user.UserEntityService;
+import de.gaz.eedu.user.UserService;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity @EnableMethodSecurity @EnableWebMvc @Configuration @AllArgsConstructor public class SecurityConfig
 {
 
-    private final UserEntityService userService;
+    private final UserService userService;
 
     @Bean public @NotNull SecurityFilterChain filterChain(@NotNull HttpSecurity http) throws Exception
     {

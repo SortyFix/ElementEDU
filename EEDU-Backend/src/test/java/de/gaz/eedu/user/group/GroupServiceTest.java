@@ -4,7 +4,7 @@ import de.gaz.eedu.user.exception.NameOccupiedException;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeEntityService;
+import de.gaz.eedu.user.privileges.PrivilegeService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Optional;
 
 /**
- * This is the test class for {@link GroupEntityService}
+ * This is the test class for {@link GroupService}
  * <p>
  * It tests all functions of the GroupService to ensure they perform as expected when any changes occur.
  * <p>
@@ -34,17 +34,17 @@ import java.util.Optional;
  * The {@link TestInstance} annotation uses the Lifecycle
  * {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS}.
  * This tells JUnit to create one instance of this test class and reuse it for all methods it contains. As a result,
- * the {@link GroupEntityService} instance is not repeatedly instantiated for each test method.
+ * the {@link GroupService} instance is not repeatedly instantiated for each test method.
  * <p>
  * This class focuses on method testing to ensure the GroupService remains functional as intended.
  *
  * @author ivo
- * @see GroupEntityService
+ * @see GroupService
  */
 @SpringBootTest @ActiveProfiles("test") @TestInstance(TestInstance.Lifecycle.PER_CLASS) public class GroupServiceTest
 {
-    private final GroupEntityService groupService;
-    private final PrivilegeEntityService privilegeService;
+    private final GroupService groupService;
+    private final PrivilegeService privilegeService;
 
     /**
      * This is the main constructor for the GroupServiceTest class.
@@ -61,8 +61,8 @@ import java.util.Optional;
      * @param groupService     A reference to the GroupService instance in order to perform group related operations.
      * @param privilegeService A reference to the PrivilegeService instance to manage the allocation of privileges.
      */
-    public GroupServiceTest(@Autowired GroupEntityService groupService,
-                            @Autowired PrivilegeEntityService privilegeService)
+    public GroupServiceTest(@Autowired GroupService groupService,
+                            @Autowired PrivilegeService privilegeService)
     {
         this.groupService = groupService;
         this.privilegeService = privilegeService;

@@ -1,6 +1,6 @@
 package de.gaz.eedu.security;
 
-import de.gaz.eedu.user.UserEntityService;
+import de.gaz.eedu.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter
 {
 
-    private final UserEntityService userService;
+    private final UserService userService;
 
     @Override protected void doFilterInternal(@NotNull HttpServletRequest request,
                                               @NotNull HttpServletResponse response,

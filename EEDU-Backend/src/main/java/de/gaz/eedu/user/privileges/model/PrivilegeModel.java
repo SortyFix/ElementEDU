@@ -3,7 +3,7 @@ package de.gaz.eedu.user.privileges.model;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeEntityService;
+import de.gaz.eedu.user.privileges.PrivilegeService;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +18,13 @@ import java.util.Set;
  * object which can be easily ported into a {@link PrivilegeEntity}.
  * It simplifies the workflow when using the rest api.
  * <p>
- * Note that the only way to interact with this is by using the {@link PrivilegeEntityService}.
+ * Note that the only way to interact with this is by using the {@link PrivilegeService}.
  * It provides all the necessary methods to create and edit privileges.
  *
  * @param id
  * @param name
  * @author ivo
- * @see PrivilegeEntityService
+ * @see PrivilegeService
  */
 public record PrivilegeModel(
         @NotNull Long id,

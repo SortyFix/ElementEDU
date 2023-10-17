@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class GroupEntityService implements EDUEntityService<GroupEntity, GroupModel,
+@Service @AllArgsConstructor public class GroupService implements EDUEntityService<GroupEntity, GroupModel,
         GroupCreateModel>
 {
 

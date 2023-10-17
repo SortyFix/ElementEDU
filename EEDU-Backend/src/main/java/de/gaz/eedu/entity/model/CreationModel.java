@@ -7,4 +7,8 @@ public interface CreationModel<E extends EDUEntity> extends Model
 
     @NotNull E toEntity();
 
+    default E toEntity(@NotNull CreationFactory<E> factory)
+    {
+        return factory.transform(toEntity());
+    }
 }

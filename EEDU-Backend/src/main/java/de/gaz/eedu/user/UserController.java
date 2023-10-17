@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Contains methods to interact with the {@link UserEntityService} using a http request.
+ * Contains methods to interact with the {@link UserService} using a http request.
  * <p>
  * This is necessary to connect the backend to the frontend.
  * In this specific case the frontend can access this resource over {@code server.example.de/user}
@@ -47,7 +47,7 @@ public class UserController
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Getter(AccessLevel.PROTECTED)
-    private final UserEntityService userService;
+    private final UserService userService;
 
     /**
      * Creates a user by a http request.

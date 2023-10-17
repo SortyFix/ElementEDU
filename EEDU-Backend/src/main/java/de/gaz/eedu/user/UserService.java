@@ -45,7 +45,7 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserEntityService implements EDUEntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EDUEntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
 
     private final UserRepository userRepository;
@@ -80,8 +80,12 @@ import java.util.function.Function;
         }
 
         String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
-        model.setEncryptedPassword(hashedPassword);
-        return saveEntity(model.toEntity());
+        return saveEntity(model.toEntity((entity ->
+        {
+            entity.setPassword(hashedPassword); // outsource password as it must be encrypted using the encryption
+            // service.
+            return entity;
+        })));
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)

@@ -1,13 +1,13 @@
 package de.gaz.eedu;
 
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserEntityService;
+import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.GroupEntityService;
+import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeEntityService;
+import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,9 +23,9 @@ import java.util.HashSet;
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
-    private final UserEntityService userService;
-    private final GroupEntityService groupService;
-    private final PrivilegeEntityService privilegeService;
+    private final UserService userService;
+    private final GroupService groupService;
+    private final PrivilegeService privilegeService;
 
     @Override @Transactional(Transactional.TxType.REQUIRED) public void run(String... args)
     {

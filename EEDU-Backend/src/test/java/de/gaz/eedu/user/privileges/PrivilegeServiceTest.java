@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.HashSet;
 
 /**
- * Test class for the {@link PrivilegeEntityService}.
+ * Test class for the {@link PrivilegeService}.
  * <p>
  * This class tests all functions of the PrivilegeService.
  * These tests are crucial for verifying that all features continue to function as expected after modification.
@@ -32,11 +32,11 @@ import java.util.HashSet;
  * <p>
  * The {@link TestInstance} annotation is set to {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS}.
  * This tells JUnit to create only one instance of this class and reuse it for every method tested,
- * meaning the {@link PrivilegeEntityService} instance is maintained and reused across test methods.
+ * meaning the {@link PrivilegeService} instance is maintained and reused across test methods.
  * <p>
  * This class manages method testing to verify if the code functions as expected.
  * Each test within {@link PrivilegeServiceMockitoTest} performs unit testing to validate the accurate functionality
- * flow within the {@link PrivilegeEntityService}.
+ * flow within the {@link PrivilegeService}.
  *
  * @author ivo
  * @see PrivilegeServiceMockitoTest
@@ -44,7 +44,7 @@ import java.util.HashSet;
 @SpringBootTest @TestInstance(TestInstance.Lifecycle.PER_CLASS) @ActiveProfiles("test") public class PrivilegeServiceTest
 {
 
-    private final PrivilegeEntityService privilegeService;
+    private final PrivilegeService privilegeService;
 
     /**
      * This is the primary constructor for the PrivilegeServiceTest class.
@@ -61,7 +61,7 @@ import java.util.HashSet;
      * @param privilegeService a reference to the PrivilegeService instance to carry out the privilege-related
      *                         operations.
      */
-    public PrivilegeServiceTest(@Autowired PrivilegeEntityService privilegeService)
+    public PrivilegeServiceTest(@Autowired PrivilegeService privilegeService)
     {
         this.privilegeService = privilegeService;
     }

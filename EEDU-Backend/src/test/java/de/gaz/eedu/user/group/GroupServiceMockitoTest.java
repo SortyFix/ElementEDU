@@ -18,11 +18,11 @@ import java.util.HashSet;
 @ActiveProfiles("test")
 public class GroupServiceMockitoTest
 {
-    private GroupEntityService groupService;
+    private GroupService groupService;
 
     @BeforeEach public void init()
     {
-        this.groupService = Mockito.mock(GroupEntityService.class);
+        this.groupService = Mockito.mock(GroupService.class);
     }
 
     @Test public void testCreatePrivilegeSuccess()

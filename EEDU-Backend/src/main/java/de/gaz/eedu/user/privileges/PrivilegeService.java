@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class PrivilegeEntityService implements EDUEntityService<PrivilegeEntity,
+@Service @AllArgsConstructor public class PrivilegeService implements EDUEntityService<PrivilegeEntity,
         PrivilegeModel,
         PrivilegeCreateModel>
 {

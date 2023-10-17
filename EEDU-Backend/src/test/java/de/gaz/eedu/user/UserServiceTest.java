@@ -3,7 +3,7 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.GroupEntityService;
+import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
@@ -28,7 +28,7 @@ import static de.gaz.eedu.user.UserTestData.LOGIN_NAME;
 import static de.gaz.eedu.user.UserTestData.PASSWORD;
 
 /**
- * Test for the {@link UserEntityService}
+ * Test for the {@link UserService}
  * <p>
  * This class tests all functions of the user service.
  * This is necessary to check if all functions still work as intended when changing them.
@@ -44,11 +44,11 @@ import static de.gaz.eedu.user.UserTestData.PASSWORD;
  * The {@link TestInstance} annotation uses the Lifecycle
  * {@link org.junit.jupiter.api.TestInstance.Lifecycle#PER_CLASS}.
  * This tells JUnit to create one instance of this class and reuse it for every method it contains. As a result, the
- * {@link UserEntityService} instance does not need to be recreated for each test method.
+ * {@link UserService} instance does not need to be recreated for each test method.
  * <p>
  * This class handles method testing with the aim to verify if the code still works as expected.
  * {@link UserServiceMockitoTest} performs unit testing to verify the correct functionality flow within the
- * {@link UserEntityService}.
+ * {@link UserService}.
  *
  * @author ivo
  * @see UserServiceMockitoTest
@@ -58,10 +58,10 @@ import static de.gaz.eedu.user.UserTestData.PASSWORD;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserServiceTest
 {
-    private final UserEntityService userService;
-    private final GroupEntityService groupService;
+    private final UserService userService;
+    private final GroupService groupService;
 
-    public UserServiceTest(@Autowired UserEntityService userService, @Autowired GroupEntityService groupService)
+    public UserServiceTest(@Autowired UserService userService, @Autowired GroupService groupService)
     {
         this.userService = userService;
         this.groupService = groupService;
@@ -73,7 +73,7 @@ public class UserServiceTest
      * In this test a completely new {@link UserEntity} is created using a defined {@link UserModel}.
      * If the user is not created for some reason the test fails.
      *
-     * @see UserEntityService
+     * @see UserService
      */
     @Test public void testCreateUserSuccessTest()
     {
@@ -102,7 +102,7 @@ public class UserServiceTest
      * fails under this specific circumstance.
      *
      * @see #testCreateUserSuccessTest()
-     * @see UserEntityService
+     * @see UserService
      */
     @Test public void testCreateUserLoginNameOccupied()
     {

@@ -2,7 +2,7 @@ package de.gaz.eedu.user.model;
 
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserEntityService;
+import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Represents a {@link UserEntity} as model.
  * <p>
- * This class is responsible for interacting with the user system in the {@link UserEntityService} as it provides a
+ * This class is responsible for interacting with the user system in the {@link UserService} as it provides a
  * convenient
  * and easy method to send json over http.
  * This then can be used to store the data in the user database and transform this model into a real user object.
