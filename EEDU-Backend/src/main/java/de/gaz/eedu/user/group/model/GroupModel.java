@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
-                         @NotNull Set<SimpleUserModel> userEntities,
+                         @NotNull Set<SimpleUserModel> users,
                          @NotNull Set<SimplePrivilegeModel> privileges) implements Model
 {
 
@@ -22,7 +22,7 @@ public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be
         return "GroupModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", userEntities=" + userEntities +
+                ", users=" + users +
                 ", privileges=" + privileges +
                 '}';
     }

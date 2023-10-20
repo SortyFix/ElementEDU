@@ -187,7 +187,7 @@ import java.util.stream.Collectors;
     @Override public String toString()
     { // Automatically generated using intellij
         return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' +
-                ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked + ", groupEntities=" + groups + '}';
+                ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
     }
 
     @Override public boolean equals(Object object)

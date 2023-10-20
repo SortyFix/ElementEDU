@@ -1,59 +1,83 @@
 /*
- * This file is for testing purposes only.
- * It provides test users and inserts them into the database
- */
-INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked)
+=============================================================================
 
+This SQL script populates the 'user_entity', 'group_entity', 'privilege_entity',
+'user_groups', and 'group_privileges' tables with test data that demonstrate
+the assignment of groups and privileges to users in 3 distinct levels of access,
+plus a dummy/test scenario.
+
+This script reflects the following design pattern:
+
+1. Users: There are four test users, each at a different level, from least to most privileged:
+    - 'Max Mustermann' is at level 1, the most basic level of access
+    - 'John Zimmermann' is at level 2, with slightly more access
+    - 'Martin Hansen' is at level 3, having the highest level of access or broader privileges
+    - Additionally, there is a 'dummy' user primarily used for testing delete operations
+
+2. Groups: These are the roles or positions users can occupy within the application.
+Every user belongs to one or more groups:
+    - The 'Users' group is the basic level, associated with normal users
+    - 'Moderators' occupy the middle ground in terms of access rights
+    - 'Admins' possesses the highest privileges
+    - 'Dummy' is a testing group designed for testing delete operations
+
+3. Privileges: These are the specific rights or permissions granted to a group. A group
+can have one or more privileges:
+    - 'READ' is the most basic privilege
+    - 'WRITE' is an intermediate privilege
+    - 'MODERATE' is the highest privilege
+    - 'DUMMY' is a test privilege for testing the delete operation
+
+4. 'user_groups' and 'group_privileges' tables are junction tables that represent many-to-many
+relationships between users and groups as well as groups and privileges.
+
+In summary, each user has a corresponding group and privilege following a pattern from the
+least to the most privileged. User 'Max' is associated with the 'Users' group and 'READ' privilege,
+'Martin' with the 'Admins' group and 'MODERATE' privilege, so on and so forth. The pattern is
+strictly consistent except for the last 'dummy' case meant for delete tests.
+
+Please note that this is simulated data and does not necessarily reflect real-world users,
+groups, or privileges. The main objective is to provide test data that demonstrates the
+assignment and hierarchy of users, groups, and privileges.
+
+=============================================================================
+*/
+
+INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked)
 VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE),
        ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE),
        ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE),
-       ('Andrew', 'Smith', 'andrew.smith', 'password123', TRUE, FALSE),
-       ('Emma', 'Brown', 'emma.brown', 'password123', TRUE, FALSE),
-       ('Oliver', 'Taylor', 'oliver.taylor', 'password123', FALSE, TRUE),
-       ('Sophia', 'Evans', 'sophia.evans', 'password123', TRUE, FALSE),
-       ('Liam', 'Wilson', 'liam.wilson', 'password123', TRUE, FALSE),
-       ('Lucas', 'Thomas', 'lucas.thomas', 'password123', FALSE, TRUE),
-       ('Ava', 'Roberts', 'ava.roberts', 'password123', TRUE, TRUE);
+       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE);
 
-/*
- * Inserting test data into privilege_entities table.
- */
 INSERT INTO group_entity (name)
-VALUES ('Admins'),
-       ('Users');
+VALUES ('Users'), ('Moderators'), ('Admins'), ('Dummy');
 
-/*
- * Inserting test data into privilege_entities table.
- */
 INSERT INTO privilege_entity (name)
 VALUES ('READ'),
        ('WRITE'),
-       ('DELETE');
+       ('MODERATE'),
+       ('DUMMY');
 
-/*
- * Inserting user-groups relations.
- * Assume that users with id 1, 2, 4, and 5 belong to the 'Admins' group (id 1),
- * and users 3, 6, 7, 8, 9, and 10 belong to 'Users' group (id 2)
- */
 INSERT INTO user_groups (user_id, group_id)
 VALUES (1, 1),
-       (2, 1),
-       (3, 2),
-       (4, 1),
-       (5, 1),
-       (6, 2),
-       (7, 2),
-       (8, 2),
-       (9, 2),
-       (10, 2);
 
-/*
- * Inserting group-privileges relations.
- * Assume that the 'Admins' group (id 1) has all the privileges (READ, WRITE, DELETE),
- * and the 'Users' group (id 2) only has the READ privilege.
- */
+       (2, 1),
+       (2, 2),
+
+       (3, 1),
+       (3, 2),
+       (3, 3),
+
+       (4, 4);
+
 INSERT INTO group_privileges (group_id, privilege_id)
 VALUES (1, 1),
-       (1, 2),
-       (1, 3),
-       (2, 1);
+
+       (2, 1),
+       (2, 2),
+
+       (3, 1),
+       (3, 2),
+       (3, 3),
+
+       (4, 4);

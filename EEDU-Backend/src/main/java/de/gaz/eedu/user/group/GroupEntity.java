@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * This class represents a database entry of a group.
  * <p>
- * This is the representation of a database entry of a group. It contains its id, name, userEntities and the
+ * This is the representation of a database entry of a group. It contains its id, name, users and the
  * privileges this group has.
  * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by
  * adding {@link PrivilegeEntity}s to
