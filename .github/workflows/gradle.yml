@@ -28,5 +28,4 @@ jobs:
         cache: gradle
     
     - name: Build with Gradle
-      working-directory: ./EEDU-Backend
       run: ./gradlew build
