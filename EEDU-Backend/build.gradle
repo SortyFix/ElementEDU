@@ -43,6 +43,7 @@ dependencies {
 
     //Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     // Runtime drivers
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
