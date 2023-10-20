@@ -1,0 +1,22 @@
+plugins {
+    id "com.github.node-gradle.node" version "7.0.1"
+}
+
+def nodejs = "20.5.0"
+def npm = "10.2.1"
+
+node {
+    version = nodejs
+    npmVersion = npm
+    download = true
+}
+
+tasks.register("ngServe", NodeTask).configure {
+    dependsOn("installAngularCLI")
+    script = file("node_modules/@angular/cli/bin/ng.js")
+    args = ["serve"]
+}
+
+tasks.register("installAngularCLI", NpmTask).configure {
+    args = ["install", "@angular/cli"]
+}

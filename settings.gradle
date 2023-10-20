@@ -1,0 +1,9 @@
+rootProject.name = 'ElementEDU'
+
+def projects = ["Frontend", "Backend"]
+
+projects.forEach {projectName ->
+    def loweredProjectName = projectName.toLowerCase(Locale.ENGLISH)
+    include(loweredProjectName)
+    findProject(":${loweredProjectName}").projectDir = file("EEDU-${projectName}")
+}

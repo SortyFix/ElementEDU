@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  eedu:
+    image: eedu-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eedumariadb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://eedumariadb:3306/spring
+      SPRING_DATASOURCE_USERNAME: spring
+      SPRING_DATASOURCE_PASSWORD: spring
+    networks:
+      - backend
+  eedumariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: spring
+      MYSQL_USER: spring
+      MYSQL_PASSWORD: spring
+    networks:
+      - backend
+    volumes:
+      - ./scripts/init-mariadb.sql:/docker-entrypoint-initdb.d/init-mariadb.sql:ro
+
+networks:
+  backend:
+    driver: bridge
