@@ -28,7 +28,7 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeEntity, Privilege
         });
     }
 
-    @Override protected PrivilegeCreateModel occupiedEval()
+    @Override protected PrivilegeCreateModel occupiedCreateModel()
     {
         return new PrivilegeCreateModel("READ", new HashSet<>());
     }

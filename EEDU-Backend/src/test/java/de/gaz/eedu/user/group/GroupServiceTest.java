@@ -37,7 +37,7 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
         });
     }
 
-    @Override protected GroupCreateModel occupiedEval()
+    @Override protected GroupCreateModel occupiedCreateModel()
     {
         return new GroupCreateModel("Users", new HashSet<>(), new HashSet<>());
     }

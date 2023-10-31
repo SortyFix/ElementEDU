@@ -89,8 +89,7 @@ public class UserController
         }
         catch (InsecurePasswordException insecurePasswordException)
         {
-            logger.info("The from the previously mentioned user create request password did not match the " +
-                    "requirements.");
+            logger.info("The from the previously mentioned user create request password did not match the requirements.");
             httpStatus = HttpStatus.NOT_ACCEPTABLE;
         }
         return ResponseEntity.status(httpStatus).body(null);
@@ -99,14 +98,12 @@ public class UserController
     @PreAuthorize("isAuthenticated()") @GetMapping("/me/{id}") public @NotNull ResponseEntity<@Nullable UserModel> getUserData(@NotNull @PathVariable Long id)
     {
         logger.info("The server has recognized an incoming self receiving data request for user.");
-        return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                null));
+        return getUserService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         logger.info("The server has recognized an incoming login request.");
-        return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                null));
+        return getUserService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
     }
 }

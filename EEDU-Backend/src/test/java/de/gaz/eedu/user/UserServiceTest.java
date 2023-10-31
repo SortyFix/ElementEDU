@@ -53,7 +53,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
         });
     }
 
-    @Override protected UserCreateModel occupiedEval()
+    @Override protected UserCreateModel occupiedCreateModel()
     {
         return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false);
     }
