@@ -13,7 +13,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Entity public class ThemeEntity implements EDUEntity
+@Entity
+public class ThemeEntity implements EDUEntity
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(value = AccessLevel.NONE)

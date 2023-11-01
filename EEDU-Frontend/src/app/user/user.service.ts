@@ -19,6 +19,7 @@ export class UserService {
      * @param loginName
      * @param password
      */
+
     requestLogin(loginName: string, password: string): Observable<number> {
         const body: {loginName: string, password: string } = {loginName, password};
         const httpOptions = {
@@ -28,6 +29,7 @@ export class UserService {
 
         return this.http.post("http://localhost:8080/user/login", body, httpOptions).pipe(
             map(response => {
+                // Navigate to ./home if routing is successful. TODO: Tokens
                 this.router.navigate(["/home"]).then(r => console.log("Successful login; Switching to user dashboard."));
                 console.log(response);
                 console.log(response.status);
