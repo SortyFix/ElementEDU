@@ -1,5 +1,8 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.model.CreationModel;
+import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
@@ -18,16 +21,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.function.Supplier;
 
 @Component @AllArgsConstructor public class DataLoader implements CommandLineRunner
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
 
-    @Override @Transactional(Transactional.TxType.REQUIRED) public void run(String... args)
+    @Override @Transactional(Transactional.TxType.REQUIRED) public void run(@NotNull String... args)
     {
         if (userService.findAll().isEmpty())
         {
@@ -55,11 +58,8 @@ import java.util.HashSet;
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 
-        PrivilegeEntity privilegeEntity =
-                privilegeService.loadEntityByName("ADMIN").orElse(privilegeService.createEntity(
-                        privilegeCreateModel));
-        GroupEntity groupEntity = groupService.loadEntityByName("admin").orElse(groupService.createEntity(
-                groupCreateModel));
+        PrivilegeEntity privilegeEntity = getEntity(privilegeService, privilegeCreateModel);
+        GroupEntity groupEntity = getEntity(groupService, groupCreateModel);
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(privilegeEntity);
@@ -68,9 +68,26 @@ import java.util.HashSet;
         userEntity.attachGroups(groupEntity);
         userService.saveEntity(userEntity);
 
-        LOGGER.info("A default user has been created with the name {} and the password {}.",
-                userEntity.getLoginName(),
-                randomPassword);
+        LOGGER.info("A default user has been created with the name {} and the password {}. It's advised to " +
+                "change the password as soon as possible.", userEntity.getLoginName(), randomPassword);
+    }
+
+    /**
+     * Attempts to load an entity by name using the provided service and creation model.
+     * If an entity with the specified name doesn't exist, a new one is created using the creation model.
+     *
+     * @param service          the service used to load and potentially create the entity
+     * @param groupCreateModel the creation model which describes the entity to be loaded or created
+     * @param <E>              The type of the EDUEntity
+     * @param <C>              The type of the CreationModel related to the EDUEntity
+     * @return the loaded or created entity
+     * @throws java.util.NoSuchElementException if the creation model didn't specify a name and an entity couldn't be
+     *                                          loaded
+     */
+    private <E extends EDUEntity, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EDUEntityService<E, ?, C> service, @NotNull C groupCreateModel)
+    {
+        Supplier<E> create = () -> service.createEntity(groupCreateModel);
+        return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);
     }
 
     //TODO maybe better
