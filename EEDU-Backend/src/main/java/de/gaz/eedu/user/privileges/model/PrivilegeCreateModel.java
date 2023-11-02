@@ -15,7 +15,7 @@ public record PrivilegeCreateModel(@NotNull String name,
     @Override public @NotNull PrivilegeEntity toEntity()
     {
         PrivilegeEntity privilegeEntity = new PrivilegeEntity();
-        privilegeEntity.setName(name());
+        privilegeEntity.setName(name().toUpperCase()); // Make privileges always uppercase
         privilegeEntity.setGroupEntities(groupEntities());
         return privilegeEntity;
     }
