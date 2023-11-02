@@ -62,11 +62,8 @@ import java.util.function.Supplier;
         GroupEntity groupEntity = getEntity(groupService, groupCreateModel);
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
-        groupEntity.grantPrivilege(privilegeEntity);
-        groupService.saveEntity(groupEntity);
-
-        userEntity.attachGroups(groupEntity);
-        userService.saveEntity(userEntity);
+        groupEntity.grantPrivilege(groupService, privilegeEntity);
+        userEntity.attachGroups(userService, groupEntity);
 
         LOGGER.info("A default user has been created with the name {} and the password {}. It's advised to " +
                 "change the password as soon as possible.", userEntity.getLoginName(), randomPassword);

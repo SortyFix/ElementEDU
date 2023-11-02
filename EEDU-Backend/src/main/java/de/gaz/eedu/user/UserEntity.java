@@ -7,31 +7,16 @@ import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -125,6 +110,29 @@ import java.util.stream.Collectors;
     }
 
     /**
+     * Attaches various groups to the user and saves the state using the provided user service.
+     * The groups are specified via their entities.
+     * The method will update the user's associated groups and then use the service to save the updated entity state.
+     * <p>
+     * The process is conducted within a transaction to ensure that all changes are either applied in full or not at
+     * all.
+     * This is essential in maintaining data integrity.
+     *
+     * @param userService   The service used for saving the user entity after attaching the groups.
+     * @param groupEntities The groups to be attached.
+     * @return true if a group was successfully attached and the user entity was saved, false otherwise.
+     */
+    @Transactional public boolean attachGroups(@NotNull UserService userService, @NotNull GroupEntity... groupEntities)
+    {
+        if (attachGroups(groupEntities))
+        {
+            userService.saveEntity(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Attaches a {@link GroupEntity} to this user.
      * <p>
      * This method adds groups this user should be in. This is stored in {@code groups}.
@@ -146,6 +154,29 @@ import java.util.stream.Collectors;
                         presentGroup,
                         requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
+    }
+
+    /**
+     * Detaches various groups from the user and saves the state using the provided user service.
+     * The groups are specified by their IDs.
+     * The method will update the user's associated groups and then use the service to save the updated entity state.
+     * <p>
+     * The process is carried out within a transaction to ensure that all changes are either committed completely or
+     * not at all.
+     * This is critical for maintaining data integrity.
+     *
+     * @param userService The service used for saving the user entity after detaching the groups.
+     * @param ids         The IDs of the groups to be detached.
+     * @return true if a group was successfully detached and the user entity was saved, false otherwise.
+     */
+    @Transactional public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
+    {
+        if (detachGroups(ids))
+        {
+            userService.saveEntity(this);
+            return true;
+        }
+        return false;
     }
 
     /**

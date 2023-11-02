@@ -7,27 +7,13 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -65,6 +51,30 @@ import java.util.stream.Collectors;
     }
 
     /**
+     * Grants various privileges to this group and saves the state using the provided group service.
+     * The privileges are specified via their entities.
+     * The method will update the state of the group and then use the service to save the updated entity state.
+     * <p>
+     * The process is carried out within a transaction to ensure that all changes are either applied in full or not
+     * at all.
+     * This is done to maintain data integrity.
+     *
+     * @param groupService    the service used for saving the group entity after granting the privileges.
+     * @param privilegeEntity the privileges to be granted.
+     * @return true if a privilege was successfully granted and the group entity was saved, false otherwise.
+     */
+    @Transactional public boolean grantPrivilege(@NotNull GroupService groupService,
+            @NotNull PrivilegeEntity... privilegeEntity)
+    {
+        if (grantPrivilege(privilegeEntity))
+        {
+            groupService.saveEntity(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Grants {@link PrivilegeEntity}s to this group.
      * <p>
      * This method can add multiple privileges to this group and therefore to all users being part of this group.
@@ -84,6 +94,28 @@ import java.util.stream.Collectors;
         Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(
                 presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
         return privileges.addAll(Arrays.stream(privilegeEntity).filter(privilegeEntityPredicate).collect(Collectors.toSet()));
+    }
+
+    /**
+     * Revokes various privileges from this group and saves the state using the provided group service.
+     * The privileges are specified via their IDs. The method will invoke {@link #revokePrivilege(Long...)}
+     * to perform the actual removal of the privileges, and then use the service to save the updated entity state.
+     * <p>
+     * The process is carried out within a transaction, ensuring that all changes are either applied in full
+     * or not at all, in order to maintain data integrity.
+     *
+     * @param groupService the service used for saving the group entity after revoking the privileges
+     * @param id           the IDs of the privileges to revoke
+     * @return true if a privilege was successfully revoked and the group entity was saved, false otherwise
+     */
+    @Transactional public boolean revokePrivilege(@NotNull GroupService groupService, @NotNull Long... id)
+    {
+        if (revokePrivilege(id))
+        {
+            groupService.saveEntity(this);
+            return true;
+        }
+        return false;
     }
 
     /**
