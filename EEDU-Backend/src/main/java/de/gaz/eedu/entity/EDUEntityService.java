@@ -37,17 +37,36 @@ public interface EDUEntityService<E extends EDUEntity, M extends Model, C extend
      * <p>
      * This method loads an entity by a specific string.
      * This string must be decided for each service and could variate therefore.
-     * <p>
-     * Note that this method has a Support {@link Transactional} which tells jarkata that this should be called in a
-     * support context.
      *
      * @param name of the entity to load.
      * @return an optional, which is empty if no entity was found.
      */
-    @Transactional(readOnly = true) @NotNull Optional<E> loadEntityByName(@NotNull String name);
+    @NotNull @Transactional(readOnly = true) Optional<E> loadEntityByName(@NotNull String name);
 
+    /**
+     * Loads all entities as {@link E}.
+     * <p>
+     * This method is responsible for loading all entities from a repository.
+     * This repository is defined within the implementation of this class.
+     * <p>
+     * Note that when the data should be prepared for the frontend, consider using {@link #findAll()} as this
+     * automatically casts all {@link E} to {@link M}.
+     *
+     * @return an unmodifiable list containing all entities from the repository defined within the implementation.
+     * @see #findAll()
+     */
     @Transactional(readOnly = true) @Unmodifiable @NotNull List<E> findAllEntities();
 
+    /**
+     * Creates an {@link E} based on the data from {@link C}.
+     * <p>
+     * This method creates a new {@link E} based on the provided {@link C}.
+     * {@link C} represents a {@link CreationModel} and therefore has the necessary method for creating
+     * a {@link E}.
+     * @param model the model which is used to create a {@link E}
+     * @return the created {@link E} which also was saved in the repository.
+     * @throws CreationException is thrown when anything went wrong while creating
+     */
     @Transactional @NotNull E createEntity(@NotNull C model) throws CreationException;
 
     @Transactional boolean delete(long id);

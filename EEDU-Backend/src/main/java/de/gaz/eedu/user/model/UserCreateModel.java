@@ -9,6 +9,11 @@ public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastN
                               @NotEmpty(message = "Password must not be empty.") String password,
                               @NotEmpty Boolean enabled, @NotEmpty Boolean locked) implements CreationModel<UserEntity>
 {
+    @Override public @NotNull String name()
+    {
+        return loginName;
+    }
+
     @Override public @NotNull UserEntity toEntity()
     {
         UserEntity userEntity = new UserEntity();

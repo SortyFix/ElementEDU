@@ -7,6 +7,7 @@ import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * UserServiceTest is a concrete extension of {@link ServiceTest}, which is specifically
+ * designed to run tests on {@link UserService}.
+ *
+ * <p>
+ * This class has dependencies on {@link UserService} and {@link GroupService}. These services
+ * get auto-wired by the Spring container at runtime, and can be used in the test methods to
+ * create different scenarios and to verify the UserService's functionality.
+ * </p>
+ *
+ * @see ServiceTest
+ * @see UserService
+ * @see GroupService
+ */
 public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCreateModel>
 {
     private final GroupService groupService;
 
+    /**
+     * Creates a UserServiceTest instance and initializes the parent {@link ServiceTest} class
+     * with a {@link UserService} instance.
+     *
+     * <p>
+     * The constructor takes two parameters which are auto-wired by the Spring testing framework:
+     * the {@link UserService} and {@link GroupService}. The state is then used by the different
+     * test methods within this class.
+     * </p>
+     *
+     * @param service      The {@link UserService} which is used to initialize the parent
+     *                     {@link ServiceTest} class and by the test methods to run service operations.
+     * @param groupService The {@link GroupService} used in test methods to create various scenarios.
+     */
     public UserServiceTest(@Autowired UserService service, @Autowired GroupService groupService)
     {
         super(service);
@@ -29,7 +58,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
 
     @Override protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
     {
-        final UserCreateModel userCreateModel = new UserCreateModel("jonas",
+        final UserCreateModel createModel = new UserCreateModel("jonas",
                 "yonas",
                 "jonas.yonas",
                 "Password123!",
@@ -42,7 +71,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 false,
                 new HashSet<>());
 
-        return Eval.eval(userCreateModel, expected, (request, expect, result) ->
+        return Eval.eval(createModel, expected, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.firstName(), result.firstName());
             Assertions.assertEquals(expect.lastName(), result.lastName());
@@ -53,7 +82,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
         });
     }
 
-    @Override protected UserCreateModel occupiedEval()
+    @Override protected @NotNull UserCreateModel occupiedCreateModel()
     {
         return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false);
     }
@@ -85,14 +114,35 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserAddGroup(long userID)
     {
-        Eval<GroupEntity, Boolean> eval =
-                Eval.eval(groupService.loadEntityByID(3).orElseThrow(IllegalStateException::new), userID == 2,
-                        (request1, expect1, result) -> Assertions.assertEquals(expect1, result));
+        GroupEntity groupEntity = groupService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
+        UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
 
-        Tester<GroupEntity, Boolean> tester = (request) ->
-                getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new).attachGroups(request);
+        test(Eval.eval(groupEntity, userID == 2, Validator.equals()), userEntity::attachGroups);
+    }
 
-        test(eval, tester);
+    /**
+     * This method handles the test case scenarios for removing a user from a group.
+     * <p>
+     * This method verifies the process of removing a user from a specific group. It checks the case for users
+     * with userIDs 3 and 2. The user with userID 3 is expected to successfully be removed from the group,
+     * whereas the removal of a user with userID 2 is anticipated to fail. The users are present as declared in
+     * the data.sql file.
+     * <p>
+     * Similar to the 'testUserAddGroup' method, {@link ParameterizedTest} and a custom name are used to provide
+     * better clarity in the logs when a test fails, and the {@link ValueSource} annotation provides the input
+     * values for the tests.
+     * <p>
+     * The {@link Transactional} annotation configures the transaction management for the test cases,
+     * specifically, it sets the value to REQUIRES_NEW which means a new transaction would be initiated for every
+     * test case.
+     *
+     * @param userID the current user id that should be tested for the group removal. These IDs can be modified inside
+     *               the {@link ValueSource} annotation.
+     */
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserDetachGroup(long userID)
+    {
+        UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
+        test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
     }
 
     /**
@@ -107,7 +157,6 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @Test public void testCreateUserInsecurePassword()
     {
-
         for (String password : List.of(
                 "password", // no numbers + no uppercase + no special character
                 "Password123", // no special character
@@ -117,14 +166,40 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 "Pa1!!" // to short
         ))
         {
-            UserCreateModel createModel = new UserCreateModel(
-                    "jonas",
-                    "yonas",
-                    "jonas.yonas$",
-                    password,
-                    true,
-                    false);
+            UserCreateModel createModel = generatePasswordModel(password);
             Assertions.assertThrows(InsecurePasswordException.class, () -> getService().create(createModel));
         }
+    }
+
+    /**
+     * Generates a new instance of {@link UserCreateModel} with given password and with
+     * predefined user details.
+     *
+     * <p>
+     * This method is annotated with {@code @Contract(value = "_ -> new", pure = true)}. The contract
+     * indicates that for any input (denoted by '_'), a new instance is returned implying that it
+     * doesn't return {@code null}, and since the method is pure (has no side-effects or dependencies
+     * on mutable state), it can be safely called at any time.
+     * </p>
+     *
+     * <p>
+     * The value of parameters for {@code UserCreateModel} constructor are predifined:
+     * {@code "jonas", "yonas", "jonas.yonas$", password, true, false}.
+     * </p>
+     *
+     * @param password the password for the {@code UserCreateModel} instance.
+     * @return a new instance of {@code UserCreateModel} with a given password and with
+     *         predefined user details.
+     * @see UserCreateModel
+     */
+    @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
+    {
+        return new UserCreateModel(
+                "jonas",
+                "yonas",
+                "jonas.yonas$",
+                password,
+                true,
+                false);
     }
 }

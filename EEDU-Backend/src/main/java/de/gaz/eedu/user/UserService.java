@@ -6,8 +6,6 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.encryption.EncryptionService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
-import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
@@ -25,8 +23,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.*;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
