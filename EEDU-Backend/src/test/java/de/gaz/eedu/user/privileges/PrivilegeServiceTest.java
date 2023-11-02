@@ -18,7 +18,9 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeEntity, Privilege
 
     @Override protected @NotNull ServiceTest.Eval<PrivilegeCreateModel, PrivilegeModel> successEval()
     {
-        return Eval.eval(new PrivilegeCreateModel("TEST", new HashSet<>()), new PrivilegeModel(5L, "TEST", new HashSet<>()), (request, expect, result) ->
+        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("test", new HashSet<>());
+        PrivilegeModel privilegeModel = new PrivilegeModel(5L, "TEST", new HashSet<>());
+        return Eval.eval(privilegeCreateModel, privilegeModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
             Assertions.assertEquals(expect.groups(), result.groups());
