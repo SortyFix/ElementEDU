@@ -7,13 +7,14 @@ import de.gaz.eedu.exception.NameOccupiedException;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@AllArgsConstructor
+@Service @AllArgsConstructor
 public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, ThemeCreateModel>
 {
     private final ThemeRepository themeRepository;
@@ -58,6 +59,7 @@ public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, T
             return true;
         }).orElse(false);
     }
+
 
     @Override
     public @NotNull ThemeEntity saveEntity(@NotNull ThemeEntity entity)

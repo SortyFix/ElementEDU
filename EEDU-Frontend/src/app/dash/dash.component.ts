@@ -5,6 +5,7 @@ import { Component } from '@angular/core';
   templateUrl: './dash.component.html',
   styleUrls: ['./dash.component.scss']
 })
+// DEPRECATED!
 export class DashComponent {
 
 }
