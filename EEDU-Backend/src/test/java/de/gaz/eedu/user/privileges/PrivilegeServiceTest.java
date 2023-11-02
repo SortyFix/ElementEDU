@@ -1,9 +1,6 @@
 package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.entity.EDUEntityService;
-import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +25,7 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeEntity, Privilege
         });
     }
 
-    @Override protected PrivilegeCreateModel occupiedCreateModel()
+    @Override protected @NotNull PrivilegeCreateModel occupiedCreateModel()
     {
         return new PrivilegeCreateModel("READ", new HashSet<>());
     }

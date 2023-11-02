@@ -1,8 +1,6 @@
 package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
@@ -37,7 +35,7 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
         });
     }
 
-    @Override protected GroupCreateModel occupiedCreateModel()
+    @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
         return new GroupCreateModel("Users", new HashSet<>(), new HashSet<>());
     }
@@ -67,13 +65,8 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupAddPrivilege(long groupID)
     {
-        Eval<PrivilegeEntity, Boolean> eval =
-                Eval.eval(privilegeService.loadEntityByID(3).orElseThrow(IllegalStateException::new), groupID == 2,
-                        (request1, expect1, result) -> Assertions.assertEquals(expect1, result));
-
-        Tester<PrivilegeEntity, Boolean> tester = (request) ->
-                getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new).grantPrivilege(request);
-
-        test(eval, tester);
+        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
+        test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
     }
 }
