@@ -14,10 +14,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 
+/**
+ * Test class for GroupService.
+ * <p>
+ * It extends from the base class ServiceTest, using GroupEntity as the main entity, GroupModel as the main model,
+ * and GroupCreateModel as the creation model for setting up the tests.
+ * <p>
+ * The PrivilegeService component is autowired and used in this test class to perform operations related to privileges
+ * while testing group service operations.
+ *
+ * @author ivo
+ */
 public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, GroupCreateModel>
 {
     private final PrivilegeService privilegeService;
 
+    /**
+     * Constructs a new GroupServiceTest instance. If I write more, I'll die, I swear!!!!!
+     *
+     * @param service the GroupService instance to be used in the tests.
+     * @param privilegeService the PrivilegeService instance to be used in the tests.
+     */
     public GroupServiceTest(@Autowired GroupService service, @Autowired PrivilegeService privilegeService)
     {
         super(service);

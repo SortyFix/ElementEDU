@@ -9,8 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 
+/**
+ * Test class for PrivilegeService.
+ * <p>
+ * It extends the base class ServiceTest, using PrivilegeEntity as the main entity, PrivilegeModel as the main model,
+ * and PrivilegeCreateModel as the creation model for setting up the tests. Helps test PrivilegeService operations.
+ *
+ * @author ivo
+ */
 public class PrivilegeServiceTest extends ServiceTest<PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
+    /**
+     * Constructs a new PrivilegeServiceTest instance.
+     *
+     * @param service The PrivilegeService instance to be used in the tests.
+     */
     public PrivilegeServiceTest(@Autowired PrivilegeService service)
     {
         super(service);
