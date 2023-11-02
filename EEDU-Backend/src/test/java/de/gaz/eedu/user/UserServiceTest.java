@@ -121,6 +121,31 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
     }
 
     /**
+     * This method handles the test case scenarios for removing a user from a group.
+     * <p>
+     * This method verifies the process of removing a user from a specific group. It checks the case for users
+     * with userIDs 3 and 2. The user with userID 3 is expected to successfully be removed from the group,
+     * whereas the removal of a user with userID 2 is anticipated to fail. The users are present as declared in
+     * the data.sql file.
+     * <p>
+     * Similar to the 'testUserAddGroup' method, {@link ParameterizedTest} and a custom name are used to provide
+     * better clarity in the logs when a test fails, and the {@link ValueSource} annotation provides the input
+     * values for the tests.
+     * <p>
+     * The {@link Transactional} annotation configures the transaction management for the test cases,
+     * specifically, it sets the value to REQUIRES_NEW which means a new transaction would be initiated for every
+     * test case.
+     *
+     * @param userID the current user id that should be tested for the group removal. These IDs can be modified inside
+     *               the {@link ValueSource} annotation.
+     */
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserDetachGroup(long userID)
+    {
+        UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
+        test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
+    }
+
+    /**
      * Test insecure password security.
      * <p>
      * This method tests if the {@link InsecurePasswordException} is thrown when the given password is too weak.

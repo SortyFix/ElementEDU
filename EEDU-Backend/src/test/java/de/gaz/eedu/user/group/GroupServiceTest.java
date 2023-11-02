@@ -63,10 +63,32 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
      * @param groupID the current group id to be tested for granting privilege. These are adjustable in the
      *                {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupAddPrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupGrantPrivilege(long groupID)
     {
         PrivilegeEntity privilegeEntity = privilegeService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
         GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
         test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
+    }
+
+    /**
+     * This method tests the functionality of removing a privilege from a group.
+     * <p>
+     * The intent of the test case is to validate if a group can have certain privileges revoked.
+     * It verifies this for groups with groupIDs 3 and 2. The group with groupID 3 is expected to have the privilege
+     * successfully revoked while the one with groupID 2 is anticipated to fail in the revocation process.
+     * <p>
+     * Like the 'testGroupGrantPrivilege' method, this method uses {@link ParameterizedTest} with a custom name
+     * for better clarity in the logs in case a test fails, and {@link ValueSource} to provide input values.
+     * <p>
+     * The {@link Transactional} annotation is used to ensure independent transactions for each method execution,
+     * by setting up a new transaction scope for every test case.
+     *
+     * @param groupID the current group id that should be tested for the privilege revocation. These IDs can be modified inside
+     *                the {@link ValueSource} annotation.
+     */
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupRevokePrivilege(long groupID)
+    {
+        GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
+        test(Eval.eval(3L /* privilegeId */, groupID == 3, Validator.equals()), groupEntity::revokePrivilege);
     }
 }
