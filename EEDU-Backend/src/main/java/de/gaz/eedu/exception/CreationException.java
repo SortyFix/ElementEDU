@@ -1,4 +1,11 @@
 package de.gaz.eedu.exception;
 
-public class CreationException extends IllegalStateException{
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@AllArgsConstructor @Getter public class CreationException extends IllegalStateException {
+
+    private final HttpStatus status;
+
 }

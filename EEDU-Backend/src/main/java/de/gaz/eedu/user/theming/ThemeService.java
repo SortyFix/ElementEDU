@@ -1,6 +1,6 @@
 package de.gaz.eedu.user.theming;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Service @AllArgsConstructor
-public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, ThemeCreateModel>
+public class ThemeService implements EntityService<ThemeEntity, ThemeModel, ThemeCreateModel>
 {
     private final ThemeRepository themeRepository;
 

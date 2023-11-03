@@ -1,6 +1,6 @@
 package de.gaz.eedu.user.group;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class GroupService implements EDUEntityService<GroupEntity, GroupModel, GroupCreateModel>
+@Service @AllArgsConstructor public class GroupService implements EntityService<GroupEntity, GroupModel, GroupCreateModel>
 {
 
     @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;

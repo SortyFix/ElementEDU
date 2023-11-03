@@ -15,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
-public interface EDUEntityService<E extends EDUEntity, M extends Model, C extends CreationModel<E>>
+public interface EntityService<E extends EDUEntity, M extends Model, C extends CreationModel<E>>
 {
 
     /**

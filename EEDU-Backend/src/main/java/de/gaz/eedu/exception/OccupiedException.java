@@ -1,3 +1,10 @@
 package de.gaz.eedu.exception;
 
-public class OccupiedException extends CreationException { }
+import org.springframework.http.HttpStatus;
+
+public class OccupiedException extends CreationException {
+    public OccupiedException()
+    {
+        super(HttpStatus.CONFLICT);
+    }
+}

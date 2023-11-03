@@ -1,6 +1,6 @@
 package de.gaz.eedu.user.privileges;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class PrivilegeService implements EDUEntityService<PrivilegeEntity,
+@Service @AllArgsConstructor public class PrivilegeService implements EntityService<PrivilegeEntity,
         PrivilegeModel,
         PrivilegeCreateModel>
 {

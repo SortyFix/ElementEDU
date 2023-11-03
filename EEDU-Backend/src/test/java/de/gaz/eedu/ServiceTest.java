@@ -1,6 +1,6 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.entity.model.Model;
@@ -49,17 +49,17 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extends CreationModel<E>>
 {
-    private final EDUEntityService<E, M, C> service;
+    private final EntityService<E, M, C> service;
 
     /**
      * Is a necessary for all children of this class.
      * Most-likely this value is annotated using {@link org.springframework.beans.factory.annotation.Autowired} which
      * automatically provides
-     * an instance of this {@link EDUEntityService}.
+     * an instance of this {@link EntityService}.
      *
      * @param service which this tests should refer to.
      */
-    public ServiceTest(@NotNull EDUEntityService<E, M, C> service)
+    public ServiceTest(@NotNull EntityService<E, M, C> service)
     {
         this.service = service;
     }
@@ -72,9 +72,9 @@ public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extend
      * circumstances.
      *
      * @return the service instance, never null
-     * @see EDUEntityService
+     * @see EntityService
      */
-    @Contract(pure = true) protected @NotNull EDUEntityService<E, M, C> getService()
+    @Contract(pure = true) protected @NotNull EntityService<E, M, C> getService()
     {
         return service;
     }

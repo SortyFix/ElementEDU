@@ -1,6 +1,6 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.encryption.EncryptionService;
@@ -45,7 +45,7 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EDUEntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
 
     private final UserRepository userRepository;

@@ -1,6 +1,6 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.entity.EDUEntityService;
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.user.UserEntity;
@@ -81,7 +81,7 @@ import java.util.function.Supplier;
      * @throws java.util.NoSuchElementException if the creation model didn't specify a name and an entity couldn't be
      *                                          loaded
      */
-    private <E extends EDUEntity, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EDUEntityService<E, ?, C> service, @NotNull C groupCreateModel)
+    private <E extends EDUEntity, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EntityService<E, ?, C> service, @NotNull C groupCreateModel)
     {
         Supplier<E> create = () -> service.createEntity(groupCreateModel);
         return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);
