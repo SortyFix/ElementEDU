@@ -1,17 +1,11 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.user.exception.InsecurePasswordException;
-import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.annotation.security.PermitAll;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,9 +30,8 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author ivo
  */
-@RestController
-@RequestMapping(value = "/user")
-public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
+@RestController @RequestMapping(value = "/user") public class UserController extends EntityController<UserService,
+        UserModel, UserCreateModel>
 {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -48,17 +41,17 @@ public class UserController extends EntityController<UserService, UserModel, Use
         super(entityService);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull UserCreateModel model)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull UserCreateModel model)
     {
         return super.create(model);
     }
 
-    @PreAuthorize("isAuthenticated()") @Override public @NotNull Boolean delete(@NotNull Long id)
+    @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @PreAuthorize("isAuthenticated()") @Override public @NotNull ResponseEntity<UserModel> getData(@NotNull Long id)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }

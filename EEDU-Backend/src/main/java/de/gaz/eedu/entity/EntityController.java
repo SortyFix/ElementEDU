@@ -9,17 +9,14 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+
 
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C>, M extends Model, C extends CreationModel<?>>
 {
 
     @Getter(AccessLevel.PROTECTED) private final S entityService;
 
-    @PostMapping("/create") public @NotNull ResponseEntity<M> create(@NotNull C model)
+    public @NotNull ResponseEntity<M> create(@NotNull C model)
     {
         try
         {
@@ -31,12 +28,12 @@ import org.springframework.web.bind.annotation.PostMapping;
         }
     }
 
-    @DeleteMapping("/delete/{id}") public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    public @NotNull Boolean delete(@NotNull Long id)
     {
         return getEntityService().delete(id);
     }
 
-    @GetMapping("/get/{id}") public @NotNull ResponseEntity<M> getData(@NotNull @PathVariable Long id)
+    public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }

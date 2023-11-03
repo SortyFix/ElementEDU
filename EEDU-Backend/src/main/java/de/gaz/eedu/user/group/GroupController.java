@@ -1,0 +1,34 @@
+package de.gaz.eedu.user.group;
+
+import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.group.model.GroupCreateModel;
+import de.gaz.eedu.user.group.model.GroupModel;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController @RequestMapping("/group") public class GroupController extends EntityController<GroupService,
+        GroupModel, GroupCreateModel>
+{
+    public GroupController(@Autowired GroupService entityService)
+    {
+        super(entityService);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<GroupModel> create(@NotNull GroupCreateModel model)
+    {
+        return super.create(model);
+    }
+
+    @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    {
+        return super.delete(id);
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull Long id)
+    {
+        return super.getData(id);
+    }
+}
