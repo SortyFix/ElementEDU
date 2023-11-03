@@ -6,6 +6,7 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -58,17 +59,20 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
 
     @Override protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
     {
+        final ThemeEntity themeEntity = new ThemeEntity();
         final UserCreateModel createModel = new UserCreateModel("jonas",
                 "yonas",
                 "jonas.yonas",
                 "Password123!",
                 true,
-                false);
+                false,
+                        themeEntity);
         final UserModel expected = new UserModel(5L, "jonas",
                 "yonas",
                 "jonas.yonas",
                 true,
                 false,
+                        themeEntity,
                 new HashSet<>());
 
         return Eval.eval(createModel, expected, (request, expect, result) ->
@@ -79,12 +83,13 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
             Assertions.assertEquals(expect.enabled(), result.enabled());
             Assertions.assertEquals(expect.locked(), result.locked());
             Assertions.assertEquals(expect.groups(), result.groups());
+            Assertions.assertEquals(expect.themeEntity(), result.themeEntity());
         });
     }
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()
     {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false);
+        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, new ThemeEntity());
     }
 
     /**
@@ -194,12 +199,14 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
     {
+        ThemeEntity themeEntity = new ThemeEntity();
         return new UserCreateModel(
                 "jonas",
                 "yonas",
                 "jonas.yonas$",
                 password,
                 true,
-                false);
+                false,
+                        themeEntity);
     }
 }

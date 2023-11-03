@@ -1,19 +1,17 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.entity.model.Model;
-import de.gaz.eedu.user.model.UserModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record ThemeModel(Long id, UserModel userModel, String name, int backgroundColor, int widgetColor, int textColor) implements Model
+public record ThemeModel(@NotNull Long id, @NotNull String name, @NotNull int backgroundColor, @NotNull int widgetColor, @NotNull int textColor) implements Model
 {
     @Contract(pure = true) @Override public @NotNull String toString()
     {
         return "ThemeModel{" +
                 "id=" + id +
-                ", userModel=" + userModel +
                 ", name='" + name + '\'' +
                 ", backgroundColor=" + backgroundColor +
                 ", widgetColor=" + widgetColor +

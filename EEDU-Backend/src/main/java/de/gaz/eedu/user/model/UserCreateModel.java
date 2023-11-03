@@ -2,12 +2,13 @@ package de.gaz.eedu.user.model;
 
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.theming.ThemeEntity;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
 public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastName, @NotEmpty String loginName,
                               @NotEmpty(message = "Password must not be empty.") String password,
-                              @NotEmpty Boolean enabled, @NotEmpty Boolean locked) implements CreationModel<UserEntity>
+                              @NotEmpty Boolean enabled, @NotEmpty Boolean locked, @NotEmpty ThemeEntity themeEntity) implements CreationModel<UserEntity>
 {
     @Override public @NotNull String name()
     {
@@ -22,6 +23,7 @@ public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastN
         userEntity.setLoginName(loginName());
         userEntity.setEnabled(enabled());
         userEntity.setLocked(locked());
+        userEntity.setThemeEntity(themeEntity());
 
         return userEntity;
     }

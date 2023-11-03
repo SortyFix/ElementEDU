@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
@@ -13,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 
 @RestController
@@ -29,38 +28,45 @@ public class ThemeController
     private final UserService userService;
 
     /**
-     * Loads Theme Entity by given theme name and replaces its UserEntity.
-     * If a User Entity is already present in a Theme Entity, it will be deleted.
-     * Returns the modified Theme Entity for usage in the frontend application.
+     * Loads User Entity by given ID and sets its Theme Entity to the one that is holding the given name.
+     * Returns the Theme Entity as a model.
      * @param id
      * @param name
-     * @return ThemeEntity
+     * @return ThemeModel
      */
-    @PermitAll @PostMapping("/me/{id}/theme/set") public ResponseEntity<ThemeEntity> setTheme(@PathVariable @NotNull Long id, @RequestBody String name){
+    @PermitAll @PostMapping("/me/{id}/theme/set") public ResponseEntity<ThemeModel> setTheme(@PathVariable @NotNull Long id, @RequestBody String name){
         logger.info("The server has recognized an incoming theme set request.");
         try{
-            // Does the following code make sense Ivo?
-            ThemeEntity themeEntity = themeService.loadEntityByName(name).orElseThrow(IllegalArgumentException::new);
-            themeEntity.setUserEntity(userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new));
-            Optional<ThemeEntity> loadedEntityByUserEntity = themeService.loadEntityByUserEntity(userService.loadEntityByID(id).orElse(null));
-            // If UserEntity is already assigned to a ThemeEntity, delete said ThemeEntity
-            loadedEntityByUserEntity.ifPresent(themeEntity1 -> {
-                logger.info("Found already existing theme entity in given user ID. Removing...");
-                themeService.delete(themeEntity1.getId());
-                logger.info("Removed.");
-            });
-            // Save newly created ThemeEntity
-            themeService.saveEntity(themeEntity);
-            return ResponseEntity.ok(themeEntity);
+            UserEntity userEntity = userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new);
+            ThemeEntity loadedEntity = themeService.loadEntityByName(name).orElseThrow(IllegalArgumentException::new);
+            userEntity.setThemeEntity(loadedEntity);
+            return ResponseEntity.ok(loadedEntity.toModel());
         }
         catch(IllegalArgumentException illegalArgumentException){
             return ResponseEntity.badRequest().body(null);
         }
     }
-    @PermitAll @GetMapping("/me/{id}/theme/get") public ThemeEntity getTheme(@PathVariable @NotNull Long id){
-        return themeService.loadEntityByUserEntity(userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new))
-                .orElseThrow(IllegalArgumentException::new);
+
+    /**
+     * Get Theme Model of user with the given <code>id</code>
+     * @param id
+     * @return ThemeModel
+     */
+    @PermitAll @GetMapping("/me/{id}/theme/get") public ResponseEntity<ThemeModel> getTheme(@PathVariable @NotNull Long id){
+        if(userService.loadEntityByID(id).isPresent()){
+            return ResponseEntity.ok(userService.loadEntityByID(id).get().getThemeEntity().toModel());
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
     }
+
+    /**
+     * Create theme with given <code>ThemeEntity</code> data in request body.
+     * Will throw a NameOccupiedException if name is already used by another Theme Entity.
+     * @param themeCreateModel
+     * @return ThemeEntity
+     */
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create") public @NotNull ResponseEntity<ThemeEntity> createTheme(@NotNull @RequestBody ThemeCreateModel themeCreateModel){
         try {
             return ResponseEntity.ok(themeService.createEntity(themeCreateModel));
@@ -70,6 +76,7 @@ public class ThemeController
         }
     }
 
+    // Possibly set for deletion.
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId){
         if(themeService.delete(themeId) == false)
         {

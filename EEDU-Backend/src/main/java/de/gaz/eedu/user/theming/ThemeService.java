@@ -4,7 +4,6 @@ import de.gaz.eedu.entity.EDUEntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
-import de.gaz.eedu.user.UserEntity;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -32,9 +31,6 @@ public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, T
         return themeRepository.findByName(name);
     }
 
-    public @NotNull Optional<ThemeEntity> loadEntityByUserEntity(UserEntity userEntity){
-        return themeRepository.findThemeEntityByUserEntity(userEntity);
-    }
 
     @Override
     public @Unmodifiable @NotNull List<ThemeEntity> findAllEntities()
@@ -50,7 +46,7 @@ public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, T
             throw new NameOccupiedException(occupied.getName());
         });
         return themeRepository.save(model.toEntity((obj -> {
-            obj.setUserEntity(null); // TODO: Implement stuff
+            // TODO: Implement stuff
             return obj;
         })));
     }
@@ -82,7 +78,6 @@ public class ThemeService implements EDUEntityService<ThemeEntity, ThemeModel, T
     public @NotNull Function<ThemeEntity, ThemeModel> toModel()
     {
         return themeEntity -> new ThemeModel(themeEntity.getId(),
-                themeEntity.getUserEntity().toModel(),
                 themeEntity.getName(),
                 themeEntity.getBackgroundColor(),
                 themeEntity.getWidgetColor(),
