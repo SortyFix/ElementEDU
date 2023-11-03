@@ -10,6 +10,7 @@ import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,6 +51,7 @@ import java.util.function.Function;
 
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
+    private final ThemeService themeService;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
@@ -82,8 +84,8 @@ import java.util.function.Function;
         String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
         return saveEntity(model.toEntity((entity ->
         {
-            entity.setPassword(hashedPassword); // outsource password as it must be encrypted using the encryption
-            // service.
+            entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
+            entity.setThemeEntity(themeService.saveEntity(model.themeEntity()));
             return entity;
         })));
     }

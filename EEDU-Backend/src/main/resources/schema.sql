@@ -8,7 +8,18 @@ CREATE TABLE user_entity
     login_name VARCHAR(255),
     password   VARCHAR(255),
     enabled    BOOLEAN,
-    locked     BOOLEAN
+    locked   BOOLEAN,
+    theme_id BIGINT
+);
+
+-- This table stores information about different themes
+CREATE TABLE theme_entity
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name            VARCHAR(255),
+    background_color INT,
+    widget_color     INT,
+    text_color       INT
 );
 
 -- This table stores information about different groups
