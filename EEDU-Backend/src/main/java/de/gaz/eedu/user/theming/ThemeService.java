@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.user.UserEntity;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -29,6 +30,10 @@ public class ThemeService implements EntityService<ThemeEntity, ThemeModel, Them
     public @NotNull Optional<ThemeEntity> loadEntityByName(@NotNull String name)
     {
         return themeRepository.findByName(name);
+    }
+
+    public @NotNull Optional<ThemeEntity> loadEntityByUserEntity(UserEntity userEntity){
+        return themeRepository.findThemeEntityByUserEntity(userEntity);
     }
 
     @Override
