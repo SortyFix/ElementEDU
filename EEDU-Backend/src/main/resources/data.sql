@@ -43,11 +43,17 @@ assignment and hierarchy of users, groups, and privileges.
 =============================================================================
 */
 
-INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked)
-VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE),
-       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE),
-       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE),
-       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE);
+INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id)
+VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1),
+       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2),
+       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3),
+       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4);
+
+INSERT INTO theme_entity(name, background_color, widget_color, text_color)
+VALUES ( 'Light', 0x000000, 0x000000, 0x000000 ),
+       ( 'Medium', 0x000000, 0x000000, 0x000000 ),
+       ( 'Dark', 0x000000, 0x000000, 0x000000 ),
+       ( 'dummy', 0x000000, 0x000000, 0x000000 );
 
 INSERT INTO group_entity (name)
 VALUES ('Users'), ('Moderators'), ('Admins'), ('Dummy');

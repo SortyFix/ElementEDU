@@ -4,6 +4,7 @@ import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 
-import static de.gaz.eedu.user.UserTestData.ENABLED;
-import static de.gaz.eedu.user.UserTestData.FIRST_NAME;
-import static de.gaz.eedu.user.UserTestData.LAST_NAME;
-import static de.gaz.eedu.user.UserTestData.LOCKED;
-import static de.gaz.eedu.user.UserTestData.LOGIN_NAME;
-import static de.gaz.eedu.user.UserTestData.PASSWORD;
+import static de.gaz.eedu.user.UserTestData.*;
 
 
 /**
@@ -69,8 +65,8 @@ public class UserServiceMockitoTest
     @Test public void testCreateUserSuccessTest()
     {
 
-        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED);
-        UserModel expected = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, new HashSet<>());
+        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, THEME_ENTITY);
+        UserModel expected = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, THEME_ENTITY, new HashSet<>());
 
         Mockito.when(userService.create(request)).thenReturn(expected);
         userService.create(request);
@@ -91,14 +87,16 @@ public class UserServiceMockitoTest
      */
     @Test public void testCreateUserLoginNameOccupied()
     {
+        ThemeEntity themeEntity = new ThemeEntity();
         UserCreateModel request = new UserCreateModel(FIRST_NAME,
                 LAST_NAME,
                 "max.mustermann",
                 PASSWORD,
                 ENABLED,
-                LOCKED);
+                LOCKED,
+                THEME_ENTITY);
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
-        UserModel expected = new UserModel(1L, null, null, null, false, false, null);
+        UserModel expected = new UserModel(1L, null, null, null, false, false, themeEntity, null);
 
         Mockito.when(userService.create(request)).thenThrow(new LoginNameOccupiedException(expected));
         Assertions.assertThrows(LoginNameOccupiedException.class, () -> userService.create(request));
@@ -112,7 +110,8 @@ public class UserServiceMockitoTest
                 LOGIN_NAME,
                 "password",
                 ENABLED,
-                LOCKED);
+                LOCKED,
+                THEME_ENTITY);
 
         Mockito.when(userService.create(request)).thenThrow(new InsecurePasswordException());
         Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(request));

@@ -21,5 +21,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @NotNull Collection<UserEntity> findUserByFirstName(@NotNull String firstname);
 
     @NotNull Collection<UserEntity> findUserByLastName(@NotNull String lastName);
-
 }
