@@ -1,58 +1,31 @@
 package de.gaz.eedu.user.group;
 
+import de.gaz.eedu.ServiceMockitoTest;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
-@SpringBootTest
-@ActiveProfiles("test")
-public class GroupServiceMockitoTest
+public class GroupServiceMockitoTest extends ServiceMockitoTest<GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
-    private GroupService groupService;
-
-    @BeforeEach public void init()
+    @Override protected Class<GroupService> serviceClass()
     {
-        this.groupService = Mockito.mock(GroupService.class);
+        return GroupService.class;
     }
 
-    @Test public void testCreatePrivilegeSuccess()
+    @Override protected @NotNull MockitoData<GroupCreateModel, GroupModel> successData()
     {
         GroupCreateModel request = new GroupCreateModel("test", new HashSet<>(), new HashSet<>());
-        GroupModel response = new GroupModel(1L, "test", new HashSet<>(), new HashSet<>());
-
-        Mockito.when(groupService.create(request)).thenReturn(response);
-        groupService.create(request);
-        Mockito.verify(groupService, Mockito.times(1)).create(request);
+        GroupModel expected = new GroupModel(1L, "test", new HashSet<>(), new HashSet<>());
+        return MockitoData.data(request, expected);
     }
 
-    @Test public void testCreatePrivilegeNameOccupied()
+    @Override protected @NotNull MockitoData<GroupCreateModel, NameOccupiedException> occupiedData()
     {
         GroupCreateModel request = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
         NameOccupiedException expected = new NameOccupiedException("admin");
-
-        Mockito.when(groupService.create(request)).thenThrow(expected);
-        Assertions.assertThrows(NameOccupiedException.class, () -> groupService.create(request));
-        Mockito.verify(groupService, Mockito.times(1)).create(request);
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = {1L, 2L})
-    public void testDeletePrivilege(long request)
-    {
-        boolean expected = request == 1L;
-
-        Mockito.when(groupService.delete(request)).thenReturn(expected);
-        groupService.delete(request);
-        Mockito.verify(groupService, Mockito.times(1)).delete(request);
+        return MockitoData.data(request, expected);
     }
 }

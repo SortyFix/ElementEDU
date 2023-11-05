@@ -33,7 +33,7 @@ import java.util.Set;
 public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty String lastName,
                         @NotEmpty String loginName,
                         @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
-                        @NotEmpty ThemeEntity themeEntity,
+                        @NotEmpty ThemeEntity themeEntity, //TODO remove entity
                         @NotEmpty Set<SimpleUserGroupModel> groups) implements Model
 {
 
