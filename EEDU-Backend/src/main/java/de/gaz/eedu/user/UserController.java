@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
         super(entityService);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull UserCreateModel model)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
     {
         return super.create(model);
     }

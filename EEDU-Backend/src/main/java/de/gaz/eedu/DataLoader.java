@@ -12,7 +12,6 @@ import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -54,9 +53,8 @@ import java.util.function.Supplier;
      */
     private void createDefaultUser()
     {
-        ThemeEntity themeEntity = new ThemeEntity();
         String randomPassword = randomPassword(10);
-        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, themeEntity);
+        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 0L);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 

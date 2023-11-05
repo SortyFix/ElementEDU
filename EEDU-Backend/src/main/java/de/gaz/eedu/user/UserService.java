@@ -10,6 +10,8 @@ import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.theming.ThemeModel;
 import de.gaz.eedu.user.theming.ThemeService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -85,7 +88,7 @@ import java.util.function.Function;
         return saveEntity(model.toEntity((entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
-            entity.setThemeEntity(themeService.saveEntity(model.themeEntity()));
+            entity.setThemeEntity(null); //TODO later
             return entity;
         })));
     }
