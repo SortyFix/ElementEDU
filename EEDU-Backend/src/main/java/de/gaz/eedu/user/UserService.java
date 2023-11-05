@@ -57,17 +57,17 @@ import java.util.function.Function;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
-        return userRepository.findById(id);
+        return getUserRepository().findById(id);
     }
 
     @Override public @NotNull Optional<UserEntity> loadEntityByName(@NotNull String name)
     {
-        return userRepository.findByLoginName(name);
+        return getUserRepository().findByLoginName(name);
     }
 
     @Override public @Unmodifiable @NotNull List<UserEntity> findAllEntities()
     {
-        return userRepository.findAll();
+        return getUserRepository().findAll();
     }
 
     @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
