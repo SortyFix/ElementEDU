@@ -36,7 +36,7 @@ import static de.gaz.eedu.user.UserTestData.*;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public class UserServiceMockitoTest
+public class UserServiceMockitoTest //TODO remove UserTestData
 {
     private UserService userService;
 
@@ -65,8 +65,8 @@ public class UserServiceMockitoTest
     @Test public void testCreateUserSuccessTest()
     {
 
-        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, THEME_ENTITY);
-        UserModel expected = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, THEME_ENTITY, new HashSet<>());
+        UserCreateModel request = new UserCreateModel(FIRST_NAME, LAST_NAME, LOGIN_NAME, PASSWORD, ENABLED, LOCKED, 1L);
+        UserModel expected = new UserModel(11L, FIRST_NAME, LAST_NAME, LOGIN_NAME, ENABLED, LOCKED, null, new HashSet<>());
 
         Mockito.when(userService.create(request)).thenReturn(expected);
         userService.create(request);
@@ -94,7 +94,7 @@ public class UserServiceMockitoTest
                 PASSWORD,
                 ENABLED,
                 LOCKED,
-                THEME_ENTITY);
+                null);
         // de.gaz.sp.UserModel#equals(Object) only tests for the id, therefore any other values are irrelevant.
         UserModel expected = new UserModel(1L, null, null, null, false, false, themeEntity, null);
 
@@ -111,7 +111,7 @@ public class UserServiceMockitoTest
                 "password",
                 ENABLED,
                 LOCKED,
-                THEME_ENTITY);
+                null);
 
         Mockito.when(userService.create(request)).thenThrow(new InsecurePasswordException());
         Assertions.assertThrows(InsecurePasswordException.class, () -> userService.create(request));

@@ -6,7 +6,7 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -33,46 +33,31 @@ import java.util.List;
  * @see UserService
  * @see GroupService
  */
-public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCreateModel>
-{
+public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCreateModel> {
     private final GroupService groupService;
+    private final ThemeService themeService;
 
-    /**
-     * Creates a UserServiceTest instance and initializes the parent {@link ServiceTest} class
-     * with a {@link UserService} instance.
-     *
-     * <p>
-     * The constructor takes two parameters which are auto-wired by the Spring testing framework:
-     * the {@link UserService} and {@link GroupService}. The state is then used by the different
-     * test methods within this class.
-     * </p>
-     *
-     * @param service      The {@link UserService} which is used to initialize the parent
-     *                     {@link ServiceTest} class and by the test methods to run service operations.
-     * @param groupService The {@link GroupService} used in test methods to create various scenarios.
-     */
-    public UserServiceTest(@Autowired UserService service, @Autowired GroupService groupService)
-    {
+    public UserServiceTest(@Autowired @NotNull UserService service, @Autowired @NotNull GroupService groupService, @Autowired @NotNull ThemeService themeService) {
         super(service);
         this.groupService = groupService;
+        this.themeService = themeService;
     }
 
-    @Override protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
-    {
-        final ThemeEntity themeEntity = new ThemeEntity();
+    @Override
+    protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas",
                 "yonas",
                 "jonas.yonas",
                 "Password123!",
                 true,
                 false,
-                        themeEntity);
+                1L);
         final UserModel expected = new UserModel(5L, "jonas",
                 "yonas",
                 "jonas.yonas",
                 true,
                 false,
-                        themeEntity,
+                themeService.loadEntityByID(1L).orElseThrow(IllegalStateException::new),
                 new HashSet<>());
 
         return Eval.eval(createModel, expected, (request, expect, result) ->
@@ -83,13 +68,13 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
             Assertions.assertEquals(expect.enabled(), result.enabled());
             Assertions.assertEquals(expect.locked(), result.locked());
             Assertions.assertEquals(expect.groups(), result.groups());
-            Assertions.assertEquals(expect.themeEntity(), result.themeEntity());
+            Assertions.assertEquals(expect.themeEntity().getId(), result.themeEntity().getId());
         });
     }
 
-    @Override protected @NotNull UserCreateModel occupiedCreateModel()
-    {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, new ThemeEntity());
+    @Override
+    protected @NotNull UserCreateModel occupiedCreateModel() {
+        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, 1L);
     }
 
     /**
@@ -117,8 +102,10 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * @param userID the current user id that should be tested for the group addition. These can be modified inside
      *               the {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserAddGroup(long userID)
-    {
+    @ParameterizedTest(name = "{index} => request={0}")
+    @ValueSource(longs = {2, 3})
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void testUserAddGroup(long userID) {
         GroupEntity groupEntity = groupService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
 
@@ -144,8 +131,10 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * @param userID the current user id that should be tested for the group removal. These IDs can be modified inside
      *               the {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserDetachGroup(long userID)
-    {
+    @ParameterizedTest(name = "{index} => request={0}")
+    @ValueSource(longs = {3, 2})
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void testUserDetachGroup(long userID) {
         UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
         test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
     }
@@ -160,8 +149,8 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * it must be 6 characters long at least.
      * Otherwise, the password will cause a {@link InsecurePasswordException} as mentioned above.
      */
-    @Test public void testCreateUserInsecurePassword()
-    {
+    @Test
+    public void testCreateUserInsecurePassword() {
         for (String password : List.of(
                 "password", // no numbers + no uppercase + no special character
                 "Password123", // no special character
@@ -169,8 +158,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 "password123!", // no uppercase
                 "PASSWORD123!", // no lowercase
                 "Pa1!!" // to short
-        ))
-        {
+        )) {
             UserCreateModel createModel = generatePasswordModel(password);
             Assertions.assertThrows(InsecurePasswordException.class, () -> getService().create(createModel));
         }
@@ -194,12 +182,11 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      *
      * @param password the password for the {@code UserCreateModel} instance.
      * @return a new instance of {@code UserCreateModel} with a given password and with
-     *         predefined user details.
+     * predefined user details.
      * @see UserCreateModel
      */
-    @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
-    {
-        ThemeEntity themeEntity = new ThemeEntity();
+    @Contract(value = "_ -> new", pure = true)
+    private @NotNull UserCreateModel generatePasswordModel(@NotNull String password) {
         return new UserCreateModel(
                 "jonas",
                 "yonas",
@@ -207,6 +194,6 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 password,
                 true,
                 false,
-                        themeEntity);
+                1L);
     }
 }

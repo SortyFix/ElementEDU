@@ -1,6 +1,5 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.user.theming.ThemeEntity;
 
 /**
  * Provides test data.
@@ -14,6 +13,7 @@ import de.gaz.eedu.user.theming.ThemeEntity;
  * @see UserServiceMockitoTest
  * @see UserServiceTest
  */
+@Deprecated(forRemoval = true)
 class UserTestData // only visible in the same package
 {
     static final String FIRST_NAME = "John";
@@ -22,5 +22,4 @@ class UserTestData // only visible in the same package
     static final String PASSWORD = "Password123!";
     static final boolean ENABLED = true;
     static final boolean LOCKED = false;
-    static final ThemeEntity THEME_ENTITY = new ThemeEntity();
 }
