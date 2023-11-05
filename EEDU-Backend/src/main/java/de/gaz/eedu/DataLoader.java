@@ -12,6 +12,9 @@ import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
+import de.gaz.eedu.user.theming.ThemeCreateModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +32,7 @@ import java.util.function.Supplier;
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
+    private final ThemeService themeService;
 
     @Override @Transactional(Transactional.TxType.REQUIRED) public void run(@NotNull String... args)
     {
@@ -54,9 +58,13 @@ import java.util.function.Supplier;
     private void createDefaultUser()
     {
         String randomPassword = randomPassword(10);
-        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 0L);
+
+        ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
+        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
+
+        getEntity(themeService, themeCreateModel); // create theme
 
         PrivilegeEntity privilegeEntity = getEntity(privilegeService, privilegeCreateModel);
         GroupEntity groupEntity = getEntity(groupService, groupCreateModel);
