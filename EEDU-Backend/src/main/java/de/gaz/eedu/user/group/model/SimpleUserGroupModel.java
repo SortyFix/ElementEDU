@@ -7,5 +7,5 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public record SimpleUserGroupModel(long id, @NotNull String name,
-                                   @NotNull Set<SimplePrivilegeModel> privileges) implements SimpleModel
-{}
+                                   @NotNull Set<SimplePrivilegeModel> privileges) implements SimpleModel {
+}
