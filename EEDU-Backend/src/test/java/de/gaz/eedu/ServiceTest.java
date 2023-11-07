@@ -68,7 +68,7 @@ public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extend
      * This method provides access to the EDUEntityService instance that serves the purpose of carrying out actions
      * related to entities within the application. This instance is typically initialized during the setup phase of a
      * test.
-     * It is marked with the @NotNull annotation, meaning that this method should never return null in any
+     * It is marked with the {@link NotNull} annotation, meaning that this method should never return null in any
      * circumstances.
      *
      * @return the service instance, never null
@@ -81,16 +81,17 @@ public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extend
 
     /**
      * This is an abstract method that must be implemented by any class inheriting from this one. The implementation of
-     * this method must provide a `Eval<C, M>` type that represents a successful case for the class under test.
+     * this method must provide a {@link Eval} type that represents a successful case for the class under test.
      * <p>
-     * It's marked as @NotNull, requiring non-null values for its return.
+     * It's marked as {@link NotNull}, requiring non-null values for its return.
      *
-     * @return the successful `Eval<C, M>` instance for the service under test
+     * @return the successful {@link Eval} instance for the service under test
      */
     @Contract(value = "-> new", pure = true) protected abstract @NotNull Eval<C, M> successEval();
 
     /**
-     * This is another abstract method that must provide a `C` type that represents the create model of an entity
+     * This is another abstract method that must provide a {@link C} type that represents the creation model of an
+     * entity
      * that has
      * already been occupied.
      * <p>
@@ -103,19 +104,24 @@ public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extend
 
     /**
      * This is a test case that checks if the service successfully creates an entity without any exception or error.
-     * The test case involves creating an instance of `Eval<C, M>` object which is representative of a successful
+     * The test case involves creating an instance of {@link Eval} object which is representative of a successful
      * evaluation
-     * (obtained using the helper method `successEval()`).
+     * (obtained using the helper method {@link #successEval()}).
      * <p>
-     * The `evaluateResult` method of the `Eval` object is then called with the result of the service's `create` method.
-     * The `create` method is called with the request from the `Eval` object. In this way it garantees consistency in
+     * The {@link Eval#evaluateResult(Object)} method of the {@link Eval} object is then called with the result of
+     * the service's `create`
+     * method.
+     * The {@code create(C)} method is called with the request from the {@link Eval} object. In this way it
+     * guarantees consistency in
      * the test.
      * <p>
-     * Thus, this method is designed to test the successful case for the create action. Any failure in this test may
+     * Thus, this method is designed to test the successful case for the creation action. Any failure in this test may
      * indicate a
-     * problem with either the `create` method of the service, or the dependencies (via `successEval()`) used for
-     * this test.
+     * problem with either the {@code create(C)} method of the service, or the dependencies
+     * (via{@link #successEval()}) used for this test.
      * If the test fails, the service may not be correctly creating entities.
+     *
+     * @see #successEval()
      */
     @Test public void testCreateEntitySuccess()
     {
@@ -236,20 +242,20 @@ public abstract class ServiceTest<E extends EDUEntity, M extends Model, C extend
         void evaluate(@NotNull R request, @NotNull E expect, @NotNull E result);
 
         /**
-         * This method returns a {@code Validator<R, E>} that performs an equality check
-         * between the expected and actual results using the {@code Assertions.assertEquals} method from JUnit.
+         * This method returns a {@link Validator} that performs an equality check
+         * between the expected and actual results using the {@link Assertions#assertEquals} method from JUnit.
          * The contract of this method is to always return a new instance every time it is called.
          *
          * <p>
          * The {@code @Contract(pure = true)} annotation indicates that this method is pure,
-         * which means that the returned {@code Validator<R, E>} doesn't depend on any mutable state
+         * which means that the returned {@link Validator} doesn't depend on any mutable state
          * and doesn't produce any side effects. The "pureness" of this method allows for safe
          * usage in any context, even in a multi-threaded environment.
          * </p>
          *
          * @param <R> The type of the request.
          * @param <E> The type of the expected and the result of the request.
-         * @return A new instance of {@code Validator<R, E>}.
+         * @return A new instance of {@link Validator}.
          * @see Validator
          * @see Assertions#assertEquals(Object, Object)
          */

@@ -41,11 +41,6 @@ import org.springframework.web.bind.annotation.*;
         super(entityService);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
-    {
-        return super.create(model);
-    }
-
     @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);

@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -15,9 +17,28 @@ import org.springframework.http.ResponseEntity;
 {
 
     @Getter(AccessLevel.PROTECTED) private final S entityService;
+    private final Logger logger = LoggerFactory.getLogger(EntityController.class);
 
+    /**
+     * This method is responsible for creating a new entity based on the provided model.
+     * It is executed when a POST request hits the API endpoint associated with this method.
+     *
+     * @param model The model that represents the entity to be created. Must be not null.
+     *              The model should include all necessary information required to create the entity.
+     * @return A ResponseEntity object that encapsulates the HTTP response.
+     * If the entity is successfully created,
+     * the method returns a ResponseEntity with HTTP status 201 (Created),
+     * and the body of the ResponseEntity will be the created entity.
+     * <p>
+     * In case an exception occurs during the creation (e.g. due to validation errors),
+     * a CreationException is caught and handled. In such scenario, the method returns
+     * a ResponseEntity with an HTTP status code associated with the error, and its body is null.
+     * @throws CreationException If there is a problem with creating the entity,
+     *                           this exception will be thrown. It contains the HTTP status code for the error response.
+     */
     public @NotNull ResponseEntity<M> create(@NotNull C model)
     {
+        logger.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
             return ResponseEntity.status(HttpStatus.CREATED).body(getEntityService().create(model));
@@ -28,13 +49,38 @@ import org.springframework.http.ResponseEntity;
         }
     }
 
+    /**
+     * This method is responsible for deleting an existing entity based on the provided id.
+     * It is executed when a DELETE request hits the API endpoint associated with this method.
+     *
+     * @param id The id of the entity to be deleted. Must be not null.
+     *
+     * @return A Boolean value. If the deletion is successful, the method returns true.
+     * Otherwise, it returns false (e.g. if no entity with the given id exists).
+     */
     public @NotNull Boolean delete(@NotNull Long id)
     {
+        logger.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().delete(id);
     }
 
+    /**
+     * This method is responsible for fetching an existing entity based on the provided id.
+     * It is executed when a GET request hits the API endpoint associated with this method.
+     *
+     * @param id The id of the entity to be fetched. Must be not null.
+     *
+     * @return A ResponseEntity object that encapsulates the HTTP response.
+     * If the entity is successfully fetched,
+     * the method returns a ResponseEntity with HTTP status 200 (Ok),
+     * and the body of the ResponseEntity will be the fetched entity.
+     * <p>
+     * If no entity with the given id exists, it returns a ResponseEntity
+     * with HTTP status 404 (Not Found), and its body is null.
+     */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
+        logger.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 }
