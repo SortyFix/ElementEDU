@@ -15,17 +15,17 @@ public class PrivilegeServiceMockitoTest extends ServiceMockitoTest<PrivilegeSer
         return PrivilegeService.class;
     }
 
-    @Override protected @NotNull MockitoData<PrivilegeCreateModel, PrivilegeModel> successData()
+    @Override protected @NotNull ServiceMockitoTest.TestExpectation<PrivilegeCreateModel, PrivilegeModel> successData()
     {
         PrivilegeCreateModel request = new PrivilegeCreateModel("test", new HashSet<>());
         PrivilegeModel expected = new PrivilegeModel(4L, "TEST", new HashSet<>());
-        return MockitoData.data(request, expected);
+        return TestExpectation.data(request, expected);
     }
 
-    @Override protected @NotNull MockitoData<PrivilegeCreateModel, NameOccupiedException> occupiedData()
+    @Override protected @NotNull ServiceMockitoTest.TestExpectation<PrivilegeCreateModel, NameOccupiedException> occupiedData()
     {
         PrivilegeCreateModel request = new PrivilegeCreateModel("READ", new HashSet<>());
         NameOccupiedException expected = new NameOccupiedException("READ");
-        return MockitoData.data(request, expected);
+        return TestExpectation.data(request, expected);
     }
 }

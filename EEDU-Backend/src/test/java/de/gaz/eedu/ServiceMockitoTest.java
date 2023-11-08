@@ -13,6 +13,17 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+/**
+ * This abstract class is used for testing with the framework Mockito to mock objects of service class type {@code S}
+ * which is a subtype of {@link EntityService}. {@code E} is the entity type derived from {@link EDUEntity}, {@code M} is a
+ * Model class and
+ * {@code C} is a class for CreationModel of {@code E}.
+ *
+ * @param <S> Represents the service class which extends {@link EntityService}.
+ * @param <E> Represents the entity class which extends {@link EDUEntity}.
+ * @param <M> Represents the Model class.
+ * @param <C> Represents the CreationModel of {@code E}.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E extends EDUEntity, M extends Model, C extends CreationModel<E>>
@@ -31,13 +42,13 @@ public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E ext
         entityService = Mockito.mock(serviceClass());
     }
 
-    protected abstract @NotNull MockitoData<C, M> successData();
+    protected abstract @NotNull ServiceMockitoTest.TestExpectation<C, M> successData();
 
-    protected abstract <T extends OccupiedException> @NotNull MockitoData<C, T> occupiedData();
+    protected abstract <T extends OccupiedException> @NotNull TestExpectation<C, T> occupiedData();
 
     @Test public void testCreateEntitySuccessMockito()
     {
-        MockitoData<C, M> data = successData();
+        TestExpectation<C, M> data = successData();
 
         Mockito.when(getEntityService().create(data.request())).thenReturn(data.expected());
         getEntityService().create(data.request());
@@ -46,7 +57,7 @@ public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E ext
 
     @Test public <T extends OccupiedException> void testCreateEntityOccupiedMockito()
     {
-        MockitoData<C, T> data = occupiedData();
+        TestExpectation<C, T> data = occupiedData();
         Mockito.when(getEntityService().create(data.request())).thenThrow(data.expected());
         try
         {
@@ -65,11 +76,11 @@ public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E ext
         Mockito.verify(getEntityService(), Mockito.times(1)).delete(4L);
     }
 
-    protected record MockitoData<R, E>(@NotNull R request, @NotNull E expected)
+    protected record TestExpectation<R, E>(@NotNull R request, @NotNull E expected)
     {
-        @Contract("_, _ -> new") public static <R, E> @NotNull MockitoData<R, E> data(@NotNull R request, @NotNull E expected)
+        @Contract("_, _ -> new") public static <R, E> @NotNull TestExpectation<R, E> data(@NotNull R request, @NotNull E expected)
         {
-            return new MockitoData<>(request, expected);
+            return new TestExpectation<>(request, expected);
         }
     }
 }

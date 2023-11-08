@@ -19,18 +19,18 @@ public class UserServiceMockitoTest extends ServiceMockitoTest<UserService, User
         return UserService.class;
     }
 
-    @Override protected @NotNull MockitoData<UserCreateModel, UserModel> successData()
+    @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, UserModel> successData()
     {
         UserCreateModel userCreateModel = new UserCreateModel("test", "test", "test", "Password123!", true, false, 1L);
         UserModel userModel = new UserModel(5L, "test", "test", "test", true, false, null /* TODO*/, new HashSet<>());
-        return MockitoData.data(userCreateModel, userModel);
+        return TestExpectation.data(userCreateModel, userModel);
     }
 
-    @Override protected @NotNull MockitoData<UserCreateModel, LoginNameOccupiedException> occupiedData()
+    @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, LoginNameOccupiedException> occupiedData()
     {
         UserCreateModel request = new UserCreateModel("test", "test", "max.mustermann", "Password123!", true, false, 1L);
         LoginNameOccupiedException expected = new LoginNameOccupiedException(new UserModel(1L, "max", "mustermann", "max.mustermann", true, false, null, new HashSet<>()));
-        return MockitoData.data(request, expected);
+        return TestExpectation.data(request, expected);
     }
 
     @Test void testCreateUserPasswordInsecureMockito()
