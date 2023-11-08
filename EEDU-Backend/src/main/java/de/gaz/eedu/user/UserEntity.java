@@ -1,6 +1,5 @@
 package de.gaz.eedu.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
