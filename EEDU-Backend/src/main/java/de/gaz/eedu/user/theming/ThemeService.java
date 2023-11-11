@@ -45,10 +45,7 @@ public class ThemeService implements EntityService<ThemeEntity, ThemeModel, Them
         {
             throw new NameOccupiedException(occupied.getName());
         });
-        return themeRepository.save(model.toEntity((obj -> {
-            // TODO: Implement stuff
-            return obj;
-        })));
+        return themeRepository.save(model.toEntity());
     }
 
     @Override
