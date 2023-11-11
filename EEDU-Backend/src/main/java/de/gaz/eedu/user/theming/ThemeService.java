@@ -77,10 +77,6 @@ public class ThemeService implements EntityService<ThemeEntity, ThemeModel, Them
     @Override
     public @NotNull Function<ThemeEntity, ThemeModel> toModel()
     {
-        return themeEntity -> new ThemeModel(themeEntity.getId(),
-                themeEntity.getName(),
-                themeEntity.getBackgroundColor(),
-                themeEntity.getWidgetColor(),
-                themeEntity.getTextColor());
+        return ThemeEntity::toModel;
     }
 }

@@ -1,6 +1,5 @@
 package de.gaz.eedu.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
@@ -62,7 +61,7 @@ import java.util.stream.Collectors;
                 getLoginName(),
                 isEnabled(),
                 isLocked(),
-                getThemeEntity(),
+                getThemeEntity().toSimpleModel(),
                 getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
                         groupEntity.getName(),
                         groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).collect(
@@ -217,6 +216,12 @@ import java.util.stream.Collectors;
     public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
     {
         return Collections.unmodifiableSet(groups);
+    }
+
+    @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService, @NotNull ThemeEntity themeEntity)
+    {
+        setThemeEntity(themeEntity);
+        userService.saveEntity(this);
     }
 
     @Override public String toString()

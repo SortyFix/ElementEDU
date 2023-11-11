@@ -6,6 +6,7 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
@@ -57,7 +58,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 "jonas.yonas",
                 true,
                 false,
-                themeService.loadEntityByID(1L).orElseThrow(IllegalStateException::new),
+                themeService.loadEntityByID(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new),
                 new HashSet<>());
 
         return Eval.eval(createModel, expected, (request, expect, result) ->
@@ -68,7 +69,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
             Assertions.assertEquals(expect.enabled(), result.enabled());
             Assertions.assertEquals(expect.locked(), result.locked());
             Assertions.assertEquals(expect.groups(), result.groups());
-            Assertions.assertEquals(expect.themeEntity().getId(), result.themeEntity().getId());
+            Assertions.assertEquals(expect.theme(), result.theme());
         });
     }
 

@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.*;
         return super.getData(id);
     }
 
-    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable UserLoginVerificationModel> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         logger.info("The server has recognized an incoming login request.");
         return getEntityService().login(userLoginModel).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));

@@ -6,6 +6,7 @@ Content-Type: application/json
   "password": "SafePassword123!!."
 }
 
+
 ###
 POST http://localhost:8080/user/login
 Content-Type: application/json

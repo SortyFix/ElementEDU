@@ -55,3 +55,39 @@ CREATE TABLE group_privileges
     FOREIGN KEY (group_id) REFERENCES group_entity (id) ON DELETE CASCADE,
     FOREIGN KEY (privilege_id) REFERENCES privilege_entity (id) ON DELETE CASCADE
 );
+
+-- This table stores information about different uploaded files.
+CREATE TABLE file_entity
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    file_name       VARCHAR(255),
+    file_path       VARCHAR(255)
+);
+
+-- This table stores which users (by Set<UserEntity>) should have permission to access a certain file.
+CREATE TABLE file_user_permissions
+(
+    file_id        BIGINT,
+    user_id        BIGINT,
+    PRIMARY KEY (file_id, user_id),
+    FOREIGN KEY (file_id) REFERENCES file_entity (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
+);
+
+-- This table stores which groups (by Set<GroupEntity>) should have permission to access a certain file.
+CREATE TABLE file_group_permissions
+(
+    file_id     BIGINT,
+    group_id    BIGINT,
+    PRIMARY KEY (file_id, group_id),
+    FOREIGN KEY (file_id) REFERENCES file_entity (id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES group_entity (id) ON DELETE CASCADE
+);
+
+-- This table stores which tags should be given to a file. Multiple tags can be given, hence this table.
+CREATE TABLE file_tags
+(
+    file_id     BIGINT,
+    tags        VARCHAR(255),
+    FOREIGN KEY (file_id) REFERENCES file_entity (id) ON DELETE CASCADE
+);

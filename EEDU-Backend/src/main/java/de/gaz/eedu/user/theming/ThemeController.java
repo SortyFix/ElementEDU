@@ -39,7 +39,7 @@ public class ThemeController
         try{
             UserEntity userEntity = userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new);
             ThemeEntity loadedEntity = themeService.loadEntityByName(name).orElseThrow(IllegalArgumentException::new);
-            userEntity.setThemeEntity(loadedEntity);
+            userEntity.setThemeEntity(userService, loadedEntity);
             return ResponseEntity.ok(loadedEntity.toModel());
         }
         catch(IllegalArgumentException illegalArgumentException){
