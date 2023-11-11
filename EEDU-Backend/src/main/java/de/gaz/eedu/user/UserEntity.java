@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
-        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(), getThemeEntity());
+        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(), getThemeEntity().toSimpleModel());
     }
 
     @Override public UserModel toModel()
