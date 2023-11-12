@@ -2,8 +2,6 @@ package de.gaz.eedu.user.model;
 
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.theming.ThemeEntity;
-import de.gaz.eedu.user.theming.ThemeModel;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,9 +14,8 @@ public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastN
         return loginName;
     }
 
-    @Override public @NotNull UserEntity toEntity()
+    @Override public @NotNull UserEntity toEntity(@NotNull UserEntity userEntity)
     {
-        UserEntity userEntity = new UserEntity();
         userEntity.setFirstName(firstName());
         userEntity.setLastName(lastName());
         userEntity.setLoginName(loginName());

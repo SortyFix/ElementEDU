@@ -13,7 +13,6 @@ import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.function.Supplier;
 
@@ -61,7 +61,7 @@ import java.util.function.Supplier;
 
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
         UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L);
-        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
+        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 
         getEntity(themeService, themeCreateModel); // create theme
@@ -71,7 +71,10 @@ import java.util.function.Supplier;
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(groupService, privilegeEntity);
-        userEntity.attachGroups(userService, groupEntity);
+        if(!userEntity.attachGroups(userService, groupEntity))
+        {
+            throw new IllegalStateException("The system was not able to attach the admin group to the default user. This is very unusual behaviour. Please consider rechecking all information.");
+        }
 
         LOGGER.info("A default user has been created with the name {} and the password {}. It's advised to " +
                 "change the password as soon as possible.", userEntity.getLoginName(), randomPassword);
@@ -95,9 +98,27 @@ import java.util.function.Supplier;
         return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);
     }
 
-    //TODO maybe better
-    private @NotNull String randomPassword(@SuppressWarnings("SameParameterValue") int length)
+    @SuppressWarnings({"SpellCheckingInspection", "SameParameterValue"})
+    private @NotNull String randomPassword(int length)
     {
-        return "SafePassword123!!.";
+        SecureRandom random = new SecureRandom();
+        String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String specialSymbols = "!@#$%^&*_=+-/";
+        String alphabet = upperCaseLetters + lowerCaseLetters + digits + specialSymbols;
+
+        StringBuilder password = new StringBuilder();
+
+        password.append(upperCaseLetters.charAt(random.nextInt(upperCaseLetters.length())));
+        password.append(lowerCaseLetters.charAt(random.nextInt(lowerCaseLetters.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(specialSymbols.charAt(random.nextInt(specialSymbols.length())));
+
+        for (int i = 4; i < length; i++) {
+            password.append(alphabet.charAt(random.nextInt(alphabet.length())));
+        }
+
+        return password.toString();
     }
 }

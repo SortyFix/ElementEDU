@@ -7,10 +7,10 @@ public interface CreationModel<E extends EDUEntity> extends Model
 
     @NotNull String name();
 
-    @NotNull E toEntity();
+    @NotNull E toEntity(@NotNull E entity);
 
-    default E toEntity(@NotNull CreationFactory<E> factory)
+    default @NotNull E toEntity(@NotNull E entity, @NotNull CreationFactory<E> factory)
     {
-        return factory.transform(toEntity());
+        return factory.transform(toEntity(entity));
     }
 }

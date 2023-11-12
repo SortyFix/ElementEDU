@@ -1,26 +1,28 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.entity.model.CreationModel;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.HashSet;
 
 public record ThemeCreateModel(String name, int backgroundColor, int widgetColor, int textColor) implements CreationModel<ThemeEntity>
 {
 
     @Override
-    public @NotNull ThemeEntity toEntity()
+    public @NotNull ThemeEntity toEntity(@NotNull ThemeEntity themeEntity)
     {
-        ThemeEntity themeEntity = new ThemeEntity();
         themeEntity.setName(name());
         themeEntity.setBackgroundColor(backgroundColor());
         themeEntity.setWidgetColor(widgetColor());
         themeEntity.setTextColor(textColor());
+        themeEntity.setUsers(new HashSet<>());
         return themeEntity;
     }
 
+    @Contract(pure = true)
     @Override
-    public String toString()
+    public @NotNull String toString()
     {
         return "ThemeCreateModel[" +
                 "name=" + name + ", " +

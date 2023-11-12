@@ -5,7 +5,7 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.theming.SimpleThemeModel;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ import java.util.Set;
 public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty String lastName,
                         @NotEmpty String loginName,
                         @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
-                        @NotEmpty ThemeEntity themeEntity, //TODO remove entity
+                        @NotEmpty SimpleThemeModel theme,
                         @NotEmpty Set<SimpleUserGroupModel> groups) implements Model
 {
 
@@ -46,7 +46,7 @@ public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty 
                 ", loginName='" + loginName + '\'' +
                 ", enabled=" + enabled +
                 ", locked=" + locked +
-                ", theme=" + themeEntity.getName() +
+                ", theme=" + theme.name() +
                 ", groups=" + groups +
                 '}';
     }

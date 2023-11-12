@@ -6,6 +6,7 @@ Content-Type: application/json
   "password": "SafePassword123!!."
 }
 
+
 ###
 POST http://localhost:8080/user/login
 Content-Type: application/json
@@ -17,8 +18,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyMTI3f
 }
 
 ###
-GET http://localhost:8080/user/get/1
+GET http://localhost:8080/group/get/5
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyMTI3fQ.XAsh1pChVFvWqzazcCX-JKtTIADh-uA1PdqlZIYMg28
+
+###
+POST http://localhost:8080/group/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyMTI3fQ.XAsh1pChVFvWqzazcCX-JKtTIADh-uA1PdqlZIYMg28
+
+{
+  "name": "test4",
+  "twoFactorRequired": false,
+  "users": [
+    1
+  ],
+  "privileges": []
+}
+
 
 ###
 POST http://localhost:8080/user/create

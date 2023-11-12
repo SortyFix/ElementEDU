@@ -42,15 +42,15 @@ import java.util.stream.Collectors;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
-    @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
 
+    @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
-        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(), getThemeEntity());
+        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(), getThemeEntity().toSimpleModel());
     }
 
     @Override public UserModel toModel()
@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
                 getLoginName(),
                 isEnabled(),
                 isLocked(),
-                getThemeEntity(),
+                getThemeEntity().toSimpleModel(),
                 getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
                         groupEntity.getName(),
                         groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).collect(
@@ -216,6 +216,12 @@ import java.util.stream.Collectors;
     public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
     {
         return Collections.unmodifiableSet(groups);
+    }
+
+    @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService, @NotNull ThemeEntity themeEntity)
+    {
+        setThemeEntity(themeEntity);
+        userService.saveEntity(this);
     }
 
     @Override public String toString()

@@ -12,9 +12,8 @@ import java.util.Set;
 public record PrivilegeCreateModel(@NotNull String name,
                                    @NotNull Set<GroupEntity> groupEntities) implements CreationModel<PrivilegeEntity>
 {
-    @Override public @NotNull PrivilegeEntity toEntity()
+    @Override public @NotNull PrivilegeEntity toEntity(@NotNull PrivilegeEntity privilegeEntity)
     {
-        PrivilegeEntity privilegeEntity = new PrivilegeEntity();
         privilegeEntity.setName(name().toUpperCase()); // Make privileges always uppercase
         privilegeEntity.setGroupEntities(groupEntities());
         return privilegeEntity;
