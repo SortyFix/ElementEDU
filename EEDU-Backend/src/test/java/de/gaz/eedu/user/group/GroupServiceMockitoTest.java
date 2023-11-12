@@ -17,14 +17,14 @@ public class GroupServiceMockitoTest extends ServiceMockitoTest<GroupService, Gr
 
     @Override protected @NotNull ServiceMockitoTest.TestExpectation<GroupCreateModel, GroupModel> successData()
     {
-        GroupCreateModel request = new GroupCreateModel("test", new HashSet<>(), new HashSet<>());
+        GroupCreateModel request = new GroupCreateModel("test", false, new Long[0], new Long[0]);
         GroupModel expected = new GroupModel(1L, "test", new HashSet<>(), new HashSet<>());
         return TestExpectation.data(request, expected);
     }
 
     @Override protected @NotNull ServiceMockitoTest.TestExpectation<GroupCreateModel, NameOccupiedException> occupiedData()
     {
-        GroupCreateModel request = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
+        GroupCreateModel request = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         NameOccupiedException expected = new NameOccupiedException("admin");
         return TestExpectation.data(request, expected);
     }

@@ -55,8 +55,8 @@ VALUES ( 'Light', 0x000000, 0x000000, 0x000000 ),
        ( 'Dark', 0x000000, 0x000000, 0x000000 ),
        ( 'dummy', 0x000000, 0x000000, 0x000000 );
 
-INSERT INTO group_entity (name)
-VALUES ('Users'), ('Moderators'), ('Admins'), ('Dummy');
+INSERT INTO group_entity (name, two_factor_required)
+VALUES ('Users', false), ('Moderators', true), ('Admins', true), ('Dummy', false);
 
 INSERT INTO privilege_entity (name)
 VALUES ('READ'),

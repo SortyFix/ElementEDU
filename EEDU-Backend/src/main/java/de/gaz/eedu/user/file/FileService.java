@@ -30,9 +30,9 @@ import java.util.Set;
 
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        return fileRepository.save(model.toEntity((obj -> {
+        return fileRepository.save(model.toEntity(new FileEntity(), obj -> {
             // TODO: Implement stuff
             return obj;
-        })));
+        }));
     }
 }

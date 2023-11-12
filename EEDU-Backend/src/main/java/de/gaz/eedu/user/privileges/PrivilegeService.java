@@ -48,7 +48,7 @@ import java.util.function.Function;
             throw new NameOccupiedException(occupiedName.getName());
         });
 
-        return getPrivilegeRepository().save(privilegeCreateModel.toEntity());
+        return getPrivilegeRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity()));
     }
 
     @Override public boolean delete(long id)

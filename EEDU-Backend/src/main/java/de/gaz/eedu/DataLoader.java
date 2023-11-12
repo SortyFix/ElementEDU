@@ -61,7 +61,7 @@ import java.util.function.Supplier;
 
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
         UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L);
-        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", new HashSet<>(), new HashSet<>());
+        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 
         getEntity(themeService, themeCreateModel); // create theme

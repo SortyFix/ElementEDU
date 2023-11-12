@@ -1,8 +1,6 @@
 package de.gaz.eedu.user.file;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.group.GroupEntity;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -27,9 +25,8 @@ public record FileCreateModel(@NotNull String name,
                 '}';
     }
 
-    public @NotNull FileEntity toEntity(){
-        FileEntity fileEntity = new FileEntity();
-        fileEntity.builder()
+    public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
+        FileEntity.builder()
                 .fileName(name)
                 .filePath(filePath)
                 .permittedUsers(new HashSet<>()) // TODO

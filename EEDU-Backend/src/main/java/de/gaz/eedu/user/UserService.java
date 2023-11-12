@@ -6,12 +6,13 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.encryption.EncryptionService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserLoginVerificationModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
-import de.gaz.eedu.user.theming.ThemeService;
+import de.gaz.eedu.user.theming.ThemeRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class manages user related tasks.
@@ -52,8 +54,10 @@ import java.util.function.Function;
 {
 
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final ThemeRepository themeRepository;
+
     private final EncryptionService encryptionService;
-    private final ThemeService themeService;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
@@ -83,15 +87,16 @@ import java.util.function.Function;
             throw new InsecurePasswordException();
         }
 
-        ThemeEntity themeEntity = getThemeService().loadEntityByID(model.themeId()).orElseThrow(() -> new CreationException(HttpStatus.NOT_FOUND));
+        Supplier<CreationException> exceptionSupplier = () -> new CreationException(HttpStatus.NOT_FOUND);
+        ThemeEntity themeEntity = getThemeRepository().findById(model.themeId()).orElseThrow(exceptionSupplier);
 
         String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
-        return saveEntity(model.toEntity((entity ->
+        return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
             entity.setThemeEntity(themeEntity);
             return entity;
-        })));
+        }));
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
