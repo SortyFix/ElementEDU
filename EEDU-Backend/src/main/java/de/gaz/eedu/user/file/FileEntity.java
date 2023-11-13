@@ -1,8 +1,6 @@
 package de.gaz.eedu.user.file;
 
 import de.gaz.eedu.entity.model.EDUEntity;
-import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.group.GroupEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,23 +11,22 @@ public class FileEntity implements EDUEntity
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String fileName;
+    private Long authorId;
     private String filePath;
-    @ManyToMany @JoinTable(
+    @ElementCollection @CollectionTable(
             name = "file_user_permissions",
-            joinColumns = @JoinColumn(name = "file_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "file_id")
     )
-    private Set<UserEntity> permittedUsers;
-    @ManyToMany @JoinTable(
+    private Set<Long> permittedUsers;
+    @ElementCollection @CollectionTable(
             name = "file_group_permissions",
-            joinColumns = @JoinColumn(name = "file_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            joinColumns = @JoinColumn(name = "file_id")
     )
-    private Set<GroupEntity> permittedGroups;
+    private Set<Long> permittedGroups;
     @ElementCollection
     private Set<String> tags;
 
     public FileModel toModel(){
-        return new FileModel(id, fileName, filePath, permittedUsers, permittedGroups, tags);
+        return new FileModel(id, fileName, authorId, filePath, permittedUsers, permittedGroups, tags);
     }
 }

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public record FileCreateModel(@NotNull String name,
+                              @NotNull Long authorId,
                               @NotNull String filePath,
                               @NotEmpty Set<Long> permittedUsers,
                               @NotEmpty Set<Long> permittedGroups,
@@ -28,6 +29,7 @@ public record FileCreateModel(@NotNull String name,
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
         FileEntity.builder()
                 .fileName(name)
+                .authorId(authorId)
                 .filePath(filePath)
                 .permittedUsers(new HashSet<>()) // TODO
                 .permittedGroups(new HashSet<>()) // TODO
