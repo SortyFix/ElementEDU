@@ -1,10 +1,12 @@
 package de.gaz.eedu.user.file;
 
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.UserService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +16,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Set;
 
 @RestController @RequestMapping(value = "/file") public class FileController
 {
+    private final @NotNull UserService userService;
+
+    public FileController(@Autowired @NotNull UserService userService)
+    {
+        this.userService = userService;
+    }
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public ResponseEntity<String> uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @NotNull UserEntity author, Set<UserEntity> permittedUsers, Set<GroupEntity> permittedGroups, Set<String> tags)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public ResponseEntity<String> uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @NotNull UserEntity author, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags)
     {
         FileService fileService = new FileService();
         if (fileService.isFileValid(file))
@@ -43,11 +50,17 @@ import java.util.Set;
             Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
             try
             {
-                Files.copy(file.getInputStream(), uploadPath);
-                FileCreateModel createModel = new FileCreateModel(fileName, uploadPath.toString(), new HashSet<>(),
-                        new HashSet<>(), tags);
-                fileService.createEntity(createModel);
-                return ResponseEntity.ok("File uploaded successfully");
+                UserEntity currentUser = userService.loadEntityByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
+                if(currentUser != null){
+                    Files.copy(file.getInputStream(), uploadPath);
+                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers,
+                            permittedGroups, tags);
+                    fileService.createEntity(createModel);
+                    return ResponseEntity.ok("File uploaded successfully");
+                }
+                else{
+                    return ResponseEntity.status(401).build();
+                }
             }
             catch (IOException ioException)
             {
@@ -58,5 +71,52 @@ import java.util.Set;
         {
             return ResponseEntity.status(406).body("File not acceptable");
         }
+    }
+
+    @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public ResponseEntity<Boolean> deleteFile(Long id) throws IOException
+    {
+        FileService fileService = new FileService();
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity currentUserEntity = userService.loadEntityByName(currentUsername).orElse(null);
+
+        if (currentUserEntity != null)
+        {
+            FileEntity fileEntity = fileService.loadEntityById(id).orElse(null);
+            if (fileEntity != null)
+            {
+                if (fileEntity.toModel().id().equals(currentUserEntity.getId()))
+                {
+                    Path path = Paths.get(fileEntity.toModel().filePath());
+                    Files.delete(path);
+                    return fileService.delete(id) ? ResponseEntity.ok(true) : !fileService.delete(id) ?
+                            ResponseEntity.notFound().build() : null;
+                } else { return ResponseEntity.status(401).build(); }
+            } else { return ResponseEntity.notFound().build(); }
+        } else { return ResponseEntity.notFound().build(); }
+    }
+
+    @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(Long id, Set<String> newTags)
+    {
+        FileService fileService = new FileService();
+        FileEntity fileEntity = fileService.loadEntityById(id).orElse(null);
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity currentUserEntity = userService.loadEntityByName(currentUsername).orElse(null);
+        if(currentUserEntity != null){
+            if (fileEntity != null)
+            {
+                // Check if currently logged-in user ID matches the author ID of the file
+                if(currentUserEntity.getId().equals(fileEntity.toModel().authorId())){
+                    Set<String> oldTags = fileEntity.toModel().tags();
+                    oldTags.clear();
+                    oldTags.addAll(newTags);
+                    FileCreateModel createModel = new FileCreateModel(fileEntity.toModel().fileName(),
+                            fileEntity.toModel().authorId(), fileEntity.toModel().filePath(),
+                            fileEntity.toModel().permittedUsers(), fileEntity.toModel().permittedGroups(), oldTags);
+                    fileService.delete(fileEntity.toModel().id());
+                    fileService.createEntity(createModel);
+                    return ResponseEntity.ok().build();
+                } else { return ResponseEntity.status(401).build(); }
+            } else { return ResponseEntity.notFound().build(); }
+        } else { return ResponseEntity.notFound().build(); }
     }
 }

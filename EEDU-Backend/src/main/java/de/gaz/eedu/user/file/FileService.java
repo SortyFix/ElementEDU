@@ -35,4 +35,12 @@ import java.util.Set;
             return obj;
         }));
     }
+
+    public boolean delete(@NotNull Long id){
+        return fileRepository.findById(id).map(fileEntity ->
+        {
+            fileRepository.deleteById(id);
+            return true;
+        }).orElse(false);
+    }
 }

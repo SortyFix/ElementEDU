@@ -63,6 +63,7 @@ CREATE TABLE file_entity
 (
     id        BIGINT PRIMARY KEY AUTO_INCREMENT,
     file_name VARCHAR(255),
+    author_id BIGINT,
     file_path VARCHAR(255)
 );
 
