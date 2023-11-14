@@ -8,6 +8,8 @@ import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
+import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class represents the user.
@@ -43,6 +46,10 @@ import java.util.stream.Collectors;
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
 
+    @OneToMany @JsonManagedReference @JoinTable(name = "user_enabled_two_factor", joinColumns = @JoinColumn(name =
+            "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "two_fa_id",
+            referencedColumnName = "id")) private Set<TwoFactorEntity> enabledTwoFactorMethods = new HashSet<>();
+
     @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
@@ -50,28 +57,19 @@ import java.util.stream.Collectors;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
-        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(), getThemeEntity().toSimpleModel());
+        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
+                getThemeEntity().toSimpleModel());
     }
 
     @Override public UserModel toModel()
     {
-        return new UserModel(getId(),
-                getFirstName(),
-                getLastName(),
-                getLoginName(),
-                isEnabled(),
-                isLocked(),
-                getThemeEntity().toSimpleModel(),
-                getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
-                        groupEntity.getName(),
-                        groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).collect(
-                        Collectors.toSet()));
+        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
+                getEnabledTwoFactorMethods().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new), getThemeEntity().toSimpleModel(), getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new));
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
     {
-        return groups.stream().flatMap(groupEntity -> groupEntity.getPrivileges().stream().map(privilege -> new SimpleGrantedAuthority(
-                privilege.getName()))).collect(Collectors.toSet());
+        return groups.stream().flatMap(groupEntity -> groupEntity.getPrivileges().stream().map(privilege -> new SimpleGrantedAuthority(privilege.getName()))).collect(Collectors.toSet());
     }
 
     @Override public @NotNull String getUsername()
@@ -112,6 +110,7 @@ import java.util.stream.Collectors;
         return lastName + ", " + firstName;
     }
 
+
     /**
      * Attaches various groups to the user and saves the state using the provided user service.
      * The groups are specified via their entities.
@@ -127,12 +126,7 @@ import java.util.stream.Collectors;
      */
     @Transactional public boolean attachGroups(@NotNull UserService userService, @NotNull GroupEntity... groupEntities)
     {
-        if (attachGroups(groupEntities))
-        {
-            userService.saveEntity(this);
-            return true;
-        }
-        return false;
+        return saveEntityIfPredicateTrue(userService, groupEntities, this::attachGroups);
     }
 
     /**
@@ -153,8 +147,7 @@ import java.util.stream.Collectors;
     {
         // Filter already attached groups out
         Predicate<GroupEntity> predicate =
-                requestedGroup -> this.groups.stream().noneMatch(presentGroup -> Objects.equals(
-                        presentGroup,
+                requestedGroup -> this.groups.stream().noneMatch(presentGroup -> Objects.equals(presentGroup,
                         requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
@@ -174,12 +167,7 @@ import java.util.stream.Collectors;
      */
     @Transactional public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
     {
-        if (detachGroups(ids))
-        {
-            userService.saveEntity(this);
-            return true;
-        }
-        return false;
+        return saveEntityIfPredicateTrue(userService, ids, this::detachGroups);
     }
 
     /**
@@ -218,7 +206,40 @@ import java.util.stream.Collectors;
         return Collections.unmodifiableSet(groups);
     }
 
-    @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService, @NotNull ThemeEntity themeEntity)
+    @Transactional public boolean enableTwoFactor(@NotNull UserService userService,
+            @NotNull TwoFactorEntity twoFactorEntity)
+    {
+        return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::enableTwoFactor);
+    }
+
+    public boolean enableTwoFactor(@NotNull TwoFactorEntity twoFactorEntity)
+    {
+        if (this.getEnabledTwoFactorMethods().stream().anyMatch(entity -> entity.getMethod().equals(twoFactorEntity.getMethod())))
+        {
+            return false;
+        }
+        return this.enabledTwoFactorMethods.add(twoFactorEntity);
+    }
+
+    @Transactional public boolean disableTwoFactor(@NotNull UserService userService, @NotNull Long... ids)
+    {
+        return saveEntityIfPredicateTrue(userService, ids, this::disableTwoFactor);
+    }
+
+    public boolean disableTwoFactor(@NotNull Long... ids)
+    {
+        Set<Long> disableFactors =
+                Stream.of(ids).filter(current -> getEnabledTwoFactorMethods().stream().anyMatch(entity -> Objects.equals(entity.getId(), current))).collect(Collectors.toSet());
+        return enabledTwoFactorMethods.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
+    }
+
+    public @NotNull @Unmodifiable Set<TwoFactorEntity> getEnabledTwoFactorMethods()
+    {
+        return Collections.unmodifiableSet(enabledTwoFactorMethods);
+    }
+
+    @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,
+            @NotNull ThemeEntity themeEntity)
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
@@ -241,5 +262,16 @@ import java.util.stream.Collectors;
     @Override public int hashCode()
     { // Automatically generated by IntelliJ
         return Objects.hash(getId());
+    }
+
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity,
+            @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    {
+        if (predicate.test(entity))
+        {
+            userService.saveEntity(this);
+            return true;
+        }
+        return false;
     }
 }

@@ -1,18 +1,3 @@
--- This table represents the user entity.
--- It contains information about the user's id, first name, last name, login name, email, password status (if they're enabled or locked).
-CREATE TABLE IF NOT EXISTS user_entity
-(
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    last_name  VARCHAR(255) NOT NULL,
-    login_name VARCHAR(255) NOT NULL,
-    password  VARCHAR(255) NOT NULL,
-    enabled   BOOLEAN      NOT NULL,
-    locked    BOOLEAN      NOT NULL,
-    theme_id  BIGINT -- This assumes theme_entity exists
-);
-
-
 -- This table stores information about different themes
 CREATE TABLE theme_entity
 (
@@ -21,6 +6,20 @@ CREATE TABLE theme_entity
     background_color INT,
     widget_color     INT,
     text_color       INT
+);
+
+-- This table represents the user entity.
+-- It contains information about the user's id, first name, last name, login name, email, password status (if they're enabled or locked).
+CREATE TABLE IF NOT EXISTS user_entity
+(
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name  VARCHAR(255),
+    login_name VARCHAR(255),
+    password  VARCHAR(255),
+    enabled   BOOLEAN NOT NULL DEFAULT false,
+    locked    BOOLEAN NOT NULL DEFAULT false,
+    theme_id  BIGINT REFERENCES theme_entity (id)
 );
 
 -- This table stores information about different groups
@@ -36,6 +35,14 @@ CREATE TABLE privilege_entity
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS user_enabled_two_factor
+(
+    user_id        BIGINT NOT NULL REFERENCES user_entity (id),
+    method         VARCHAR(255),
+    PRIMARY KEY (user_id, method),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
 -- This table is a relational table that connects groups and their associated privileges

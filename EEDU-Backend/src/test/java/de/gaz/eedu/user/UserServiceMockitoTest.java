@@ -3,13 +3,14 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.ServiceMockitoTest;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.HashSet;
 
 public class UserServiceMockitoTest extends ServiceMockitoTest<UserService, UserEntity, UserModel, UserCreateModel>
 {
@@ -22,14 +23,14 @@ public class UserServiceMockitoTest extends ServiceMockitoTest<UserService, User
     @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, UserModel> successData()
     {
         UserCreateModel userCreateModel = new UserCreateModel("test", "test", "test", "Password123!", true, false, 1L);
-        UserModel userModel = new UserModel(5L, "test", "test", "test", true, false, null /* TODO*/, new HashSet<>());
+        UserModel userModel = new UserModel(5L, "test", "test", "test", true, false, new TwoFactorModel[0], null /* TODO*/, new SimpleUserGroupModel[0]);
         return TestExpectation.data(userCreateModel, userModel);
     }
 
     @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, LoginNameOccupiedException> occupiedData()
     {
         UserCreateModel request = new UserCreateModel("test", "test", "max.mustermann", "Password123!", true, false, 1L);
-        LoginNameOccupiedException expected = new LoginNameOccupiedException(new UserModel(1L, "max", "mustermann", "max.mustermann", true, false, null, new HashSet<>()));
+        LoginNameOccupiedException expected = new LoginNameOccupiedException(new UserModel(1L, "max", "mustermann", "max.mustermann", true, false, new TwoFactorModel[0], null, new SimpleUserGroupModel[0]));
         return TestExpectation.data(request, expected);
     }
 

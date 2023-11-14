@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.encryption;
+package de.gaz.eedu.user.verfication;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;

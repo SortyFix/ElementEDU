@@ -3,13 +3,14 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.encryption.EncryptionService;
+import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.verfication.VerificationService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserLoginModel;
-import de.gaz.eedu.user.model.UserLoginVerificationModel;
+import de.gaz.eedu.user.verfication.model.LoginResponseModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeRepository;
@@ -27,9 +28,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -57,7 +58,7 @@ import java.util.function.Supplier;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
 
-    private final EncryptionService encryptionService;
+    private final VerificationService verificationService;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
@@ -90,7 +91,7 @@ import java.util.function.Supplier;
         Supplier<CreationException> exceptionSupplier = () -> new CreationException(HttpStatus.NOT_FOUND);
         ThemeEntity themeEntity = getThemeRepository().findById(model.themeId()).orElseThrow(exceptionSupplier);
 
-        String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
+        String hashedPassword = getVerificationService().getEncoder().encode(model.password());
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
@@ -114,7 +115,7 @@ import java.util.function.Supplier;
         return UserEntity::toModel;
     }
 
-    @Transactional @Override public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    @Transactional @Override public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -128,14 +129,29 @@ import java.util.function.Supplier;
         }).orElse(false);
     }
 
-    @Transactional public @NotNull Optional<UserLoginVerificationModel> login(@NotNull UserLoginModel userLoginModel)
+    @Transactional public @NotNull Optional<LoginResponseModel> login(@NotNull UserLoginModel userLoginModel)
     {
         return loadEntityByName(userLoginModel.loginName()).map(user ->
         {
-            if (getEncryptionService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
+            if (getVerificationService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
             {
-                return new UserLoginVerificationModel(user.getId(),
-                        getEncryptionService().generateKey(String.valueOf(user.getId())));
+                ZoneId zid = ZoneId.systemDefault();
+
+                Instant timeStamp = userLoginModel.keepLoggedIn()
+                        ?  Instant.now().atZone(zid).plusWeeks(2).toInstant()
+                        :  Instant.now().atZone(zid).plusDays(1).toInstant();
+
+                if(!user.getEnabledTwoFactorMethods().isEmpty()) //two factor enabled?
+                {
+                    return getVerificationService().twoFactor(user.toModel(), timeStamp);
+                }
+
+                if(user.getGroups().stream().anyMatch(GroupEntity::isTwoFactorRequired)) //two factor required?
+                {
+                    return getVerificationService().twoFactorRequired(user.toModel(), timeStamp);
+                }
+
+                return getVerificationService().loginSuccess(user.toModel(), timeStamp);
             }
             return null; // Optional empty as password does not match.
         });
@@ -143,7 +159,7 @@ import java.util.function.Supplier;
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        return getEncryptionService().validate(token,
+        return getVerificationService().validate(token,
                 (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
     }
 }

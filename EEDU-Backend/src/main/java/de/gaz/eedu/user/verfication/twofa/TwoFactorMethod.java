@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.twofa;
+package de.gaz.eedu.user.verfication.twofa;
 
 public enum TwoFactorMethod {
     EMAIL,
