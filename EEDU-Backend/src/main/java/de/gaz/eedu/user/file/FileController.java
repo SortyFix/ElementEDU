@@ -4,6 +4,8 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,51 +50,45 @@ import java.util.Set;
             }
 
             Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
-            try
+            return userService.loadEntityByName(SecurityContextHolder.getContext().getAuthentication().getName()).map(currentUser ->
             {
-                UserEntity currentUser = userService.loadEntityByName(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
-                if(currentUser != null){
+                try
+                {
                     Files.copy(file.getInputStream(), uploadPath);
-                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers,
-                            permittedGroups, tags);
+                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
                     fileService.createEntity(createModel);
-                    return ResponseEntity.ok("File uploaded successfully");
+                    return ResponseEntity.ok("File upload successful");
                 }
-                else{
-                    return ResponseEntity.status(401).build();
+                catch (IOException ioException)
+                {
+                    return ResponseEntity.status(500).body("Internal server error");
                 }
-            }
-            catch (IOException ioException)
-            {
-                return ResponseEntity.status(500).body("Could not upload file");
-            }
+            }).orElse(ResponseEntity.status(401).body("Unauthorized"));
         }
-        else
-        {
-            return ResponseEntity.status(406).body("File not acceptable");
-        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Could not pass file check");
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public ResponseEntity<Boolean> deleteFile(Long id) throws IOException
     {
         FileService fileService = new FileService();
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity currentUserEntity = userService.loadEntityByName(currentUsername).orElse(null);
-
-        if (currentUserEntity != null)
-        {
-            FileEntity fileEntity = fileService.loadEntityById(id).orElse(null);
-            if (fileEntity != null)
-            {
-                if (fileEntity.toModel().id().equals(currentUserEntity.getId()))
+        return userService.loadEntityByName(currentUsername).map(userEntity -> {
+            try{
+                FileEntity fileEntity = fileService.loadEntityById(id).orElse(null);
+                if (fileEntity.toModel().id().equals(userEntity.getId()))
                 {
                     Path path = Paths.get(fileEntity.toModel().filePath());
                     Files.delete(path);
-                    return fileService.delete(id) ? ResponseEntity.ok(true) : !fileService.delete(id) ?
-                            ResponseEntity.notFound().build() : null;
-                } else { return ResponseEntity.status(401).build(); }
-            } else { return ResponseEntity.notFound().build(); }
-        } else { return ResponseEntity.notFound().build(); }
+                    fileService.delete(id);
+                    return ResponseEntity.ok(true);
+                }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+            }
+            catch(IOException ioException){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+            }
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(false));
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(Long id, Set<String> newTags)
@@ -106,17 +102,12 @@ import java.util.Set;
             {
                 // Check if currently logged-in user ID matches the author ID of the file
                 if(currentUserEntity.getId().equals(fileEntity.toModel().authorId())){
-                    Set<String> oldTags = fileEntity.toModel().tags();
-                    oldTags.clear();
-                    oldTags.addAll(newTags);
-                    FileCreateModel createModel = new FileCreateModel(fileEntity.toModel().fileName(),
-                            fileEntity.toModel().authorId(), fileEntity.toModel().filePath(),
-                            fileEntity.toModel().permittedUsers(), fileEntity.toModel().permittedGroups(), oldTags);
-                    fileService.delete(fileEntity.toModel().id());
-                    fileService.createEntity(createModel);
-                    return ResponseEntity.ok().build();
-                } else { return ResponseEntity.status(401).build(); }
-            } else { return ResponseEntity.notFound().build(); }
-        } else { return ResponseEntity.notFound().build(); }
+                    fileEntity.setTags(newTags);
+                    return ResponseEntity.ok(newTags);
+                }
+                return ResponseEntity.status(401).build();
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 }
