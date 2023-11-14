@@ -10,21 +10,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/twofa")
-public class TwoFactorController extends EntityController<TwoFactorService, TwoFactorModel, TwoFactorCreateModel>
+@RestController @RequestMapping("/twofa") public class TwoFactorController extends EntityController<TwoFactorService,
+        TwoFactorModel, TwoFactorCreateModel>
 {
     public TwoFactorController(@Autowired @NotNull TwoFactorService entityService)
     {
         super(entityService);
     }
 
-    @PreAuthorize("hasAuthority('$ADVANCED_USER_MANAGEMENT') or hasAuthority('$TWO_FACTOR_CREATE')") @PostMapping("/request") public @NotNull ResponseEntity<?> requestTwoFactor(@NotNull @RequestBody TwoFactorRequestModel twoFactorRequestModel)
+    /*@PreAuthorize("hasAuthority('$ADVANCED_USER_MANAGEMENT') or hasAuthority('$TWO_FACTOR_CREATE')")*/
+    @PostMapping("/request") public @NotNull ResponseEntity<?> requestTwoFactor(@NotNull @RequestBody TwoFactorRequestModel twoFactorRequestModel)
     {
-        return null;
+        return ResponseEntity.ok(getEntityService().setup(twoFactorRequestModel.userId(), twoFactorRequestModel.twoFactorMethod()));
     }
 
-    @PreAuthorize("hasAuthority('$ADVANCED_USER_MANAGEMENT') or hasAuthority('$TWO_FACTOR_CREATE')") @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
+    @PreAuthorize("hasAuthority('$ADVANCED_USER_MANAGEMENT') or hasAuthority('$TWO_FACTOR_CREATE')") @PostMapping(
+            "/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
     {
         return super.create(model);
     }

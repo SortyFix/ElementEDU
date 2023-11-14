@@ -2,7 +2,7 @@ package de.gaz.eedu.user.verfication.twofa.model;
 
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
-import de.gaz.eedu.user.verfication.twofa.TwoFactorMethod;
+import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import org.jetbrains.annotations.NotNull;
 
 public record TwoFactorCreateModel(@NotNull Long userID, @NotNull String name,

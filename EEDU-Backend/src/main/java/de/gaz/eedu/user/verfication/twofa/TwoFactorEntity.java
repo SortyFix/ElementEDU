@@ -3,6 +3,7 @@ package de.gaz.eedu.user.verfication.twofa;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

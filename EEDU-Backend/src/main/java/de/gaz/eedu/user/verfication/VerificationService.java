@@ -2,12 +2,14 @@ package de.gaz.eedu.user.verfication;
 
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.model.*;
-import de.gaz.eedu.user.verfication.twofa.TwoFactorMethod;
+import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,10 +25,11 @@ import java.util.*;
 @Service public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
+    @Getter private final BCryptPasswordEncoder passwordEncoder;
 
-    public @NotNull BCryptPasswordEncoder getEncoder()
+    public VerificationService(@Autowired BCryptPasswordEncoder passwordEncoder)
     {
-        return new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     public @NotNull LoginResponseModel twoFactor(@NotNull UserModel userModel, @NotNull Instant expiry)

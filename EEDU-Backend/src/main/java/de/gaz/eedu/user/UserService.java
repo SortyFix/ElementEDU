@@ -91,7 +91,7 @@ import java.util.function.Supplier;
         Supplier<CreationException> exceptionSupplier = () -> new CreationException(HttpStatus.NOT_FOUND);
         ThemeEntity themeEntity = getThemeRepository().findById(model.themeId()).orElseThrow(exceptionSupplier);
 
-        String hashedPassword = getVerificationService().getEncoder().encode(model.password());
+        String hashedPassword = getVerificationService().getPasswordEncoder().encode(model.password());
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
@@ -133,7 +133,7 @@ import java.util.function.Supplier;
     {
         return loadEntityByName(userLoginModel.loginName()).map(user ->
         {
-            if (getVerificationService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
+            if (getVerificationService().getPasswordEncoder().matches(userLoginModel.password(), user.getPassword()))
             {
                 ZoneId zid = ZoneId.systemDefault();
 
