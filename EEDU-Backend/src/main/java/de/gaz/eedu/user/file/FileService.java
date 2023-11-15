@@ -1,9 +1,13 @@
 package de.gaz.eedu.user.file;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,6 +34,18 @@ import java.util.Set;
     {
         // Return empty FileEntity if not found
         return fileRepository.findById(id);
+    }
+
+    public @NotNull ByteArrayResource loadResourceById(@NotNull Long id)
+    {
+        try
+        {
+            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityById(id).map(
+                    fileEntity -> fileEntity.toModel().filePath()
+                    )))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
