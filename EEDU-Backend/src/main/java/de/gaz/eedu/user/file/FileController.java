@@ -2,12 +2,14 @@ package de.gaz.eedu.user.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.group.GroupService;
+import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,22 +18,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController @RequestMapping(value = "/file") public class FileController
 {
     private final @NotNull UserService userService;
     private final @NotNull FileService fileService;
-    private final @NotNull GroupService groupService;
-    private final @NotNull String currentUsername;
+    private @NotNull String currentUsername;
 
-    public FileController(@Autowired @NotNull UserService userService, @Autowired @NotNull FileService fileService, @Autowired @NotNull GroupService groupService)
+    public FileController(@Autowired @NotNull UserService userService, @Autowired @NotNull FileService fileService)
     {
         this.userService = userService;
         this.fileService = fileService;
-        this.currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        this.groupService = groupService;
+    }
+
+    @ModelAttribute
+    public void defineUsername(){
+        // Create optional from potential 'null' authentication
+        Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName)
+                .ifPresent(username -> this.currentUsername = username);
     }
 
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
@@ -55,7 +63,7 @@ import java.util.Set;
             }
 
             Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
-            return userService.loadEntityByName(SecurityContextHolder.getContext().getAuthentication().getName()).map(currentUser ->
+            return userService.loadEntityByName(currentUsername).map(currentUser ->
             {
                 try
                 {
@@ -105,5 +113,22 @@ import java.util.Set;
             // Return empty sets if error occurs
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(emptySet);
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptySet))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(emptySet));
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS)
+    {
+        ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
+        return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.loadEntityByName(currentUsername).map(userEntity -> {
+            // Reduce groups in user entity to their ids
+            Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
+            if(userEntity.getId().equals(fileEntity.toModel().authorId())
+                    || !Collections.disjoint(userGroupIds, fileEntity.toModel().permittedGroups())
+                    || fileEntity.toModel().permittedUsers().contains(userEntity.getId()))
+            {
+                return ResponseEntity.ok(fileService.loadResourceById(fileIdS));
+            }
+            // Send back empty resources as request body
+            return ResponseEntity.badRequest().body(emptyResource);
+        }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 }
