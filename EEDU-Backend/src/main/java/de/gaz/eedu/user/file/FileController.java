@@ -133,9 +133,15 @@ import java.util.stream.Collectors;
         }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/info") public ResponseEntity<List<FileModel>> getCurrentUserFilesInfo(){
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/me/info") public ResponseEntity<List<FileModel>> getCurrentUserFilesInfo(){
         Optional<Long> userId = userService.loadEntityByName(currentUsername).map(UserEntity::getId);
         return userId.map(id -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id).stream().map(FileEntity::toModel).collect(Collectors.toList())))
                 .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.emptyList()));
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id]/info") public ResponseEntity<List<FileModel>> getUserFilesInfo(@PathVariable Long id){
+        return userService.loadEntityByID(id).map(userEntity -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id)
+                .stream().map(FileEntity::toModel).collect(Collectors.toList())))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList()));
     }
 }
