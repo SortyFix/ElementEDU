@@ -1,15 +1,20 @@
 package de.gaz.eedu.user.file;
 
+import de.gaz.eedu.user.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service public class FileService
 {
@@ -58,6 +63,13 @@ import java.util.Set;
     public @NotNull Set<FileEntity> loadEntitiesByTag(@NotNull String tag)
     {
         return fileRepository.findFileEntitiesByTags(tag);
+    }
+
+    public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
+    {
+        return fileRepository.findFileEntitiesByAuthorId(id).stream().filter(fileEntity ->
+                Objects.equals(fileEntity.toModel().authorId(), id))
+                .collect(Collectors.toList());
     }
 
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)

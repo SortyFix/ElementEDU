@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -130,5 +131,11 @@ import java.util.stream.Collectors;
             // Send back empty resources as request body
             return ResponseEntity.badRequest().body(emptyResource);
         }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/info") public ResponseEntity<List<FileModel>> getCurrentUserFilesInfo(){
+        Optional<Long> userId = userService.loadEntityByName(currentUsername).map(UserEntity::getId);
+        return userId.map(id -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id).stream().map(FileEntity::toModel).collect(Collectors.toList())))
+                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.emptyList()));
     }
 }
