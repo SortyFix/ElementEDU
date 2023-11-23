@@ -5,6 +5,7 @@ import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.UserStatus;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
@@ -60,7 +61,7 @@ import java.util.function.Supplier;
         String randomPassword = randomPassword(10);
 
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
-        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L);
+        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L, UserStatus.PROSPECTIVE);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
 

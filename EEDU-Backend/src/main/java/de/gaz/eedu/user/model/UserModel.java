@@ -27,6 +27,7 @@ import java.util.Objects;
  * @param enabled   whether the user allowed to log in.
  * @param locked    whether the user allowed to log in.
  * @param groups    groups this user is in.
+ * @param status
  * @author ivo
  * @see UserEntity
  * @see GroupEntity
@@ -36,7 +37,7 @@ public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty 
                         @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
                         @NotEmpty TwoFactorModel[] enabledTwoFactor,
                         @NotEmpty SimpleThemeModel theme,
-                        @NotEmpty SimpleUserGroupModel[] groups) implements Model
+                        @NotEmpty SimpleUserGroupModel[] groups, de.gaz.eedu.user.UserStatus status) implements Model
 {
 
 

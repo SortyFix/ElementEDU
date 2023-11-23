@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS user_entity
     password  VARCHAR(255),
     enabled   BOOLEAN NOT NULL DEFAULT false,
     locked    BOOLEAN NOT NULL DEFAULT false,
-    theme_id  BIGINT REFERENCES theme_entity (id)
+    theme_id  BIGINT REFERENCES theme_entity (id),
+    status     VARCHAR(255)
 );
 
 -- This table stores information about different groups
@@ -100,4 +101,12 @@ CREATE TABLE file_tags
     file_id BIGINT,
     tags    VARCHAR(255),
     FOREIGN KEY (file_id) REFERENCES file_entity (id) ON DELETE CASCADE
+);
+
+CREATE TABLE illness_notification_entity
+(
+    notification_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id             BIGINT,
+    status              VARCHAR(255),
+    notification_date   DATE
 );

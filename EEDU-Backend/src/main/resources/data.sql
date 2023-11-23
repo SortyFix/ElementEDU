@@ -49,11 +49,11 @@ VALUES ( 'Light', 0x000000, 0x000000, 0x000000 ),
        ( 'Dark', 0x000000, 0x000000, 0x000000 ),
        ( 'dummy', 0x000000, 0x000000, 0x000000 );
 
-INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id)
-VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1),
-       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2),
-       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3),
-       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4);
+INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
+VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 'PRESENT'),
+       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2, 'PRESENT'),
+       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3, 'PRESENT'),
+       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 'PROSPECTIVE');
 
 INSERT INTO group_entity (name, two_factor_required)
 VALUES ('Users', false), ('Moderators', true), ('Admins', true), ('Dummy', false);
