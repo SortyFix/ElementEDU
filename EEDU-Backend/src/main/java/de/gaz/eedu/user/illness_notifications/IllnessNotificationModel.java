@@ -3,10 +3,9 @@ package de.gaz.eedu.user.illness_notifications;
 import de.gaz.eedu.entity.model.Model;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
 import java.util.Objects;
 
-public record IllnessNotificationModel(@NotNull Long illnessId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, @NotNull Date date) implements Model
+public record IllnessNotificationModel(@NotNull Long illnessId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, java.time.LocalDate date) implements Model
 {
     @Override public boolean equals(Object o)
     {

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,45 +45,11 @@ import java.util.stream.Collectors;
     }
 
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public ResponseEntity<String> uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @NotNull UserEntity author, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public ResponseEntity<Boolean> uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags)
     {
-        if (fileService.isFileValid(file))
-        {
-            // TEMPORARY!
-            String dropPath = "/upload/files/" + author.getUsername() + "/";
-            Path path = Paths.get(dropPath);
-            if (!Files.exists(path))
-            {
-                try
-                {
-                    Files.createDirectories(path);
-                }
-                catch (IOException ioException)
-                {
-                    return ResponseEntity.status(500).body("Could not create new directory");
-                }
-            }
-
-            Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
-            return userService.loadEntityByName(currentUsername).map(currentUser ->
-            {
-                try
-                {
-                    Files.copy(file.getInputStream(), uploadPath);
-                    // Current user will be added automatically
-                    permittedUsers.add(currentUser.getId());
-                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
-                    fileService.createEntity(createModel);
-                    return ResponseEntity.ok("File upload successful");
-                }
-                catch (IOException ioException)
-                {
-                    return ResponseEntity.status(500).body("Internal server error");
-                }
-            }).orElse(ResponseEntity.status(401).body("Unauthorized"));
-        }
-
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Could not pass file check");
+        Boolean uploadSuccessful = fileService.upload(file, fileName, authorId, permittedUsers, permittedGroups, tags, false);
+        return uploadSuccessful ? ResponseEntity.ok(true)
+                : ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public ResponseEntity<Boolean> deleteFile(@NotNull Long id)

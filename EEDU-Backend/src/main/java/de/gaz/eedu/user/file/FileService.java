@@ -1,8 +1,13 @@
 package de.gaz.eedu.user.file;
 
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,15 +15,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service public class FileService
 {
     FileRepository fileRepository;
+
+    private final UserService userService;
+    public FileService(@Autowired @NotNull UserService userService){
+        this.userService = userService;
+    }
 
     /**
      * Checks if file is empty or contains malicious files.
@@ -33,6 +42,47 @@ import java.util.stream.Collectors;
     {
         // TODO: Implement antivirus check (with ClamAV?)
         return !file.isEmpty();
+    }
+
+    public @NotNull Boolean upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags, @NotNull Boolean illnessNotification){
+        if (isFileValid(file))
+        {
+            String date = LocalDate.now().toString();
+            // TEMPORARY!
+            String dropPath = "/upload/files/" + userService.loadEntityByID(authorId).map(UserEntity::getUsername) + "/" + (illnessNotification ? "missing/" + date + "/" : null);
+            Path path = Paths.get(dropPath);
+            if (!Files.exists(path))
+            {
+                try
+                {
+                    Files.createDirectories(path);
+                }
+                catch (IOException ioException)
+                {
+                    return false;
+                }
+            }
+
+            Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
+            return userService.loadEntityByID(authorId).map(currentUser ->
+            {
+                try
+                {
+                    Files.copy(file.getInputStream(), uploadPath);
+                    // Current user will be added automatically
+                    permittedUsers.add(currentUser.getId());
+                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
+                    createEntity(createModel);
+                    return true;
+                }
+                catch (IOException ioException)
+                {
+                    return false;
+                }
+            }).orElse(false);
+        }
+
+        return false;
     }
 
     public @NotNull Optional<FileEntity> loadEntityById(@NotNull Long id)
@@ -67,9 +117,7 @@ import java.util.stream.Collectors;
 
     public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
     {
-        return fileRepository.findFileEntitiesByAuthorId(id).stream().filter(fileEntity ->
-                Objects.equals(fileEntity.toModel().authorId(), id))
-                .collect(Collectors.toList());
+        return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
