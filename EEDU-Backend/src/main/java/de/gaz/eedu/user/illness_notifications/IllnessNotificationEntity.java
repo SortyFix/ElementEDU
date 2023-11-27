@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Setter @Getter @Entity @Table(name="illness_notification_entity") public class IllnessNotificationEntity implements EDUEntity, EntityModelRelation<IllnessNotificationModel>
 {
