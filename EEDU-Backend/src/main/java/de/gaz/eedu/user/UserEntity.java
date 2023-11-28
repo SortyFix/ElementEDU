@@ -9,11 +9,14 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
+import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.jetbrains.annotations.Unmodifiable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,14 +44,14 @@ import java.util.stream.Stream;
  */
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
-
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
 
-    @OneToMany @JsonManagedReference @JoinTable(name = "user_enabled_two_factor", joinColumns = @JoinColumn(name =
-            "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "two_fa_id",
-            referencedColumnName = "id")) private Set<TwoFactorEntity> enabledTwoFactorMethods = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference @JoinTable(name =
+            "user_enabled_two_factor", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "two_fa_id", referencedColumnName = "id")) private Set<TwoFactorEntity> twoFactors = new HashSet<>();
 
     @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
@@ -64,7 +67,11 @@ import java.util.stream.Stream;
     @Override public UserModel toModel()
     {
         return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
-                getEnabledTwoFactorMethods().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new), getThemeEntity().toSimpleModel(), getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(), groupEntity.getName(), groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new));
+                getTwoFactors().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new),
+                getThemeEntity().toSimpleModel(),
+                getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
+                        groupEntity.getName(),
+                        groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new));
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
@@ -206,19 +213,32 @@ import java.util.stream.Stream;
         return Collections.unmodifiableSet(groups);
     }
 
-    @Transactional public boolean enableTwoFactor(@NotNull UserService userService,
-            @NotNull TwoFactorEntity twoFactorEntity)
+    public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)
     {
-        return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::enableTwoFactor);
+        return this.getTwoFactors().stream().filter(entity -> entity.getMethod().equals(twoFactorMethod)).findFirst();
     }
 
-    public boolean enableTwoFactor(@NotNull TwoFactorEntity twoFactorEntity)
+    @Transactional public boolean initTwoFactor(@NotNull UserService userService,
+            @NotNull TwoFactorEntity twoFactorEntity)
     {
-        if (this.getEnabledTwoFactorMethods().stream().anyMatch(entity -> entity.getMethod().equals(twoFactorEntity.getMethod())))
+        return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::initTwoFactor);
+    }
+
+    public boolean initTwoFactor(@NotNull TwoFactorEntity twoFactorEntity)
+    {
+        if (this.getTwoFactors().stream().anyMatch(entity -> entity.getMethod().equals(twoFactorEntity.getMethod())))
         {
             return false;
         }
-        return this.enabledTwoFactorMethods.add(twoFactorEntity);
+
+        // remove not enabled instances of this two factor
+        if (twoFactors.removeIf(entity -> Objects.equals(entity.getMethod(), twoFactorEntity.getMethod())))
+        {
+            String removalMessage = "A disabled two-factor instance using method {} was auto-removed from user {}.";
+            LOGGER.warn(removalMessage, twoFactorEntity.getMethod(), getId());
+        }
+
+        return this.twoFactors.add(twoFactorEntity);
     }
 
     @Transactional public boolean disableTwoFactor(@NotNull UserService userService, @NotNull Long... ids)
@@ -229,13 +249,13 @@ import java.util.stream.Stream;
     public boolean disableTwoFactor(@NotNull Long... ids)
     {
         Set<Long> disableFactors =
-                Stream.of(ids).filter(current -> getEnabledTwoFactorMethods().stream().anyMatch(entity -> Objects.equals(entity.getId(), current))).collect(Collectors.toSet());
-        return enabledTwoFactorMethods.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
+                Stream.of(ids).filter(current -> getTwoFactors().stream().anyMatch(entity -> Objects.equals(entity.getId(), current))).collect(Collectors.toSet());
+        return twoFactors.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
     }
 
-    public @NotNull @Unmodifiable Set<TwoFactorEntity> getEnabledTwoFactorMethods()
+    public @NotNull @Unmodifiable Set<TwoFactorEntity> getTwoFactors()
     {
-        return Collections.unmodifiableSet(enabledTwoFactorMethods);
+        return twoFactors.stream().filter(TwoFactorEntity::isEnabled).collect(Collectors.toUnmodifiableSet());
     }
 
     @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,

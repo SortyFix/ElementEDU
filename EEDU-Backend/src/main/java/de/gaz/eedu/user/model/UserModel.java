@@ -34,7 +34,7 @@ import java.util.Objects;
 public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty String lastName,
                         @NotEmpty String loginName,
                         @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
-                        @NotEmpty TwoFactorModel[] enabledTwoFactor,
+                        @NotEmpty TwoFactorModel[] twoFactor,
                         @NotEmpty SimpleThemeModel theme,
                         @NotEmpty SimpleUserGroupModel[] groups) implements Model
 {
@@ -49,7 +49,7 @@ public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty 
                 ", loginName='" + loginName + '\'' +
                 ", enabled=" + enabled +
                 ", locked=" + locked +
-                ", enabledTwoFactor=" + Arrays.toString(enabledTwoFactor) +
+                ", twoFactor=" + Arrays.toString(twoFactor) +
                 ", theme=" + theme +
                 ", groups=" + Arrays.toString(groups) +
                 '}';

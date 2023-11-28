@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C>, M extends Model, C extends CreationModel<?>>
@@ -82,5 +85,18 @@ import org.springframework.http.ResponseEntity;
     {
         logger.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull String authority)
+    {
+        return isAuthorized(authentication, authority, SimpleGrantedAuthority.class);
+    }
+
+    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
+    {
+        return authentication.getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 }

@@ -4,17 +4,20 @@ import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Objects;
 
-public record TwoFactorModel(@NotNull Long id, @NotNull TwoFactorMethod twoFactorMethod) implements Model
+public record TwoFactorModel(@NotNull Long id, @NotNull TwoFactorMethod method, boolean enabled, @Nullable Map<String, String> claims) implements Model
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()
     {
         return "TwoFactorModel{" +
                 "id=" + id +
-                ", twoFactorMethod=" + twoFactorMethod +
+                ", method=" + method +
+                ", enabled=" + enabled +
                 '}';
     }
 

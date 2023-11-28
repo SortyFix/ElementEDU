@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class TwoFactorEntity implements EDUEntity, EntityModelRelation<TwoFactorModel>
 {
@@ -17,7 +20,8 @@ public class TwoFactorEntity implements EDUEntity, EntityModelRelation<TwoFactor
     @Setter(AccessLevel.NONE)
     private Long id;
     private TwoFactorMethod method;
-    private String data;
+    private String data, secret;
+    private boolean enabled;
     @ManyToOne
     @Setter(AccessLevel.NONE)
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,6 +34,11 @@ public class TwoFactorEntity implements EDUEntity, EntityModelRelation<TwoFactor
 
     @Override public TwoFactorModel toModel()
     {
-        return new TwoFactorModel(id, method);
+        Map<String, String> claims = new HashMap<>();
+        if(!isEnabled())
+        {
+            claims.put("setup", getMethod().getTwoFactorMethodImplementation().creation(this));
+        }
+        return new TwoFactorModel(getId(), getMethod(), isEnabled(), claims);
     }
 }
