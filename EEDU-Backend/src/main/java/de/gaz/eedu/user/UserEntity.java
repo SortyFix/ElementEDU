@@ -57,11 +57,12 @@ import java.util.stream.Stream;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
+    @Enumerated(EnumType.STRING) UserStatus status;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
         return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
-                getThemeEntity().toSimpleModel());
+                getThemeEntity().toSimpleModel(), getStatus());
     }
 
     @Override public UserModel toModel()
@@ -69,9 +70,11 @@ import java.util.stream.Stream;
         return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
                 getTwoFactors().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new),
                 getThemeEntity().toSimpleModel(),
-                getGroups().stream().map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
-                        groupEntity.getName(),
-                        groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new));
+                getGroups().stream().map(
+                        groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
+                                groupEntity.getName(),
+                                groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new),
+                getStatus());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
