@@ -42,12 +42,11 @@ assignment and hierarchy of users, groups, and privileges.
 
 =============================================================================
 */
-
 INSERT INTO theme_entity(name, background_color, widget_color, text_color)
-VALUES ( 'Light', 0x000000, 0x000000, 0x000000 ),
-       ( 'Medium', 0x000000, 0x000000, 0x000000 ),
-       ( 'Dark', 0x000000, 0x000000, 0x000000 ),
-       ( 'dummy', 0x000000, 0x000000, 0x000000 );
+VALUES ('Light', 0x000000, 0x000000, 0x000000),
+       ('Medium', 0x000000, 0x000000, 0x000000),
+       ('Dark', 0x000000, 0x000000, 0x000000),
+       ('dummy', 0x000000, 0x000000, 0x000000);
 
 INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 'PRESENT'),
@@ -56,7 +55,10 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 'P
        ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 'PROSPECTIVE');
 
 INSERT INTO group_entity (name, two_factor_required)
-VALUES ('Users', false), ('Moderators', true), ('Admins', true), ('Dummy', false);
+VALUES ('Users', false),
+       ('Moderators', true),
+       ('Admins', true),
+       ('Dummy', false);
 
 INSERT INTO privilege_entity (name)
 VALUES ('READ'),
@@ -64,19 +66,19 @@ VALUES ('READ'),
        ('MODERATE'),
        ('DUMMY');
 
-INSERT INTO user_enabled_two_factor (user_id, method)
-VALUES (1, 'EMAIL'),
+INSERT INTO two_factor_entity(method, data, secret, enabled, user_id)
+VALUES ('EMAIL', 'mustermann@example.com', '', true, 1),
 
-       (2, 'EMAIL'),
-       (2, 'SMS'),
+       ('EMAIL', 'mustermann@example.com', '', true, 2),
+       ('SMS', '555 5555555', '', true, 2),
 
-       (3, 'EMAIL'),
-       (3, 'SMS'),
-       (3, 'TOTP'),
+       ('EMAIL', 'mustermann@examle.com', '', true, 3),
+       ('SMS', '555 5555555', '', true, 3),
+       ('TOTP', NULL, '', true, 3),
 
-       (4, 'TOTP');
+       ('TOTP', NULL, '', true, 4);
 
-INSERT INTO user_groups (user_id, group_id)
+MERGE INTO user_groups (user_id, group_id)
 VALUES (1, 1),
 
        (2, 1),
@@ -88,7 +90,7 @@ VALUES (1, 1),
 
        (4, 4);
 
-INSERT INTO group_privileges (group_id, privilege_id)
+MERGE INTO group_privileges (group_id, privilege_id)
 VALUES (1, 1),
 
        (2, 1),

@@ -1,5 +1,5 @@
 -- This table stores information about different themes
-CREATE TABLE theme_entity
+CREATE TABLE IF NOT EXISTS theme_entity
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(255),
@@ -12,19 +12,21 @@ CREATE TABLE theme_entity
 -- It contains information about the user's id, first name, last name, login name, email, password status (if they're enabled or locked).
 CREATE TABLE IF NOT EXISTS user_entity
 (
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255),
     last_name  VARCHAR(255),
     login_name VARCHAR(255),
-    password  VARCHAR(255),
-    enabled   BOOLEAN NOT NULL DEFAULT false,
-    locked    BOOLEAN NOT NULL DEFAULT false,
-    theme_id  BIGINT REFERENCES theme_entity (id),
-    status     VARCHAR(255)
+    password   VARCHAR(255),
+    enabled    BOOLEAN NOT NULL DEFAULT false,
+    locked     BOOLEAN NOT NULL DEFAULT false,
+    theme_id   BIGINT REFERENCES theme_entity (id),
+    status ENUM('PRESENT', 'EXCUSED', 'UNEXCUSED', 'PROSPECTIVE')
 );
 
+
+
 -- This table stores information about different groups
-CREATE TABLE group_entity
+CREATE TABLE IF NOT EXISTS group_entity
 (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     name                VARCHAR(255),
@@ -32,22 +34,27 @@ CREATE TABLE group_entity
 );
 
 -- This table is a relational table that connects users and their associated groups
-CREATE TABLE privilege_entity
+CREATE TABLE IF NOT EXISTS privilege_entity
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255)
 );
 
-CREATE TABLE IF NOT EXISTS user_enabled_two_factor
+
+-- This table is a for two factor instances connecting users and their security
+CREATE TABLE IF NOT EXISTS two_factor_entity
 (
-    user_id        BIGINT NOT NULL REFERENCES user_entity (id),
-    method         VARCHAR(255),
-    PRIMARY KEY (user_id, method),
-    FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    method  ENUM('EMAIL', 'SMS', 'TOTP') NOT NULL,
+    data    VARCHAR(255) NULL,
+    secret  VARCHAR(255) NOT NULL,
+    enabled BOOLEAN      NOT NULL,
+    user_id BIGINT       NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
 -- This table is a relational table that connects groups and their associated privileges
-CREATE TABLE user_groups
+CREATE TABLE IF NOT EXISTS user_groups
 (
     user_id  BIGINT,
     group_id BIGINT,
@@ -57,7 +64,7 @@ CREATE TABLE user_groups
 );
 
 -- This table stores information about different privileges.
-CREATE TABLE group_privileges
+CREATE TABLE IF NOT EXISTS group_privileges
 (
     group_id     BIGINT,
     privilege_id BIGINT,
@@ -67,7 +74,7 @@ CREATE TABLE group_privileges
 );
 
 -- This table stores information about different uploaded files.
-CREATE TABLE file_entity
+CREATE TABLE IF NOT EXISTS file_entity
 (
     id        BIGINT PRIMARY KEY AUTO_INCREMENT,
     file_name VARCHAR(255),
@@ -76,7 +83,7 @@ CREATE TABLE file_entity
 );
 
 -- This table stores which users (by Set<UserEntity>) should have permission to access a certain file.
-CREATE TABLE file_user_permissions
+CREATE TABLE IF NOT EXISTS file_user_permissions
 (
     file_id BIGINT,
     user_id BIGINT,
@@ -86,7 +93,7 @@ CREATE TABLE file_user_permissions
 );
 
 -- This table stores which groups (by Set<GroupEntity>) should have permission to access a certain file.
-CREATE TABLE file_group_permissions
+CREATE TABLE IF NOT EXISTS file_group_permissions
 (
     file_id  BIGINT,
     group_id BIGINT,
@@ -96,17 +103,17 @@ CREATE TABLE file_group_permissions
 );
 
 -- This table stores which tags should be given to a file. Multiple tags can be given, hence this table.
-CREATE TABLE file_tags
+CREATE TABLE IF NOT EXISTS file_tags
 (
     file_id BIGINT,
     tags    VARCHAR(255),
     FOREIGN KEY (file_id) REFERENCES file_entity (id) ON DELETE CASCADE
 );
 
-CREATE TABLE illness_notification_entity
+CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    notification_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id             BIGINT,
-    status              VARCHAR(255),
-    notification_date   DATE
+    notification_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id           BIGINT,
+    status            VARCHAR(255),
+    notification_date DATE
 );

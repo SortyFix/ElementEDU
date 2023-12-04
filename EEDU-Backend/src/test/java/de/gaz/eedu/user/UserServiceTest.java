@@ -19,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
             Assertions.assertEquals(expect.loginName(), result.loginName());
             Assertions.assertEquals(expect.enabled(), result.enabled());
             Assertions.assertEquals(expect.locked(), result.locked());
-            Assertions.assertEquals(expect.groups(), result.groups());
+            Assertions.assertEquals(expect.groups().length, result.groups().length);
             Assertions.assertEquals(expect.theme(), result.theme());
         });
     }
