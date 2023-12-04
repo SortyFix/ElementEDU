@@ -6,6 +6,7 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verfication.model.LoginResponse;
+import de.gaz.eedu.user.verfication.model.LoginTwoFactorEnabled;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethodImplementation;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
@@ -115,7 +116,7 @@ import java.util.function.Supplier;
         {
             if (enable)
             {
-                enableMapper(authModel).apply(auth);
+                return enableMapper(authModel).apply(auth);
             }
             return verifyMapper(authModel).apply(auth);
         };
@@ -123,7 +124,14 @@ import java.util.function.Supplier;
         return userEntity.getTwoFactor(authModel.twoFactorMethod())
                 .map(mapper)
                 .filter(Boolean::booleanValue)
-                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims));
+                .map(entity ->
+                {
+                    if(enable)
+                    {
+                        return new LoginTwoFactorEnabled(userEntity.toModel());
+                    }
+                    return getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims);
+                });
     }
 
     @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull TwoFactorAuthModel twoFactorAuthModel)

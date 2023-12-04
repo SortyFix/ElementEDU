@@ -2,6 +2,8 @@ package de.gaz.eedu.user.verfication;
 
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
+import de.gaz.eedu.user.verfication.authority.InvalidTokenException;
 import de.gaz.eedu.user.verfication.model.LoginResponse;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import io.jsonwebtoken.Claims;
@@ -65,7 +67,7 @@ import java.util.Optional;
         private static @NotNull ClaimDecoder decode(@NotNull Claims claims) throws InvalidTokenException
         {
             long userID = verify(claims.get("userID", Long.class));
-            Instant expiry = verify(claims.get("expiry", Instant.class));
+            Instant expiry = Instant.ofEpochMilli(verify(claims.get("expiry", Long.class)));
             boolean advanced = verify(claims.get("advanced", Boolean.class));
             return new ClaimDecoder(userID, expiry, advanced);
         }

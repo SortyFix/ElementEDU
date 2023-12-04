@@ -5,7 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.HTTPRequestException;
 import de.gaz.eedu.user.model.*;
-import de.gaz.eedu.user.verfication.AuthorityFactory;
+import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.AuthorizeService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;

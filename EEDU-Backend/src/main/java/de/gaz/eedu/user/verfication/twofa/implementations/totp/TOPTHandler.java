@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 
     public boolean isValidCode(long timeStamp, @NotNull String secret, @NotNull String code)
     {
+        System.out.println(secret + " " + code);
         long currentBucket = Math.floorDiv(timeStamp, timePeriod);
         boolean success = false;
         for (int i = -timeGap; i <= timeGap; i++)

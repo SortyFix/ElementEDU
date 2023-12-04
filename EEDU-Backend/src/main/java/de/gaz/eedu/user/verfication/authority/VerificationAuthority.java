@@ -1,5 +1,6 @@
-package de.gaz.eedu.user.verfication;
+package de.gaz.eedu.user.verfication.authority;
 
+import de.gaz.eedu.user.verfication.JwtTokenType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

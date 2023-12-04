@@ -4,6 +4,7 @@ import de.gaz.eedu.user.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.model.*;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
@@ -64,7 +65,7 @@ import java.util.function.Function;
     {
         ClaimHolder<?>[] holders = {
                 new ClaimHolder<>("userID", userID),
-                new ClaimHolder<>("expiry", expiry),
+                new ClaimHolder<>("expiry", expiry.toEpochMilli()),
                 new ClaimHolder<>("advanced", advanced),
                 new ClaimHolder<>("method", twoFactorMethod)
         };
@@ -77,7 +78,7 @@ import java.util.function.Function;
     {
         ClaimHolder<?>[] holders = {
                 new ClaimHolder<>("userID", userID),
-                new ClaimHolder<>("expiry", expiry),
+                new ClaimHolder<>("expiry", expiry.toEpochMilli()),
                 new ClaimHolder<>("advanced", advanced),
         };
         return twoFactor(twoFactorMethods, holders);

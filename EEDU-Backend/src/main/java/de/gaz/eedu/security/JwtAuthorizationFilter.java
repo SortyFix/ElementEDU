@@ -1,6 +1,7 @@
 package de.gaz.eedu.security;
 
 import de.gaz.eedu.user.UserService;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +41,11 @@ import java.util.function.Consumer;
             };
             getUserService().validate(token).ifPresent(tokenConsumer);
 
+        }
+        else
+        {
+            //Add empty claims
+            request.setAttribute("claims", Jwts.claims().build());
         }
 
         filterChain.doFilter(request, response);

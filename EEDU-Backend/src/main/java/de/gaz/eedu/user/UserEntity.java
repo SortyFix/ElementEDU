@@ -218,7 +218,8 @@ import java.util.stream.Stream;
 
     public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)
     {
-        return this.getTwoFactors().stream().filter(entity -> entity.getMethod().equals(twoFactorMethod)).findFirst();
+        // Also include not enabled ones, therefore not getter
+        return twoFactors.stream().filter(entity -> entity.getMethod().equals(twoFactorMethod)).findFirst();
     }
 
     @Transactional public boolean initTwoFactor(@NotNull UserService userService,

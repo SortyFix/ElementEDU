@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.verfication;
+package de.gaz.eedu.user.verfication.authority;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;

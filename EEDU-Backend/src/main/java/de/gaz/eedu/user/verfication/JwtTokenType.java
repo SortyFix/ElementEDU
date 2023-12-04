@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.verfication;
 
+import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.verfication;
+package de.gaz.eedu.user.verfication.authority;
 
 import de.gaz.eedu.exception.HTTPRequestException;
 import org.springframework.http.HttpStatus;
