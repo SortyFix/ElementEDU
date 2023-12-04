@@ -49,9 +49,7 @@ import java.util.stream.Stream;
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference @JoinTable(name =
-            "user_enabled_two_factor", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "two_fa_id", referencedColumnName = "id")) private Set<TwoFactorEntity> twoFactors = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference private Set<TwoFactorEntity> twoFactors = new HashSet<>();
 
     @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =

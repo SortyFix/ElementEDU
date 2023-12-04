@@ -28,7 +28,12 @@ import org.springframework.web.bind.annotation.*;
 
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
     {
-        return super.create(model);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
+        {
+            return super.create(model);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
     @PostMapping("/verify") public @NotNull ResponseEntity<LoginResponse> verify(@RequestBody @NotNull String code, @AuthenticationPrincipal Long userID, @RequestAttribute("claims") @NotNull Claims claims)

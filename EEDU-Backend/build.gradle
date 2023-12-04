@@ -41,15 +41,16 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.12.2'
     implementation "io.sensesecure:clamav4j:0.6"
 
-    // Two-Factor
-    implementation 'dev.samstevens.totp:totp:1.7.1'
-
     // Compiled code only
     compileOnly 'org.projectlombok:lombok'
 
     //Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // Two factor
+    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'commons-codec:commons-codec:1.15'
 
     // Runtime drivers
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

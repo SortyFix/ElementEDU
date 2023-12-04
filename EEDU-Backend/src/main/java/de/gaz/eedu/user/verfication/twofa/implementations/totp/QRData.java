@@ -3,12 +3,12 @@ package de.gaz.eedu.user.verfication.twofa.implementations.totp;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +35,15 @@ public record QRData(@NotNull String type, @NotNull String label, @NotNull Strin
         Writer writer = new QRCodeWriter();
         BitMatrix bitMatrix = writer.encode(toURI(), BarcodeFormat.QR_CODE, imageSize, imageSize);
 
-        BufferedImage image = MatrixToImageWriter.toBufferedImage(bitMatrix);
+        int width = bitMatrix.getWidth();
+        int height = bitMatrix.getHeight();
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = bitMatrix.get(x, y) ? Color.BLACK.getRGB() : Color.WHITE.getRGB();
+                image.setRGB(x, y, rgb);
+            }
+        }
         ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
 
         ImageIO.write(image, "JPEG", jpegOutputStream);

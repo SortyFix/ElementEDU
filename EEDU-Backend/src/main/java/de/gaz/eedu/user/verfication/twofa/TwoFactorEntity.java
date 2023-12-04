@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.verfication.twofa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
@@ -12,20 +13,14 @@ import lombok.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter
-public class TwoFactorEntity implements EDUEntity, EntityModelRelation<TwoFactorModel>
+@Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class TwoFactorEntity implements EDUEntity,
+        EntityModelRelation<TwoFactorModel>
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private TwoFactorMethod method;
     private String data, secret;
     private boolean enabled;
-    @ManyToOne
-    @Setter(AccessLevel.NONE)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    @ManyToOne @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
 
     public TwoFactorEntity(@NotNull UserEntity user)
     {
@@ -35,7 +30,7 @@ public class TwoFactorEntity implements EDUEntity, EntityModelRelation<TwoFactor
     @Override public TwoFactorModel toModel()
     {
         Map<String, String> claims = new HashMap<>();
-        if(!isEnabled())
+        if (!isEnabled())
         {
             claims.put("setup", getMethod().getTwoFactorMethodImplementation().creation(this));
         }
