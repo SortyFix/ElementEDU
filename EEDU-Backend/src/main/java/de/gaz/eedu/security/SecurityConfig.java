@@ -38,5 +38,4 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
             }
         };
     }
-
 }

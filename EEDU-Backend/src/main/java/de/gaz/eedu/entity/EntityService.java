@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EDUEntity;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.EntityUnknownException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +77,16 @@ public interface EntityService<E extends EDUEntity, M extends Model, C extends C
     @Transactional(readOnly = true) @NotNull Function<M, E> toEntity();
 
     @NotNull Function<E, M> toModel();
+
+    default @NotNull @Transactional(readOnly = true) E loadEntityByIDSafe(long id) throws EntityUnknownException
+    {
+        return loadEntityByID(id).orElseThrow(() -> new EntityUnknownException(id));
+    }
+
+    @Transactional(readOnly = true) default @NotNull M loadByIdSafe(long id) throws EntityUnknownException
+    {
+        return toModel().apply(loadEntityByIDSafe(id));
+    }
 
     @Transactional(readOnly = true) default @NotNull Optional<M> loadById(long id)
     {

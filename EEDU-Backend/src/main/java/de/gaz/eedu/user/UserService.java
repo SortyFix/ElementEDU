@@ -3,16 +3,17 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.encryption.EncryptionService;
+import de.gaz.eedu.exception.HTTPRequestException;
+import de.gaz.eedu.user.model.*;
+import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
+import de.gaz.eedu.user.verfication.AuthorizeService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupRepository;
-import de.gaz.eedu.user.model.UserCreateModel;
-import de.gaz.eedu.user.model.UserLoginModel;
-import de.gaz.eedu.user.model.UserLoginVerificationModel;
-import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeRepository;
+import de.gaz.eedu.user.verfication.model.LoginResponse;
+import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,15 +22,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -56,8 +56,7 @@ import java.util.function.Supplier;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
-
-    private final EncryptionService encryptionService;
+    @Getter private final AuthorizeService authorizeService;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
@@ -90,7 +89,7 @@ import java.util.function.Supplier;
         Supplier<CreationException> exceptionSupplier = () -> new CreationException(HttpStatus.NOT_FOUND);
         ThemeEntity themeEntity = getThemeRepository().findById(model.themeId()).orElseThrow(exceptionSupplier);
 
-        String hashedPassword = getEncryptionService().getEncoder().encode(model.password());
+        String hashedPassword = getAuthorizeService().encode(model.password());
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
@@ -114,7 +113,7 @@ import java.util.function.Supplier;
         return UserEntity::toModel;
     }
 
-    @Transactional @Override public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    @Transactional @Override public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -128,22 +127,23 @@ import java.util.function.Supplier;
         }).orElse(false);
     }
 
-    @Transactional public @NotNull Optional<UserLoginVerificationModel> login(@NotNull UserLoginModel userLoginModel)
+    @Transactional public @NotNull Optional<LoginResponse> login(@NotNull LoginModel loginModel)
     {
-        return loadEntityByName(userLoginModel.loginName()).map(user ->
-        {
-            if (getEncryptionService().getEncoder().matches(userLoginModel.password(), user.getPassword()))
-            {
-                return new UserLoginVerificationModel(user.getId(),
-                        getEncryptionService().generateKey(String.valueOf(user.getId())));
-            }
-            return null; // Optional empty as password does not match.
-        });
+        return loadEntityByName(loginModel.loginName()).map(user -> getAuthorizeService().login(user.toModel(),
+                user.getPassword(),
+                loginModel));
+    }
+
+    @Transactional public @NotNull LoginResponse authorize(long userID, @NotNull Claims claims)
+    {
+        Supplier<HTTPRequestException> supplier = () -> new HTTPRequestException(HttpStatus.INTERNAL_SERVER_ERROR);
+        return loadById(userID).map(user -> getAuthorizeService().authorize(user, claims)).orElseThrow(supplier);
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        return getEncryptionService().validate(token,
-                (id) -> loadEntityByID(id).map(UserEntity::getAuthorities).orElse(new HashSet<>()));
+        Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
+        AuthorityFactory authorityFactory = (id) -> loadEntityByID(id).map(function).orElse(new HashSet<>());
+        return getAuthorizeService().validate(token, authorityFactory);
     }
 }

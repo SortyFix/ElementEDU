@@ -2,8 +2,9 @@ POST http://localhost:8080/user/login
 Content-Type: application/json
 
 {
-  "loginName": "root",
-  "password": "SafePassword123!!."
+  "loginName": "john.doe",
+  "password": "testPass123!",
+  "keepLoggedIn": true
 }
 
 
@@ -18,7 +19,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyMTI3f
 }
 
 ###
-GET http://localhost:8080/group/get/5
+GET http://localhost:8080/user/get/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyMTI3fQ.XAsh1pChVFvWqzazcCX-JKtTIADh-uA1PdqlZIYMg28
 
 ###
@@ -44,7 +45,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5MTcyODIwf
 {
   "firstName": "John",
   "lastName": "Doe",
-  "loginName": "asdasf",
+  "loginName": "john.doe",
   "password": "testPass123!",
   "enabled": true,
   "locked": false,

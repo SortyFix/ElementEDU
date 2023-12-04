@@ -6,11 +6,12 @@ import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.theming.SimpleThemeModel;
+import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents a {@link UserEntity} as model.
@@ -26,6 +27,7 @@ import java.util.Set;
  * @param enabled   whether the user allowed to log in.
  * @param locked    whether the user allowed to log in.
  * @param groups    groups this user is in.
+ * @param status
  * @author ivo
  * @see UserEntity
  * @see GroupEntity
@@ -33,9 +35,11 @@ import java.util.Set;
 public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty String lastName,
                         @NotEmpty String loginName,
                         @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
+                        @NotEmpty TwoFactorModel[] twoFactor,
                         @NotEmpty SimpleThemeModel theme,
-                        @NotEmpty Set<SimpleUserGroupModel> groups) implements Model
+                        @NotEmpty SimpleUserGroupModel[] groups, de.gaz.eedu.user.UserStatus status) implements Model
 {
+
 
     @Override public String toString()
     {
@@ -46,8 +50,9 @@ public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty 
                 ", loginName='" + loginName + '\'' +
                 ", enabled=" + enabled +
                 ", locked=" + locked +
-                ", theme=" + theme.name() +
-                ", groups=" + groups +
+                ", twoFactor=" + Arrays.toString(twoFactor) +
+                ", theme=" + theme +
+                ", groups=" + Arrays.toString(groups) +
                 '}';
     }
 
