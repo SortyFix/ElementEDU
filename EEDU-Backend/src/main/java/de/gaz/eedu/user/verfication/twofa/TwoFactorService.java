@@ -107,9 +107,10 @@ import java.util.function.Supplier;
         return TwoFactorEntity::toModel;
     }
 
-    public @NotNull Optional<LoginResponse> verify(long userID, @NotNull TwoFactorAuthModel authModel, boolean enable
+    public @NotNull Optional<LoginResponse> verify(@NotNull TwoFactorAuthModel authModel, boolean enable
             , @NotNull Claims claims)
     {
+        long userID = claims.get("user_id", Long.class);
         UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
 
         Function<TwoFactorEntity, Boolean> mapper = auth ->

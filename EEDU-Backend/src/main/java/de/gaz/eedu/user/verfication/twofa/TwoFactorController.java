@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,18 +36,17 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("/enable") public @NotNull ResponseEntity<LoginResponse> enable(@RequestBody @NotNull TwoFactorAuthModel authModel,
-                                                                        @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
+    @PostMapping("/enable") public @NotNull ResponseEntity<LoginResponse> enable(@RequestBody @NotNull TwoFactorAuthModel authModel, @RequestAttribute("claims") Claims claims)
     {
         ResponseEntity<LoginResponse> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.ADVANCED_AUTHORIZATION))
         {
             return invalidResponse;
         }
-        return getEntityService().verify(userID, authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
+        return getEntityService().verify(authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
     }
 
-    @PostMapping("/verify") public @NotNull ResponseEntity<LoginResponse> verify(@RequestBody @NotNull String code, @AuthenticationPrincipal Long userID, @RequestAttribute("claims") @NotNull Claims claims)
+    @PostMapping("/verify") public @NotNull ResponseEntity<LoginResponse> verify(@RequestBody @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -57,7 +55,7 @@ import org.springframework.web.bind.annotation.*;
             TwoFactorMethod authMethod = TwoFactorMethod.valueOf(claims.get("method", String.class));
             TwoFactorAuthModel authModel = new TwoFactorAuthModel(code, authMethod);
 
-            return getEntityService().verify(userID, authModel, false, claims)
+            return getEntityService().verify(authModel, false, claims)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
         }
@@ -75,6 +73,16 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.ok().body(getEntityService().getUserService().getAuthorizeService().selectTwoFactor(twoFactorMethod, claims));
     }
 
+    /**
+     * Checks whether a request has a certain authority.
+     * <p>
+     * This method references the {@link #isAuthorized(Authentication, String, Class)} and checks
+     * if a user has a permission based on a {@link JwtTokenType}.
+     *
+     * @param authentication the current requests authentication
+     * @param jwtTokenType the token that the authentication should have to be authorized
+     * @return whether a {@link Authentication} has the given token type authority
+     */
     private boolean isAuthorized(@NotNull Authentication authentication, @NotNull JwtTokenType jwtTokenType)
     {
         return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
