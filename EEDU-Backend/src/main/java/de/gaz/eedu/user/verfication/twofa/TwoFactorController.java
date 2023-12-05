@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import de.gaz.eedu.user.verfication.model.LoginResponse;
+import de.gaz.eedu.user.verfication.model.LoginTwoFactorPendingResponse;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
@@ -36,6 +37,17 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
+    @PostMapping("/enable") public @NotNull ResponseEntity<LoginResponse> enable(@RequestBody @NotNull TwoFactorAuthModel authModel,
+                                                                        @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
+    {
+        ResponseEntity<LoginResponse> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.ADVANCED_AUTHORIZATION))
+        {
+            return invalidResponse;
+        }
+        return getEntityService().verify(userID, authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
+    }
+
     @PostMapping("/verify") public @NotNull ResponseEntity<LoginResponse> verify(@RequestBody @NotNull String code, @AuthenticationPrincipal Long userID, @RequestAttribute("claims") @NotNull Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,15 +65,14 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("/enable") public ResponseEntity<LoginResponse> enable(@RequestBody @NotNull TwoFactorAuthModel authModel,
-            @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
+    @PostMapping("/select/{twoFactorMethod}") public @NotNull ResponseEntity<LoginTwoFactorPendingResponse> select(@PathVariable @NotNull TwoFactorMethod twoFactorMethod, @RequestAttribute Claims claims)
     {
-        ResponseEntity<LoginResponse> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.ADVANCED_AUTHORIZATION))
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!isAuthorized(authentication, JwtTokenType.TWO_FACTOR_SELECTION))
         {
-            return invalidResponse;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        return getEntityService().verify(userID, authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
+        return ResponseEntity.ok().body(getEntityService().getUserService().getAuthorizeService().selectTwoFactor(twoFactorMethod, claims));
     }
 
     private boolean isAuthorized(@NotNull Authentication authentication, @NotNull JwtTokenType jwtTokenType)
