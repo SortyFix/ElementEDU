@@ -11,11 +11,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class represents a database entry of a group.
@@ -38,7 +41,8 @@ import java.util.stream.Collectors;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
     private boolean twoFactorRequired;
-    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE) private Set<UserEntity> users = new HashSet<>();
+    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE) private Set<UserEntity> users =
+            new HashSet<>();
     @ManyToMany @JsonManagedReference @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
             "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
             referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
@@ -63,12 +67,62 @@ import java.util.stream.Collectors;
         this.users = users;
     }
 
+    public @NotNull @Unmodifiable Set<GrantedAuthority> toSpringSecurity()
+    {
+        return Stream.concat(getAuthorities().stream(), Stream.of(toRole())).collect(Collectors.toSet());
+    }
+
+
     @Override public @NotNull GroupModel toModel()
     {
         return new GroupModel(getId(),
                 getName(),
                 getUsers().stream().map(UserEntity::toSimpleModel).collect(Collectors.toSet()),
                 getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()));
+    }
+
+    /**
+     * This method is used to convert the name of a user/role to a format that aligns with spring API,
+     * specifically {@link org.springframework.security.core.GrantedAuthority}.
+     * <p>
+     * The format adopted is to prefix the name with "ROLE_", this is because the spring API
+     * uses roles to check authorizations and expects role names to be in specific formats.
+     * GrantedAuthority is a key interface in the Spring Security framework, representing an
+     * authority that's been granted to an Authentication object. The main benefit of this
+     * convention is that it enables method level security.
+     *
+     * @return a new {@link org.springframework.security.core.authority.SimpleGrantedAuthority} object which
+     *         incorporates the adjusted (prefixed) name/role. SimpleGrantedAuthority is a basic,
+     *         immutable implementation of {@link org.springframework.security.core.GrantedAuthority}.
+     *
+     * @see org.springframework.security.core.authority.SimpleGrantedAuthority
+     * @see org.springframework.security.core.GrantedAuthority
+     */
+    private @NotNull GrantedAuthority toRole()
+    {
+        return new SimpleGrantedAuthority("ROLE_" + getName());
+    }
+
+    /**
+     * This method returns a set of authorities/permissions that a principal has.
+     * <p>
+     * It makes use of Java Streams to transform the set of privilege entities
+     * into a set of GrantedAuthority. This is done via a map operation that
+     * uses a method reference PrivilegeEntity::toAuthority to do the transformation.
+     * Finally, it uses the collect() method from the Streams API to convert
+     * the Stream into a Set, thus giving us a Set of GrantedAuthorities.
+     * Importantly, this method is annotated with '@Unmodifiable', which means
+     * that the returned Set instance is unmodifiable and any attempt to modify it would
+     * result in an UnsupportedOperationException.
+     *
+     * @return an unmodifiable set of {@link org.springframework.security.core.GrantedAuthority} objects, each
+     *         representing a user authority (privilege). It may be empty but is never null.
+     *
+     * @see org.springframework.security.core.GrantedAuthority
+     */
+    private @NotNull @Unmodifiable Set<GrantedAuthority> getAuthorities()
+    {
+        return getPrivileges().stream().map(PrivilegeEntity::toAuthority).collect(Collectors.toSet());
     }
 
     /**
@@ -112,9 +166,11 @@ import java.util.stream.Collectors;
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
         // Filter already granted privileges out
-        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(
-                presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
-        return privileges.addAll(Arrays.stream(privilegeEntity).filter(privilegeEntityPredicate).collect(Collectors.toSet()));
+        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream()
+                .noneMatch(presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
+        return privileges.addAll(Arrays.stream(privilegeEntity)
+                .filter(privilegeEntityPredicate)
+                .collect(Collectors.toSet()));
     }
 
     /**
