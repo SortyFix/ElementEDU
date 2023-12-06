@@ -7,6 +7,7 @@ import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
+import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -55,6 +56,7 @@ import java.util.stream.Stream;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
+    @Enumerated(EnumType.STRING) UserStatus status;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
@@ -70,6 +72,15 @@ import java.util.stream.Stream;
 
     @Override public UserModel toModel()
     {
+        Function<GroupEntity, SimpleUserGroupModel> mapper = (entity) ->
+        {
+            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges()
+                    .stream()
+                    .map(PrivilegeEntity::toSimpleModel)
+                    .toArray(SimplePrivilegeModel[]::new);
+            return new SimpleUserGroupModel(entity.getId(), entity.getName(), privilegeModels);
+        };
+
         return new UserModel(getId(),
                 getFirstName(),
                 getLastName(),
@@ -78,15 +89,7 @@ import java.util.stream.Stream;
                 isLocked(),
                 getTwoFactors().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new),
                 getThemeEntity().toSimpleModel(),
-                getGroups().stream()
-                        .map(groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
-                                groupEntity.getName(),
-                                groupEntity.getPrivileges()
-                                        .stream()
-                                        .map(PrivilegeEntity::toSimpleModel)
-                                        .collect(Collectors.toSet())))
-                        .distinct()
-                        .toArray(SimpleUserGroupModel[]::new),
+                getGroups().stream().map(mapper).toArray(SimpleUserGroupModel[]::new),
                 getStatus());
     }
 
@@ -236,7 +239,7 @@ import java.util.stream.Stream;
     }
 
     @Transactional public boolean initTwoFactor(@NotNull UserService userService,
-            @NotNull TwoFactorEntity twoFactorEntity)
+		    @NotNull TwoFactorEntity twoFactorEntity)
     {
         return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::initTwoFactor);
     }
@@ -277,7 +280,7 @@ import java.util.stream.Stream;
     }
 
     @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,
-            @NotNull ThemeEntity themeEntity)
+		    @NotNull ThemeEntity themeEntity)
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
@@ -286,7 +289,7 @@ import java.util.stream.Stream;
     @Override public String toString()
     { // Automatically generated using intellij
         return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' +
-                ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+		        ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
     }
 
     @Override public boolean equals(Object object)
@@ -303,7 +306,7 @@ import java.util.stream.Stream;
     }
 
     private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity,
-            @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+		    @org.jetbrains.annotations.NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

@@ -7,12 +7,12 @@ import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.Set;
 
 public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
-                         @NotNull Set<SimpleUserModel> users,
-                         @NotNull Set<SimplePrivilegeModel> privileges) implements Model
+                         @NotNull SimpleUserModel[] users,
+                         @NotNull SimplePrivilegeModel[] privileges) implements Model
 {
 
     @Contract(pure = true)
@@ -22,8 +22,8 @@ public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be
         return "GroupModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", users=" + users +
-                ", privileges=" + privileges +
+                ", users=" + Arrays.toString(users) +
+                ", privileges=" + Arrays.toString(privileges) +
                 '}';
     }
 

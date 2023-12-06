@@ -5,14 +5,10 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
+import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,10 +16,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import lombok.*;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity") public class PrivilegeEntity implements EntityModelRelation<PrivilegeModel>
 {
@@ -47,10 +43,15 @@ import java.util.stream.Collectors;
     {
         return new PrivilegeModel(getId(),
                 getName(),
-                getGroupEntities().stream().map(groupEntity -> new SimplePrivilegeGroupModel(groupEntity.getId(),
-                        groupEntity.getName(),
-                        groupEntity.getUsers().stream().map(UserEntity::toSimpleModel).collect(Collectors.toSet()))).collect(
-                        Collectors.toSet()));
+                getGroupEntities().stream()
+                        .map(groupEntity -> new SimplePrivilegeGroupModel(groupEntity.getId(),
+                                groupEntity.getName(),
+                                groupEntity.getUsers()
+                                        .stream()
+                                        .map(UserEntity::toSimpleModel)
+                                        .toArray(SimpleUserModel[]::new)))
+                        .distinct()
+                        .toArray(SimplePrivilegeGroupModel[]::new));
     }
 
     @Override public String toString()

@@ -1,7 +1,7 @@
 package de.gaz.eedu.user.verfication.twofa;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import de.gaz.eedu.entity.model.EDUEntity;
+import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -13,7 +13,7 @@ import lombok.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class TwoFactorEntity implements EDUEntity,
+@Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class TwoFactorEntity implements EntityObject,
         EntityModelRelation<TwoFactorModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;

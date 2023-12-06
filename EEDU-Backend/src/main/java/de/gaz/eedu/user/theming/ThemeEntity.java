@@ -1,7 +1,7 @@
 package de.gaz.eedu.user.theming;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import de.gaz.eedu.entity.model.EDUEntity;
+import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EDUEntity,
+@Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EntityObject,
         EntityModelRelation<ThemeModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
