@@ -3,16 +3,16 @@ package de.gaz.eedu.user.group;
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
+import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
+import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashSet;
 
 /**
  * Test class for GroupService.
@@ -44,12 +44,12 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
         GroupCreateModel groupCreateModel = new GroupCreateModel("test", false, new Long[0], new Long[0]);
-        GroupModel groupModel = new GroupModel(5L, "test", new HashSet<>(), new HashSet<>());
+        GroupModel groupModel = new GroupModel(5L, "test", new SimpleUserModel[0], new SimplePrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
-            Assertions.assertEquals(expect.privileges(), result.privileges());
-            Assertions.assertEquals(expect.users(), result.users());
+            Assertions.assertEquals(expect.privileges().length, result.privileges().length);
+            Assertions.assertEquals(expect.users().length, result.users().length);
         });
     }
 
