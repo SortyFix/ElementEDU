@@ -2,7 +2,7 @@ package de.gaz.eedu;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EDUEntity;
+import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -24,7 +24,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.HashSet;
 import java.util.function.Supplier;
 
 @Component @AllArgsConstructor public class DataLoader implements CommandLineRunner
@@ -63,7 +62,7 @@ import java.util.function.Supplier;
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
         UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L, UserStatus.PROSPECTIVE);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
-        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new HashSet<>());
+        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
         getEntity(themeService, themeCreateModel); // create theme
 
@@ -93,7 +92,7 @@ import java.util.function.Supplier;
      * @throws java.util.NoSuchElementException if the creation model didn't specify a name and an entity couldn't be
      *                                          loaded
      */
-    private <E extends EDUEntity, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EntityService<E, ?, C> service, @NotNull C groupCreateModel)
+    private <E extends EntityObject, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EntityService<E, ?, C> service, @NotNull C groupCreateModel)
     {
         Supplier<E> create = () -> service.createEntity(groupCreateModel);
         return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);

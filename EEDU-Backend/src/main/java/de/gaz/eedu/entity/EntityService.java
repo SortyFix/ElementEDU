@@ -1,7 +1,7 @@
 package de.gaz.eedu.entity;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EDUEntity;
+import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
-public interface EntityService<E extends EDUEntity, M extends Model, C extends CreationModel<E>>
+public interface EntityService<E extends EntityObject, M extends Model, C extends CreationModel<E>>
 {
 
     /**

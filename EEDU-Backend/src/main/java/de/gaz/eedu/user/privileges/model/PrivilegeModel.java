@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import java.util.Set;
 public record PrivilegeModel(
         @NotNull Long id,
         @NotEmpty(message = "Name must be not empty.") @NotNull String name,
-        @NotNull Set<SimplePrivilegeGroupModel> groups) implements Model
+        @NotNull SimplePrivilegeGroupModel[] groups) implements Model
 {
 
     @Contract(pure = true)
@@ -38,7 +39,7 @@ public record PrivilegeModel(
         return "PrivilegeModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", groups=" + groups +
+                ", groups=" + Arrays.toString(groups) +
                 '}';
     }
 

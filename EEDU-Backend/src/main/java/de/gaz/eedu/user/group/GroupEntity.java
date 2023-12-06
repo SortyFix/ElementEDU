@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
+import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
+import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -38,10 +40,11 @@ import java.util.stream.Collectors;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
     private boolean twoFactorRequired;
-    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE) private Set<UserEntity> users = new HashSet<>();
+    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE) private Set<UserEntity> users =
+		    new HashSet<>();
     @ManyToMany @JsonManagedReference @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
-            "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
-            referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
+		    "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
+		    referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
 
     /**
      * Creates an instance with a {@link Set} of users.
@@ -67,8 +70,8 @@ import java.util.stream.Collectors;
     {
         return new GroupModel(getId(),
                 getName(),
-                getUsers().stream().map(UserEntity::toSimpleModel).collect(Collectors.toSet()),
-                getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()));
+                getUsers().stream().map(UserEntity::toSimpleModel).toArray(SimpleUserModel[]::new),
+                getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).toArray(SimplePrivilegeModel[]::new));
     }
 
     /**
@@ -85,7 +88,7 @@ import java.util.stream.Collectors;
      * @return true if a privilege was successfully granted and the group entity was saved, false otherwise.
      */
     @Transactional public boolean grantPrivilege(@NotNull GroupService groupService,
-            @NotNull PrivilegeEntity... privilegeEntity)
+		    @NotNull PrivilegeEntity... privilegeEntity)
     {
         if (grantPrivilege(privilegeEntity))
         {
@@ -112,9 +115,11 @@ import java.util.stream.Collectors;
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
         // Filter already granted privileges out
-        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(
-                presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
-        return privileges.addAll(Arrays.stream(privilegeEntity).filter(privilegeEntityPredicate).collect(Collectors.toSet()));
+        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream()
+                .noneMatch(presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
+        return privileges.addAll(Arrays.stream(privilegeEntity)
+                .filter(privilegeEntityPredicate)
+                .collect(Collectors.toSet()));
     }
 
     /**

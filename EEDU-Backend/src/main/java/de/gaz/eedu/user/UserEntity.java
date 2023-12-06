@@ -7,6 +7,7 @@ import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
+import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -23,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,39 +47,58 @@ import java.util.stream.Stream;
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
+    @Enumerated(EnumType.STRING) UserStatus status;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference private Set<TwoFactorEntity> twoFactors = new HashSet<>();
-
     @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
-            referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
-    @Enumerated(EnumType.STRING) UserStatus status;
+		    referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
-        return new SimpleUserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
-                getThemeEntity().toSimpleModel(), getStatus());
+        return new SimpleUserModel(getId(),
+                getFirstName(),
+                getLastName(),
+                getLoginName(),
+                isEnabled(),
+                isLocked(),
+                getThemeEntity().toSimpleModel(),
+                getStatus());
     }
 
     @Override public UserModel toModel()
     {
-        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), isEnabled(), isLocked(),
+        Function<GroupEntity, SimpleUserGroupModel> mapper = (entity) ->
+        {
+            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges()
+                    .stream()
+                    .map(PrivilegeEntity::toSimpleModel)
+                    .toArray(SimplePrivilegeModel[]::new);
+            return new SimpleUserGroupModel(entity.getId(), entity.getName(), privilegeModels);
+        };
+
+        return new UserModel(getId(),
+                getFirstName(),
+                getLastName(),
+                getLoginName(),
+                isEnabled(),
+                isLocked(),
                 getTwoFactors().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new),
                 getThemeEntity().toSimpleModel(),
-                getGroups().stream().map(
-                        groupEntity -> new SimpleUserGroupModel(groupEntity.getId(),
-                                groupEntity.getName(),
-                                groupEntity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).collect(Collectors.toSet()))).distinct().toArray(SimpleUserGroupModel[]::new),
+                getGroups().stream().map(mapper).toArray(SimpleUserGroupModel[]::new),
                 getStatus());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
     {
-        return groups.stream().flatMap(groupEntity -> groupEntity.getPrivileges().stream().map(privilege -> new SimpleGrantedAuthority(privilege.getName()))).collect(Collectors.toSet());
+        return groups.stream()
+                .flatMap(groupEntity -> groupEntity.getPrivileges()
+                        .stream()
+                        .map(privilege -> new SimpleGrantedAuthority(privilege.getName())))
+                .collect(Collectors.toSet());
     }
 
     @Override public @NotNull String getUsername()
@@ -154,9 +175,8 @@ import java.util.stream.Stream;
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         // Filter already attached groups out
-        Predicate<GroupEntity> predicate =
-                requestedGroup -> this.groups.stream().noneMatch(presentGroup -> Objects.equals(presentGroup,
-                        requestedGroup));
+        Predicate<GroupEntity> predicate = requestedGroup -> this.groups.stream()
+                .noneMatch(presentGroup -> Objects.equals(presentGroup, requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
 
@@ -221,7 +241,7 @@ import java.util.stream.Stream;
     }
 
     @Transactional public boolean initTwoFactor(@NotNull UserService userService,
-            @NotNull TwoFactorEntity twoFactorEntity)
+		    @NotNull TwoFactorEntity twoFactorEntity)
     {
         return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::initTwoFactor);
     }
@@ -250,8 +270,9 @@ import java.util.stream.Stream;
 
     public boolean disableTwoFactor(@NotNull Long... ids)
     {
-        Set<Long> disableFactors =
-                Stream.of(ids).filter(current -> getTwoFactors().stream().anyMatch(entity -> Objects.equals(entity.getId(), current))).collect(Collectors.toSet());
+        Set<Long> disableFactors = Stream.of(ids)
+                .filter(current -> getTwoFactors().stream().anyMatch(entity -> Objects.equals(entity.getId(), current)))
+                .collect(Collectors.toSet());
         return twoFactors.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
     }
 
@@ -261,7 +282,7 @@ import java.util.stream.Stream;
     }
 
     @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,
-            @NotNull ThemeEntity themeEntity)
+		    @NotNull ThemeEntity themeEntity)
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
@@ -270,7 +291,7 @@ import java.util.stream.Stream;
     @Override public String toString()
     { // Automatically generated using intellij
         return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' +
-                ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+		        ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
     }
 
     @Override public boolean equals(Object object)
@@ -287,7 +308,7 @@ import java.util.stream.Stream;
     }
 
     private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity,
-            @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+		    @org.jetbrains.annotations.NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

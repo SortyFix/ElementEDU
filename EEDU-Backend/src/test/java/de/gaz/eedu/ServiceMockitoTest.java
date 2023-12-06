@@ -2,7 +2,7 @@ package de.gaz.eedu;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EDUEntity;
+import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.exception.OccupiedException;
 import org.jetbrains.annotations.Contract;
@@ -15,18 +15,18 @@ import org.springframework.test.context.ActiveProfiles;
 
 /**
  * This abstract class is used for testing with the framework Mockito to mock objects of service class type {@code S}
- * which is a subtype of {@link EntityService}. {@code E} is the entity type derived from {@link EDUEntity}, {@code M} is a
+ * which is a subtype of {@link EntityService}. {@code E} is the entity type derived from {@link EntityObject}, {@code M} is a
  * Model class and
  * {@code C} is a class for CreationModel of {@code E}.
  *
  * @param <S> Represents the service class which extends {@link EntityService}.
- * @param <E> Represents the entity class which extends {@link EDUEntity}.
+ * @param <E> Represents the entity class which extends {@link EntityObject}.
  * @param <M> Represents the Model class.
  * @param <C> Represents the CreationModel of {@code E}.
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E extends EDUEntity, M extends Model, C extends CreationModel<E>>
+public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E extends EntityObject, M extends Model, C extends CreationModel<E>>
 {
     public S entityService;
 
