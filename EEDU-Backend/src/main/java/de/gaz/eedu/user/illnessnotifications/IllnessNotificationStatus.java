@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.illness_notifications;
+package de.gaz.eedu.user.illnessnotifications;
 
 public enum IllnessNotificationStatus
 {
