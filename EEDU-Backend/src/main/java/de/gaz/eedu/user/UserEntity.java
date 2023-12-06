@@ -56,7 +56,6 @@ import java.util.stream.Stream;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
-    @Enumerated(EnumType.STRING) UserStatus status;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
