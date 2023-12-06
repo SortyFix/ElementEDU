@@ -8,8 +8,6 @@ import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-
 public class GroupServiceMockitoTest extends ServiceMockitoTest<GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
     @Override protected Class<GroupService> serviceClass()
