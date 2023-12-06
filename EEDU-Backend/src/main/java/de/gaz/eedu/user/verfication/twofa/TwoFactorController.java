@@ -3,8 +3,6 @@ package de.gaz.eedu.user.verfication.twofa;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
-import de.gaz.eedu.user.verfication.model.LoginResponse;
-import de.gaz.eedu.user.verfication.model.LoginTwoFactorPendingResponse;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
@@ -36,9 +34,9 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("/enable") public @NotNull ResponseEntity<LoginResponse> enable(@RequestBody @NotNull TwoFactorAuthModel authModel, @RequestAttribute("claims") Claims claims)
+    @PostMapping("/enable") public @NotNull ResponseEntity<String> enable(@RequestBody @NotNull TwoFactorAuthModel authModel, @RequestAttribute("claims") Claims claims)
     {
-        ResponseEntity<LoginResponse> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        ResponseEntity<String> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.ADVANCED_AUTHORIZATION))
         {
             return invalidResponse;
@@ -46,7 +44,7 @@ import org.springframework.web.bind.annotation.*;
         return getEntityService().verify(authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
     }
 
-    @PostMapping("/verify") public @NotNull ResponseEntity<LoginResponse> verify(@RequestBody @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
+    @PostMapping("/verify") public @NotNull ResponseEntity<String> verify(@RequestBody @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -63,7 +61,7 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
-    @PostMapping("/select/{twoFactorMethod}") public @NotNull ResponseEntity<LoginTwoFactorPendingResponse> select(@PathVariable @NotNull TwoFactorMethod twoFactorMethod, @RequestAttribute Claims claims)
+    @PostMapping("/select/{twoFactorMethod}") public @NotNull ResponseEntity<String> select(@PathVariable @NotNull TwoFactorMethod twoFactorMethod, @RequestAttribute Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(!isAuthorized(authentication, JwtTokenType.TWO_FACTOR_SELECTION))

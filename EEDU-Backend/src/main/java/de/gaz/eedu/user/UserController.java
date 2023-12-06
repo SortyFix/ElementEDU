@@ -2,7 +2,6 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.model.*;
-import de.gaz.eedu.user.verfication.model.LoginResponse;
 import jakarta.annotation.security.PermitAll;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,19 +54,19 @@ import org.springframework.web.bind.annotation.*;
         return super.getData(id);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable LoginResponse> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
     {
         return login(userLoginModel);
     }
 
     //TODO only the user itself can get this token
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/advanced/login") public @NotNull ResponseEntity<LoginResponse> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel advancedUserLoginModel)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/advanced/login") public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel advancedUserLoginModel)
     {
         return login(advancedUserLoginModel);
     }
 
-    private @NotNull ResponseEntity<LoginResponse> login(@NotNull LoginModel userLoginModel)
+    private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
     {
         logger.info("The server has recognized an incoming login request.");
         return getEntityService().login(userLoginModel)

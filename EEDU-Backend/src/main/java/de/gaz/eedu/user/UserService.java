@@ -12,7 +12,6 @@ import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeRepository;
-import de.gaz.eedu.user.verfication.model.LoginResponse;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -127,14 +126,14 @@ import java.util.function.Supplier;
         }).orElse(false);
     }
 
-    @Transactional public @NotNull Optional<LoginResponse> login(@NotNull LoginModel loginModel)
+    @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
         return loadEntityByName(loginModel.loginName()).map(user -> getAuthorizeService().login(user.toModel(),
                 user.getPassword(),
                 loginModel));
     }
 
-    @Transactional public @NotNull LoginResponse authorize(long userID, @NotNull Claims claims)
+    @Transactional public @NotNull String authorize(long userID, @NotNull Claims claims)
     {
         Supplier<HTTPRequestException> supplier = () -> new HTTPRequestException(HttpStatus.INTERNAL_SERVER_ERROR);
         return loadById(userID).map(user -> getAuthorizeService().authorize(user, claims)).orElseThrow(supplier);

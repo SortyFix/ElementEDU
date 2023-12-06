@@ -4,8 +4,6 @@ import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.authority.InvalidTokenException;
-import de.gaz.eedu.user.verfication.model.LoginResponse;
-import de.gaz.eedu.user.verfication.model.LoginTwoFactorPendingResponse;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
@@ -26,7 +24,7 @@ import java.util.Optional;
     private final VerificationService verificationService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Transactional public @Nullable LoginResponse login(@NotNull UserModel model, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
+    @Transactional public @Nullable String login(@NotNull UserModel model, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
     {
         if (getPasswordEncoder().matches(loginModel.password(), hashedPassword))
         {
@@ -35,13 +33,13 @@ import java.util.Optional;
         return null; //password does not match
     }
 
-    public @NotNull LoginTwoFactorPendingResponse selectTwoFactor(@NotNull TwoFactorMethod twoFactorMethod, @NotNull Claims claims)
+    public @NotNull String selectTwoFactor(@NotNull TwoFactorMethod twoFactorMethod, @NotNull Claims claims)
     {
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
         return getVerificationService().twoFactor(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), twoFactorMethod);
     }
 
-    @Transactional public @Nullable LoginResponse authorize(@NotNull UserModel userModel, @NotNull Claims claims)
+    @Transactional public @Nullable String authorize(@NotNull UserModel userModel, @NotNull Claims claims)
     {
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
 

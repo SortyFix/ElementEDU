@@ -5,8 +5,6 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.verfication.model.LoginResponse;
-import de.gaz.eedu.user.verfication.model.LoginTwoFactorEnabled;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethodImplementation;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
@@ -107,7 +105,7 @@ import java.util.function.Supplier;
         return TwoFactorEntity::toModel;
     }
 
-    public @NotNull Optional<LoginResponse> verify(@NotNull TwoFactorAuthModel authModel, boolean enable
+    public @NotNull Optional<String> verify(@NotNull TwoFactorAuthModel authModel, boolean enable
             , @NotNull Claims claims)
     {
         long userID = claims.get("user_id", Long.class);
@@ -129,7 +127,7 @@ import java.util.function.Supplier;
                 {
                     if(enable)
                     {
-                        return new LoginTwoFactorEnabled(userEntity.toModel());
+                        return "";
                     }
                     return getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims);
                 });
