@@ -57,7 +57,7 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 'P
 INSERT INTO group_entity (name, two_factor_required)
 VALUES ('Users', false),
        ('Moderators', true),
-       ('Admins', true),
+       ('Admin', true),
        ('Dummy', false);
 
 INSERT INTO privilege_entity (name)
@@ -78,7 +78,7 @@ VALUES ('EMAIL', 'mustermann@example.com', '', true, 1),
 
        ('TOTP', NULL, '', true, 4);
 
-MERGE INTO user_groups (user_id, group_id)
+INSERT INTO user_groups (user_id, group_id)
 VALUES (1, 1),
 
        (2, 1),
@@ -90,7 +90,7 @@ VALUES (1, 1),
 
        (4, 4);
 
-MERGE INTO group_privileges (group_id, privilege_id)
+INSERT INTO group_privileges (group_id, privilege_id)
 VALUES (1, 1),
 
        (2, 1),

@@ -7,10 +7,10 @@ import de.gaz.eedu.user.verfication.authority.InvalidTokenException;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,10 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 
-@AllArgsConstructor @Getter(AccessLevel.PROTECTED) @Service public class AuthorizeService
+@Getter(AccessLevel.PROTECTED) @Service public class AuthorizeService
 {
     private final VerificationService verificationService;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthorizeService(@Autowired VerificationService verificationService)
+    {
+        this.verificationService = verificationService;
+        this.passwordEncoder = new BCryptPasswordEncoder();
+    }
 
     @Transactional public @Nullable String login(@NotNull UserModel model, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
     {

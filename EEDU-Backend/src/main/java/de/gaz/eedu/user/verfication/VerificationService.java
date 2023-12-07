@@ -293,7 +293,7 @@ import java.util.function.Function;
      * @param jwtTokenType       the JwtTokenType identifying the type of JWT token
      * @param authorityFactory   factory used to generate user authorities according to user ID
      * @param userID             the ID of the user whose authorities are to be generated
-     * @return a unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
+     * @return an unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
      *
      * @throws IllegalStateException if the jwtTokenType does not match any case in the switch statement
      */
