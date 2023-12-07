@@ -79,7 +79,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * This method aims at verifying the process of adding a user to a specific group. It checks the case for the user
      * with userID 3 and 1. The user with userID 3 is expected to successfully get added to the group whereas the
      * userID 1
-     * is anticipated to fail. The users are present as declared in the data-dev.sql file.
+     * is anticipated to fail. The users are present as declared in the data-test.sql file.
      * <p>
      * The {@link ParameterizedTest} with a custom name provides better distinction when a test fails as it looks like
      * the following in the logs:
@@ -112,7 +112,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * This method verifies the process of removing a user from a specific group. It checks the case for users
      * with userIDs 3 and 2. The user with userID 3 is expected to successfully be removed from the group,
      * whereas the removal of a user with userID 2 is anticipated to fail. The users are present as declared in
-     * the data-dev.sql file.
+     * the data-test.sql file.
      * <p>
      * Similar to the 'testUserAddGroup' method, {@link ParameterizedTest} and a custom name are used to provide
      * better clarity in the logs when a test fails, and the {@link ValueSource} annotation provides the input

@@ -17,7 +17,7 @@ import java.util.Map;
         EntityModelRelation<TwoFactorModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
-    @Enumerated(EnumType.STRING) private TwoFactorMethod method;
+    @Enumerated private TwoFactorMethod method;
     private String data, secret;
     private boolean enabled;
     @ManyToOne @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;

@@ -3,7 +3,6 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.exception.HTTPRequestException;
 import de.gaz.eedu.user.model.*;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.AuthorizeService;
@@ -80,7 +79,7 @@ import java.util.function.Supplier;
         });
 
         String password = model.password();
-        if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!@#$%^&*()\\-_+.])+).{6,}$"))
+        if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
         {
             throw new InsecurePasswordException();
         }
@@ -95,6 +94,7 @@ import java.util.function.Supplier;
             entity.setThemeEntity(themeEntity);
             return entity;
         }));
+        //!"#$%&'( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
@@ -131,12 +131,6 @@ import java.util.function.Supplier;
         return loadEntityByName(loginModel.loginName()).map(user -> getAuthorizeService().login(user.toModel(),
                 user.getPassword(),
                 loginModel));
-    }
-
-    @Transactional public @NotNull String authorize(long userID, @NotNull Claims claims)
-    {
-        Supplier<HTTPRequestException> supplier = () -> new HTTPRequestException(HttpStatus.INTERNAL_SERVER_ERROR);
-        return loadById(userID).map(user -> getAuthorizeService().authorize(user, claims)).orElseThrow(supplier);
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)

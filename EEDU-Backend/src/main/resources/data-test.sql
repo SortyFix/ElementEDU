@@ -49,10 +49,10 @@ VALUES ('Light', 0x000000, 0x000000, 0x000000),
        ('dummy', 0x000000, 0x000000, 0x000000);
 
 INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
-VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 'PRESENT'),
-       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2, 'PRESENT'),
-       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3, 'PRESENT'),
-       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 'PROSPECTIVE');
+VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 0),
+       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2, 0),
+       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3, 0),
+       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 3);
 
 INSERT INTO group_entity (name, two_factor_required)
 VALUES ('Users', false),
@@ -67,18 +67,18 @@ VALUES ('READ'),
        ('DUMMY');
 
 INSERT INTO two_factor_entity(method, data, secret, enabled, user_id)
-VALUES ('EMAIL', 'mustermann@example.com', '', true, 1),
+VALUES (0, 'mustermann@example.com', '', true, 1),
 
-       ('EMAIL', 'mustermann@example.com', '', true, 2),
-       ('SMS', '555 5555555', '', true, 2),
+       (0, 'mustermann@example.com', '', true, 2),
+       (1, '555 5555555', '', true, 2),
 
-       ('EMAIL', 'mustermann@examle.com', '', true, 3),
-       ('SMS', '555 5555555', '', true, 3),
-       ('TOTP', NULL, '', true, 3),
+       (0, 'mustermann@examle.com', '', true, 3),
+       (1, '555 5555555', '', true, 3),
+       (2, NULL, '', true, 3),
 
-       ('TOTP', NULL, '', true, 4);
+       (2, NULL, '', true, 4);
 
-INSERT INTO user_groups (user_id, group_id)
+MERGE INTO user_groups (user_id, group_id)
 VALUES (1, 1),
 
        (2, 1),
@@ -90,7 +90,7 @@ VALUES (1, 1),
 
        (4, 4);
 
-INSERT INTO group_privileges (group_id, privilege_id)
+MERGE INTO group_privileges (group_id, privilege_id)
 VALUES (1, 1),
 
        (2, 1),

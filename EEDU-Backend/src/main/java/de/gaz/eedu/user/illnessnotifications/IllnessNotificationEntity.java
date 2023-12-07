@@ -12,7 +12,7 @@ public class IllnessNotificationEntity implements EntityObject, EntityModelRelat
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long notificationId;
     private Long userId;
-    @Enumerated(EnumType.STRING) private IllnessNotificationStatus status;
+    @Enumerated private IllnessNotificationStatus status;
     private LocalDate notificationDate;
     private String reason;
 

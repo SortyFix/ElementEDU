@@ -16,23 +16,25 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 import java.util.function.Supplier;
 
-@Component @AllArgsConstructor public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor public class DataLoader implements CommandLineRunner
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
+    @Value("${development:false}") private boolean development;
 
     @Override @Transactional(Transactional.TxType.REQUIRED) public void run(@NotNull String... args)
     {
@@ -57,10 +59,16 @@ import java.util.function.Supplier;
      */
     private void createDefaultUser()
     {
-        String randomPassword = randomPassword(10);
-
+        String randomPassword = randomPassword(15);
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
-        UserCreateModel userCreateModel = new UserCreateModel("root", "root", "root", randomPassword, true, false, 1L, UserStatus.PROSPECTIVE);
+        UserCreateModel userCreateModel = new UserCreateModel("root",
+                "root",
+                "root",
+                randomPassword,
+                true,
+                false,
+                1L,
+                UserStatus.PROSPECTIVE);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
@@ -71,13 +79,23 @@ import java.util.function.Supplier;
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(groupService, privilegeEntity);
-        if(!userEntity.attachGroups(userService, groupEntity))
+        if (!userEntity.attachGroups(userService, groupEntity))
         {
-            throw new IllegalStateException("The system was not able to attach the admin group to the default user. This is very unusual behaviour. Please consider rechecking all information.");
+            throw new IllegalStateException(
+                    "The system was not able to attach the admin group to the default user. This is very unusual " +
+                            "behaviour. Please consider rechecking all information.");
         }
 
-        LOGGER.info("A default user has been created with the name {} and the password {}. It's advised to " +
-                "change the password as soon as possible.", userEntity.getLoginName(), randomPassword);
+        LOGGER.info("A default user has been created");
+        LOGGER.info("-------------------------------");
+        LOGGER.info("USERNAME: {}", "root");
+        LOGGER.info("PASSWORD: {}", randomPassword);
+        LOGGER.info("-------------------------------");
+
+        if (!development)
+        {
+            LOGGER.warn("It's advised to change the password as soon as possible.");
+        }
     }
 
     /**
@@ -98,9 +116,15 @@ import java.util.function.Supplier;
         return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);
     }
 
-    @SuppressWarnings({"SpellCheckingInspection", "SameParameterValue"})
-    private @NotNull String randomPassword(int length)
+    @SuppressWarnings({
+            "SpellCheckingInspection", "SameParameterValue"
+    }) private @NotNull String randomPassword(int length)
     {
+        if (development)
+        {
+            return "Development123!";
+        }
+
         SecureRandom random = new SecureRandom();
         String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
@@ -115,7 +139,8 @@ import java.util.function.Supplier;
         password.append(digits.charAt(random.nextInt(digits.length())));
         password.append(specialSymbols.charAt(random.nextInt(specialSymbols.length())));
 
-        for (int i = 4; i < length; i++) {
+        for (int i = 4; i < length; i++)
+        {
             password.append(alphabet.charAt(random.nextInt(alphabet.length())));
         }
 

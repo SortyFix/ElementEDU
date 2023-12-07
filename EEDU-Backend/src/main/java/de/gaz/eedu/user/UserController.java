@@ -61,7 +61,7 @@ import org.springframework.web.bind.annotation.*;
 
     //TODO only the user itself can get this token
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/advanced/login") public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel advancedUserLoginModel)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/login/advanced") public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel advancedUserLoginModel)
     {
         return login(advancedUserLoginModel);
     }
