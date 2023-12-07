@@ -18,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
     private final int digits;
     private int timePeriod, timeGap;
 
-
     public TOPTHandler(@NotNull HashingAlgorithm hashingAlgorithm)
     {
         this(hashingAlgorithm, 6, 30, 1);

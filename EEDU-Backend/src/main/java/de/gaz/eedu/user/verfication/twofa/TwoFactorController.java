@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
         {
             return invalidResponse;
         }
-        return getEntityService().verify(authModel, true, claims).map(ResponseEntity::ok).orElse(invalidResponse);
+        return getEntityService().verify(authModel, true, claims).map(response -> ResponseEntity.<String>ok(null)).orElse(invalidResponse);
     }
 
     @PostMapping("/verify") public @NotNull ResponseEntity<String> verify(@RequestBody @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)

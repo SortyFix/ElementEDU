@@ -20,9 +20,20 @@ Content-Type: application/json
 ### Log in advanced
 POST {{host}}/user/login/advanced
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDMxOTAyNTYsImlhdCI6MTcwMTk4MDY1Nn0.RkwzLbPGlbh6Ji-9QI0k-gIidgtcE9-z_XCkk-C4llA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDMxOTM5MTMsImlhdCI6MTcwMTk4NDMxM30.jXONAqzj9qT6nxS12LHP76ycyTYH56oAZRwToFk1hjQ
 
 {
   "loginName": {{login_name}},
   "password": {{login_password}}
+}
+
+###
+POST {{host}}/user/login/twofactor/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIwNzA3NzgsImlhdCI6MTcwMTk4NDM3OH0.2pbc0fZEsl-fcwNg6yjk-3E7-QBdJoQ2elMAlbr-Zes
+
+{
+  "userID": 1,
+  "data": "",
+  "method": "TOTP"
 }
