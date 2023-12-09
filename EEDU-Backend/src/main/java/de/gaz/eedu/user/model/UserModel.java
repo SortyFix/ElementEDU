@@ -33,10 +33,10 @@ import java.util.Objects;
  * @see UserEntity
  * @see GroupEntity
  */
-public record UserModel(@NotNull Long id, @NotEmpty String firstName, @NotEmpty String lastName,
-                        @NotEmpty String loginName, @NotEmpty Boolean enabled, @NotEmpty Boolean locked,
-                        @NotEmpty TwoFactorModel[] twoFactor, @NotEmpty SimpleThemeModel theme,
-                        @NotEmpty SimpleUserGroupModel[] groups, @NotNull UserStatus status) implements Model
+public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull String lastName,
+                        @NotNull String loginName, @NotNull Boolean enabled, @NotNull Boolean locked,
+                        @NotNull TwoFactorModel[] twoFactor, @NotNull SimpleThemeModel theme,
+                        @NotNull SimpleUserGroupModel[] groups, @NotNull UserStatus status) implements Model
 {
 
 

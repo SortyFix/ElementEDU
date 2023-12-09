@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethodImplementation;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
@@ -105,7 +106,7 @@ import java.util.function.Supplier;
         return TwoFactorEntity::toModel;
     }
 
-    public @NotNull Optional<String> verify(@NotNull TwoFactorAuthModel authModel, boolean enable
+    public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, boolean enable
             , @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
@@ -115,25 +116,25 @@ import java.util.function.Supplier;
         {
             if (enable)
             {
-                return enableMapper(authModel).apply(auth);
+                return enableMapper(code).apply(auth);
             }
-            return verifyMapper(authModel).apply(auth);
+            return verifyMapper(code).apply(auth);
         };
 
-        return userEntity.getTwoFactor(authModel.twoFactorMethod())
+        return userEntity.getTwoFactor(method)
                 .map(mapper)
                 .filter(Boolean::booleanValue)
                 .map(entity ->
                 {
                     if(enable)
                     {
-                        return "";
+                        return null;
                     }
                     return getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims);
                 });
     }
 
-    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull TwoFactorAuthModel twoFactorAuthModel)
+    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull String code)
     {
         return twoFactorEntity ->
         {
@@ -143,11 +144,11 @@ import java.util.function.Supplier;
             }
 
             TwoFactorMethodImplementation impl = twoFactorEntity.getMethod().getTwoFactorMethodImplementation();
-            return impl.verify(twoFactorEntity, twoFactorAuthModel.code());
+            return impl.verify(twoFactorEntity, code);
         };
     }
 
-    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> enableMapper(@NotNull TwoFactorAuthModel twoFactorAuthModel)
+    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> enableMapper(@NotNull String code)
     {
         return new Function<>()
         {
@@ -159,7 +160,7 @@ import java.util.function.Supplier;
                 }
 
                 TwoFactorMethodImplementation impl = twoFactorEntity.getMethod().getTwoFactorMethodImplementation();
-                if (impl.verify(twoFactorEntity, twoFactorAuthModel.code()))
+                if (impl.verify(twoFactorEntity, code))
                 {
                     twoFactorEntity.setEnabled(true);
                     save(twoFactorEntity);

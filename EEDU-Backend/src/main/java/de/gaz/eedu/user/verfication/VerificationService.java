@@ -7,10 +7,7 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.jetbrains.annotations.NotNull;
@@ -265,7 +262,7 @@ import java.util.function.Function;
      * @throws IllegalArgumentException  if JWT token's compact value is null or empty, JWT claims string is null or empty, JWT claims map is empty, or any required claim is missing
      */
     @NotNull public Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token,
-            @NotNull AuthorityFactory authorityFactory)
+            @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
         Claims tokenContent = Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
         long userID = tokenContent.get("userID", Long.class);

@@ -17,10 +17,14 @@ Content-Type: application/json
   "keepLoggedIn": true
 }
 
+### Verify 2fa
+GET {{host}}/user/login/twofactor/verify/1111
+Authorization: Bearer
+
 ### Log in advanced
 POST {{host}}/user/login/advanced
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDMxOTM5MTMsImlhdCI6MTcwMTk4NDMxM30.jXONAqzj9qT6nxS12LHP76ycyTYH56oAZRwToFk1hjQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDMzMzQ2NDgsImlhdCI6MTcwMjEyNTA0OH0.Je1TKV0W5zZhaWiH3Y9Xv2HPZ_XooUpMdleaQsON_e8
 
 {
   "loginName": {{login_name}},
@@ -30,10 +34,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEI
 ###
 POST {{host}}/user/login/twofactor/create
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIwNzA3NzgsImlhdCI6MTcwMTk4NDM3OH0.2pbc0fZEsl-fcwNg6yjk-3E7-QBdJoQ2elMAlbr-Zes
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIyMTE0NzQsImlhdCI6MTcwMjEyNTA3NH0.YuzS96y6wzL37NNuabgByLtVjvqlpyWU44EB0AYGwQs
 
 {
   "userID": 1,
   "data": "",
   "method": "TOTP"
 }
+
+### Enable two factor
+GET {{host}}/user/login/twofactor/enable/TOTP/204106
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIyMTE0NzQsImlhdCI6MTcwMjEyNTA3NH0.YuzS96y6wzL37NNuabgByLtVjvqlpyWU44EB0AYGwQs

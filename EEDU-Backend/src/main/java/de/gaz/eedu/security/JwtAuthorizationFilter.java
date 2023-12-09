@@ -28,8 +28,10 @@ import java.util.function.Consumer;
             IOException
     {
         String prefix = "Bearer ";
-
         String header = request.getHeader("Authorization");
+
+        Runnable emptyClaims = () -> request.setAttribute("claims", Jwts.claims().build());
+
         if (header != null && header.startsWith(prefix))
         {
             String token = header.substring(prefix.length());
@@ -39,13 +41,11 @@ import java.util.function.Consumer;
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordToken);
                 request.setAttribute("claims", usernamePasswordToken.getDetails());
             };
-            getUserService().validate(token).ifPresent(tokenConsumer);
-
+            getUserService().validate(token).ifPresentOrElse(tokenConsumer, emptyClaims);
         }
         else
         {
-            //Add empty claims
-            request.setAttribute("claims", Jwts.claims().build());
+            emptyClaims.run();
         }
 
         filterChain.doFilter(request, response);

@@ -6,10 +6,10 @@ import de.gaz.eedu.user.UserStatus;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
-public record UserCreateModel(@NotEmpty String firstName, @NotEmpty String lastName, @NotEmpty String loginName,
-                              @NotEmpty(message = "Password must not be empty.") String password,
-                              @NotEmpty Boolean enabled, @NotEmpty Boolean locked, @NotEmpty Long themeId,
-                              @NotEmpty UserStatus status) implements CreationModel<UserEntity>
+public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName,
+                              @NotEmpty(message = "Password must not be empty.") @NotNull String password,
+                              @NotNull Boolean enabled, @NotNull Boolean locked, @NotNull Long themeId,
+                              @NotNull UserStatus status) implements CreationModel<UserEntity>
 {
     @Override public @NotNull String name()
     {

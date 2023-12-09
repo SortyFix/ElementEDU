@@ -11,13 +11,15 @@ import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeRepository;
-import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -50,7 +52,7 @@ import java.util.function.Supplier;
  */
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
@@ -94,7 +96,6 @@ import java.util.function.Supplier;
             entity.setThemeEntity(themeEntity);
             return entity;
         }));
-        //!"#$%&'( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
     }
 
     public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
@@ -135,8 +136,16 @@ import java.util.function.Supplier;
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
-        AuthorityFactory authorityFactory = (id) -> loadEntityByID(id).map(function).orElse(new HashSet<>());
-        return getAuthorizeService().validate(token, authorityFactory);
+        try
+        {
+            Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
+            AuthorityFactory authorityFactory = (id) -> loadEntityByID(id).map(function).orElse(new HashSet<>());
+            return getAuthorizeService().validate(token, authorityFactory);
+        }
+        catch (ExpiredJwtException ignored)
+        {
+            LOGGER.warn("An incoming request has been received with an expired token.");
+        }
+        return Optional.empty();
     }
 }
