@@ -8,7 +8,6 @@ import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethodImplementation;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
-import de.gaz.eedu.user.verfication.twofa.model.TwoFactorAuthModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
@@ -56,16 +55,14 @@ import java.util.function.Supplier;
     {
         Supplier<EntityUnknownException> exceptionSupplier = () -> new EntityUnknownException(model.userID());
         UserEntity userEntity = getUserService().loadEntityByID(model.userID()).orElseThrow(exceptionSupplier);
-        TwoFactorEntity twoFactorEntity;
 
         try
         {
-            twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
+            TwoFactorEntity twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
             {
                 entity.setSecret(generateBase32());
                 return entity;
             }));
-
 
             if (userEntity.initTwoFactor(twoFactorEntity))
             {

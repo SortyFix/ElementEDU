@@ -8,7 +8,6 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.theming.SimpleThemeModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
-import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
