@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 
-public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull LocalDate date, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
+public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long date, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
 {
     @Override public String toString()
     {

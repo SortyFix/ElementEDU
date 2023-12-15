@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface CreationModel<E extends EntityObject> extends Model
 {
-
     @NotNull String name();
 
     @NotNull E toEntity(@NotNull E entity);

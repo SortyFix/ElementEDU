@@ -32,13 +32,13 @@ public class IllnessNotificationManagementController
 
     // As already stated, authority still open for discussion
 
-    @PreAuthorize("hasAuthority('ADMIN')") @GetMapping("/user/open")
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/open")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsWithStatusOfUser(@NotNull Long userId, @NotNull IllnessNotificationStatus status){
         return ResponseEntity.ok(illnessNotificationService.loadEntitiesByUserIdWithStatus(userId, status).stream().map(
                 IllnessNotificationEntity::toModel).collect(Collectors.toList()));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @GetMapping("/user/all")
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/all")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsOfUser(@NotNull Long userId){
         return ResponseEntity.ok(illnessNotificationService.loadEntitiesByUserId(userId).stream().map(
                 IllnessNotificationEntity::toModel).collect(Collectors.toList()));

@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.file;
+package de.gaz.eedu.file;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;

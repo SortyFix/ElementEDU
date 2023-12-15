@@ -70,10 +70,10 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    notification_date DATE                                     NULL,
+    notification_date BIGINT NOT NULL,
     notification_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id           BIGINT                                   NULL,
-    reason            VARCHAR(255)                             NULL,
+    user_id           BIGINT NOT NULL,
+    reason            VARCHAR(255) NOT NULL,
     status            TINYINT NULL
 );
 
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS group_privileges
 CREATE TABLE IF NOT EXISTS file_user_permissions
 (
     file_id         BIGINT NOT NULL,
-    permitted_users BIGINT NULL,
+    permitted_users BIGINT NOT NULL,
     FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
 
@@ -109,6 +109,28 @@ CREATE TABLE IF NOT EXISTS file_user_permissions
 CREATE TABLE IF NOT EXISTS file_group_permissions
 (
     file_id          BIGINT NOT NULL,
-    permitted_groups BIGINT NULL,
+    permitted_groups BIGINT NOT NULL,
     FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
+
+CREATE TABLE IF NOT EXISTS chat_entity
+(
+    chat_id         BIGINT AUTO_INCREMENT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS chat_entity_users
+(
+    chat_id         BIGINT NOT NULL,
+    user_id         BIGINT NOT NULL,
+    PRIMARY KEY (chat_id, user_id),
+    FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
+);
+
+CREATE TABLE IF NOT EXISTS chat_entity_messages
+(
+    chat_id         BIGINT NOT NULL,
+    message_id      BIGINT NOT NULL,
+    PRIMARY KEY (chat_id, message_id),
+    FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
+);
+

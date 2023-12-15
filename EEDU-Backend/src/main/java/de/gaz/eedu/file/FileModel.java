@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.file;
+package de.gaz.eedu.file;
 
 import de.gaz.eedu.entity.model.Model;
 import jakarta.validation.constraints.NotEmpty;

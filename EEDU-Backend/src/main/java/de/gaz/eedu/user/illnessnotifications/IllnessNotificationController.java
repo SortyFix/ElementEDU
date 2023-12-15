@@ -2,7 +2,7 @@ package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
-import de.gaz.eedu.user.file.FileService;
+import de.gaz.eedu.file.FileService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Set;
 
 
@@ -35,7 +36,8 @@ import java.util.Set;
         return userService.loadEntityByID(id).map(userEntity ->
         {
             userEntity.setStatus(UserStatus.EXCUSED);
-            IllnessNotificationCreateModel illnessNotificationCreateModel = new IllnessNotificationCreateModel(id, LocalDate.now(), reason);
+            IllnessNotificationCreateModel illnessNotificationCreateModel = new IllnessNotificationCreateModel(id,
+                    LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(), reason);
             illnessNotificationService.createEntity(illnessNotificationCreateModel);
             return ResponseEntity.ok(true);
         }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false));

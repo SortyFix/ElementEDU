@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record IllnessNotificationModel(@NotNull Long illnessId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, @NotNull java.time.LocalDate date, @NotNull String reason) implements Model
+public record IllnessNotificationModel(@NotNull Long illnessId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, Long date, @NotNull String reason) implements Model
 {
     @Override public boolean equals(Object o)
     {

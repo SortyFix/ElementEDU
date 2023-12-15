@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.file;
+package de.gaz.eedu.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service public class FileService
 {

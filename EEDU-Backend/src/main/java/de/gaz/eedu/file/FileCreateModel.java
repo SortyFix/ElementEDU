@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.file;
+package de.gaz.eedu.file;
 
 import de.gaz.eedu.entity.model.CreationModel;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,8 +31,8 @@ public record FileCreateModel(@NotNull String name,
                 .fileName(name)
                 .authorId(authorId)
                 .filePath(filePath)
-                .permittedUsers(new HashSet<>()) // TODO
-                .permittedGroups(new HashSet<>()) // TODO
+                .permittedUsers(permittedUsers) // TODO | 11.12.2023: what?
+                .permittedGroups(permittedGroups) // TODO | same here
                 .tags(tags);
         return fileEntity;
     }

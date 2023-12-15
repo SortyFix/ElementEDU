@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.file;
+package de.gaz.eedu.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
