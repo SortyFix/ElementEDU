@@ -12,7 +12,7 @@ public class MessageEntity implements EntityObject, EntityModelRelation<MessageM
     private Long authorId;
     private String body;
     private Long timestamp;
-    @Enumerated(EnumType.STRING) private MessageStatus status;
+    @Enumerated private MessageStatus status;
 
     @Override
     public MessageModel toModel()

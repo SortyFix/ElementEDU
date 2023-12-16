@@ -15,7 +15,7 @@ import java.util.Optional;
         return illnessNotificationRepository.findById(notificationId);
     }
 
-    @NotNull public List<IllnessNotificationEntity> loadEntitiesByDate(@NotNull LocalDate date){
+    @NotNull public List<IllnessNotificationEntity> loadEntitiesByDate(@NotNull Long date){
         return illnessNotificationRepository.getIllnessNotificationEntitiesByNotificationDate(date);
     }
 

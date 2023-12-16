@@ -134,3 +134,13 @@ CREATE TABLE IF NOT EXISTS chat_entity_messages
     FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
 );
 
+CREATE TABLE IF NOT EXISTS message_entity
+(
+    message_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id       BIGINT NOT NULL,
+    body            VARCHAR(255) NOT NULL,
+    timestamp       BIGINT NOT NULL,
+    status          TINYINT,
+    FOREIGN KEY (author_id) REFERENCES user_entity (id)
+);
+

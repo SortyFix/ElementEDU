@@ -4,24 +4,21 @@ import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public record MessageCreateModel(@NotNull Long authorId, @NotNull String body,
-                                 @NotNull Long timeStamp, @NotNull MessageStatus status) implements CreationModel<MessageEntity>
+public record MessageCreateModel(@NotNull Long authorId, @NotNull String body) implements CreationModel<MessageEntity>
 {
-    @Contract(pure = true) @Override
-    public @NotNull String toString()
+    @Override public String toString()
     {
         return "MessageCreateModel{" +
                 "authorId=" + authorId +
                 ", body='" + body + '\'' +
-                ", timeStamp=" + timeStamp +
-                ", status=" + status +
                 '}';
     }
 
-    @Contract(pure = true) @Override
+
+    @Override
     public @NotNull String name()
     {
-        return System.currentTimeMillis() + " " + authorId();
+        return System.currentTimeMillis() + " " + authorId;
     }
 
     @Override
@@ -30,7 +27,7 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body,
         messageEntity.setAuthorId(authorId());
         messageEntity.setBody(body());
         messageEntity.setTimestamp(System.currentTimeMillis());
-        messageEntity.setStatus(status());
+        messageEntity.setStatus(MessageStatus.UNREAD);
         return messageEntity;
     }
 }

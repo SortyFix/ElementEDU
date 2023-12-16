@@ -45,7 +45,7 @@ public class IllnessNotificationManagementController
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @GetMapping("/{date}")
-    public ResponseEntity<List<IllnessNotificationModel>> getNotificationsOfDate(@NotNull @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date){
+    public ResponseEntity<List<IllnessNotificationModel>> getNotificationsOfDate(@NotNull @PathVariable Long date){
         return ResponseEntity.ok(illnessNotificationService.loadEntitiesByDate(date).stream().map(IllnessNotificationEntity::toModel).collect(Collectors.toList()));
     }
 

@@ -54,6 +54,9 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 0)
        ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3, 0),
        ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 3);
 
+INSERT INTO message_entity (message_id, author_id, body, timestamp, status)
+VALUES (0, 0, 'dummy text', 1702672064, 0);
+
 INSERT INTO group_entity (name, two_factor_required)
 VALUES ('Users', false),
        ('Moderators', true),

@@ -9,6 +9,6 @@ import java.util.List;
 public interface IllnessNotificationRepository extends JpaRepository<IllnessNotificationEntity, Long>
 {
     @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserId(@NotNull Long userId);
-    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByNotificationDate(@NotNull LocalDate date);
+    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByNotificationDate(@NotNull Long date);
     @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserIdAndStatus(@NotNull Long userId, @NotNull IllnessNotificationStatus status);
 }
