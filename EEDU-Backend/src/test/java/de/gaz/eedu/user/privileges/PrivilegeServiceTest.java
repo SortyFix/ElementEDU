@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashSet;
 
 /**
  * Test class for PrivilegeService.

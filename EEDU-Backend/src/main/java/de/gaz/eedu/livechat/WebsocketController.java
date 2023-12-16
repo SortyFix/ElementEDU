@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Objects;
+
 @Controller
 @RequestMapping(name = "/chat")
 public class WebsocketController
@@ -51,16 +53,42 @@ public class WebsocketController
         return ResponseEntity.notFound().build();
     }
 
-    @MessageMapping("/connect/{chatId}")
+    @MessageMapping("/load/{chatId}")
     public ResponseEntity<ChatModel> loadChat(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long chatId)
     {
         chatService.loadEntityByID(chatId).map(chatEntity -> {
             if(chatEntity.getUsers().contains(userId))
             {
+                chatEntity.getMessages().forEach(
+                        messageId -> messageService.loadEntityByID(messageId).ifPresent(messageEntity ->
+                        {
+                            if(!Objects.equals(messageEntity.getAuthorId(), userId)){
+                                messageEntity.setStatus(MessageStatus.READ);
+                                messageService.save(messageEntity);
+                            }
+                        }));
                 return ResponseEntity.ok(chatEntity.toModel());
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         });
+        return ResponseEntity.notFound().build();
+    }
+
+    // A message can only be deleted as long as 20 seconds have not passed since sending a message.
+    @MessageMapping("/hold/{messageId]}")
+    public ResponseEntity<Boolean> holdMessage(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long chatId)
+    {
+        messageService.loadEntityByID(chatId).map(
+                messageEntity -> {
+                    if(messageEntity.getAuthorId().equals(userId)){
+                        if((System.currentTimeMillis() - messageEntity.getTimestamp()) > 20000){
+                            messageService.delete(chatId);
+                            return ResponseEntity.ok(true);
+                        }
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+                    }
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+                });
         return ResponseEntity.notFound().build();
     }
 }

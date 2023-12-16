@@ -1,13 +1,10 @@
 package de.gaz.eedu.livechat.chat;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.livechat.message.MessageModel;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 public record ChatCreateModel(@NotNull Long[] users) implements CreationModel<ChatEntity>
 {

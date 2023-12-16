@@ -7,9 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel, MessageCreateModel>
 {
     /**
@@ -47,6 +44,6 @@ public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel,
     @Override
     protected MessageCreateModel occupiedCreateModel()
     {
-        return null;
+        return new MessageCreateModel(0L, ":)");
     }
 }

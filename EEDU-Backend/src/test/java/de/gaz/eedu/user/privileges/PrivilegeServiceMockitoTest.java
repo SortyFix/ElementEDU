@@ -8,7 +8,6 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 
 public class PrivilegeServiceMockitoTest extends ServiceMockitoTest<PrivilegeService, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {

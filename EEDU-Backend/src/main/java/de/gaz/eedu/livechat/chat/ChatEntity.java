@@ -2,15 +2,12 @@ package de.gaz.eedu.livechat.chat;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
-import de.gaz.eedu.livechat.message.MessageEntity;
-import de.gaz.eedu.livechat.message.MessageModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity @AllArgsConstructor @NoArgsConstructor @Getter @Setter @Table(name = "chat_entity")

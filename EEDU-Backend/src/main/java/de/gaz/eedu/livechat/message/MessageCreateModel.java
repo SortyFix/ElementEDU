@@ -1,7 +1,6 @@
 package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public record MessageCreateModel(@NotNull Long authorId, @NotNull String body) implements CreationModel<MessageEntity>

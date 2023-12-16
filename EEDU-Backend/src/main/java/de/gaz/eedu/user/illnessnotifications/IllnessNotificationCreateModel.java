@@ -3,7 +3,6 @@ package de.gaz.eedu.user.illnessnotifications;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDate;
 
 public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long date, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
 {
