@@ -1,14 +1,16 @@
 package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.model.CreationModel;
+import de.gaz.eedu.user.UserEntity;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull MessageStatus status) implements CreationModel<MessageEntity>
 {
-    @Override public String toString()
+    @Contract(pure = true) @Override public @NotNull String toString()
     {
         return "MessageCreateModel{" +
-                "authorId=" + authorId +
+                "author=" + authorId() +
                 ", body='" + body + '\'' +
                 '}';
     }
@@ -22,7 +24,12 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @
     @Override
     public @NotNull MessageEntity toEntity(@NotNull MessageEntity messageEntity)
     {
-        messageEntity.setAuthorId(authorId());
+        return messageEntity;
+    }
+
+    // Necessary for future tests, don't remove
+    public @NotNull MessageEntity toMessageEntity(@NotNull UserEntity author, @NotNull MessageEntity messageEntity){
+        messageEntity.setAuthor(author);
         messageEntity.setBody(body());
         messageEntity.setTimestamp(System.currentTimeMillis());
         messageEntity.setStatus(MessageStatus.UNREAD);

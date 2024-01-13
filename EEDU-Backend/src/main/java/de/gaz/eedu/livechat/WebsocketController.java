@@ -123,7 +123,7 @@ public class WebsocketController
     {
         messageService.loadEntityByID(chatId).map(
                 messageEntity -> {
-                    if(messageEntity.getAuthorId().equals(userId)){
+                    if(messageEntity.getAuthor().getId().equals(userId)){
                         if((System.currentTimeMillis() - messageEntity.getTimestamp()) > 20000){
                             messageService.delete(chatId);
                             return ResponseEntity.ok(true);

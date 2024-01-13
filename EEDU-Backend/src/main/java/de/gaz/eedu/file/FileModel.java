@@ -20,7 +20,7 @@ public record FileModel(@NotNull Long id,
         return "FileModel{" +
                 "id=" + id +
                 ", fileName='" + fileName + '\'' +
-                ", authorId=" + authorId +
+                ", author=" + authorId +
                 ", filePath='" + filePath + '\'' +
                 ", permittedUsers=" + permittedUsers +
                 ", permittedGroups=" + permittedGroups +

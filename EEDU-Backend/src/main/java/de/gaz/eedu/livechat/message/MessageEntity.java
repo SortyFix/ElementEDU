@@ -2,6 +2,7 @@ package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
+import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,9 @@ import lombok.*;
 public class MessageEntity implements EntityObject, EntityModelRelation<MessageModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long messageId;
-    private Long authorId;
+    @ManyToOne(targetEntity = UserEntity.class)
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
+    private UserEntity author;
     private String body;
     private Long timestamp;
     @Enumerated private MessageStatus status;
@@ -17,6 +20,6 @@ public class MessageEntity implements EntityObject, EntityModelRelation<MessageM
     @Override
     public MessageModel toModel()
     {
-        return new MessageModel(messageId, authorId, body, timestamp, status);
+        return new MessageModel(messageId, author.toModel(), body, timestamp, status);
     }
 }

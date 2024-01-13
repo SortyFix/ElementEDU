@@ -1,11 +1,12 @@
 package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.model.Model;
+import de.gaz.eedu.user.model.UserModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record MessageModel(@NotNull Long messageId, @NotNull Long authorId, @NotNull String body,
+public record MessageModel(@NotNull Long messageId, @NotNull UserModel author, @NotNull String body,
                            @NotNull Long timeStamp, MessageStatus status) implements Model
 {
     @Override public boolean equals(Object o)

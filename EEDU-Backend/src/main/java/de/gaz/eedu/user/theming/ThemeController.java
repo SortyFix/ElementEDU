@@ -78,7 +78,7 @@ public class ThemeController
 
     // Possibly set for deletion.
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId){
-        if(themeService.delete(themeId) == false)
+        if(!themeService.delete(themeId))
         {
             return ResponseEntity.ok(themeService.delete(themeId));
         }

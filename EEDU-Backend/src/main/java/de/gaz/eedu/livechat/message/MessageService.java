@@ -2,6 +2,9 @@ package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.EntityUnknownException;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Service;
@@ -10,22 +13,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel>
+@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel>
 {
     private final MessageRepository messageRepository;
 
-    public MessageService(@NotNull MessageRepository messageRepository){
-        this.messageRepository = messageRepository;
-    }
-
     public MessageEntity findEntityById(@NotNull Long id){
-        return messageRepository.findMessageEntityByMessageId(id);
+        return getMessageRepository().findMessageEntityByMessageId(id);
     }
 
     @Override
     public @NotNull Optional<MessageEntity> loadEntityByID(long id)
     {
-        return Optional.of(messageRepository.findMessageEntityByMessageId(id));
+        return Optional.of(getMessageRepository().findMessageEntityByMessageId(id));
     }
 
     @Override
@@ -37,34 +36,34 @@ import java.util.function.Function;
     @Override
     public @Unmodifiable @NotNull List<MessageEntity> findAllEntities()
     {
-        return messageRepository.findAll();
+        return getMessageRepository().findAll();
     }
 
-    public MessageEntity createEntity(@NotNull MessageCreateModel messageCreateModel)
+    public @NotNull MessageEntity createEntity(@NotNull MessageCreateModel messageCreateModel)
     {
-        return messageCreateModel.toEntity(new MessageEntity());
+        return saveEntity(messageCreateModel.toEntity(new MessageEntity()));
     }
 
     @Override
     public boolean delete(long id)
     {
-        messageRepository.findById(id).map(messageEntity -> {
-            messageRepository.delete(messageEntity);
+        return getMessageRepository().findById(id).map(messageEntity ->
+        {
+            getMessageRepository().deleteById(id);
             return true;
-        });
-        return false;
+        }).orElse(false);
     }
 
     @Override
     public @NotNull MessageEntity saveEntity(@NotNull MessageEntity entity)
     {
-        return messageRepository.save(entity);
+        return getMessageRepository().save(entity);
     }
 
     @Override
     public @NotNull Function<MessageModel, MessageEntity> toEntity()
     {
-        return messageModel -> messageRepository.findById(messageModel.messageId()).orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
+        return messageModel -> getMessageRepository().findById(messageModel.messageId()).orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
     }
 
     @Override
