@@ -1,7 +1,6 @@
 package de.gaz.eedu.livechat.chat;
 
 import de.gaz.eedu.entity.model.Model;
-import de.gaz.eedu.livechat.message.MessageModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -14,8 +13,7 @@ public record ChatModel(@NotNull Long chatId, @NotNull Long[] users, @NotNull Lo
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChatModel chatModel = (ChatModel) o;
-        return Objects.equals(chatId, chatModel.chatId) && Arrays.equals(users,
-                chatModel.users) && Arrays.equals(chatHistory, chatModel.chatHistory);
+        return Objects.equals(chatId, chatModel.chatId);
     }
 
     @Override

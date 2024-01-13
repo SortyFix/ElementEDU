@@ -1,3 +1,4 @@
+###
 @host = http://localhost:8080/
 @user = 1
 
@@ -30,6 +31,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEI
   "loginName": {{login_name}},
   "password": {{login_password}}
 }
+
+### Create chat
+POST localhost:8080/chat/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIyMTE0NzQsImlhdCI6MTcwMjEyNTA3NH0.YuzS96y6wzL37NNuabgByLtVjvqlpyWU44EB0AYGwQs
+
+[0, 1]
 
 ###
 POST {{host}}/user/login/twofactor/create

@@ -67,7 +67,6 @@ import java.util.function.Supplier;
                 randomPassword,
                 true,
                 false,
-                1L,
                 UserStatus.PROSPECTIVE);
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);

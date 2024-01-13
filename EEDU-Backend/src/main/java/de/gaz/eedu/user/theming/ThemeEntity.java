@@ -20,7 +20,10 @@ import java.util.stream.Collectors;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String name;
     private int backgroundColor, widgetColor, textColor;
-    @OneToMany(mappedBy = "themeEntity") @JsonBackReference private Set<UserEntity> users;
+    @OneToMany(mappedBy = "themeEntity", cascade = {
+            CascadeType.REFRESH,
+            CascadeType.PERSIST
+    }) @JsonBackReference private Set<UserEntity> users;
 
     @Contract(pure = true) @NotNull public SimpleThemeModel toSimpleModel()
     {

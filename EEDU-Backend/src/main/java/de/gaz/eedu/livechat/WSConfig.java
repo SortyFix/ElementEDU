@@ -34,6 +34,7 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer
      */
     @Override
     public void registerStompEndpoints(@NotNull StompEndpointRegistry registry){
+        // allowed origins should be changed to match the ElementEDU domain in production
         registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
     }
 }

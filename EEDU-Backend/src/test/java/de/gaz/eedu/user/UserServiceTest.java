@@ -51,7 +51,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
     @Override protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
     {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", "Password123!", true
-                , false, 1L, UserStatus.PRESENT);
+                , false, UserStatus.PRESENT);
         final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", true, false,
                 new TwoFactorModel[0],
                 themeService.loadEntityByID(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new), new SimpleUserGroupModel[0], UserStatus.PRESENT);
@@ -70,7 +70,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()
     {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, 1L, UserStatus.PRESENT);
+        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, UserStatus.PRESENT);
     }
 
     /**
@@ -179,6 +179,6 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
     {
-        return new UserCreateModel("jonas", "yonas", "jonas.yonas$", password, true, false, 1L, UserStatus.PRESENT);
+        return new UserCreateModel("jonas", "yonas", "jonas.yonas$", password, true, false, UserStatus.PRESENT);
     }
 }

@@ -141,6 +141,6 @@ CREATE TABLE IF NOT EXISTS message_entity
     body            VARCHAR(255) NOT NULL,
     timestamp       BIGINT NOT NULL,
     status          TINYINT,
-    FOREIGN KEY (author_id) REFERENCES user_entity (id)
+    FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 

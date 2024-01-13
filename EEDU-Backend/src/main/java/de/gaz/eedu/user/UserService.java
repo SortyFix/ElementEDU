@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.model.*;
+import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.AuthorizeService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
@@ -20,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * This class manages user related tasks.
@@ -75,6 +74,7 @@ import java.util.function.Supplier;
 
     @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
+        ThemeEntity defaultTheme = new ThemeCreateModel("default", 0x001938, 0x5b7ba3, 0x000000).toEntity(new ThemeEntity());
         getUserRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
         {
             throw new LoginNameOccupiedException(occupiedModel);
@@ -86,14 +86,11 @@ import java.util.function.Supplier;
             throw new InsecurePasswordException();
         }
 
-        Supplier<CreationException> exceptionSupplier = () -> new CreationException(HttpStatus.NOT_FOUND);
-        ThemeEntity themeEntity = getThemeRepository().findById(model.themeId()).orElseThrow(exceptionSupplier);
-
         String hashedPassword = getAuthorizeService().encode(model.password());
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
-            entity.setThemeEntity(themeEntity);
+            entity.setThemeEntity(defaultTheme);
             return entity;
         }));
     }

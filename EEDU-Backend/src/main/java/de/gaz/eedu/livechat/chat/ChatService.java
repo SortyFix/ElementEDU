@@ -14,7 +14,12 @@ import java.util.function.Function;
 @Service
 public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCreateModel>
 {
-    ChatRepository chatRepository;
+    private final ChatRepository chatRepository;
+
+    public ChatService(@NotNull ChatRepository chatRepository)
+    {
+        this.chatRepository = chatRepository;
+    }
 
     @Override
     public @NotNull Optional<ChatEntity> loadEntityByID(long id)
@@ -68,4 +73,9 @@ public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCre
     {
         return ChatEntity::toModel;
     }
+
+    public @NotNull Optional<List<ChatEntity>> loadEntityByUserIDs(@NotNull List<Long> userIDs){
+        return chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size());
+    }
+
 }

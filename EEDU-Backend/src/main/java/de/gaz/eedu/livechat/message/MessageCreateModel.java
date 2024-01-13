@@ -3,7 +3,7 @@ package de.gaz.eedu.livechat.message;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
 
-public record MessageCreateModel(@NotNull Long authorId, @NotNull String body) implements CreationModel<MessageEntity>
+public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull MessageStatus status) implements CreationModel<MessageEntity>
 {
     @Override public String toString()
     {
@@ -13,17 +13,25 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body) i
                 '}';
     }
 
-
     @Override
     public @NotNull String name()
     {
-        return System.currentTimeMillis() + " " + authorId;
+        return System.currentTimeMillis() + " " + authorId();
     }
 
     @Override
     public @NotNull MessageEntity toEntity(@NotNull MessageEntity messageEntity)
     {
         messageEntity.setAuthorId(authorId());
+        messageEntity.setBody(body());
+        messageEntity.setTimestamp(System.currentTimeMillis());
+        messageEntity.setStatus(MessageStatus.UNREAD);
+        return messageEntity;
+    }
+
+    // Necessary for future tests, don't remove
+    public @NotNull MessageEntity toMessageEntity(@NotNull UserEntity author, @NotNull MessageEntity messageEntity){
+        messageEntity.setAuthor(author);
         messageEntity.setBody(body());
         messageEntity.setTimestamp(System.currentTimeMillis());
         messageEntity.setStatus(MessageStatus.UNREAD);
