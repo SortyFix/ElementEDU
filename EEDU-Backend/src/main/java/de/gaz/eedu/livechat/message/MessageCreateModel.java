@@ -35,13 +35,4 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @
         messageEntity.setStatus(MessageStatus.UNREAD);
         return messageEntity;
     }
-
-    // Necessary for future tests, don't remove
-    public @NotNull MessageEntity toMessageEntity(@NotNull UserEntity author, @NotNull MessageEntity messageEntity){
-        messageEntity.setAuthor(author);
-        messageEntity.setBody(body());
-        messageEntity.setTimestamp(System.currentTimeMillis());
-        messageEntity.setStatus(MessageStatus.UNREAD);
-        return messageEntity;
-    }
 }
