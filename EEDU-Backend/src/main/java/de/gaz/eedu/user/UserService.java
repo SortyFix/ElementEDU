@@ -74,7 +74,6 @@ import java.util.function.Function;
 
     @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
-        ThemeEntity defaultTheme = new ThemeCreateModel("default", 0x001938, 0x5b7ba3, 0x000000).toEntity(new ThemeEntity());
         getUserRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
         {
             throw new LoginNameOccupiedException(occupiedModel);
@@ -90,7 +89,7 @@ import java.util.function.Function;
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
-            entity.setThemeEntity(defaultTheme);
+            entity.setThemeEntity(themeRepository.getReferenceById(1L));
             return entity;
         }));
     }
