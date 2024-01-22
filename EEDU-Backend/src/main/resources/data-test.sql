@@ -72,6 +72,7 @@ VALUES ('READ'),
        ('MODERATE'),
        ('DUMMY');
 
+/* 0 = EMAIL, 1 = SMS, 2 = TOTP */
 INSERT INTO two_factor_entity(method, data, secret, enabled, user_id)
 VALUES (0, 'mustermann@example.com', '', true, 1),
 

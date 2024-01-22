@@ -123,7 +123,7 @@ import java.util.function.Function;
      * @throws NullPointerException if `twoFactorMethod` is null or if `twoFactorMethod` has null elements
      * @throws IllegalArgumentException if `twoFactorMethod` is empty
      */
-    @NotNull private VerificationService.KeyType getKeyType(@NotNull TwoFactorMethod @NotNull [] twoFactorMethod)
+    private @NotNull VerificationService.KeyType getKeyType(@NotNull TwoFactorMethod @NotNull [] twoFactorMethod)
     {
         boolean single = twoFactorMethod.length == 1;
 
@@ -325,7 +325,19 @@ import java.util.function.Function;
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public record ClaimHolder<T>(@NotNull String key, @NotNull T content) {}
+    /**
+     * A private record class that helps with creating claims.
+     * <p>
+     * This private record is a helper class for creating Claims. These claims are saved in a
+     * {@link Map} wit the types String and Object.
+     * With this class multiple objects can be added to such a list as key and value are both included within this
+     * object.
+     *
+     * @param key the key of the claim.
+     * @param content the content of the claim.
+     * @param <T> the type of the content.
+     */
+    private record ClaimHolder<T>(@NotNull String key, @NotNull T content) {}
 
     /**
      * A private record class that represents a particular JWT token type and its associated claim holder method.
