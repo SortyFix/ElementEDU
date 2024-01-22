@@ -52,10 +52,10 @@ import java.util.function.Function;
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    @Getter private final AuthorizeService authorizeService;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
-    @Getter private final AuthorizeService authorizeService;
 
     @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
     {
@@ -99,12 +99,12 @@ import java.util.function.Function;
         return getUserRepository().save(entity);
     }
 
-    @Transactional @Override public @NotNull Function<UserModel, UserEntity> toEntity()
+    @Override @Transactional public @NotNull Function<UserModel, UserEntity> toEntity()
     {
         return userModel -> loadEntityByID(userModel.id()).orElseThrow(() -> new EntityUnknownException(userModel.id()));
     }
 
-    @Override @Contract(pure = true) public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel()
+    @Override public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel()
     {
         return UserEntity::toModel;
     }
@@ -125,9 +125,8 @@ import java.util.function.Function;
 
     @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
-        return loadEntityByName(loginModel.loginName()).map(user -> getAuthorizeService().login(user.toModel(),
-                user.getPassword(),
-                loginModel));
+        Optional<UserEntity> userOptional = loadEntityByName(loginModel.loginName());
+        return userOptional.map(user -> getAuthorizeService().login(user.toModel(), user.getPassword(), loginModel));
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)

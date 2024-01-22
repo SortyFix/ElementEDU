@@ -8,15 +8,23 @@ public enum JwtTokenType
 {
     TWO_FACTOR_SELECTION,
     TWO_FACTOR_PENDING,
-    ADVANCED_AUTHORIZATION, // authorities received from actual user + this one
-    AUTHORIZED; // authorities received from actual user
-
+    ADVANCED_AUTHORIZATION, // authorities from actual user and advanced
+    AUTHORIZED; // authorities from actual user
 
     @Contract(pure = true) @Override public @NotNull String toString()
     {
         return name();
     }
 
+    /**
+     * Creates a dedicated authority mapped to this toke type.
+     * <p>
+     * This method creates a {@link VerificationAuthority} which is dedicated to this class.
+     * It grants rights to some special requests, which are related to the key type.
+     *
+     * @return the created {@link VerificationAuthority}
+     * @see VerificationAuthority
+     */
     @Contract(value = "-> new", pure = true) public @NotNull VerificationAuthority getAuthority()
     {
         return new VerificationAuthority(this);

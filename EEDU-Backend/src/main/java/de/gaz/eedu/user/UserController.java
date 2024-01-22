@@ -1,7 +1,11 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.model.*;
+import de.gaz.eedu.user.model.LoginModel;
+import de.gaz.eedu.user.model.UserCreateModel;
+import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.function.Function;
 
 /**
  * Contains methods to interact with the {@link UserService} using a http request.
@@ -54,21 +61,31 @@ import org.springframework.web.bind.annotation.*;
         return super.getData(id);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200") @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel userLoginModel)
+    @CrossOrigin(origins = "http://localhost:4200")
+    @PermitAll
+    @PostMapping("/login")
+    public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel loginModel)
     {
-        return login(userLoginModel);
+        return login(loginModel);
     }
 
-    //TODO only the user itself can get this token
-
-    @PreAuthorize("isAuthenticated()") @PostMapping("/login/advanced") public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel advancedUserLoginModel)
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/login/advanced")
+    public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
     {
-        return login(advancedUserLoginModel);
+        Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
+        if (getEntityService().getUserRepository().findById(userID).map(isAllowed).orElse(false))
+        {
+            return login(loginModel);
+        }
+        logger.warn("A user tried to access the advanced token of another user. The request has been rejected.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
 
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
     {
         logger.info("The server has recognized an incoming login request.");
+
         return getEntityService().login(userLoginModel)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));

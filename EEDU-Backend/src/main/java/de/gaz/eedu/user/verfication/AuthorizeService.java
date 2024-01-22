@@ -36,7 +36,7 @@ import java.util.Optional;
         {
             return getVerificationService().loginUserToken(model, loginModel);
         }
-        return null; //password does not match
+        return null; //passwords do not match
     }
 
     public @NotNull String selectTwoFactor(@NotNull TwoFactorMethod twoFactorMethod, @NotNull Claims claims)
@@ -67,6 +67,21 @@ import java.util.Optional;
         return getPasswordEncoder().encode(password);
     }
 
+    /**
+     * A decoder for JWT tokens.
+     * <p>
+     * This record serves as a helper class for decoding jwt tokens send to the backend.
+     * A jwt token must always contain the following attributes:
+     * <ul>
+     *     <li>userID</li>
+     *     <li>expiry</li>
+     *     <li>advanced</li>
+     * </ul>
+     *
+     * @param userID the id of the user.
+     * @param expiry the expiry of the token, or the token created with the current token.
+     * @param advanced if the token has advanced access to user management areas.
+     */
     private record ClaimDecoder(long userID, @NotNull Instant expiry, boolean advanced)
     {
         private static @NotNull ClaimDecoder decode(@NotNull Claims claims) throws InvalidTokenException

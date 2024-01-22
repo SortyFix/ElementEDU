@@ -5,6 +5,7 @@ import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,8 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @return an optional containing the {@link E} object or an empty one.
      * @see #loadById(long)
      */
-    @NotNull @Transactional(readOnly = true) Optional<E> loadEntityByID(long id);
+    @Transactional(readOnly = true)
+    @NotNull Optional<E> loadEntityByID(long id);
 
     /**
      * Loads an {@link E} by a string.
@@ -42,7 +44,8 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @param name of the entity to load.
      * @return an optional, which is empty if no entity was found.
      */
-    @NotNull @Transactional(readOnly = true) Optional<E> loadEntityByName(@NotNull String name);
+    @Transactional(readOnly = true)
+    @NotNull Optional<E> loadEntityByName(@NotNull String name);
 
     /**
      * Loads all entities as {@link E}.
@@ -56,7 +59,8 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @return an unmodifiable list containing all entities from the repository defined within the implementation.
      * @see #findAll()
      */
-    @Transactional(readOnly = true) @Unmodifiable @NotNull List<E> findAllEntities();
+    @Transactional(readOnly = true)
+    @NotNull @Unmodifiable List<E> findAllEntities();
 
     /**
      * Creates an {@link E} based on the data from {@link C}.
@@ -74,11 +78,14 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
 
     @Transactional @NotNull E saveEntity(@NotNull E entity);
 
+    @Contract(pure = true, value = "-> new")
     @Transactional(readOnly = true) @NotNull Function<M, E> toEntity();
 
+    @Contract(pure = true, value = "-> new")
     @NotNull Function<E, M> toModel();
 
-    default @NotNull @Transactional(readOnly = true) E loadEntityByIDSafe(long id) throws EntityUnknownException
+    @Transactional(readOnly = true)
+    default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
     {
         return loadEntityByID(id).orElseThrow(() -> new EntityUnknownException(id));
     }
@@ -98,7 +105,8 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
         return loadEntityByName(name).map(toModel());
     }
 
-    @Transactional(readOnly = true) default @Unmodifiable @NotNull Set<M> findAll()
+    @Transactional(readOnly = true)
+    default @NotNull @Unmodifiable Set<M> findAll()
     {
         return findAllEntities().stream().map(toModel()).collect(Collectors.toSet());
     }
@@ -108,7 +116,8 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
         return toModel().apply(createEntity(model));
     }
 
-    @Transactional @NotNull default M save(@NotNull E entity)
+    @Transactional
+    default @NotNull M save(@NotNull E entity)
     {
         return toModel().apply(saveEntity(entity));
     }

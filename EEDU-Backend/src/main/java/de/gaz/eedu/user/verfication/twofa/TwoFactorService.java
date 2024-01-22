@@ -24,7 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -72,7 +73,10 @@ import java.util.function.Supplier;
                 return twoFactorEntity;
             }
         }
-        catch (IllegalArgumentException illegalArgumentException) {throw new CreationException(HttpStatus.BAD_REQUEST);}
+        catch (IllegalArgumentException illegalArgumentException)
+        {
+            throw new CreationException(HttpStatus.BAD_REQUEST);
+        }
 
         throw new CreationException(HttpStatus.CONFLICT);
     }

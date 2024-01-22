@@ -1,8 +1,8 @@
 package de.gaz.eedu.user.verfication;
 
-import de.gaz.eedu.user.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.model.LoginModel;
-import de.gaz.eedu.user.model.UserLoginModel;
+import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -324,6 +324,8 @@ import java.util.function.Function;
     {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
+
+    public record ClaimHolder<T>(@NotNull String key, @NotNull T content) {}
 
     /**
      * A private record class that represents a particular JWT token type and its associated claim holder method.

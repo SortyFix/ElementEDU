@@ -252,7 +252,7 @@ import java.util.stream.Stream;
         // remove not enabled instances of this two factor
         if (twoFactors.removeIf(entity -> Objects.equals(entity.getMethod(), twoFactorEntity.getMethod())))
         {
-            String removalMessage = "A disabled two-factor instance using method {} was auto-removed from user {}.";
+            String removalMessage = "A disabled two-factor instance using method {} was overridden from user {}.";
             LOGGER.warn(removalMessage, twoFactorEntity.getMethod(), getId());
         }
 
