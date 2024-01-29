@@ -126,7 +126,7 @@ import java.util.function.Function;
     @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> userOptional = loadEntityByName(loginModel.loginName());
-        return userOptional.map(user -> getAuthorizeService().login(user.toModel(), user.getPassword(), loginModel));
+        return userOptional.filter(UserEntity::isAccountNonLocked).map(user -> getAuthorizeService().login(user.toModel(), user.getPassword(), loginModel));
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)

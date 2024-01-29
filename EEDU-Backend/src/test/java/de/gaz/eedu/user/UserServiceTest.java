@@ -5,10 +5,12 @@ import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
+import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
+import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
@@ -16,10 +18,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * UserServiceTest is a concrete extension of {@link ServiceTest}, which is specifically
@@ -48,24 +52,25 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
         this.themeService = themeService;
     }
 
-    @Override protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
+    @Contract(pure = true, value = "-> new")
+    private static @NotNull Stream<LoginTestData> loginTestData()
     {
-        final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", "Password123!", true
-                , false, UserStatus.PRESENT);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", true, false,
-                new TwoFactorModel[0],
-                themeService.loadEntityByID(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new), new SimpleUserGroupModel[0], UserStatus.PRESENT);
+        return Stream.of(new LoginTestData(false, "max.mustermann", "123password!"), // password from John
+                new LoginTestData(false, "max.mustermann", "wrongPassword!"), // wrong password
+                new LoginTestData(true, "max.mustermann", "securestPasswordProbably123!"), // right password
+                new LoginTestData(false, "john.zimmermann", "123password"),  // slightly wrong password
+                new LoginTestData(false, "john.zimmermann", "wrongPassword!"), // wrong password
+                new LoginTestData(false, "john.zimmermann", "123password!"), // account locked, but right password
+                new LoginTestData(true, "martin.hansen", "password123"), // right password
+                new LoginTestData(false, "martin.hansen", "wrongPassword!") // wrong password
+        );
+    }
 
-        return Eval.eval(createModel, expected, (request, expect, result) ->
-        {
-            Assertions.assertEquals(expect.firstName(), result.firstName());
-            Assertions.assertEquals(expect.lastName(), result.lastName());
-            Assertions.assertEquals(expect.loginName(), result.loginName());
-            Assertions.assertEquals(expect.enabled(), result.enabled());
-            Assertions.assertEquals(expect.locked(), result.locked());
-            Assertions.assertEquals(expect.groups().length, result.groups().length);
-            Assertions.assertEquals(expect.theme(), result.theme());
-        });
+    @ParameterizedTest(name = "{index} => expected={0}, username={1}, password={1}")
+    @MethodSource("loginTestData")
+    public void testUserLogin(@NotNull LoginTestData loginTestData)
+    {
+        test(loginTestData.createEval(), request -> ((UserService) getService()).login(request).isPresent());
     }
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()
@@ -131,6 +136,39 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
         test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
     }
 
+    @Override
+    protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
+    {
+        final UserCreateModel createModel = new UserCreateModel("jonas",
+                "yonas",
+                "jonas.yonas",
+                "Password123!",
+                true,
+                false,
+                UserStatus.PRESENT);
+        final UserModel expected = new UserModel(5L,
+                "jonas",
+                "yonas",
+                "jonas.yonas",
+                true,
+                false,
+                new TwoFactorModel[0],
+                themeService.loadEntityByID(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new),
+                new SimpleUserGroupModel[0],
+                UserStatus.PRESENT);
+
+        return Eval.eval(createModel, expected, (request, expect, result) ->
+        {
+            Assertions.assertEquals(expect.firstName(), result.firstName());
+            Assertions.assertEquals(expect.lastName(), result.lastName());
+            Assertions.assertEquals(expect.loginName(), result.loginName());
+            Assertions.assertEquals(expect.enabled(), result.enabled());
+            Assertions.assertEquals(expect.locked(), result.locked());
+            Assertions.assertEquals(expect.groups().length, result.groups().length);
+            Assertions.assertEquals(expect.theme(), result.theme());
+        });
+    }
+
     /**
      * Test insecure password security.
      * <p>
@@ -180,5 +218,20 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
     @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
     {
         return new UserCreateModel("jonas", "yonas", "jonas.yonas$", password, true, false, UserStatus.PRESENT);
+    }
+
+    public record LoginTestData(@NotNull Boolean expected, @NotNull String userName, @NotNull String password)
+    {
+        @Contract(pure = true, value = "-> new")
+        private @NotNull Eval<LoginModel, Boolean> createEval()
+        {
+            return Eval.eval(createLoginModel(), expected(), Validator.equals());
+        }
+
+        @Contract(pure = true, value = "-> new")
+        private @NotNull LoginModel createLoginModel()
+        {
+            return new UserLoginModel(userName(), password(), true);
+        }
     }
 }

@@ -7,6 +7,7 @@
 
 ###
 GET {{host}}/user/get/{{user}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDc1NTczMzUsImlhdCI6MTcwNjM0NzczNX0.f9ERkmcgZgjT4bg-s5CUFHJycIa1R-vhJrU-1oQUiIw
 
 ### Log in
 POST {{host}}/user/login
@@ -25,7 +26,7 @@ Authorization: Bearer
 ### Log in advanced
 POST {{host}}/user/login/advanced
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDcxMjY0NzQsImlhdCI6MTcwNTkxNjg3NH0.Xv4VZe6MEnQJxzwCH28rgZcbbwhYkXTZ6ykm4P1vIR8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUV09fRkFDVE9SX1BFTkRJTkciLCJtZXRob2QiOiJUT1RQIiwiYWR2YW5jZWQiOmZhbHNlLCJleHBpcnkiOjE3MDc1NTc2NzM3OTEsInVzZXJJRCI6MSwiZXhwIjoxNzA2MzQ4MzczLCJpYXQiOjE3MDYzNDgwNzN9.SpElFvfptrNDhRv91mVR3vUtYw_R_qiVJ_O3qSrPsBs
 
 {
   "loginName": {{login_name}},
@@ -39,10 +40,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUS
 
 [0, 1]
 
-###
+### Create 2fa
 POST {{host}}/user/login/twofactor/create
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDYwMDM2MjksImlhdCI6MTcwNTkxNzIyOX0.YXrFJ-zeFmDl336Pv9Otz73fP4UThn99S6OPK9HTyek
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUV09fRkFDVE9SX1BFTkRJTkciLCJtZXRob2QiOiJUT1RQIiwiYWR2YW5jZWQiOnRydWUsImV4cGlyeSI6MTcwNjQzNDQ4MDg5MCwidXNlcklEIjoxLCJleHAiOjE3MDYzNDgzODAsImlhdCI6MTcwNjM0ODA4MH0.5ALtZNaWOQjt6DEqzA1SIfAjZabPKUI1MsHUoii-P2s
 
 {
   "userID": 1,
@@ -51,5 +52,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUS
 }
 
 ### Enable two factor
-GET {{host}}/user/login/twofactor/enable/TOTP/204106
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDIyMTE0NzQsImlhdCI6MTcwMjEyNTA3NH0.YuzS96y6wzL37NNuabgByLtVjvqlpyWU44EB0AYGwQs
+GET {{host}}/user/login/twofactor/enable/TOTP/057724
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUV09fRkFDVE9SX1BFTkRJTkciLCJtZXRob2QiOiJUT1RQIiwiYWR2YW5jZWQiOnRydWUsImV4cGlyeSI6MTcwNjQzNDMyODk2MywidXNlcklEIjoxLCJleHAiOjE3MDYzNDgyMjgsImlhdCI6MTcwNjM0NzkyOH0.OxO4hiQZWLwhhZGmiNR3fUwXyB3Et-Id6qWZChl2ZlA

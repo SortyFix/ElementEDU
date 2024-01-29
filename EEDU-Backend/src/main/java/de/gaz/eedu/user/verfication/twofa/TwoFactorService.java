@@ -6,7 +6,6 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
-import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethodImplementation;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.Claims;
@@ -135,7 +134,9 @@ import java.util.function.Supplier;
                 });
     }
 
-    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull String code)
+    @Contract(pure = true, value = "_ -> new")
+    @NotNull
+    private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull String code)
     {
         return twoFactorEntity ->
         {
@@ -144,12 +145,13 @@ import java.util.function.Supplier;
                 return false;
             }
 
-            TwoFactorMethodImplementation impl = twoFactorEntity.getMethod().getTwoFactorMethodImplementation();
-            return impl.verify(twoFactorEntity, code);
+            return twoFactorEntity.getMethod().getTwoFactorMethodImplementation().verify(twoFactorEntity, code);
         };
     }
 
-    @Contract(pure = true) @NotNull private Function<TwoFactorEntity, Boolean> enableMapper(@NotNull String code)
+    @Contract(pure = true, value = "_ -> new")
+    @NotNull
+    private Function<TwoFactorEntity, Boolean> enableMapper(@NotNull String code)
     {
         return new Function<>()
         {
@@ -160,8 +162,7 @@ import java.util.function.Supplier;
                     return false;
                 }
 
-                TwoFactorMethodImplementation impl = twoFactorEntity.getMethod().getTwoFactorMethodImplementation();
-                if (impl.verify(twoFactorEntity, code))
+                if (twoFactorEntity.getMethod().getTwoFactorMethodImplementation().verify(twoFactorEntity, code))
                 {
                     twoFactorEntity.setEnabled(true);
                     save(twoFactorEntity);

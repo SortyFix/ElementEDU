@@ -104,7 +104,7 @@ import java.util.stream.Stream;
 
     @Override public boolean isAccountNonLocked()
     {
-        return locked;
+        return !locked;
     }
 
     @Override public boolean isEnabled()

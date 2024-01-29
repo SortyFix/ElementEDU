@@ -48,10 +48,14 @@ VALUES ('Light', 0x000000, 0x000000, 0x000000),
        ('Dark', 0x000000, 0x000000, 0x000000),
        ('dummy', 0x000000, 0x000000, 0x000000);
 
+/* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
 INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
-VALUES ('Max', 'Mustermann', 'max.mustermann', 'password123', TRUE, FALSE, 1, 0),
-       ('John', 'Zimmermann', 'john.zimmermann', 'password123', TRUE, TRUE, 2, 0),
-       ('Martin', 'Hansen', 'martin.hansen', 'password123', FALSE, FALSE, 3, 0),
+VALUES ('Max', 'Mustermann', 'max.mustermann', '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', TRUE,
+        FALSE, 1, 0),
+       ('John', 'Zimmermann', 'john.zimmermann', '$2y$10$4urnpOegHUXoQaQakLcKP.iNZxrGeaKhS.55FlAI1eJqkLeGqF.iO', TRUE,
+        TRUE, 2, 0),
+       ('Martin', 'Hansen', 'martin.hansen', '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', FALSE,
+        FALSE, 3, 0),
        ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 3);
 
 INSERT INTO message_entity (author_id, body, timestamp, status)
