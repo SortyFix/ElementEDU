@@ -115,7 +115,8 @@ CREATE TABLE IF NOT EXISTS file_group_permissions
 
 CREATE TABLE IF NOT EXISTS chat_entity
 (
-    chat_id         BIGINT AUTO_INCREMENT PRIMARY KEY
+    chat_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    time_of_creation    BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity_users
