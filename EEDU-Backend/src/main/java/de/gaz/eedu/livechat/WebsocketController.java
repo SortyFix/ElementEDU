@@ -83,7 +83,7 @@ public class WebsocketController
                 MessageCreateModel messageCreateModel =   chatEntity.getUsers().size()  > 2 ? new MessageCreateModel(authorId, body, MessageStatus.GROUP)
                                                         : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, MessageStatus.UNREAD)
                                                         : null;
-                if(!Objects.isNull(messageCreateModel)){
+                if(Objects.nonNull(messageCreateModel)){
                     MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
                     chatEntity.getMessages().add(messageEntity.getMessageId());
                     return ResponseEntity.ok(messageEntity.toModel());
