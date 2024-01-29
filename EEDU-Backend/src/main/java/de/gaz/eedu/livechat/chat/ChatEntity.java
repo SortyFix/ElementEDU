@@ -14,6 +14,7 @@ import java.util.List;
 public class ChatEntity implements EntityObject, EntityModelRelation<ChatModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long chatId;
+    private Long timeOfCreation;
 
     @ElementCollection @Column(name = "user_id")
     @CollectionTable(name = "chat_entity_users", joinColumns = @JoinColumn(name = "chat_id"))
@@ -26,7 +27,7 @@ public class ChatEntity implements EntityObject, EntityModelRelation<ChatModel>
     @Override
     public ChatModel toModel()
     {
-        return new ChatModel(chatId, users.toArray(Long[]::new),
+        return new ChatModel(chatId, timeOfCreation, users.toArray(Long[]::new),
                 messages.toArray(Long[]::new));
     }
 }

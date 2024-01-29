@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public record ChatCreateModel(@NotNull Long[] users) implements CreationModel<ChatEntity>
+public record ChatCreateModel(@NotNull Long[] users, @NotNull Long timeOfCreation) implements CreationModel<ChatEntity>
 {
     @Override
     public @NotNull String name()
@@ -20,6 +20,7 @@ public record ChatCreateModel(@NotNull Long[] users) implements CreationModel<Ch
         chatEntity.setUsers(Arrays.stream(users()).toList());
         // Is this necessary?
         chatEntity.setMessages(new ArrayList<>());
+        chatEntity.setTimeOfCreation(timeOfCreation());
         return chatEntity;
     }
 }

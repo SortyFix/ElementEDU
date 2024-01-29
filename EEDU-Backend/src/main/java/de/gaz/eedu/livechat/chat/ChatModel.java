@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record ChatModel(@NotNull Long chatId, @NotNull Long[] users, @NotNull Long[] chatHistory) implements Model
+public record ChatModel(@NotNull Long chatId, @NotNull Long timeOfCreation, @NotNull Long[] users, @NotNull Long[] chatHistory) implements Model
 {
     @Override public boolean equals(Object o)
     {

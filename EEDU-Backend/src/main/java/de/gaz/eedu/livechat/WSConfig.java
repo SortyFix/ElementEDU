@@ -1,5 +1,6 @@
 package de.gaz.eedu.livechat;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -9,8 +10,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@Getter
 public class WSConfig implements WebSocketMessageBrokerConfigurer
 {
+    private final String broker = "/topic";
+    private final String apd = "/app";
+    private final String endpoint = "/ws-endpoint";
+
     /**
      *     The enableSimpleBroker method configures a simple in-memory broker that allows broadcasting
      *     messages to clients subscribed to specific topics (in this case, "/topic").
@@ -24,17 +30,17 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer
      */
     @Override
     public void configureMessageBroker(@NotNull MessageBrokerRegistry config){
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker(broker);
+        config.setApplicationDestinationPrefixes(apd);
     }
 
     /**
      * The endpoint is responsible for establishing the WebSocket
      * connection between the client and the server.
+     * Can be contacted at <code>ws://localhost:8080/ws-endpoint</code>
      */
     @Override
     public void registerStompEndpoints(@NotNull StompEndpointRegistry registry){
-        // allowed origins should be changed to match the ElementEDU domain in production
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint(endpoint).setAllowedOrigins("*").withSockJS();
     }
 }
