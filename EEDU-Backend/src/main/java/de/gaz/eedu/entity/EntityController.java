@@ -3,6 +3,8 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.user.verfication.JwtTokenType;
+import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,8 +22,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C>, M extends Model, C extends CreationModel<?>>
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntityController.class);
     @Getter(AccessLevel.PROTECTED) private final S entityService;
-    private final Logger logger = LoggerFactory.getLogger(EntityController.class);
 
     /**
      * This method is responsible for creating a new entity based on the provided model.
@@ -41,7 +44,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
      */
     public @NotNull ResponseEntity<M> create(@NotNull C model)
     {
-        logger.info("Received an incoming create request from class {}.", getClass().getSuperclass());
+        LOGGER.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
             return ResponseEntity.status(HttpStatus.CREATED).body(getEntityService().create(model));
@@ -63,7 +66,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
      */
     public @NotNull Boolean delete(@NotNull Long id)
     {
-        logger.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
+        LOGGER.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().delete(id);
     }
 
@@ -83,7 +86,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
      */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
-        logger.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
+        LOGGER.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
@@ -98,5 +101,25 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
                 .stream()
                 .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
+    }
+
+    /**
+     * Checks whether a request has a certain authority.
+     * <p>
+     * This method references the {@link #isAuthorized(Authentication, String, Class)} and checks
+     * if a user has a permission based on a {@link JwtTokenType}.
+     *
+     * @param authentication the current requests authentication
+     * @param jwtTokenType   the token that the authentication should have to be authorized
+     * @return whether a {@link Authentication} has the given token type authority
+     */
+    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull JwtTokenType jwtTokenType)
+    {
+        return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
+    }
+
+    protected @NotNull AccessDeniedException forbiddenThrowable()
+    {
+        throw new AccessDeniedException(""); // message is ignored anyway
     }
 }

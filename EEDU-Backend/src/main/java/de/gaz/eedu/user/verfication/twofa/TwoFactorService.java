@@ -106,32 +106,24 @@ import java.util.function.Supplier;
         return TwoFactorEntity::toModel;
     }
 
-    public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, boolean enable
-            , @NotNull Claims claims)
+    public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
         UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
 
-        Function<TwoFactorEntity, Boolean> mapper = auth ->
-        {
-            if (enable)
-            {
-                return enableMapper(code).apply(auth);
-            }
-            return verifyMapper(code).apply(auth);
-        };
-
+        Function<TwoFactorEntity, Boolean> mapper = authentication -> verifyMapper(code).apply(authentication);
         return userEntity.getTwoFactor(method)
                 .map(mapper)
                 .filter(Boolean::booleanValue)
-                .map(entity ->
-                {
-                    if(enable)
-                    {
-                        return null;
-                    }
-                    return getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims);
-                });
+                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims));
+    }
+
+    public boolean enable(@NotNull TwoFactorMethod method, @NotNull String code, @NotNull Claims claims)
+    {
+        long userID = claims.get("userID", Long.class);
+        UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
+        Function<TwoFactorEntity, Boolean> mapper = authentication -> enableMapper(code).apply(authentication);
+        return userEntity.getTwoFactor(method).map(mapper).orElse(false);
     }
 
     @Contract(pure = true, value = "_ -> new")
