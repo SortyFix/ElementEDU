@@ -20,6 +20,6 @@ public class MessageEntity implements EntityObject, EntityModelRelation<MessageM
     @Override
     public MessageModel toModel()
     {
-        return new MessageModel(messageId, author.toModel(), body, timestamp, status);
+        return new MessageModel(messageId, author.getId(), body, timestamp, status);
     }
 }

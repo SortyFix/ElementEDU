@@ -2,6 +2,8 @@ package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.EntityUnknownException;
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.function.Function;
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel>
 {
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     public MessageEntity findEntityById(@NotNull Long id){
         return getMessageRepository().findMessageEntityByMessageId(id);
@@ -41,7 +44,8 @@ import java.util.function.Function;
 
     public @NotNull MessageEntity createEntity(@NotNull MessageCreateModel messageCreateModel)
     {
-        return saveEntity(messageCreateModel.toEntity(new MessageEntity()));
+        return getMessageRepository().save(messageCreateModel.toMessageEntity(getUserRepository().getReferenceById(
+                messageCreateModel.authorId()), new MessageEntity()));
     }
 
     @Override
@@ -63,7 +67,10 @@ import java.util.function.Function;
     @Override
     public @NotNull Function<MessageModel, MessageEntity> toEntity()
     {
-        return messageModel -> getMessageRepository().findById(messageModel.messageId()).orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
+        return messageModel ->
+                getMessageRepository()
+                        .findById(messageModel.messageId())
+                        .orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
     }
 
     @Override

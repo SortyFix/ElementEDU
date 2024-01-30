@@ -78,8 +78,8 @@ public class WebsocketController
         return chatService.loadEntityByID(chatId).map(chatEntity -> {
             if (chatEntity.getUsers().contains(authorId) && Objects.nonNull(author))
             {
-                MessageCreateModel messageCreateModel =   chatEntity.getUsers().size()  > 2 ? new MessageCreateModel(authorId, body, MessageStatus.GROUP)
-                                                        : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, MessageStatus.UNREAD)
+                MessageCreateModel messageCreateModel =   chatEntity.getUsers().size()  > 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.GROUP)
+                                                        : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.UNREAD)
                                                         : null;
                 if(Objects.nonNull(messageCreateModel)){
                     MessageEntity messageEntity = messageService.createEntity(messageCreateModel);

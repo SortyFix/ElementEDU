@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record MessageModel(@NotNull Long messageId, @NotNull UserModel author, @NotNull String body,
+public record MessageModel(@NotNull Long messageId, @NotNull Long authorId, @NotNull String body,
                            @NotNull Long timeStamp, MessageStatus status) implements Model
 {
     @Override public boolean equals(Object o)
@@ -20,6 +20,6 @@ public record MessageModel(@NotNull Long messageId, @NotNull UserModel author, @
     @Override
     public int hashCode()
     {
-        return Objects.hash(messageId, author, body, timeStamp);
+        return Objects.hash(messageId, authorId(), body, timeStamp);
     }
 }
