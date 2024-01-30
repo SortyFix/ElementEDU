@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.function.Function;
@@ -58,6 +60,10 @@ import java.util.function.Function;
 
     @PreAuthorize("hasAuthority('ADMIN') or (#id == authentication.principal)") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
+        if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.AUTHORIZED))
+        {
+            throw forbiddenThrowable();
+        }
         return super.getData(id);
     }
 
@@ -79,7 +85,7 @@ import java.util.function.Function;
             return login(loginModel);
         }
         logger.warn("A user tried to access the advanced token of another user. The request has been rejected.");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        throw forbiddenThrowable();
     }
 
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)

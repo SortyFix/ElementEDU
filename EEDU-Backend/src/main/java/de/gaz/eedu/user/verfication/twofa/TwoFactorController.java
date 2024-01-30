@@ -1,8 +1,8 @@
 package de.gaz.eedu.user.verfication.twofa;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.verfication.AuthorizeService;
 import de.gaz.eedu.user.verfication.JwtTokenType;
-import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.function.Function;
 
 /**
  * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
@@ -54,11 +52,11 @@ import java.util.function.Function;
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
+        if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
         {
-            return super.create(model);
+            throw forbiddenThrowable();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        return super.create(model);
     }
 
     /**
@@ -72,18 +70,19 @@ import java.util.function.Function;
      * @param method This is the two factor method for which verification is done.
      * @param code   This is the provided verification code.
      * @param claims These are the claims associated with the JWT token.
-     * @return Returns ResponseEntity of type {@link String}.
+     * @return A {@link HttpStatus} representing the state of the request.
      */
-    @GetMapping("/enable/{method}/{code}") public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull TwoFactorMethod method, @PathVariable String code, @RequestAttribute("claims") Claims claims)
+    @GetMapping("/enable/{method}/{code}")
+    public @NotNull HttpStatus enable(@PathVariable @NotNull TwoFactorMethod method, @PathVariable String code, @RequestAttribute("claims") Claims claims)
     {
-        ResponseEntity<String> invalidResponse = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.ADVANCED_AUTHORIZATION))
+        JwtTokenType type = JwtTokenType.ADVANCED_AUTHORIZATION;
+        boolean authorized = isAuthorized(SecurityContextHolder.getContext().getAuthentication(), type);
+
+        if (authorized && getEntityService().enable(method, code, claims))
         {
-            return invalidResponse;
+            return HttpStatus.OK;
         }
-        // body is always null
-        Function<String, ResponseEntity<String>> mapper = response -> ResponseEntity.ok(null);
-        return getEntityService().verify(method, code, true, claims).map(mapper).orElse(invalidResponse);
+        throw forbiddenThrowable();
     }
 
     /**
@@ -105,12 +104,11 @@ import java.util.function.Function;
         {
             TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
 
-            return getEntityService().verify(method, code, false, claims)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
+            return getEntityService().verify(method, code, claims)
+                    .map(ResponseEntity::ok).orElseThrow(this::forbiddenThrowable);
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        throw forbiddenThrowable();
     }
 
     /**
@@ -129,24 +127,9 @@ import java.util.function.Function;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthorized(authentication, JwtTokenType.TWO_FACTOR_SELECTION))
         {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            throw forbiddenThrowable();
         }
-        return ResponseEntity.ok()
-                .body(getEntityService().getUserService().getAuthorizeService().selectTwoFactor(method, claims));
-    }
-
-    /**
-     * Checks whether a request has a certain authority.
-     * <p>
-     * This method references the {@link #isAuthorized(Authentication, String, Class)} and checks
-     * if a user has a permission based on a {@link JwtTokenType}.
-     *
-     * @param authentication the current requests authentication
-     * @param jwtTokenType   the token that the authentication should have to be authorized
-     * @return whether a {@link Authentication} has the given token type authority
-     */
-    private boolean isAuthorized(@NotNull Authentication authentication, @NotNull JwtTokenType jwtTokenType)
-    {
-        return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
+        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
+        return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
     }
 }

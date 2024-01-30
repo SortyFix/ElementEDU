@@ -66,7 +66,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
         );
     }
 
-    @ParameterizedTest(name = "{index} => expected={0}, username={1}, password={1}")
+    @ParameterizedTest(name = "{index} => data={0}")
     @MethodSource("loginTestData")
     public void testUserLogin(@NotNull LoginTestData loginTestData)
     {
