@@ -132,7 +132,7 @@ import java.util.stream.Stream;
      */
     public @NotNull String getFullName()
     {
-        return lastName + ", " + firstName;
+        return getLastName() + ", " + getFirstName();
     }
 
 
