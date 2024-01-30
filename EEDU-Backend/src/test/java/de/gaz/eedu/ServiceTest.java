@@ -135,7 +135,7 @@ public abstract class ServiceTest<E extends EntityObject, M extends Model, C ext
      * already been occupied.
      * Firstly, it uses the JUnit's assertThrows() method to expect the specified exception (in this case,
      * OccupiedException).
-     * Secondly, it asserts that running the service's create method with an CreateModel (obtained via the helper
+     * Secondly, it asserts that running the service's create method with a CreateModel (obtained via the helper
      * method occupiedCreateModel()) will throw the expected exception.
      * <p>
      * The lambda expression inside the assertThrows is an executable, which can be any statement which throws an

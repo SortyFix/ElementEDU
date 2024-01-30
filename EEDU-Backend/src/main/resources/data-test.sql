@@ -56,7 +56,7 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPI
         TRUE, 2, 0),
        ('Martin', 'Hansen', 'martin.hansen', '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', FALSE,
         FALSE, 3, 0),
-       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 4, 3);
+       ('dummy', 'dummy', 'dummy.dummy', 'password123', TRUE, FALSE, 2, 3);
 
 INSERT INTO message_entity (author_id, body, timestamp, status)
 VALUES (1, 'Hey, wie geht es?', 1702672064, 0),
@@ -88,6 +88,31 @@ VALUES (0, 'mustermann@example.com', '', true, 1),
        (2, NULL, '', true, 3),
 
        (2, NULL, '', true, 4);
+
+INSERT INTO chat_entity (time_of_creation)
+VALUES (90234802),
+       (92038200),
+       (33400000),
+       (75839435);
+
+INSERT INTO chat_entity_messages (chat_id, message_id)
+VALUES (1, 1),
+       (2, 2),
+       (3, 3),
+       (4, 4);
+
+INSERT INTO chat_entity_users (chat_id, user_id)
+VALUES (1, 1),
+       (1, 3),
+
+       (2, 2),
+       (2, 4),
+
+       (3, 2),
+       (3, 3),
+
+       (4, 1),
+       (4, 4);
 
 MERGE INTO user_groups (user_id, group_id)
 VALUES (1, 1),

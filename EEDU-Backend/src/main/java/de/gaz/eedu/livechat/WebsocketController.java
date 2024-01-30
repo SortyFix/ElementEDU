@@ -7,6 +7,7 @@ import de.gaz.eedu.livechat.chat.ChatService;
 import de.gaz.eedu.livechat.message.*;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("/chat")
+@RequiredArgsConstructor
 public class WebsocketController
 {
     private final ChatService chatService;
@@ -35,14 +37,6 @@ public class WebsocketController
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
     private final WSConfig WSConfig;
-
-    public WebsocketController(@NotNull ChatService chatService, @NotNull MessageService messageService, @NotNull UserService userService, @NotNull SimpMessagingTemplate messagingTemplate, WSConfig WSConfig){
-        this.chatService = chatService;
-        this.messageService = messageService;
-        this.userService = userService;
-        this.messagingTemplate = messagingTemplate;
-        this.WSConfig = WSConfig;
-    }
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
@@ -124,7 +118,7 @@ public class WebsocketController
     @PreAuthorize("isAuthenticated()")
     public HttpStatus holdMessage(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
     {
-        messageService.loadEntityByID(chatId).map(
+        return messageService.loadEntityByID(chatId).map(
                 messageEntity -> {
                     if(messageEntity.getAuthor().getId().equals(userId)){
                         if((System.currentTimeMillis() - messageEntity.getTimestamp()) > 20000){
@@ -134,7 +128,6 @@ public class WebsocketController
                         return HttpStatus.FORBIDDEN;
                     }
                     return HttpStatus.UNAUTHORIZED;
-                });
-        return HttpStatus.NOT_FOUND;
+                }).orElse(HttpStatus.NOT_FOUND);
     }
 }
