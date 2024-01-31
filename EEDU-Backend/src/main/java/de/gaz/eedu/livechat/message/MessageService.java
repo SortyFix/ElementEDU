@@ -51,9 +51,9 @@ import java.util.function.Function;
     @Override
     public boolean delete(long id)
     {
-        return getMessageRepository().findById(id).map(messageEntity ->
+        return messageRepository.findById(id).map(messageEntity ->
         {
-            getMessageRepository().deleteById(id);
+            messageRepository.deleteById(id);
             return true;
         }).orElse(false);
     }
