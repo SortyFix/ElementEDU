@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Set;
@@ -44,7 +45,7 @@ import java.util.Set;
     }
 
     // Same here
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse/upload") public ResponseEntity<Boolean> upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse/upload") public ResponseEntity<Boolean> upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
         Boolean uploadSuccessful = fileService.upload(file, fileName, authorId, permittedUsers, permittedGroups, tags,true);
         return uploadSuccessful ? ResponseEntity.ok(true) : ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);

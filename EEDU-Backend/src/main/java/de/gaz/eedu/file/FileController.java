@@ -44,14 +44,14 @@ import java.util.stream.Collectors;
     }
 
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public ResponseEntity<Boolean> uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
         Boolean uploadSuccessful = fileService.upload(file, fileName, authorId, permittedUsers, permittedGroups, tags, false);
-        return uploadSuccessful ? ResponseEntity.ok(true)
-                : ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+        return uploadSuccessful ? HttpStatus.OK
+                : HttpStatus.FORBIDDEN;
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public ResponseEntity<Boolean> deleteFile(@NotNull Long id)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public HttpStatus deleteFile(@NotNull Long id)
     {
         return userService.loadEntityByName(currentUsername).flatMap(userEntity -> fileService.loadEntityById(id).map(fileEntity -> {
             if (fileEntity.toModel().authorId().equals(userEntity.getId())) {
@@ -59,13 +59,13 @@ import java.util.stream.Collectors;
                     Path path = Paths.get(fileEntity.toModel().filePath());
                     Files.delete(path);
                     fileService.delete(id);
-                    return ResponseEntity.ok(true);
+                    return HttpStatus.OK;
                 } catch (IOException ioException) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+                    return HttpStatus.INTERNAL_SERVER_ERROR;
                 }
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
-        })).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(false));
+            return HttpStatus.UNAUTHORIZED;
+        })).orElse(HttpStatus.NOT_FOUND);
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(@NotNull Long id, @NotNull Set<String> newTags)

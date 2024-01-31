@@ -5,11 +5,15 @@ import de.gaz.eedu.user.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.capybara.clamav.ClamavClient;
+import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,23 +29,12 @@ import java.util.*;
         this.userService = userService;
     }
 
-    /**
-     * Checks if file is empty or contains malicious files.
-     * Uses ClamAV for malware detection.
-     * @param file
-     * <code>MultipartFile</code>
-     * @return <code>Boolean</code> <br>
-     * True: File is usable <br>
-     * False: File is unusable
-     */
-    public @NotNull Boolean isFileValid(@NotNull MultipartFile file)
+    public @NotNull Boolean upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags, @NotNull Boolean illnessNotification) throws IOException, IllegalStateException
     {
-        // TODO: Implement antivirus check (with ClamAV?)
-        return !file.isEmpty();
-    }
+        ClamavClient client = new ClamavClient("localhost");
+        ScanResult scanResult = client.scan(file.getInputStream());
 
-    public @NotNull Boolean upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags, @NotNull Boolean illnessNotification){
-        if (isFileValid(file))
+        if (scanResult instanceof ScanResult.OK)
         {
             String date = LocalDate.now().toString();
             // TEMPORARY!
