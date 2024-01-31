@@ -59,9 +59,9 @@ import java.util.function.Function;
     }
 
     @Override
-    public @NotNull MessageEntity saveEntity(@NotNull MessageEntity entity)
+    public @NotNull List<MessageEntity> saveEntity(@NotNull Iterable<MessageEntity> entity)
     {
-        return getMessageRepository().save(entity);
+        return getMessageRepository().saveAll(entity);
     }
 
     @Override

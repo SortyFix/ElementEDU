@@ -43,8 +43,15 @@ import java.util.stream.Stream;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
     private boolean twoFactorRequired;
-    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE) private Set<UserEntity> users = new HashSet<>();
-    @ManyToMany @JsonManagedReference @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
+
+    @ManyToMany(mappedBy = "groups")
+    @JsonBackReference
+    @Setter(AccessLevel.PRIVATE)
+    private Set<UserEntity> users = new HashSet<>();
+
+    @ManyToMany
+    @JsonManagedReference
+    @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
 		    "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
 		    referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
 

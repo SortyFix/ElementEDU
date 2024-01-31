@@ -10,12 +10,9 @@ import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.util.Objects;
 import java.util.Set;
 
@@ -25,7 +22,9 @@ import java.util.Set;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) // ID is final
     private Long id;
     private String name;
-    @JsonBackReference @ManyToMany(mappedBy = "privileges") private Set<GroupEntity> groupEntities;
+    @JsonBackReference
+    @ManyToMany(mappedBy = "privileges")
+    private Set<GroupEntity> groupEntities;
 
     public @NotNull SimpleGrantedAuthority toAuthority()
     {

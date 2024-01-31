@@ -3,20 +3,20 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.model.*;
-import de.gaz.eedu.user.theming.ThemeCreateModel;
-import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
-import de.gaz.eedu.user.verfication.AuthorizeService;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
+import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
-import de.gaz.eedu.user.theming.ThemeEntity;
+import de.gaz.eedu.user.model.LoginModel;
+import de.gaz.eedu.user.model.UserCreateModel;
+import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
+import de.gaz.eedu.user.verfication.AuthorizeService;
+import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
@@ -29,7 +29,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -94,9 +97,10 @@ import java.util.function.Function;
         }));
     }
 
-    public @NotNull UserEntity saveEntity(@NotNull UserEntity entity)
+    @Override
+    public @NotNull List<UserEntity> saveEntity(@NotNull Iterable<UserEntity> entity)
     {
-        return getUserRepository().save(entity);
+        return getUserRepository().saveAll(entity);
     }
 
     @Override @Transactional public @NotNull Function<UserModel, UserEntity> toEntity()
@@ -118,6 +122,10 @@ import java.util.function.Function;
     {
         return getUserRepository().findById(id).map(userEntity ->
         {
+            // Delete groups from this user
+            Long[] groups = userEntity.getGroups().stream().map(GroupEntity::getId).toArray(Long[]::new);
+            userEntity.detachGroups(this, groups);
+
             getUserRepository().deleteById(id);
             return true;
         }).orElse(false);

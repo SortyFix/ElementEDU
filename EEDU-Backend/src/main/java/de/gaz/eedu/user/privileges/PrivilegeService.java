@@ -4,6 +4,8 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.AccessLevel;
@@ -17,14 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor public class PrivilegeService implements EntityService<PrivilegeEntity,
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService implements EntityService<PrivilegeEntity,
         PrivilegeModel,
         PrivilegeCreateModel>
 {
 
-    @Getter(AccessLevel.PROTECTED) private final PrivilegeRepository privilegeRepository;
+    private final PrivilegeRepository privilegeRepository;
+    private final GroupRepository groupRepository;
 
     @Override public @NotNull Optional<PrivilegeEntity> loadEntityByID(long id)
     {
@@ -53,16 +57,25 @@ import java.util.function.Function;
 
     @Override public boolean delete(long id)
     {
-        return getPrivilegeRepository().findById(id).map(userEntity ->
+        return getPrivilegeRepository().findById(id).map(privilegeEntity ->
         {
+            // Delete this privilege from the groups
+            Set<GroupEntity> groups = privilegeEntity.getGroupEntities();
+            for(GroupEntity entity : groups)
+            {
+                entity.revokePrivilege(privilegeEntity.getId());
+            }
+            getGroupRepository().saveAll(groups);
+
             getPrivilegeRepository().deleteById(id);
             return true;
         }).orElse(false);
     }
 
-    @Override public @NotNull PrivilegeEntity saveEntity(@NotNull PrivilegeEntity entity)
+    @Override
+    public @NotNull List<PrivilegeEntity> saveEntity(@NotNull Iterable<PrivilegeEntity> entity)
     {
-        return getPrivilegeRepository().save(entity);
+        return getPrivilegeRepository().saveAll(entity);
     }
 
     @Transactional @Override public @NotNull Function<PrivilegeModel, PrivilegeEntity> toEntity()

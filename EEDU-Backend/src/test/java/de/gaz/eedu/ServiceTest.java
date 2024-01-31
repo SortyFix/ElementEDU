@@ -211,8 +211,13 @@ public abstract class ServiceTest<E extends EntityObject, M extends Model, C ext
      * @see ValueSource
      */
     @ParameterizedTest(name = "{index} => request={0}")
-    @ValueSource(longs = {4L, 15L}) public void testDeleteEntitySuccess(long id)
+    @ValueSource(longs = {
+            4L,
+            15L
+    })
+    public void testDeleteEntitySuccess(long id)
     {
+        getService().findAll().forEach(System.out::println);
         Assertions.assertEquals(id == 4, getService().delete(id));
     }
 

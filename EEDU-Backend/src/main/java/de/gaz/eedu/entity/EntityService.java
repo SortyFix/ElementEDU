@@ -10,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +74,12 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
 
     @Transactional boolean delete(long id);
 
-    @Transactional @NotNull E saveEntity(@NotNull E entity);
+    default @Transactional @NotNull E saveEntity(@NotNull E entity)
+    {
+        return saveEntity(Collections.singleton(entity)).get(0);
+    }
+
+    @Transactional @NotNull List<E> saveEntity(@NotNull Iterable<E> entity);
 
     @Contract(pure = true, value = "-> new")
     @Transactional(readOnly = true) @NotNull Function<M, E> toEntity();

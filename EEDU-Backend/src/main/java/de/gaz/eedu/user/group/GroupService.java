@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -72,15 +73,32 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
 
     @Override
     public boolean delete(long id) {
-        return getGroupRepository().findById(id).map(userEntity -> {
+        return getGroupRepository().findById(id).map(groupEntity -> {
+
+            // Delete this entity from the users
+            Set<UserEntity> users = groupEntity.getUsers();
+            users.forEach(user -> user.detachGroups(groupEntity.getId()));
+            getUserService().saveEntity(users);
+
+            // Delete privileges from this entity
+            Long[] privilegeIDs = groupEntity.getPrivileges().stream().map(PrivilegeEntity::getId).toArray(Long[]::new);
+            groupEntity.revokePrivilege(this, privilegeIDs);
+
             getGroupRepository().deleteById(id);
             return true;
         }).orElse(false);
     }
 
     @Override
-    public @NotNull GroupEntity saveEntity(@NotNull GroupEntity entity) {
+    public @NotNull GroupEntity saveEntity(@NotNull GroupEntity entity)
+    {
         return getGroupRepository().save(entity);
+    }
+
+    @Override
+    public @NotNull List<GroupEntity> saveEntity(@NotNull Iterable<GroupEntity> entity)
+    {
+        return getGroupRepository().saveAll(entity);
     }
 
     @Transactional

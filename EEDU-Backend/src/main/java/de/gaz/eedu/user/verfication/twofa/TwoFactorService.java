@@ -90,9 +90,10 @@ import java.util.function.Supplier;
         }).orElse(false);
     }
 
-    @Override public @NotNull TwoFactorEntity saveEntity(@NotNull TwoFactorEntity entity)
+    @Override
+    public @NotNull List<TwoFactorEntity> saveEntity(@NotNull Iterable<TwoFactorEntity> entity)
     {
-        return getTwoFactorRepository().save(entity);
+        return getTwoFactorRepository().saveAll(entity);
     }
 
     @Override public @NotNull Function<TwoFactorModel, TwoFactorEntity> toEntity()
