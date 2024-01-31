@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +61,13 @@ import java.util.function.Function;
 
     @PreAuthorize("hasAuthority('ADMIN') or (#id == authentication.principal)") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
+        for (GrantedAuthority authority : SecurityContextHolder.getContext().getAuthentication().getAuthorities())
+        {
+            System.out.println(authority.getAuthority() + " " + authority.getClass().getName());
+        }
         if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.AUTHORIZED))
         {
+            System.out.println("Does not have this thing");
             throw forbiddenThrowable();
         }
         return super.getData(id);

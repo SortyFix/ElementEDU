@@ -7,7 +7,7 @@
 
 ###
 GET {{host}}/user/get/{{user}}
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUV09fRkFDVE9SX1BFTkRJTkciLCJtZXRob2QiOiJUT1RQIiwiYWR2YW5jZWQiOmZhbHNlLCJleHBpcnkiOjE3MDc4NTc4MzM1ODEsInVzZXJJRCI6MSwiZXhwIjoxNzA2NjQ4NTMzLCJpYXQiOjE3MDY2NDgyMzN9.rV7fQ51heOXIl-LpYA5T1-wGfQCe_S2xvokb2x7MAjk
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDc5MjA4NjMsImlhdCI6MTcwNjcxMTI4N30.6K5sr3DviM-xJX2mJvJou7fkWSluHp2eDPQCOLUhiwY
 
 ### Log in
 POST {{host}}/user/login
@@ -20,13 +20,13 @@ Content-Type: application/json
 }
 
 ### Verify 2fa
-GET {{host}}/user/login/twofactor/verify/1111
-Authorization: Bearer
+GET {{host}}/user/login/twofactor/verify/274976
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUV09fRkFDVE9SX1BFTkRJTkciLCJtZXRob2QiOiJUT1RQIiwiYWR2YW5jZWQiOmZhbHNlLCJleHBpcnkiOjE3MDc5MjA4NjMwMjAsInVzZXJJRCI6MSwiZXhwIjoxNzA2NzExNTYzLCJpYXQiOjE3MDY3MTEyNjN9.2vENCRF2ROvV3EijNLSKkMzDknCcmxvs9zU_aahVxls
 
 ### Log in advanced
 POST {{host}}/user/login/advanced
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDc4NTcxMTQsImlhdCI6MTcwNjY0NzUxNH0.NXTyFeNGlsBC9-FjLThMYe8AGCiliV30UoPR69eaHuA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIT1JJWkVEIiwidXNlcklEIjoxLCJleHAiOjE3MDc5MjA0MzIsImlhdCI6MTcwNjcxMDgzMn0.-Jwpvif3xmWj9bdmn0-Q7O9icBbN3B_US1S-3s5YWRU
 
 {
   "loginName": {{login_name}},
@@ -43,7 +43,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUS
 ### Create 2fa
 POST {{host}}/user/login/twofactor/create
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDY3MzM5MzEsImlhdCI6MTcwNjY0NzUzMX0.LtdC9ZtVdKiU0x6D98ygrkjl4qlaDBKbn64FT_YRe48
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDY3OTcyNDIsImlhdCI6MTcwNjcxMDg0Mn0.8xOEG7R53vFy5Zv822j7--Pn2i3dEezE5FMMzjZsUcM
 
 {
   "userID": 1,
@@ -52,5 +52,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUS
 }
 
 ### Enable two factor
-GET {{host}}/user/login/twofactor/enable/TOTP/750577
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDY3MzM5MzEsImlhdCI6MTcwNjY0NzUzMX0.LtdC9ZtVdKiU0x6D98ygrkjl4qlaDBKbn64FT_YRe48
+GET {{host}}/user/login/twofactor/enable/TOTP/969158
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBRFZBTkNFRF9BVVRIT1JJWkFUSU9OIiwidXNlcklEIjoxLCJleHAiOjE3MDY3OTcyNDIsImlhdCI6MTcwNjcxMDg0Mn0.8xOEG7R53vFy5Zv822j7--Pn2i3dEezE5FMMzjZsUcM

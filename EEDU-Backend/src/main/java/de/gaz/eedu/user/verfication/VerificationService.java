@@ -301,6 +301,7 @@ import java.util.function.Function;
             case ADVANCED_AUTHORIZATION, AUTHORIZED ->
             {
                 Collection<GrantedAuthority> authorities = new HashSet<>(authorityFactory.get(userID));
+                authorities.add(JwtTokenType.AUTHORIZED.getAuthority());
                 if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION))
                 {
                     authorities.add(JwtTokenType.ADVANCED_AUTHORIZATION.getAuthority());
