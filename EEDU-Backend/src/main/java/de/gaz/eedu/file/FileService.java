@@ -2,37 +2,41 @@ package de.gaz.eedu.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.capybara.clamav.ClamavClient;
+import xyz.capybara.clamav.ClamavException;
 import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
-@Service public class FileService
+@Service @RequiredArgsConstructor public class FileService
 {
-    FileRepository fileRepository;
+    private final FileRepository fileRepository;
 
     private final UserService userService;
-    public FileService(@Autowired @NotNull UserService userService){
-        this.userService = userService;
-    }
 
     public @NotNull Boolean upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags, @NotNull Boolean illnessNotification) throws IOException, IllegalStateException
     {
-        ClamavClient client = new ClamavClient("localhost");
-        ScanResult scanResult = client.scan(file.getInputStream());
+        ScanResult scanResult = null;
+        ClamavClient client;
+
+        try
+        {
+            client = new ClamavClient("localhost");
+            client.ping();
+            scanResult = client.scan(file.getInputStream());
+        }
+        catch (ClamavException | IllegalStateException ignored) { }
 
         if (scanResult instanceof ScanResult.OK)
         {

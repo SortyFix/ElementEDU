@@ -38,58 +38,123 @@ public class WebsocketController
     private final SimpMessagingTemplate messagingTemplate;
     private final WSConfig WSConfig;
 
+    /**
+     * Creates a new chat room with the specified users.
+     *
+     * <p>This endpoint requires authentication, and the current user initiating the request is considered as the creator of the chat room.
+     * The request body should contain a list of user IDs representing the participants in the chat room. A room must have at least two users to be valid.
+     * </p>
+     * <p>
+     * If the number of users is less than two, the response will be a {@link org.springframework.http.HttpStatus#FORBIDDEN} status.
+     * </p>
+     * <p>
+     * Checks are performed to ensure the validity of the provided user IDs:
+     * <ul>
+     *     <li>Verifies that all provided user IDs exist in the system.</li>
+     *     <li>Ensures that the current user initiating the request is included in the list of users.</li>
+     * </ul>
+     * If any of these checks fail, the response will be a {@link org.springframework.http.HttpStatus#FORBIDDEN} status.
+     * </p>
+     * <p>
+     * Additionally, checks if a chat room already exists with the same set of users. If such a chat room exists, the response will be a {@link org.springframework.http.HttpStatus#CONFLICT} status.
+     * </p>
+     * <p>
+     * If all validation checks pass, a new chat room is created with the specified users, and a {@link org.springframework.http.ResponseEntity} containing the created chat room's details is returned with a {@link org.springframework.http.HttpStatus#OK} status.
+     * </p>
+     *
+     * @param currentUser The ID of the authenticated user initiating the request.
+     * @param users       A list of user IDs representing the participants in the chat room.
+     * @return A {@link org.springframework.http.ResponseEntity} containing the details of the created chat room if successful, or an appropriate HTTP status indicating the outcome.
+     */
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChatModel> createNewRoom(@AuthenticationPrincipal Long currentUser,
-                                                    @RequestBody @NotNull List<Long> users){
-        if(users.size() >= 2){
-            List<ChatEntity> empty = Collections.emptyList();
-            Boolean usersValid = chatService.loadEntityByUserIDs(users).map(chatEntities ->
+                                                    @RequestBody @NotNull List<Long> users)
+    {
+        if(users.size() < 2)
+        {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        Boolean usersValid = chatService.loadEntityByUserIDs(users).map(chatEntities ->
+        {
+            AtomicReference<Boolean> allUsersPresent = new AtomicReference<>(users.contains(currentUser));
+
+            users.forEach(userId ->
             {
-                AtomicReference<Boolean> allUsersPresent = new AtomicReference<>(true);
-                if (!users.contains(currentUser))
-                    allUsersPresent.set(false);
-                users.forEach(userId ->
+                if (userService.loadEntityByID(userId).isEmpty())
                 {
-                    if (userService.loadEntityByID(userId).isEmpty())
-                    {
-                        allUsersPresent.set(false);
-                    }
-                });
-                return allUsersPresent.get().equals(true);
-            }).orElse(false);
+                    allUsersPresent.set(false);
+                }
+            });
 
-            if(chatService.loadEntityByUserIDs(users).equals(Optional.of(empty)) && usersValid){
-                ChatCreateModel chatCreateModel = new ChatCreateModel(users.toArray(new Long[0]), System.currentTimeMillis());
-                ChatEntity chatEntity = chatService.createEntity(chatCreateModel);
-                return ResponseEntity.ok(chatEntity.toModel());
-            }
+            return allUsersPresent.get().equals(true);
+        }).orElse(false);
 
+        if(!chatService.loadEntityByUserIDs(users).isPresent() && usersValid)
+        {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+
+        ChatCreateModel chatCreateModel = new ChatCreateModel(users.toArray(new Long[0]), System.currentTimeMillis());
+        ChatEntity chatEntity = chatService.createEntity(chatCreateModel);
+        return ResponseEntity.ok(chatEntity.toModel());
     }
 
+
+    /**
+     * Handles the sending of a message within a chat identified by the specified chat ID.
+     *
+     * <p>
+     * This endpoint, like the former, requires authentication, and the current user initiating the request is considered as the author of the message.
+     * The request body should contain the text content of the message.
+     * </p>
+     * <p>
+     * The method performs the following checks:
+     * <ul>
+     *     <li>Verifies that the authenticated user is authorized to send messages in the specified chat.</li>
+     *     <li>Determines the message status based on the number of users in the chat: GROUP for chats with more than two users,
+     *         UNREAD for two-user chats, and returns a {@link org.springframework.http.HttpStatus#BAD_REQUEST} status if the chat size is invalid.</li>
+     *     <li>Creates a new message entity with the provided author ID, message body, timestamp, and message status.</li>
+     *     <li>Adds the new message to the chat's list of messages.</li>
+     *     <li>Sends the message to the WebSocket topic associated with the chat.</li>
+     * </ul>
+     * </p>
+     *
+     * @param authorId The ID of the authenticated user initiating the request, considered as the author of the message.
+     * @param chatId   The ID of the chat to which the message is being sent.
+     * @param body     The text content of the message being sent.
+     * @return A {@link org.springframework.http.HttpStatus} indicating the outcome of the message sending operation.
+     *         Returns {@link org.springframework.http.HttpStatus#OK} if the operation is successful,
+     *         {@link org.springframework.http.HttpStatus#UNAUTHORIZED} if the user is not authorized to send messages in the chat,
+     *         or {@link org.springframework.http.HttpStatus#BAD_REQUEST} if there's an issue with the chat size.
+     */
     @MessageMapping("/{chatId}/send")
     @PreAuthorize("isAuthenticated()")
     public HttpStatus sendMessage(@AuthenticationPrincipal Long authorId, @NotNull @DestinationVariable Long chatId, @NotNull @RequestBody String body)
     {
         UserEntity author = userService.loadEntityByID(authorId).orElse(null);
+
         return chatService.loadEntityByID(chatId).map(chatEntity -> {
-            if (chatEntity.getUsers().contains(authorId) && Objects.nonNull(author))
+
+            if (!(chatEntity.getUsers().contains(authorId) && Objects.nonNull(author)))
             {
-                MessageCreateModel messageCreateModel =   chatEntity.getUsers().size()  > 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.GROUP)
-                                                        : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.UNREAD)
-                                                        : null;
-                if(Objects.nonNull(messageCreateModel)){
-                    MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
-                    chatEntity.getMessages().add(messageEntity.getMessageId());
-                    messagingTemplate.convertAndSend(WSConfig.getBroker() + "/" + chatId, messageEntity.toModel());
-                    return HttpStatus.OK;
-                }
+                return HttpStatus.UNAUTHORIZED;
+            }
+
+            MessageCreateModel messageCreateModel =   chatEntity.getUsers().size()  > 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.GROUP)
+                    : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis(), MessageStatus.UNREAD)
+                    : null;
+            if(Objects.isNull(messageCreateModel))
+            {
                 return HttpStatus.BAD_REQUEST;
             }
-            return HttpStatus.UNAUTHORIZED;
+
+            MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
+            chatEntity.getMessages().add(messageEntity.getMessageId());
+            messagingTemplate.convertAndSend(WSConfig.getBroker() + "/" + chatId, messageEntity.toModel());
+
+            return HttpStatus.OK;
         }).orElse(HttpStatus.UNAUTHORIZED);
     }
 
