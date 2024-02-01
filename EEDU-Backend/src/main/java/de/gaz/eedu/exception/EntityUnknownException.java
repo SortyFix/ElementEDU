@@ -3,7 +3,6 @@ package de.gaz.eedu.exception;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 @Getter

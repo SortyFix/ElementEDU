@@ -22,7 +22,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.function.Supplier;
 
 @Component @RequiredArgsConstructor public class DataLoader implements CommandLineRunner
 {
