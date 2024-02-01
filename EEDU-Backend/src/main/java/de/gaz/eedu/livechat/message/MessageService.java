@@ -2,7 +2,6 @@ package de.gaz.eedu.livechat.message;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
