@@ -35,7 +35,7 @@ public class ChatServiceTest extends ServiceTest<ChatEntity, ChatModel, ChatCrea
         ChatModel chatModel = new ChatModel(5L, currentTime, emptyArr, emptyArr);
         return Eval.eval(chatCreateModel, chatModel, (request, expect, result) ->
         {
-            Assertions.assertEquals(expect.chatId(), result.chatId());
+            Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.timeOfCreation(), result.timeOfCreation());
             Assertions.assertArrayEquals(expect.users(), result.users());
             Assertions.assertArrayEquals(expect.chatHistory(), result.chatHistory());

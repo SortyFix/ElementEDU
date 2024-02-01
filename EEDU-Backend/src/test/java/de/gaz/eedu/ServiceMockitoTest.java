@@ -1,9 +1,7 @@
 package de.gaz.eedu;
 
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EntityObject;
-import de.gaz.eedu.entity.model.Model;
+import de.gaz.eedu.entity.model.*;
 import de.gaz.eedu.exception.OccupiedException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public abstract class ServiceMockitoTest<S extends EntityService<E, M, C, ?>, E extends EntityObject, M extends Model, C extends CreationModel<E>>
+public abstract class ServiceMockitoTest<S extends EntityService<?, E, M, C>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
     public S entityService;
 

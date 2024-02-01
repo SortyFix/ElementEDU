@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController @RequestMapping("/user/login/twofactor") public class TwoFactorController extends EntityController<TwoFactorService, TwoFactorModel, TwoFactorCreateModel>
 {
-
     /**
      * This is the constructor of the {@code TwoFactorController}. It uses the {@link Autowired}
      * annotation to request the dependency injection of the {@link TwoFactorService} instance.

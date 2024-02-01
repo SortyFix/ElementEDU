@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.privileges.model;
 
+import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
@@ -29,7 +30,7 @@ import java.util.Objects;
 public record PrivilegeModel(
         @NotNull Long id,
         @NotEmpty(message = "Name must be not empty.") @NotNull String name,
-        @NotNull SimplePrivilegeGroupModel[] groups) implements Model
+        @NotNull SimplePrivilegeGroupModel[] groups) implements EntityModel
 {
 
     @Contract(pure = true)

@@ -1,7 +1,7 @@
 package de.gaz.eedu.entity;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.Model;
+import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
@@ -19,7 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.server.ResponseStatusException;
 
 
-@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C, ?>, M extends Model, C extends CreationModel<?>>
+@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityController.class);

@@ -21,7 +21,7 @@ public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel,
                 new MessageCreateModel(1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime, MessageStatus.UNREAD);
         MessageModel messageModel = new MessageModel(5L, 1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime, MessageStatus.UNREAD);
         return Eval.eval(messageCreateModel, messageModel, ((request, expect, result) -> {
-            Assertions.assertEquals(expect.messageId(), result.messageId());
+            Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.authorId(), result.authorId());
             Assertions.assertEquals(expect.body(), result.body());
             Assertions.assertEquals(expect.timeStamp(),result.timeStamp());

@@ -1,9 +1,7 @@
 package de.gaz.eedu;
 
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EntityObject;
-import de.gaz.eedu.entity.model.Model;
+import de.gaz.eedu.entity.model.*;
 import de.gaz.eedu.exception.OccupiedException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -47,9 +45,9 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public abstract class ServiceTest<E extends EntityObject, M extends Model, C extends CreationModel<E>>
+public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
-    private final EntityService<E, M, C, ?> service;
+    private final EntityService<?, E, M, C> service;
 
     /**
      * Is a necessary for all children of this class.
@@ -59,7 +57,7 @@ public abstract class ServiceTest<E extends EntityObject, M extends Model, C ext
      *
      * @param service which this tests should refer to.
      */
-    public ServiceTest(@NotNull EntityService<E, M, C, ?> service)
+    public ServiceTest(@NotNull EntityService<?, E, M, C> service)
     {
         this.service = service;
     }
@@ -74,7 +72,7 @@ public abstract class ServiceTest<E extends EntityObject, M extends Model, C ext
      * @return the service instance, never null
      * @see EntityService
      */
-    @Contract(pure = true) protected @NotNull EntityService<E, M, C, ?> getService()
+    @Contract(pure = true) protected EntityService<?, E, M, C> getService()
     {
         return service;
     }

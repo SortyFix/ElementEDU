@@ -2,7 +2,6 @@ package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
@@ -14,14 +13,11 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.function.Function;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService implements EntityService<PrivilegeEntity,
-        PrivilegeModel,
-        PrivilegeCreateModel, PrivilegeRepository>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService implements EntityService<PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
 
     @Getter(AccessLevel.NONE)
@@ -59,16 +55,5 @@ import java.util.function.Function;
             getRepository().deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    @Transactional @Override public @NotNull Function<PrivilegeModel, PrivilegeEntity> toEntity()
-    {
-        return privilegeModel -> loadEntityByID(privilegeModel.id()).orElseThrow(() -> new EntityUnknownException(
-                privilegeModel.id()));
-    }
-
-    @Override @Contract(pure = true) public @NotNull Function<PrivilegeEntity, PrivilegeModel> toModel()
-    {
-        return PrivilegeEntity::toModel;
     }
 }

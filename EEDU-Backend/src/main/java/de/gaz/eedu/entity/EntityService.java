@@ -1,8 +1,8 @@
 package de.gaz.eedu.entity;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EntityObject;
-import de.gaz.eedu.entity.model.Model;
+import de.gaz.eedu.entity.model.EntityModel;
+import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import org.jetbrains.annotations.Contract;
@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
-public interface EntityService<E extends EntityObject, M extends Model, C extends CreationModel<E>, R extends JpaRepository<E, Long>>
+public interface EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
 
     @NotNull R getRepository();
@@ -131,7 +131,7 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
     /**
      * Saves multiply {@link E}s in the database.
      * <p>
-     * Unlike {@link #saveEntity(EntityObject)} this method saves or creates multiple entries in the database.
+     * Unlike {@link #saveEntity(EntityModelRelation)} (EntityObject)} this method saves or creates multiple entries in the database.
      * This should be used when mass updating entities, like for example making every user part of a specific group.
      *
      * <p>
@@ -169,7 +169,7 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      *
      * @param entity the entities you want to safe
      * @return a list of the entities that are now saved in the database.
-     * @see #saveEntity(EntityObject)
+     * @see #saveEntity(EntityModelRelation)
      * @see Transactional
      */
     @Transactional
@@ -191,10 +191,16 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @see Transactional
      */
     @Contract(pure = true, value = "-> new")
-    @Transactional(readOnly = true) @NotNull Function<M, E> toEntity();
+    @Transactional(readOnly = true) default @NotNull Function<M, E> toEntity()
+    {
+        return model -> getRepository().findById(model.id()).orElseThrow(() -> new EntityUnknownException(model.id()));
+    }
 
     @Contract(pure = true, value = "-> new")
-    @NotNull Function<E, M> toModel();
+    default @NotNull Function<E, M> toModel()
+    {
+        return EntityModelRelation::toModel;
+    }
 
     /**
      * Saves an {@link E} in the database.

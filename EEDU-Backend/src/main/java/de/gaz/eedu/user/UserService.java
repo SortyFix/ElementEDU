@@ -2,7 +2,6 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -51,7 +49,7 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel, UserRepository>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserRepository, UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
@@ -86,16 +84,6 @@ import java.util.function.Function;
             entity.setThemeEntity(themeRepository.getReferenceById(1L));
             return entity;
         }));
-    }
-
-    @Override @Transactional public @NotNull Function<UserModel, UserEntity> toEntity()
-    {
-        return userModel -> loadEntityByID(userModel.id()).orElseThrow(() -> new EntityUnknownException(userModel.id()));
-    }
-
-    @Override public @NotNull Function<UserEntity, UserModel> toModel()
-    {
-        return UserEntity::toModel;
     }
 
     @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException

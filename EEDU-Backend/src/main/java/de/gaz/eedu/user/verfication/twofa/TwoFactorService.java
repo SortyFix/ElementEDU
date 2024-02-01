@@ -15,7 +15,6 @@ import lombok.Getter;
 import org.apache.commons.codec.binary.Base32;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,12 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService implements EntityService<TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel, TwoFactorRepository>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService implements EntityService<TwoFactorRepository, TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwoFactorService.class);
     private static final int BYTE_SIZE = 20;
@@ -43,15 +41,6 @@ import java.util.function.Supplier;
         return twoFactorRepository;
     }
 
-    @Override public @NotNull Optional<TwoFactorEntity> loadEntityByID(long id)
-    {
-        return Optional.empty();
-    }
-
-    @Override public @Unmodifiable @NotNull List<TwoFactorEntity> findAllEntities()
-    {
-        return getRepository().findAll();
-    }
 
     @Override public @NotNull TwoFactorEntity createEntity(@NotNull TwoFactorCreateModel model) throws CreationException
     {
@@ -90,23 +79,6 @@ import java.util.function.Supplier;
             getRepository().deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    @Override
-    public <T extends TwoFactorEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return getRepository().saveAll(entity);
-    }
-
-    @Override public @NotNull Function<TwoFactorModel, TwoFactorEntity> toEntity()
-    {
-        return twoFactorModel -> getRepository().findById(twoFactorModel.id())
-                .orElseThrow(() -> new EntityUnknownException(twoFactorModel.id()));
-    }
-
-    @Override public @NotNull Function<TwoFactorEntity, TwoFactorModel> toModel()
-    {
-        return TwoFactorEntity::toModel;
     }
 
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)

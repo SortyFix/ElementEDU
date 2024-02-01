@@ -1,5 +1,6 @@
 package de.gaz.eedu.file;
 
+import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.entity.model.Model;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ public record FileModel(@NotNull Long id,
                         @NotNull String filePath,
                         @NotEmpty Set<Long> permittedUsers,
                         @NotEmpty Set<Long> permittedGroups,
-                        Set<String> tags) implements Model
+                        Set<String> tags) implements EntityModel
 {
     @Override public String toString()
     {

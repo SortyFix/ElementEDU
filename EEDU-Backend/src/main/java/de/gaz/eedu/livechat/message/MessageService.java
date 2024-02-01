@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel, MessageRepository>
+@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageRepository, MessageEntity, MessageModel, MessageCreateModel>
 {
     @Getter(AccessLevel.NONE)
     private final MessageRepository messageRepository;
@@ -38,13 +38,7 @@ import java.util.function.Function;
     {
         return messageModel ->
                 getRepository()
-                        .findById(messageModel.messageId())
-                        .orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
-    }
-
-    @Override
-    public @NotNull Function<MessageEntity, MessageModel> toModel()
-    {
-        return MessageEntity::toModel;
+                        .findById(messageModel.id())
+                        .orElseThrow(() -> new EntityUnknownException(messageModel.id()));
     }
 }

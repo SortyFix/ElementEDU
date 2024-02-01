@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCreateModel, ChatRepository>
+public class ChatService implements EntityService<ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
 {
     private final ChatRepository chatRepository;
 
@@ -35,18 +35,6 @@ public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCre
             throw new OccupiedException();
         }
         return chatRepository.save(model.toEntity(new ChatEntity()));
-    }
-
-    @Override
-    public @NotNull Function<ChatModel, ChatEntity> toEntity()
-    {
-        return chatModel -> chatRepository.findById(chatModel.chatId()).orElseThrow(() -> new EntityUnknownException(chatModel.chatId()));
-    }
-
-    @Override
-    public @NotNull Function<ChatEntity, ChatModel> toModel()
-    {
-        return ChatEntity::toModel;
     }
 
     public @NotNull Optional<List<ChatEntity>> loadEntityByUserIDs(@NotNull List<Long> userIDs){

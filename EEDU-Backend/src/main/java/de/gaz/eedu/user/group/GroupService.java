@@ -2,7 +2,6 @@ package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +27,7 @@ import java.util.stream.Stream;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService implements EntityService<GroupEntity, GroupModel, GroupCreateModel, GroupRepository> {
+public class GroupService implements EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
     @Getter(AccessLevel.NONE)
@@ -77,18 +75,5 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
             getRepository().deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    @Transactional
-    @Override
-    @Contract(pure = true)
-    public @NotNull Function<GroupModel, GroupEntity> toEntity() {
-        return groupModel -> loadEntityByID(groupModel.id()).orElseThrow(() -> new EntityUnknownException(groupModel.id()));
-    }
-
-    @Override
-    @Contract(pure = true)
-    public @NotNull Function<GroupEntity, GroupModel> toModel() {
-        return GroupEntity::toModel;
     }
 }

@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.theming;
 
+import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import org.jetbrains.annotations.Contract;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Set;
 
-public record ThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor, int widgetColor, int textColor, @NotNull Set<SimpleUserModel> users) implements Model
+public record ThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor, int widgetColor, int textColor, @NotNull Set<SimpleUserModel> users) implements EntityModel
 {
     @Contract(pure = true) @Override public @NotNull String toString()
     {
