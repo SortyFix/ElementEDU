@@ -51,7 +51,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
         }
         catch (CreationException creationException)
         {
-            return ResponseEntity.status(creationException.getStatus()).body(null);
+            return ResponseEntity.status(creationException.getStatusCode()).body(null);
         }
     }
 
@@ -120,6 +120,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
     protected @NotNull AccessDeniedException forbiddenThrowable()
     {
-        throw new AccessDeniedException(""); // message is ignored anyway
+        return new AccessDeniedException(""); // message is ignored anyway
     }
 }

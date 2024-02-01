@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.verfication.twofa.implementations;
 
 import com.google.zxing.WriterException;
-import de.gaz.eedu.exception.HTTPRequestException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.totp.HashingAlgorithm;
@@ -12,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -33,7 +33,7 @@ import java.util.Base64;
         }
         catch (WriterException | IOException exception)
         {
-            throw new HTTPRequestException(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -219,6 +219,13 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
         return saveEntity(Collections.singleton(entity)).get(0);
     }
 
+    /**
+     * This method loads an {@link E}
+     *
+     * @param id
+     * @return
+     * @throws EntityUnknownException
+     */
     @Transactional(readOnly = true)
     default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
     {

@@ -1,9 +1,9 @@
 package de.gaz.eedu.user.verfication.authority;
 
-import de.gaz.eedu.exception.HTTPRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
-public class InvalidTokenException extends HTTPRequestException
+public class InvalidTokenException extends HttpClientErrorException
 {
     public InvalidTokenException()
     {
