@@ -8,6 +8,7 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -18,8 +19,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
-public interface EntityService<E extends EntityObject, M extends Model, C extends CreationModel<E>>
+public interface EntityService<E extends EntityObject, M extends Model, C extends CreationModel<E>, R extends JpaRepository<E, Long>>
 {
+
+    @NotNull R getRepository();
 
     /**
      * Loads an entity {@link E} by its id.
@@ -40,25 +43,10 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @see Transactional
      */
     @Transactional(readOnly = true)
-    @NotNull Optional<E> loadEntityByID(long id);
-
-    /**
-     * Loads an {@link E} by a string.
-     * <p>
-     * This method loads an entity by a specific string.
-     * This string must be decided for each service and could variate therefore.
-     *
-     * <p>
-     * The {@link Transactional} marks that this method performs a database query. The {@link Transactional#readOnly()}
-     * makes sure this method only reads from the database but doesn't perform any write operations.
-     * </p>
-     *
-     * @param name of the entity to load.
-     * @return an optional, which is empty if no entity was found.
-     * @see Transactional
-     */
-    @Transactional(readOnly = true)
-    @NotNull Optional<E> loadEntityByName(@NotNull String name);
+    default @NotNull Optional<E> loadEntityByID(long id)
+    {
+        return getRepository().findById(id);
+    }
 
     /**
      * Loads all entities as {@link E}.
@@ -79,7 +67,10 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @see Transactional
      */
     @Transactional(readOnly = true)
-    @NotNull @Unmodifiable List<E> findAllEntities();
+    default @NotNull @Unmodifiable List<E> findAllEntities()
+    {
+        return getRepository().findAll();
+    }
 
     /**
      * Creates an {@link E} based on the data from {@link C}.
@@ -128,7 +119,14 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional boolean delete(long id);
+    @Transactional default boolean delete(long id)
+    {
+        return getRepository().findById(id).map(entry ->
+        {
+            getRepository().deleteById(id);
+            return true;
+        }).orElse(false);
+    }
 
     /**
      * Saves multiply {@link E}s in the database.
@@ -175,8 +173,23 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
      * @see Transactional
      */
     @Transactional
-    @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity);
+    default @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity)
+    {
+        return getRepository().saveAll(entity);
+    }
 
+    /**
+     * This returns a {@link Function} for turning a {@link M} into an {@link E}.
+     * <p>
+     * This method creates a {@link Function} turning a {@link M} into an {@link E}.
+     * Note that most likely, it will just the id to load the current entity from the database instead of actually
+     * translating it. Therefore, it has the {@link Transactional} annotation.
+     *
+     * @return a function for transforming a {@link M} into a {@link E}
+     * @see Function
+     * @see Contract
+     * @see Transactional
+     */
     @Contract(pure = true, value = "-> new")
     @Transactional(readOnly = true) @NotNull Function<M, E> toEntity();
 
@@ -243,11 +256,6 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
     @Transactional(readOnly = true) default @NotNull Optional<M> loadById(long id)
     {
         return loadEntityByID(id).map(toModel());
-    }
-
-    @Transactional(readOnly = true) default @NotNull Optional<M> loadByName(@NotNull String name)
-    {
-        return loadEntityByName(name).map(toModel());
     }
 
     @Transactional(readOnly = true)

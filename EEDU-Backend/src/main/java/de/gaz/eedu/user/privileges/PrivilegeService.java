@@ -24,40 +24,32 @@ import java.util.function.Function;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService implements EntityService<PrivilegeEntity,
         PrivilegeModel,
-        PrivilegeCreateModel>
+        PrivilegeCreateModel, PrivilegeRepository>
 {
 
+    @Getter(AccessLevel.NONE)
     private final PrivilegeRepository privilegeRepository;
     private final GroupRepository groupRepository;
 
-    @Override public @NotNull Optional<PrivilegeEntity> loadEntityByID(long id)
+    @Override
+    public @NotNull PrivilegeRepository getRepository()
     {
-        return getPrivilegeRepository().findById(id);
-    }
-
-    @Override public @NotNull Optional<PrivilegeEntity> loadEntityByName(@NotNull String name)
-    {
-        return getPrivilegeRepository().findByName(name);
-    }
-
-    @Override public @Unmodifiable @NotNull List<PrivilegeEntity> findAllEntities()
-    {
-        return getPrivilegeRepository().findAll();
+        return privilegeRepository;
     }
 
     @Override public @NotNull PrivilegeEntity createEntity(@NotNull PrivilegeCreateModel privilegeCreateModel) throws CreationException
     {
-        getPrivilegeRepository().findByName(privilegeCreateModel.name()).ifPresent(occupiedName ->
+        getRepository().findByName(privilegeCreateModel.name()).ifPresent(occupiedName ->
         {
             throw new NameOccupiedException(occupiedName.getName());
         });
 
-        return getPrivilegeRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity()));
+        return getRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity()));
     }
 
     @Override public boolean delete(long id)
     {
-        return getPrivilegeRepository().findById(id).map(privilegeEntity ->
+        return getRepository().findById(id).map(privilegeEntity ->
         {
             // Delete this privilege from the groups
             Set<GroupEntity> groups = privilegeEntity.getGroupEntities();
@@ -67,15 +59,9 @@ import java.util.function.Function;
             }
             getGroupRepository().saveAll(groups);
 
-            getPrivilegeRepository().deleteById(id);
+            getRepository().deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    @Override
-    public <T extends PrivilegeEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return getPrivilegeRepository().saveAll(entity);
     }
 
     @Transactional @Override public @NotNull Function<PrivilegeModel, PrivilegeEntity> toEntity()

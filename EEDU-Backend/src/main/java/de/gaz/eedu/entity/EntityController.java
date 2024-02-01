@@ -18,9 +18,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
 
 
-@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C>, M extends Model, C extends CreationModel<?>>
+@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C, ?>, M extends Model, C extends CreationModel<?>>
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityController.class);
@@ -119,8 +120,8 @@ import org.springframework.web.client.HttpStatusCodeException;
         return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
     }
 
-    protected @NotNull HttpStatusCodeException unauthorizedThrowable()
+    protected @NotNull ResponseStatusException unauthorizedThrowable()
     {
-        return new HttpClientErrorException(HttpStatus.UNAUTHORIZED); // message is ignored anyway
+        return new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }

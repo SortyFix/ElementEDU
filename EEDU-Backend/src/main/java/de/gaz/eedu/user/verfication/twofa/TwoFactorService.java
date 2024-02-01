@@ -28,27 +28,29 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService implements EntityService<TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService implements EntityService<TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel, TwoFactorRepository>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(TwoFactorService.class);
     private static final int BYTE_SIZE = 20;
     private static final Base32 BASE_32 = new Base32();
+    @Getter(AccessLevel.NONE)
     private final TwoFactorRepository twoFactorRepository;
     private final UserService userService;
+
+    @Override
+    public @NotNull TwoFactorRepository getRepository()
+    {
+        return twoFactorRepository;
+    }
 
     @Override public @NotNull Optional<TwoFactorEntity> loadEntityByID(long id)
     {
         return Optional.empty();
     }
 
-    @Override public @NotNull Optional<TwoFactorEntity> loadEntityByName(@NotNull String name)
-    {
-        throw new UnsupportedOperationException();
-    }
-
     @Override public @Unmodifiable @NotNull List<TwoFactorEntity> findAllEntities()
     {
-        return getTwoFactorRepository().findAll();
+        return getRepository().findAll();
     }
 
     @Override public @NotNull TwoFactorEntity createEntity(@NotNull TwoFactorCreateModel model) throws CreationException
@@ -66,7 +68,7 @@ import java.util.function.Supplier;
 
             if (userEntity.initTwoFactor(twoFactorEntity))
             {
-                getTwoFactorRepository().save(twoFactorEntity);
+                getRepository().save(twoFactorEntity);
                 getUserService().save(userEntity);
 
                 return twoFactorEntity;
@@ -82,10 +84,10 @@ import java.util.function.Supplier;
 
     @Override public boolean delete(long id)
     {
-        return getTwoFactorRepository().findById(id).map(twoFactor ->
+        return getRepository().findById(id).map(twoFactor ->
         {
             twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
-            getTwoFactorRepository().deleteById(id);
+            getRepository().deleteById(id);
             return true;
         }).orElse(false);
     }
@@ -93,12 +95,12 @@ import java.util.function.Supplier;
     @Override
     public <T extends TwoFactorEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
-        return getTwoFactorRepository().saveAll(entity);
+        return getRepository().saveAll(entity);
     }
 
     @Override public @NotNull Function<TwoFactorModel, TwoFactorEntity> toEntity()
     {
-        return twoFactorModel -> getTwoFactorRepository().findById(twoFactorModel.id())
+        return twoFactorModel -> getRepository().findById(twoFactorModel.id())
                 .orElseThrow(() -> new EntityUnknownException(twoFactorModel.id()));
     }
 

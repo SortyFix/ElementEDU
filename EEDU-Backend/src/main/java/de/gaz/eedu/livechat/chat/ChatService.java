@@ -7,6 +7,7 @@ import de.gaz.eedu.exception.OccupiedException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,26 +18,14 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCreateModel>
+public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCreateModel, ChatRepository>
 {
     private final ChatRepository chatRepository;
 
     @Override
-    public @NotNull Optional<ChatEntity> loadEntityByID(long id)
+    public @NotNull ChatRepository getRepository()
     {
-        return chatRepository.findById(id);
-    }
-
-    @Override
-    public @NotNull Optional<ChatEntity> loadEntityByName(@NotNull String name)
-    {
-        return Optional.empty();
-    }
-
-    @Override
-    public @Unmodifiable @NotNull List<ChatEntity> findAllEntities()
-    {
-        return chatRepository.findAll();
+        return chatRepository;
     }
 
     @Override
@@ -48,22 +37,6 @@ public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCre
             throw new OccupiedException();
         }
         return chatRepository.save(model.toEntity(new ChatEntity()));
-    }
-
-    @Override
-    public boolean delete(long id)
-    {
-        return chatRepository.findById(id).map(entity ->
-        {
-           chatRepository.deleteById(id);
-           return true;
-        }).orElse(false);
-    }
-
-    @Override
-    public <T extends ChatEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return chatRepository.saveAll(entity);
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-public abstract class ServiceMockitoTest<S extends EntityService<E, M, C>, E extends EntityObject, M extends Model, C extends CreationModel<E>>
+public abstract class ServiceMockitoTest<S extends EntityService<E, M, C, ?>, E extends EntityObject, M extends Model, C extends CreationModel<E>>
 {
     public S entityService;
 

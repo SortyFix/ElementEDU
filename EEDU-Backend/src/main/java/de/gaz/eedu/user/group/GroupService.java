@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,36 +32,29 @@ import java.util.stream.Stream;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService implements EntityService<GroupEntity, GroupModel, GroupCreateModel> {
+public class GroupService implements EntityService<GroupEntity, GroupModel, GroupCreateModel, GroupRepository> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
+    @Getter(AccessLevel.NONE)
     private final GroupRepository groupRepository;
     private final UserService userService; // managed by
     private final PrivilegeRepository privilegeRepository;
 
-    @Override
-    public @NotNull Optional<GroupEntity> loadEntityByID(long id) {
-        return getGroupRepository().findById(id);
-    }
 
     @Override
-    public @NotNull Optional<GroupEntity> loadEntityByName(@NotNull String name) {
-        return getGroupRepository().findByName(name);
-    }
-
-    @Override
-    public @Unmodifiable @NotNull List<GroupEntity> findAllEntities() {
-        return getGroupRepository().findAll();
+    public @NotNull GroupRepository getRepository()
+    {
+        return groupRepository;
     }
 
     @Override
     public @NotNull GroupEntity createEntity(@NotNull GroupCreateModel createModel) throws CreationException {
-        getGroupRepository().findByName(createModel.name()).map(toModel()).ifPresent(occupiedModel -> {
+        getRepository().findByName(createModel.name()).map(toModel()).ifPresent(occupiedModel -> {
             throw new NameOccupiedException(occupiedModel.name());
         });
 
         Set<UserEntity> users = Stream.of(createModel.users()).map(getUserService()::loadEntityByID).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
-        GroupEntity groupEntity = getGroupRepository().save(createModel.toEntity(new GroupEntity(users), group -> {
+        GroupEntity groupEntity = getRepository().save(createModel.toEntity(new GroupEntity(users), group -> {
             Stream<Optional<PrivilegeEntity>> privileges = Stream.of(createModel.privileges()).map(getPrivilegeRepository()::findById);
             group.setPrivileges(privileges.map(privilegeEntity -> privilegeEntity.orElse(null)).collect(Collectors.toSet()));
             return group;
@@ -72,7 +66,7 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
 
     @Override
     public boolean delete(long id) {
-        return getGroupRepository().findById(id).map(groupEntity -> {
+        return getRepository().findById(id).map(groupEntity -> {
 
             // Delete this entity from the users
             Set<UserEntity> users = groupEntity.getUsers();
@@ -83,15 +77,9 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
             Long[] privilegeIDs = groupEntity.getPrivileges().stream().map(PrivilegeEntity::getId).toArray(Long[]::new);
             groupEntity.revokePrivilege(this, privilegeIDs);
 
-            getGroupRepository().deleteById(id);
+            getRepository().deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    @Override
-    public <T extends GroupEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return getGroupRepository().saveAll(entity);
     }
 
     @Transactional

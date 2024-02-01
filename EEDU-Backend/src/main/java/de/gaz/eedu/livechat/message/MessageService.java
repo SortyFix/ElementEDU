@@ -14,60 +14,33 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel>
+@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageEntity, MessageModel, MessageCreateModel, MessageRepository>
 {
+    @Getter(AccessLevel.NONE)
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
 
     public MessageEntity findEntityById(@NotNull Long id){
-        return getMessageRepository().findMessageEntityByMessageId(id);
+        return getRepository().findMessageEntityByMessageId(id);
     }
 
     @Override
-    public @NotNull Optional<MessageEntity> loadEntityByID(long id)
+    public @NotNull MessageRepository getRepository()
     {
-        return Optional.of(getMessageRepository().findMessageEntityByMessageId(id));
-    }
-
-    @Override
-    public @NotNull Optional<MessageEntity> loadEntityByName(@NotNull String name)
-    {
-        return Optional.empty();
-    }
-
-    @Override
-    public @Unmodifiable @NotNull List<MessageEntity> findAllEntities()
-    {
-        return getMessageRepository().findAll();
+        return messageRepository;
     }
 
     public @NotNull MessageEntity createEntity(@NotNull MessageCreateModel messageCreateModel)
     {
-        return getMessageRepository().save(messageCreateModel.toMessageEntity(getUserRepository().getReferenceById(
+        return getRepository().save(messageCreateModel.toMessageEntity(getUserRepository().getReferenceById(
                 messageCreateModel.authorId()), new MessageEntity()));
-    }
-
-    @Override
-    public boolean delete(long id)
-    {
-        return messageRepository.findById(id).map(messageEntity ->
-        {
-            messageRepository.deleteById(id);
-            return true;
-        }).orElse(false);
-    }
-
-    @Override
-    public <T extends MessageEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return getMessageRepository().saveAll(entity);
     }
 
     @Override
     public @NotNull Function<MessageModel, MessageEntity> toEntity()
     {
         return messageModel ->
-                getMessageRepository()
+                getRepository()
                         .findById(messageModel.messageId())
                         .orElseThrow(() -> new EntityUnknownException(messageModel.messageId()));
     }

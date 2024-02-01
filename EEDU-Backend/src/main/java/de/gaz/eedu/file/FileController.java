@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public HttpStatus deleteFile(@NotNull Long id)
     {
-        return userService.loadEntityByName(currentUsername).flatMap(userEntity -> fileService.loadEntityById(id).map(fileEntity -> {
+        return userService.getRepository().findByLoginName(currentUsername).flatMap(userEntity -> fileService.loadEntityById(id).map(fileEntity -> {
             if (fileEntity.toModel().authorId().equals(userEntity.getId())) {
                 try {
                     Path path = Paths.get(fileEntity.toModel().filePath());
@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
     @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(@NotNull Long id, @NotNull Set<String> newTags)
     {
         Set<String> emptySet = new HashSet<>();
-        return fileService.loadEntityById(id).map(fileEntity -> userService.loadEntityByName(currentUsername).map(userEntity -> {
+        return fileService.loadEntityById(id).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
             // Check if currently logged-in user ID matches the author ID of the file
             if(userEntity.getId().equals(fileEntity.toModel().authorId())){
                 fileEntity.setTags(newTags);
@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS)
     {
         ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
-        return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.loadEntityByName(currentUsername).map(userEntity -> {
+        return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
             // Reduce groups in user entity to their ids
             Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
             if(userEntity.getId().equals(fileEntity.toModel().authorId())
@@ -100,7 +100,7 @@ import java.util.stream.Collectors;
     }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/me/info") public ResponseEntity<List<FileModel>> getCurrentUserFilesInfo(){
-        Optional<Long> userId = userService.loadEntityByName(currentUsername).map(UserEntity::getId);
+        Optional<Long> userId = userService.getRepository().findByLoginName(currentUsername).map(UserEntity::getId);
         return userId.map(id -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id).stream().map(FileEntity::toModel).collect(Collectors.toList())))
                 .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.emptyList()));
     }

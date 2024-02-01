@@ -80,7 +80,7 @@ import java.util.function.Function;
     public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
     {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
-        if (getEntityService().getUserRepository().findById(userID).map(isAllowed).orElse(false))
+        if (getEntityService().getRepository().findById(userID).map(isAllowed).orElse(false))
         {
             return login(loginModel);
         }

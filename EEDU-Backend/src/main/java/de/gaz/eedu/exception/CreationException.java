@@ -2,9 +2,9 @@ package de.gaz.eedu.exception;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
-public class CreationException extends HttpClientErrorException
+public class CreationException extends ResponseStatusException
 {
 
     public CreationException(@NotNull HttpStatus status)

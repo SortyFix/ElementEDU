@@ -1,8 +1,5 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -71,10 +68,10 @@ import java.util.function.Supplier;
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
-        getEntity(themeService, themeCreateModel); // create theme
+        themeService.getRepository().findByName(themeCreateModel.name()).orElseGet(() -> themeService.createEntity(themeCreateModel));
 
-        PrivilegeEntity privilegeEntity = getEntity(privilegeService, privilegeCreateModel);
-        GroupEntity groupEntity = getEntity(groupService, groupCreateModel);
+        PrivilegeEntity privilegeEntity = privilegeService.getRepository().findByName(privilegeCreateModel.name()).orElseGet(() -> privilegeService.createEntity(privilegeCreateModel));
+        GroupEntity groupEntity = groupService.getRepository().findByName(groupCreateModel.name()).orElseGet(() -> groupService.createEntity(groupCreateModel));
         UserEntity userEntity = userService.createEntity(userCreateModel);
 
         groupEntity.grantPrivilege(groupService, privilegeEntity);
@@ -86,33 +83,15 @@ import java.util.function.Supplier;
         }
 
         LOGGER.info("A default user has been created");
-        LOGGER.info("-------------------------------");
+        LOGGER.info("-".repeat(20));
         LOGGER.info("USERNAME: {}", "root");
         LOGGER.info("PASSWORD: {}", randomPassword);
-        LOGGER.info("-------------------------------");
+        LOGGER.info("-".repeat(20));
 
         if (!development)
         {
             LOGGER.warn("It's advised to change the password as soon as possible.");
         }
-    }
-
-    /**
-     * Attempts to load an entity by name using the provided service and creation model.
-     * If an entity with the specified name doesn't exist, a new one is created using the creation model.
-     *
-     * @param service          the service used to load and potentially create the entity
-     * @param groupCreateModel the creation model which describes the entity to be loaded or created
-     * @param <E>              The type of the EDUEntity
-     * @param <C>              The type of the CreationModel related to the EDUEntity
-     * @return the loaded or created entity
-     * @throws java.util.NoSuchElementException if the creation model didn't specify a name and an entity couldn't be
-     *                                          loaded
-     */
-    private <E extends EntityObject, C extends CreationModel<E>> @NotNull E getEntity(@NotNull EntityService<E, ?, C> service, @NotNull C groupCreateModel)
-    {
-        Supplier<E> create = () -> service.createEntity(groupCreateModel);
-        return service.loadEntityByName(groupCreateModel.name()).orElseGet(create);
     }
 
     @SuppressWarnings({

@@ -38,7 +38,7 @@ public class ThemeController
         logger.info("The server has recognized an incoming theme set request.");
         try{
             UserEntity userEntity = userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new);
-            ThemeEntity loadedEntity = themeService.loadEntityByName(name).orElseThrow(IllegalArgumentException::new);
+            ThemeEntity loadedEntity = themeService.getRepository().findByName(name).orElseThrow(IllegalArgumentException::new);
             userEntity.setThemeEntity(userService, loadedEntity);
             return ResponseEntity.ok(loadedEntity.toModel());
         }

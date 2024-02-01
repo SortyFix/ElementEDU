@@ -52,32 +52,24 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserEntity, UserModel, UserCreateModel, UserRepository>, UserDetailsService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
+    @Getter(AccessLevel.NONE)
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
 
-    @Override public @NotNull Optional<UserEntity> loadEntityByID(long id)
+    @Override
+    public @NotNull UserRepository getRepository()
     {
-        return getUserRepository().findById(id);
-    }
-
-    @Override public @NotNull Optional<UserEntity> loadEntityByName(@NotNull String name)
-    {
-        return getUserRepository().findByLoginName(name);
-    }
-
-    @Override public @Unmodifiable @NotNull List<UserEntity> findAllEntities()
-    {
-        return getUserRepository().findAll();
+        return userRepository;
     }
 
     @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
-        getUserRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
+        getRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
         {
             throw new LoginNameOccupiedException(occupiedModel);
         });
@@ -97,12 +89,6 @@ import java.util.function.Function;
         }));
     }
 
-    @Override
-    public <T extends UserEntity>  @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return getUserRepository().saveAll(entity);
-    }
-
     @Override @Transactional public @NotNull Function<UserModel, UserEntity> toEntity()
     {
         return userModel -> loadEntityByID(userModel.id()).orElseThrow(() -> new EntityUnknownException(userModel.id()));
@@ -115,25 +101,25 @@ import java.util.function.Function;
 
     @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
-        return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
     @Override public boolean delete(long id)
     {
-        return getUserRepository().findById(id).map(userEntity ->
+        return getRepository().findById(id).map(userEntity ->
         {
             // Delete groups from this user
             Long[] groups = userEntity.getGroups().stream().map(GroupEntity::getId).toArray(Long[]::new);
             userEntity.detachGroups(this, groups);
 
-            getUserRepository().deleteById(id);
+            getRepository().deleteById(id);
             return true;
         }).orElse(false);
     }
 
     @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
-        Optional<UserEntity> userOptional = loadEntityByName(loginModel.loginName());
+        Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
         return userOptional.filter(UserEntity::isAccountNonLocked).map(user -> getAuthorizeService().login(user.toModel(), user.getPassword(), loginModel));
     }
 

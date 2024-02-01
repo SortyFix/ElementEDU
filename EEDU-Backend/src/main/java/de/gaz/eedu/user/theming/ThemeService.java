@@ -15,27 +15,14 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Service @AllArgsConstructor
-public class ThemeService implements EntityService<ThemeEntity, ThemeModel, ThemeCreateModel>
+public class ThemeService implements EntityService<ThemeEntity, ThemeModel, ThemeCreateModel, ThemeRepository>
 {
     private final ThemeRepository themeRepository;
 
     @Override
-    public @NotNull Optional<ThemeEntity> loadEntityByID(long id)
+    public @NotNull ThemeRepository getRepository()
     {
-        return themeRepository.findById(id);
-    }
-
-    @Override
-    public @NotNull Optional<ThemeEntity> loadEntityByName(@NotNull String name)
-    {
-        return themeRepository.findByName(name);
-    }
-
-
-    @Override
-    public @Unmodifiable @NotNull List<ThemeEntity> findAllEntities()
-    {
-        return themeRepository.findAll();
+        return themeRepository;
     }
 
     @Override
@@ -46,22 +33,6 @@ public class ThemeService implements EntityService<ThemeEntity, ThemeModel, Them
             throw new NameOccupiedException(occupied.getName());
         });
         return themeRepository.save(model.toEntity(new ThemeEntity()));
-    }
-
-    @Override
-    public boolean delete(long id)
-    {
-        return themeRepository.findById(id).map(userEntity ->
-        {
-            themeRepository.deleteById(id);
-            return true;
-        }).orElse(false);
-    }
-
-    @Override
-    public <T extends ThemeEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
-    {
-        return themeRepository.saveAll(entity);
     }
 
     @Override @Transactional
