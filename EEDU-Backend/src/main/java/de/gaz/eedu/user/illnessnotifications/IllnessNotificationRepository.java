@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.illnessnotifications;
 
+import de.gaz.eedu.user.UserEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 public interface IllnessNotificationRepository extends JpaRepository<IllnessNotificationEntity, Long>
 {
-    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserId(@NotNull Long userId);
-    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByNotificationDate(@NotNull Long date);
-    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserIdAndStatus(@NotNull Long userId, @NotNull IllnessNotificationStatus status);
+    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUser(@NotNull UserEntity userId);
+    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByTimeStamp(@NotNull Long date);
+    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserAndStatus(@NotNull UserEntity userId, @NotNull IllnessNotificationStatus status);
 }

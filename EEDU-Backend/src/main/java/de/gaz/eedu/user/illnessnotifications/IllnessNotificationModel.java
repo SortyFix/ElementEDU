@@ -5,21 +5,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record IllnessNotificationModel(@NotNull Long illnessId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, Long date, @NotNull String reason) implements Model
+public record IllnessNotificationModel(@NotNull Long notificationId, @NotNull Long userId, @NotNull IllnessNotificationStatus status, Long timestamp, @NotNull String reason) implements Model
 {
     @Override public boolean equals(Object o)
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IllnessNotificationModel that = (IllnessNotificationModel) o;
-        return Objects.equals(illnessId, that.illnessId) && Objects.equals(userId,
-                that.userId) && status == that.status && Objects.equals(date, that.date) && Objects.equals(reason,
+        return Objects.equals(notificationId, that.notificationId) && Objects.equals(userId,
+                that.userId) && status == that.status && Objects.equals(timestamp, that.timestamp) && Objects.equals(
+                reason,
                 that.reason);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(illnessId, userId, status, date, reason);
+        return Objects.hash(notificationId(), userId(), status(), timestamp(), reason());
     }
 }

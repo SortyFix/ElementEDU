@@ -70,11 +70,13 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    notification_date BIGINT NOT NULL,
-    notification_id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id           BIGINT NOT NULL,
-    reason            VARCHAR(255) NOT NULL,
-    status            TINYINT NULL
+    notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT NOT NULL,
+    status          TINYINT NOT NULL,
+    reason          VARCHAR(255) NOT NULL,
+    time_stamp      BIGINT NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
 -- The 'theme_entity' table contains various themes that can be applied to the user interface. Each theme includes specific colors for different elements of the interface.

@@ -1,33 +1,47 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.entity.model.CreationModel;
+import de.gaz.eedu.user.UserEntity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 
-public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long date, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
+
+public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long timestamp, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
 {
-    @Override public String toString()
+    @Override public boolean equals(Object o)
     {
-        return "IllnessNotificationCreateModel{" +
-                "userId=" + userId +
-                ", date=" + date +
-                '}';
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IllnessNotificationCreateModel that = (IllnessNotificationCreateModel) o;
+        return Objects.equals(userId, that.userId) && Objects.equals(timestamp,
+                that.timestamp) && Objects.equals(reason, that.reason);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(userId, timestamp, reason);
     }
 
     // Please check this. I'm not sure here.
     @Override
     public @NotNull String name()
     {
-        return reason;
+        return reason + " " + timestamp();
     }
 
     @Override
     public @NotNull IllnessNotificationEntity toEntity(@NotNull IllnessNotificationEntity entity)
     {
+        return entity;
+    }
+
+    public @NotNull IllnessNotificationEntity toINEntity(@NotNull UserEntity userEntity, @NotNull IllnessNotificationEntity entity){
         return IllnessNotificationEntity.builder()
                 .notificationId(entity.getNotificationId())
-                .userId(userId)
-                .notificationDate(date)
+                .user(userEntity)
+                .timeStamp(timestamp())
                 .status(IllnessNotificationStatus.PENDING)
                 .reason(reason)
                 .build();
