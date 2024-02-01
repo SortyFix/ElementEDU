@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.*;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
         {
-            throw forbiddenThrowable();
+            throw unauthorizedThrowable();
         }
         return super.create(model);
     }
@@ -82,7 +82,7 @@ import org.springframework.web.bind.annotation.*;
         {
             return HttpStatus.OK;
         }
-        throw forbiddenThrowable();
+        throw unauthorizedThrowable();
     }
 
     /**
@@ -105,10 +105,10 @@ import org.springframework.web.bind.annotation.*;
             TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
 
             return getEntityService().verify(method, code, claims)
-                    .map(ResponseEntity::ok).orElseThrow(this::forbiddenThrowable);
+                    .map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
         }
 
-        throw forbiddenThrowable();
+        throw unauthorizedThrowable();
     }
 
     /**
@@ -127,7 +127,7 @@ import org.springframework.web.bind.annotation.*;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!isAuthorized(authentication, JwtTokenType.TWO_FACTOR_SELECTION))
         {
-            throw forbiddenThrowable();
+            throw unauthorizedThrowable();
         }
         AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
         return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));

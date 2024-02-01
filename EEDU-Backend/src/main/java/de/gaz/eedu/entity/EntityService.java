@@ -220,11 +220,14 @@ public interface EntityService<E extends EntityObject, M extends Model, C extend
     }
 
     /**
-     * This method loads an {@link E}
+     * Loads the {@link E} by its id.
+     * <p>
+     * Unlike the method {@link #loadEntityByID(long)} this method does not return an {@link Optional}.
+     * If the given id does not exist, this method will instead throw an {@link EntityUnknownException}.
      *
-     * @param id
-     * @return
-     * @throws EntityUnknownException
+     * @param id the id of the entry to load.
+     * @return the entity from the database.
+     * @throws EntityUnknownException when the entity does not exist.
      */
     @Transactional(readOnly = true)
     default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException

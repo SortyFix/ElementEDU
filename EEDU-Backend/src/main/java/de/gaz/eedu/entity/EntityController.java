@@ -13,10 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, M, C>, M extends Model, C extends CreationModel<?>>
@@ -118,8 +119,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
         return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
     }
 
-    protected @NotNull AccessDeniedException forbiddenThrowable()
+    protected @NotNull HttpStatusCodeException unauthorizedThrowable()
     {
-        return new AccessDeniedException(""); // message is ignored anyway
+        return new HttpClientErrorException(HttpStatus.UNAUTHORIZED); // message is ignored anyway
     }
 }

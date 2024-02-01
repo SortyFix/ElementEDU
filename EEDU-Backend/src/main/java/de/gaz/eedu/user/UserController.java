@@ -62,7 +62,7 @@ import java.util.function.Function;
     {
         if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.AUTHORIZED))
         {
-            throw forbiddenThrowable();
+            throw unauthorizedThrowable();
         }
         return super.getData(id);
     }
@@ -85,7 +85,7 @@ import java.util.function.Function;
             return login(loginModel);
         }
         logger.warn("A user tried to access the advanced token of another user. The request has been rejected.");
-        throw forbiddenThrowable();
+        throw unauthorizedThrowable();
     }
 
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
