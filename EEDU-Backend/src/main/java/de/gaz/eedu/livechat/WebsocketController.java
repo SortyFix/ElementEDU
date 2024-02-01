@@ -20,12 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("/chat")
@@ -73,25 +71,13 @@ public class WebsocketController
     {
         if(users.size() < 2)
         {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            // Cannot use forbiddenThrowable as this class doesn't extend EntityController
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        Boolean usersValid = chatService.loadEntityByUserIDs(users).map(chatEntities ->
-        {
-            AtomicReference<Boolean> allUsersPresent = new AtomicReference<>(users.contains(currentUser));
+        boolean usersValid = users.stream().allMatch(user -> userService.loadEntityByID(user).isPresent());
 
-            users.forEach(userId ->
-            {
-                if (userService.loadEntityByID(userId).isEmpty())
-                {
-                    allUsersPresent.set(false);
-                }
-            });
-
-            return allUsersPresent.get().equals(true);
-        }).orElse(false);
-
-        if(!chatService.loadEntityByUserIDs(users).isPresent() && usersValid)
+        if(chatService.loadEntityByUserIDs(users).isEmpty() && usersValid)
         {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
@@ -160,7 +146,7 @@ public class WebsocketController
 
     @MessageMapping("{chatId}/join")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<? /* Will fix that later, i'm sickkkk */> joinRoom(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
+    public ResponseEntity<ChatModel> joinRoom(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
     {
         return chatService.loadEntityByID(chatId).map(chatEntity -> {
             if(chatEntity.getUsers().contains(userId))
@@ -175,8 +161,8 @@ public class WebsocketController
                         }));
                 return ResponseEntity.ok(chatEntity.toModel());
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body((ResponseEntity<ChatModel>) null);
-        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body((ResponseEntity<ChatModel>) null));
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @MessageMapping("/hold/{messageId]}")

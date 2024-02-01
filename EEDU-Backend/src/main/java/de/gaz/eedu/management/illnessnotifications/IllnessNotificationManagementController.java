@@ -52,7 +52,7 @@ public class IllnessNotificationManagementController
     {
         return illnessNotificationService.loadEntityById(notificationId).map(illnessNotificationEntity -> {
             illnessNotificationEntity.setStatus(status);
-            userService.loadEntityByID(illnessNotificationEntity.getUserId()).ifPresentOrElse(userEntity ->
+            userService.loadEntityByID(illnessNotificationEntity.getUser().getId()).ifPresentOrElse(userEntity ->
                             userEntity.setStatus(status == IllnessNotificationStatus.ACCEPTED ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
                     () -> ResponseEntity.status(HttpStatus.FORBIDDEN).body(false));
             return ResponseEntity.ok(true);
