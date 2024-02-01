@@ -98,7 +98,7 @@ import java.util.function.Function;
     }
 
     @Override
-    public @NotNull List<UserEntity> saveEntity(@NotNull Iterable<UserEntity> entity)
+    public <T extends UserEntity>  @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return getUserRepository().saveAll(entity);
     }
@@ -108,12 +108,12 @@ import java.util.function.Function;
         return userModel -> loadEntityByID(userModel.id()).orElseThrow(() -> new EntityUnknownException(userModel.id()));
     }
 
-    @Override public @org.jetbrains.annotations.NotNull Function<UserEntity, UserModel> toModel()
+    @Override public @NotNull Function<UserEntity, UserModel> toModel()
     {
         return UserEntity::toModel;
     }
 
-    @Transactional @Override public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return loadEntityByName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }

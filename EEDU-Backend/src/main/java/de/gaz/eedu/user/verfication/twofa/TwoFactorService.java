@@ -91,7 +91,7 @@ import java.util.function.Supplier;
     }
 
     @Override
-    public @NotNull List<TwoFactorEntity> saveEntity(@NotNull Iterable<TwoFactorEntity> entity)
+    public <T extends TwoFactorEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return getTwoFactorRepository().saveAll(entity);
     }

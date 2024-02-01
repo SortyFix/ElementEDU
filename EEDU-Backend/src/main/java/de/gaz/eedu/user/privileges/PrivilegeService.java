@@ -73,7 +73,7 @@ import java.util.function.Function;
     }
 
     @Override
-    public @NotNull List<PrivilegeEntity> saveEntity(@NotNull Iterable<PrivilegeEntity> entity)
+    public <T extends PrivilegeEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return getPrivilegeRepository().saveAll(entity);
     }

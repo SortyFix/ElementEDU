@@ -90,13 +90,7 @@ public class GroupService implements EntityService<GroupEntity, GroupModel, Grou
     }
 
     @Override
-    public @NotNull GroupEntity saveEntity(@NotNull GroupEntity entity)
-    {
-        return getGroupRepository().save(entity);
-    }
-
-    @Override
-    public @NotNull List<GroupEntity> saveEntity(@NotNull Iterable<GroupEntity> entity)
+    public <T extends GroupEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return getGroupRepository().saveAll(entity);
     }

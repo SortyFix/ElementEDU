@@ -59,7 +59,7 @@ public class ThemeService implements EntityService<ThemeEntity, ThemeModel, Them
     }
 
     @Override
-    public @NotNull List<ThemeEntity> saveEntity(@NotNull Iterable<ThemeEntity> entity)
+    public <T extends ThemeEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return themeRepository.saveAll(entity);
     }

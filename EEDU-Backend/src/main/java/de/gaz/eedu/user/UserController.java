@@ -61,13 +61,8 @@ import java.util.function.Function;
 
     @PreAuthorize("hasAuthority('ADMIN') or (#id == authentication.principal)") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        for (GrantedAuthority authority : SecurityContextHolder.getContext().getAuthentication().getAuthorities())
-        {
-            System.out.println(authority.getAuthority() + " " + authority.getClass().getName());
-        }
         if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.AUTHORIZED))
         {
-            System.out.println("Does not have this thing");
             throw forbiddenThrowable();
         }
         return super.getData(id);

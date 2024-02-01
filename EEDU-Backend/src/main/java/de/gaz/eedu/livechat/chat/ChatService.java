@@ -61,7 +61,7 @@ public class ChatService implements EntityService<ChatEntity, ChatModel, ChatCre
     }
 
     @Override
-    public @NotNull List<ChatEntity> saveEntity(@NotNull Iterable<ChatEntity> entity)
+    public <T extends ChatEntity> @NotNull List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return chatRepository.saveAll(entity);
     }
