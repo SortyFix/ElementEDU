@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
-
 @Service @AllArgsConstructor
 public class ThemeService implements EntityService<ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
@@ -23,10 +21,10 @@ public class ThemeService implements EntityService<ThemeRepository, ThemeEntity,
     @Override
     public @NotNull ThemeEntity createEntity(@NotNull ThemeCreateModel model) throws CreationException
     {
-        themeRepository.findByName(model.name()).ifPresent(occupied ->
+        getRepository().findByName(model.name()).ifPresent(occupied ->
         {
             throw new NameOccupiedException(occupied.getName());
         });
-        return themeRepository.save(model.toEntity(new ThemeEntity()));
+        return getRepository().save(model.toEntity(new ThemeEntity()));
     }
 }
