@@ -89,6 +89,20 @@ VALUES (0, 'mustermann@example.com', '', true, 1),
 
        (2, NULL, '', true, 4);
 
+--- Courses
+INSERT INTO subject_entity(name)
+VALUES ('German'),
+       ('Mathematics'),
+       ('Informatics'),
+       ('Dummy');
+
+INSERT INTO course_entity(name, subject_id)
+VALUES ('Q1-German', 1),
+       ('5e-Math', 2),
+       ('2e-Informatics', 3),
+       ('Dummy', 4);
+---
+
 INSERT INTO chat_entity (time_of_creation)
 VALUES (90234802),
        (92038200),
@@ -133,6 +147,18 @@ VALUES (1, 1),
        (4, 4);
 
 MERGE INTO group_privileges (group_id, privilege_id)
+VALUES (1, 1),
+
+       (2, 1),
+       (2, 2),
+
+       (3, 1),
+       (3, 2),
+       (3, 3),
+
+       (4, 4);
+
+MERGE INTO course_users(course_id, user_id)
 VALUES (1, 1),
 
        (2, 1),

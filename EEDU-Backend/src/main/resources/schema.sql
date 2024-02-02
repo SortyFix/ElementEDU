@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS theme_entity
 -- The 'file_entity_tags' table is used to keep track of tags applied to file entities in the 'file_entity' table.
 CREATE TABLE IF NOT EXISTS user_entity
 (
-    enabled    BIT                                                     NOT NULL,
-    locked     BIT                                                     NOT NULL,
+    enabled    BIT          NOT NULL,
+    locked     BIT          NOT NULL,
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    theme_id   BIGINT                                                  NULL,
-    first_name VARCHAR(255)                                            NULL,
-    last_name  VARCHAR(255)                                            NULL,
-    login_name VARCHAR(255)                                            NULL,
-    password   VARCHAR(255)                                            NULL,
+    theme_id   BIGINT       NULL,
+    first_name VARCHAR(255) NULL,
+    last_name  VARCHAR(255) NULL,
+    login_name VARCHAR(255) NULL,
+    password   VARCHAR(255) NULL,
     status     TINYINT NULL,
     FOREIGN KEY (theme_id) REFERENCES theme_entity (id)
 );
@@ -41,12 +41,12 @@ CREATE TABLE IF NOT EXISTS privilege_entity
 -- The 'group_entity' table contains information about user groups. Each group can have a unique name and optionally require two-factor authentication.
 CREATE TABLE IF NOT EXISTS two_factor_entity
 (
-    enabled BIT                           NOT NULL,
+    enabled BIT          NOT NULL,
     id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT                        NOT NULL,
-    data    VARCHAR(255)                  NULL,
+    user_id BIGINT       NOT NULL,
+    data    VARCHAR(255) NULL,
     method  TINYINT NULL,
-    secret  VARCHAR(255)                  NULL,
+    secret  VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
@@ -147,3 +147,26 @@ CREATE TABLE IF NOT EXISTS message_entity
     FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
+-- Courses
+CREATE TABLE IF NOT EXISTS subject_entity
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS course_entity
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name       VARCHAR(255) NOT NULL,
+    subject_id BIGINT       NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES subject_entity (id)
+);
+
+CREATE TABLE IF NOT EXISTS course_users
+(
+    course_id BIGINT NOT NULL,
+    user_id   BIGINT NOT NULL,
+    PRIMARY KEY (course_id, user_id),
+    FOREIGN KEY (course_id) REFERENCES course_entity (id),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+)
