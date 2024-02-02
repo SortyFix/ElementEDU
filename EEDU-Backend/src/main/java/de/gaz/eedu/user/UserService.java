@@ -2,8 +2,8 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
-import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
@@ -66,10 +66,10 @@ import java.util.function.Function;
 
     @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
-        getRepository().findByLoginName(model.loginName()).map(toModel()).ifPresent(occupiedModel ->
+        if(getRepository().existsByLoginName(model.loginName()))
         {
-            throw new LoginNameOccupiedException(occupiedModel);
-        });
+            throw new NameOccupiedException(model.loginName());
+        }
 
         String password = model.password();
         if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))

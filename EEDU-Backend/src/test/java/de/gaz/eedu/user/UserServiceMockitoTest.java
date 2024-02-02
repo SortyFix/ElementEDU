@@ -1,8 +1,8 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.ServiceMockitoTest;
+import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
-import de.gaz.eedu.user.exception.LoginNameOccupiedException;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
@@ -27,10 +27,10 @@ public class UserServiceMockitoTest extends ServiceMockitoTest<UserService, User
         return TestExpectation.data(userCreateModel, userModel);
     }
 
-    @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, LoginNameOccupiedException> occupiedData()
+    @Override protected @NotNull ServiceMockitoTest.TestExpectation<UserCreateModel, NameOccupiedException> occupiedData()
     {
         UserCreateModel request = new UserCreateModel("test", "test", "max.mustermann", "Password123!", true, false, UserStatus.PROSPECTIVE);
-        LoginNameOccupiedException expected = new LoginNameOccupiedException(new UserModel(1L, "max", "mustermann", "max.mustermann", true, false, new TwoFactorModel[0], null, new SimpleUserGroupModel[0], UserStatus.PROSPECTIVE));
+        NameOccupiedException expected = new NameOccupiedException("max.mustermann");
         return TestExpectation.data(request, expected);
     }
 
