@@ -8,6 +8,7 @@ public enum JwtTokenType
 {
     TWO_FACTOR_SELECTION,
     TWO_FACTOR_PENDING,
+    TWO_FACTOR_REQUIRED,
     ADVANCED_AUTHORIZATION, // authorities from actual user and advanced
     AUTHORIZED; // authorities from actual user
 

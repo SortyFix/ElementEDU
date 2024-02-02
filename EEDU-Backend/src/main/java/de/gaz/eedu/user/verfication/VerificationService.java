@@ -1,10 +1,11 @@
 package de.gaz.eedu.user.verfication;
 
-import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.LoginModel;
-import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
+import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.*;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 import java.util.function.Function;
@@ -58,6 +60,13 @@ import java.util.function.Function;
         if (factorMethods.length > 0)
         {
             return twoFactor(user.id(), expiry, advanced, factorMethods);
+        }
+
+        // user has no two factor set up, but his group requires it
+        if (Arrays.stream(user.groups()).anyMatch(SimpleUserGroupModel::requiresTwoFactor))
+        {
+            Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
+            return generateKey(JwtTokenType.TWO_FACTOR_REQUIRED, time, new ClaimHolder<>("userID", user.id()));
         }
 
         return authorizeToken(user, expiry, advanced);
@@ -308,7 +317,8 @@ import java.util.function.Function;
                 }
                 yield authorities;
             }
-            case TWO_FACTOR_SELECTION, TWO_FACTOR_PENDING -> Collections.singleton(jwtTokenType.getAuthority());
+            case TWO_FACTOR_SELECTION, TWO_FACTOR_PENDING, TWO_FACTOR_REQUIRED ->
+                    Collections.singleton(jwtTokenType.getAuthority());
         };
     }
 

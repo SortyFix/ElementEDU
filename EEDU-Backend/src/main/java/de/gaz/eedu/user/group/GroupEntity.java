@@ -84,7 +84,7 @@ import java.util.stream.Stream;
     @Override public @NotNull GroupModel toModel()
     {
         return new GroupModel(getId(),
-                getName(),
+                getName(), isTwoFactorRequired(),
                 getUsers().stream().map(UserEntity::toSimpleModel).toArray(SimpleUserModel[]::new),
                 getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).toArray(SimplePrivilegeModel[]::new));
     }

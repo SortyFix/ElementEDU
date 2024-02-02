@@ -18,7 +18,7 @@ public class GroupServiceMockitoTest extends ServiceMockitoTest<GroupService, Gr
     @Override protected @NotNull ServiceMockitoTest.TestExpectation<GroupCreateModel, GroupModel> successData()
     {
         GroupCreateModel request = new GroupCreateModel("test", false, new Long[0], new Long[0]);
-        GroupModel expected = new GroupModel(1L, "test", new SimpleUserModel[0], new SimplePrivilegeModel[0]);
+        GroupModel expected = new GroupModel(1L, "test", true, new SimpleUserModel[0], new SimplePrivilegeModel[0]);
         return TestExpectation.data(request, expected);
     }
 

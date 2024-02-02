@@ -76,7 +76,7 @@ import java.util.stream.Stream;
                     .stream()
                     .map(PrivilegeEntity::toSimpleModel)
                     .toArray(SimplePrivilegeModel[]::new);
-            return new SimpleUserGroupModel(entity.getId(), entity.getName(), privilegeModels);
+            return new SimpleUserGroupModel(entity.getId(), entity.getName(), entity.isTwoFactorRequired(), privilegeModels);
         };
 
         return new UserModel(getId(),

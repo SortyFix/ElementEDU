@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
  * providing endpoints related to Two-Factor Authentication(2FA) for user login. It maps to the
@@ -51,11 +53,15 @@ import org.springframework.web.bind.annotation.*;
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
+
+        boolean hasAdvanced = isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(authentication, JwtTokenType.TWO_FACTOR_REQUIRED);
+
+        if (hasAdvanced || hasRequired)
         {
-            throw unauthorizedThrowable();
+            return super.create(model);
         }
-        return super.create(model);
+        throw unauthorizedThrowable();
     }
 
     /**
@@ -72,14 +78,21 @@ import org.springframework.web.bind.annotation.*;
      * @return A {@link HttpStatus} representing the state of the request.
      */
     @GetMapping("/enable/{method}/{code}")
-    public @NotNull HttpStatus enable(@PathVariable @NotNull TwoFactorMethod method, @PathVariable String code, @RequestAttribute("claims") Claims claims)
+    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull TwoFactorMethod method, @PathVariable String code, @RequestAttribute("claims") Claims claims)
     {
-        JwtTokenType type = JwtTokenType.ADVANCED_AUTHORIZATION;
-        boolean authorized = isAuthorized(SecurityContextHolder.getContext().getAuthentication(), type);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authorized && getEntityService().enable(method, code, claims))
+        boolean hasAdvanced = isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(authentication, JwtTokenType.TWO_FACTOR_REQUIRED);
+
+        if ((hasAdvanced || hasRequired) && getEntityService().enable(method, code, claims))
         {
-            return HttpStatus.OK;
+            if (hasRequired) // return login token after user has setup two factor
+            {
+                Optional<String> token = getEntityService().verify(method, code, claims);
+                return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+            }
+            return ResponseEntity.ok(null);
         }
         throw unauthorizedThrowable();
     }
@@ -94,17 +107,16 @@ import org.springframework.web.bind.annotation.*;
      * @param claims These are the claims associated with the associated JWT token.
      * @return Returns ResponseEntity of type {@link String}.
      */
-    @GetMapping("/verify/{code}") public @NotNull ResponseEntity<String> verify(@PathVariable @NotNull String code,
-            @RequestAttribute("claims") @NotNull Claims claims)
+    @GetMapping("/verify/{code}")
+    public @NotNull ResponseEntity<String> verify(@PathVariable @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (isAuthorized(authentication, JwtTokenType.TWO_FACTOR_PENDING))
         {
             TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
-
-            return getEntityService().verify(method, code, claims)
-                    .map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+            Optional<String> verifyToken = getEntityService().verify(method, code, claims);
+            return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
         }
 
         throw unauthorizedThrowable();

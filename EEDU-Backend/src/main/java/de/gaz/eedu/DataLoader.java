@@ -64,7 +64,7 @@ import java.security.SecureRandom;
                 true,
                 false,
                 UserStatus.PROSPECTIVE);
-        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", false, new Long[0], new Long[0]);
+        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", true, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
         themeService.getRepository().findByName(themeCreateModel.name()).orElseGet(() -> themeService.createEntity(themeCreateModel));

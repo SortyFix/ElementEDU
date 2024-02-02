@@ -43,6 +43,7 @@ import java.util.Set;
                 getGroupEntities().stream()
                         .map(groupEntity -> new SimplePrivilegeGroupModel(groupEntity.getId(),
                                 groupEntity.getName(),
+                                groupEntity.isTwoFactorRequired(),
                                 groupEntity.getUsers()
                                         .stream()
                                         .map(UserEntity::toSimpleModel)

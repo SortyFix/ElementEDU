@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
+                         @NotNull Boolean requiresTwoFactor,
                          @NotNull SimpleUserModel[] users,
                          @NotNull SimplePrivilegeModel[] privileges) implements EntityModel
 {

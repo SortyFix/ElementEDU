@@ -44,7 +44,7 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
         GroupCreateModel groupCreateModel = new GroupCreateModel("test", false, new Long[0], new Long[0]);
-        GroupModel groupModel = new GroupModel(5L, "test", new SimpleUserModel[0], new SimplePrivilegeModel[0]);
+        GroupModel groupModel = new GroupModel(5L, "test", false, new SimpleUserModel[0], new SimplePrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
