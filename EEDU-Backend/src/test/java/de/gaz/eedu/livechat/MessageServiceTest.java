@@ -35,11 +35,4 @@ public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel,
         // No occupied test necessary as messages can't be "occupied"
         throw new OccupiedException();
     }
-
-    @Override
-    public void testDeleteEntitySuccess(long id)
-    {
-        System.out.println(" " + getService().loadById(id));
-        super.testDeleteEntitySuccess(id);
-    }
 }

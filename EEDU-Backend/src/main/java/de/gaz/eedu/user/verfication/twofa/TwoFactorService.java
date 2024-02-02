@@ -47,25 +47,18 @@ import java.util.function.Supplier;
         Supplier<EntityUnknownException> exceptionSupplier = () -> new EntityUnknownException(model.userID());
         UserEntity userEntity = getUserService().loadEntityByID(model.userID()).orElseThrow(exceptionSupplier);
 
-        try
+        TwoFactorEntity twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
         {
-            TwoFactorEntity twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
-            {
-                entity.setSecret(generateBase32());
-                return entity;
-            }));
+            entity.setSecret(generateBase32());
+            return entity;
+        }));
 
-            if (userEntity.initTwoFactor(twoFactorEntity))
-            {
-                getRepository().save(twoFactorEntity);
-                getUserService().save(userEntity);
-
-                return twoFactorEntity;
-            }
-        }
-        catch (IllegalArgumentException illegalArgumentException)
+        if (userEntity.initTwoFactor(twoFactorEntity))
         {
-            throw new CreationException(HttpStatus.BAD_REQUEST);
+            getRepository().save(twoFactorEntity);
+            getUserService().save(userEntity);
+
+            return twoFactorEntity;
         }
 
         throw new CreationException(HttpStatus.CONFLICT);
@@ -75,9 +68,9 @@ import java.util.function.Supplier;
     {
         return getRepository().findById(id).map(twoFactor ->
         {
-            twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
-            getRepository().deleteById(id);
-            return true;
+            boolean disabled = twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
+            getRepository().deleteById(id); // delete anyway, as the user has no connection
+            return disabled;
         }).orElse(false);
     }
 

@@ -215,7 +215,6 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
     })
     public void testDeleteEntitySuccess(long id)
     {
-        getService().findAll().forEach(System.out::println);
         Assertions.assertEquals(id == 4, getService().delete(id));
     }
 
