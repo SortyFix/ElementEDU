@@ -1,42 +1,38 @@
 package de.gaz.eedu.user.illnessnotifications;
 
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service public class IllnessNotificationService
+@RequiredArgsConstructor
+@Service public class IllnessNotificationService implements EntityService<IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
-    IllnessNotificationRepository illnessNotificationRepository;
-    UserRepository userRepository;
-
-    @NotNull public Optional<IllnessNotificationEntity> loadEntityById(@NotNull Long notificationId){
-        return illnessNotificationRepository.findById(notificationId);
-    }
-
-    @NotNull public Boolean delete(Long id)
-    {
-        return illnessNotificationRepository.findById(id).map(entity ->{
-            illnessNotificationRepository.deleteById(id);
-            return true;
-        }).orElse(false);
-    }
+    private final IllnessNotificationRepository illnessNotificationRepository;
+    private final UserRepository userRepository;
 
     @NotNull public List<IllnessNotificationEntity> loadEntitiesByDate(@NotNull Long date){
-        return illnessNotificationRepository.getIllnessNotificationEntitiesByTimeStamp(date);
+        return getRepository().getIllnessNotificationEntitiesByTimeStamp(date);
     }
 
     @NotNull public List<IllnessNotificationEntity> loadEntitiesByUserIdWithStatus(@NotNull Long userId, @NotNull IllnessNotificationStatus status){
-        return illnessNotificationRepository.getIllnessNotificationEntitiesByUserAndStatus(userRepository.getReferenceById(userId), status);
+        return getRepository().getIllnessNotificationEntitiesByUserAndStatus(userRepository.getReferenceById(userId), status);
     }
 
     @NotNull public List<IllnessNotificationEntity> loadEntitiesByUserId(@NotNull Long userId){
-        return illnessNotificationRepository.getIllnessNotificationEntitiesByUser(userRepository.getReferenceById(userId));
+        return getRepository().getIllnessNotificationEntitiesByUser(userRepository.getReferenceById(userId));
+    }
+
+    @Override
+    public @NotNull IllnessNotificationRepository getRepository()
+    {
+        return illnessNotificationRepository;
     }
 
     @NotNull public IllnessNotificationEntity createEntity(@NotNull IllnessNotificationCreateModel illnessNotificationCreateModel){
-        return illnessNotificationRepository.save(illnessNotificationCreateModel.toINEntity(userRepository.getReferenceById(illnessNotificationCreateModel.userId()), new IllnessNotificationEntity()));
+        return illnessNotificationRepository.save(illnessNotificationCreateModel.toINEntity(userRepository.getReferenceById(illnessNotificationCreateModel.userId())));
     }
 }

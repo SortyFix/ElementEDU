@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id         BIGINT NOT NULL,
     status          TINYINT NOT NULL,
     reason          VARCHAR(255) NOT NULL,

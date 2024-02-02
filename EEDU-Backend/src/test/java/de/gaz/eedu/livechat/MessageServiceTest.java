@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.livechat;
+package de.gaz.eedu.livechat;
 
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.exception.OccupiedException;

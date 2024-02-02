@@ -37,13 +37,12 @@ public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long
         return entity;
     }
 
-    public @NotNull IllnessNotificationEntity toINEntity(@NotNull UserEntity userEntity, @NotNull IllnessNotificationEntity entity){
-        return IllnessNotificationEntity.builder()
-                .notificationId(entity.getNotificationId())
-                .user(userEntity)
-                .timeStamp(timestamp())
-                .status(IllnessNotificationStatus.PENDING)
-                .reason(reason)
-                .build();
+    public @NotNull IllnessNotificationEntity toINEntity(@NotNull UserEntity userEntity){
+        IllnessNotificationEntity newEntity = new IllnessNotificationEntity();
+        newEntity.setUser(userEntity);
+        newEntity.setStatus(IllnessNotificationStatus.PENDING);
+        newEntity.setReason(reason());
+        newEntity.setTimeStamp(timestamp());
+        return newEntity;
     }
 }

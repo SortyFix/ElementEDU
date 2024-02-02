@@ -50,7 +50,7 @@ public class IllnessNotificationManagementController
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/respond")
     public ResponseEntity<Boolean> respondToNotification(@NotNull Long notificationId, @NotNull IllnessNotificationStatus status)
     {
-        return illnessNotificationService.loadEntityById(notificationId).map(illnessNotificationEntity -> {
+        return illnessNotificationService.loadEntityByID(notificationId).map(illnessNotificationEntity -> {
             illnessNotificationEntity.setStatus(status);
             userService.loadEntityByID(illnessNotificationEntity.getUser().getId()).ifPresentOrElse(userEntity ->
                             userEntity.setStatus(status == IllnessNotificationStatus.ACCEPTED ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
