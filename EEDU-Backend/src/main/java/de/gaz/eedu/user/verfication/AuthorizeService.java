@@ -42,7 +42,7 @@ import java.util.Optional;
     public @NotNull String selectTwoFactor(@NotNull TwoFactorMethod twoFactorMethod, @NotNull Claims claims)
     {
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
-        return getVerificationService().twoFactor(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), twoFactorMethod);
+        return getVerificationService().twoFactorToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), twoFactorMethod);
     }
 
     @Transactional public @Nullable String authorize(@NotNull UserModel userModel, @NotNull Claims claims)

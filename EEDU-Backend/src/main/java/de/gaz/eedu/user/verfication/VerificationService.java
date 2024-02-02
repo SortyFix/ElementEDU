@@ -7,6 +7,7 @@ import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
+import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -59,14 +60,13 @@ import java.util.function.Function;
         TwoFactorMethod[] factorMethods = getMethods(user);
         if (factorMethods.length > 0)
         {
-            return twoFactor(user.id(), expiry, advanced, factorMethods);
+            return twoFactorToken(user.id(), expiry, advanced, factorMethods);
         }
 
         // user has no two factor set up, but his group requires it
         if (Arrays.stream(user.groups()).anyMatch(SimpleUserGroupModel::requiresTwoFactor))
         {
-            Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
-            return generateKey(JwtTokenType.TWO_FACTOR_REQUIRED, time, new ClaimHolder<>("userID", user.id()));
+            return twoFactorRequired(user.id(), expiry, advanced);
         }
 
         return authorizeToken(user, expiry, advanced);
@@ -106,7 +106,7 @@ import java.util.function.Function;
      * @throws IllegalArgumentException if `twoFactorMethod` is empty
      * @throws IllegalStateException if there is an issue with JWT generation related to key generation or compacting the token
      */
-    public @NotNull String twoFactor(long userID, @NotNull Instant expiry, boolean advanced,
+    public @NotNull String twoFactorToken(long userID, @NotNull Instant expiry, boolean advanced,
             @NotNull TwoFactorMethod @NotNull ... twoFactorMethod)
     {
         KeyType keyType = getKeyType(twoFactorMethod);
@@ -119,6 +119,38 @@ import java.util.function.Function;
         };
 
         return generateKey(keyType.type(), getExpiry(Duration.ofMinutes(5)), holders);
+    }
+
+    /**
+     * Generates a token for the user to be able to set up two-factor.
+     * <p>
+     * This method generates a token for making a user able to set up two-factor. It is required when a group enforces
+     * two-factor on their members but this user does not have two-factor setup yet.
+     * <p>
+     * This token enables them to use:
+     * <ul>
+     *     <li>{@link de.gaz.eedu.user.verfication.twofa.TwoFactorController#create(TwoFactorCreateModel)}</li>
+     *     <li>{@link de.gaz.eedu.user.verfication.twofa.TwoFactorController#enable(TwoFactorMethod, String, Claims)}</li>
+     * </ul>
+     * <p>
+     * Note that the user can still decide themselves what {@link TwoFactorMethod} they set up.
+     *
+     * @param userID   id of the user.
+     * @param expiry   when the login token should expire after the two-factor has been set up.
+     * @param advanced whether this token should have advanced user rights.
+     * @return the token which the user then can use to create and enable a {@link TwoFactorMethod}.
+     */
+    public @NotNull String twoFactorRequired(long userID, @NotNull Instant expiry, boolean advanced)
+    {
+        Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
+
+        ClaimHolder<?>[] holders = {
+                new ClaimHolder<>("userID", userID),
+                new ClaimHolder<>("expiry", expiry.toEpochMilli()),
+                new ClaimHolder<>("advanced", advanced)
+        };
+
+        return generateKey(JwtTokenType.TWO_FACTOR_REQUIRED, time, holders);
     }
 
     /**
