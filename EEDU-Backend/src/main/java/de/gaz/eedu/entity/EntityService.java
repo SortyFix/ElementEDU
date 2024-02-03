@@ -242,14 +242,26 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
     }
 
     /**
-     * Loads the {@link E} by its id.
+     * Loads an {@link E} by its id.
      * <p>
      * Unlike the method {@link #loadEntityByID(long)} this method does not return an {@link Optional}.
      * If the given id does not exist, this method will instead throw an {@link EntityUnknownException}.
+     * <p>
+     * Example Usage:
+     * <pre>
+     * {@code
+     * EntityService service = new SomeServiceImplementation();
+     * service.saveEntity(new SomeE());
      *
+     * System.out.println(service.loadEntityByIDSafe(1)); // Output: entity1
+     * System.out.println(service.loadEntityByIDSafe(2)); // throws EntityUnknownException
+     * }
+     * </pre>
      * @param id the id of the entry to load.
      * @return the entity from the database.
-     * @throws EntityUnknownException when the entity does not exist.
+     * @throws EntityUnknownException is thrown when the entity with the provided id is not present in the database.
+     * @see #loadByIdSafe(long)
+     * @see #loadEntityByID(long)
      */
     @Transactional(readOnly = true)
     default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
@@ -257,11 +269,43 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
         return loadEntityByID(id).orElseThrow(() -> new EntityUnknownException(id));
     }
 
+    /**
+     * Loads a {@link M} by its id.
+     * <p>
+     * This method loads {@link M} by its id. It does this by using {@link #loadEntityByIDSafe(long)} and translates the result into a {@link M} using the {@link #toModel()} {@link Function}
+     *
+     * @param id the id of the entity to load and transform. 
+     * @return the transformed entity loaded from the database.
+     * @throws EntityUnknownException is thrown when the entity with the provided id is not present in the database.
+     * @see #loadEntityByIDSafe(long)
+     * @see #loadById(long)
+     */
     @Transactional(readOnly = true) default @NotNull M loadByIdSafe(long id) throws EntityUnknownException
     {
         return toModel().apply(loadEntityByIDSafe(id));
     }
 
+    /**
+     * Loads a {@link M} by its id.
+     * <p>
+     * This method load a {@link M} by its id. Unlike {@link #loadByIdSafe(long)} this method does not throw an exception when the entity does not exist.
+     * Instead, it will return an empty {@link Optional}.
+     * <p>
+     * If the entity exists it will then be transformed into a {@link M} using the {@link #toModel()} {@link Function}
+     * <p>
+     * Example Usage:
+     * <pre>
+     * {@code
+     * EntityService service = new SomeServiceImplementation();
+     * service.saveEntity(new SomeE());
+     *
+     * System.out.println(service.loadById(1)); // Output: Optional[entity1]
+     * System.out.println(service.loadById(2)); // Output: Optional[]
+     * }
+     * </pre>
+     * @param id of the entity to load.
+     * @return an {@link Optional} containing the {@link M} if it exists or a {@link Optional#empty()}.
+     */
     @Transactional(readOnly = true) default @NotNull Optional<M> loadById(long id)
     {
         return loadEntityByID(id).map(toModel());
