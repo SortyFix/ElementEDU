@@ -69,6 +69,20 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return this.users.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
     }
 
+    /**
+     * This method checks if a specific {@link UserEntity} is part of this course.
+     * <p>
+     * This method checks whether a {@link UserEntity} is part of this course or not.
+     * It does this by checking the ids of each user from {@code getUsers()}. TODO also add classes
+     *
+     * @param id the id of the user which should be checked
+     * @return whether this user is in the course or not.
+     */
+    public boolean inCourse(long id)
+    {
+        return getUsers().stream().anyMatch(user -> Objects.equals(user.getId(), id));
+    }
+
     private <T> boolean saveEntityIfPredicateTrue(@NotNull CourseService courseService, @NotNull T entity, @NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))

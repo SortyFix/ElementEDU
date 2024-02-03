@@ -292,6 +292,21 @@ import java.util.stream.Stream;
         return twoFactors.stream().filter(TwoFactorEntity::isEnabled).collect(Collectors.toUnmodifiableSet());
     }
 
+    /**
+     * Checks whether this user is in the specified {@link CourseEntity}.
+     * <p>
+     * This method checks whether this user is part of the {@link CourseEntity} provided.
+     * It does this by iterating over {@code getCourses()} and checks their ids.
+     *
+     * @param id the id of the course to check for.
+     * @return whether this user is part of this course.
+     */
+    public boolean inCourse(long id)
+    {
+        //TODO add classes
+        return getCourses().stream().anyMatch(course -> course.getId() == id);
+    }
+
     @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,
 		    @NotNull ThemeEntity themeEntity)
     {
