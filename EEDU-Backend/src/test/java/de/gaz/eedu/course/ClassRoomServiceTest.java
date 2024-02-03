@@ -1,14 +1,22 @@
 package de.gaz.eedu.course;
 
+import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.course.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityService;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
+import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.stream.Stream;
 
 public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
@@ -44,5 +52,22 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoom
     protected @NotNull ClassRoomCreateModel occupiedCreateModel()
     {
         return new ClassRoomCreateModel("Q1");
+    }
+
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> userTestData()
+    {
+        return Stream.of(new ArrayTestData<>(1, new Long[]{1L}),
+                new ArrayTestData<>(2, new Long[]{1L}),
+                new ArrayTestData<>(3, new Long[]{2L, 3L}));
+    }
+
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("userTestData")
+    public void testGetUsers(@NotNull ArrayTestData<Long> data)
+    {
+        test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->
+        {
+            Stream<UserEntity> userEntities = getService().loadEntityByIDSafe(data.entityID()).getUsers().stream();
+            return userEntities.map(UserEntity::getId).toArray(Long[]::new);
+        });
     }
 }

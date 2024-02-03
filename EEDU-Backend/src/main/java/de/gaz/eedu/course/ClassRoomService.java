@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -57,7 +58,11 @@ public class ClassRoomService implements EntityService<ClassRoomRepository, Clas
 
             getRepository().deleteById(id);
 
-            //TODO log
+            String deleteMessage = "Deleted class room {} from the system. Additionally, the class room has been disassociated from {} users and {} courses.";
+            LoggerFactory.getLogger(ClassRoomService.class).info(deleteMessage,
+                    classRoom.getId(),
+                    userIds.length,
+                    courses.size());
             return true;
         }).orElse(false);
     }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +48,19 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     protected @NotNull TwoFactorService getEntityService()
     {
         return twoFactorService;
+    }
+
+    @PreAuthorize("(#id == authentication.principal)")
+    @DeleteMapping("/delete/{id}")
+    @Override
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
+        {
+            throw unauthorizedThrowable();
+        }
+        return super.delete(id);
     }
 
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)

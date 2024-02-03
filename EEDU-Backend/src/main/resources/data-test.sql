@@ -80,12 +80,12 @@ VALUES ('READ'),
 INSERT INTO two_factor_entity(method, data, secret, enabled, user_id)
 VALUES (0, 'mustermann@example.com', '', true, 1),
 
-       (0, 'mustermann@example.com', '', true, 2),
+       (0, 'mustermann@example.com', '', false, 2),
        (1, '555 5555555', '', true, 2),
 
        (0, 'mustermann@examle.com', '', true, 3),
        (1, '555 5555555', '', true, 3),
-       (2, NULL, '', true, 3),
+       (2, NULL, '', false, 3),
 
        (2, NULL, '', true, 4);
 
@@ -165,23 +165,15 @@ VALUES (1, 1),
        (4, 4);
 
 MERGE INTO course_users(course_id, user_id)
-VALUES (1, 1),
-
-       (2, 1),
-       (2, 2),
-
+VALUES (2, 2),
        (3, 1),
-       (3, 2),
-       (3, 3),
-
        (4, 4);
 
 MERGE INTO class_users (class_id, user_id)
 VALUES (1, 1),
-       (2, 1),
-       (2, 2),
 
-       (3, 1),
+       (2, 1),
+
        (3, 2),
        (3, 3),
 

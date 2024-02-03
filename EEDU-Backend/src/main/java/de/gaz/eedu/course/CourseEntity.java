@@ -145,7 +145,10 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * This method checks if a specific {@link UserEntity} is part of this course.
      * <p>
      * This method checks whether a {@link UserEntity} is part of this course or not.
-     * It does this by checking the ids of each user from {@code getUsers()}. TODO also add classes
+     * It does this by checking the ids of each user from {@code getUsers()}.
+     * <p>
+     * Note that {@code getUsers()} also includes the {@link UserEntity} from the {@link ClassRoomEntity} if any
+     * classroom has been set.
      *
      * @param id the id of the user which should be checked
      * @return whether this user is in the course or not.
