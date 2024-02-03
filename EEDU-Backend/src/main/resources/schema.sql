@@ -148,6 +148,12 @@ CREATE TABLE IF NOT EXISTS message_entity
 );
 
 -- Courses
+CREATE TABLE IF NOT EXISTS class_room_entity
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS subject_entity
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -156,10 +162,12 @@ CREATE TABLE IF NOT EXISTS subject_entity
 
 CREATE TABLE IF NOT EXISTS course_entity
 (
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name       VARCHAR(255) NOT NULL,
-    subject_id BIGINT       NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES subject_entity (id)
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name          VARCHAR(255) NOT NULL,
+    subject_id    BIGINT       NOT NULL,
+    class_room_id BIGINT       NULL,
+    FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
+    FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS course_users
@@ -168,5 +176,14 @@ CREATE TABLE IF NOT EXISTS course_users
     user_id   BIGINT NOT NULL,
     PRIMARY KEY (course_id, user_id),
     FOREIGN KEY (course_id) REFERENCES course_entity (id),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+);
+
+CREATE TABLE IF NOT EXISTS class_users
+(
+    class_id BIGINT NOT NULL,
+    user_id  BIGINT NOT NULL,
+    PRIMARY KEY (class_id, user_id),
+    FOREIGN KEY (class_id) REFERENCES class_room_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 )

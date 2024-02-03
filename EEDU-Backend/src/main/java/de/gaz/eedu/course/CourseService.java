@@ -38,7 +38,12 @@ public class CourseService implements EntityService<CourseRepository, CourseEnti
 
         return saveEntity(model.toEntity(new CourseEntity(), (entity) ->
         {
+            // Remove this course from the subject
             entity.setSubject(getSubjectService().loadEntityByIDSafe(model.subjectId()));
+
+            // Remove this course from its class
+            entity.disassociateClassroom();
+
             return entity;
         }));
     }

@@ -10,10 +10,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents a course entity in the system.
@@ -38,6 +40,14 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @JsonManagedReference
     @JoinTable(name = "course_users", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private final Set<UserEntity> users = new HashSet<>();
+
+    @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name = "class_room_id", referencedColumnName = "id")
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private ClassRoomEntity classRoom;
+
     @ManyToOne
     @JsonManagedReference
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
@@ -111,7 +121,6 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return saveEntityIfPredicateTrue(courseService, ids, this::detachUser);
     }
 
-
     /**
      * Detaches the user entities with the specified IDs from the current group.
      * <p>
@@ -146,6 +155,13 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return getUsers().stream().anyMatch(user -> Objects.equals(user.getId(), id));
     }
 
+    public @NotNull @Unmodifiable Set<UserEntity> getUsers()
+    {
+        // add users from class if class is present
+        Stream<UserEntity> userStream = getClassRoom().stream().flatMap(clazz -> clazz.getUsers().stream());
+        return Stream.concat(users.stream(), userStream).collect(Collectors.toUnmodifiableSet());
+    }
+
     /**
      * Saves this entity if the predicate returns true.
      * <p>
@@ -168,6 +184,48 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
             return true;
         }
         return false;
+    }
+
+    public boolean assignClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
+    {
+        return saveEntityIfPredicateTrue(courseService, classRoom, this::assignClassRoom);
+    }
+
+    public boolean assignClassRoom(@NotNull ClassRoomEntity classRoom)
+    {
+        if (!Objects.equals(this.classRoom, classRoom))
+        {
+            this.classRoom = classRoom;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean disassociateClassroom(@NotNull CourseService courseService)
+    {
+        // That's what I call an API stretch
+        return saveEntityIfPredicateTrue(courseService, disassociateClassroom(), (value) -> value);
+    }
+
+    public boolean disassociateClassroom()
+    {
+        if (!hasClassRoomAssigned())
+        {
+            return false;
+        }
+
+        classRoom = null;
+        return true;
+    }
+
+    public @NotNull Optional<ClassRoomEntity> getClassRoom()
+    {
+        return Optional.ofNullable(classRoom);
+    }
+
+    public boolean hasClassRoomAssigned()
+    {
+        return getClassRoom().isPresent();
     }
 
     @Contract(pure = true)

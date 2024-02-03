@@ -2,6 +2,7 @@ package de.gaz.eedu.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.course.ClassRoomEntity;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
@@ -65,6 +66,11 @@ import java.util.stream.Stream;
     @JsonBackReference
     @Setter(AccessLevel.NONE)
     private Set<CourseEntity> courses = new HashSet<>();
+
+    @ManyToMany(mappedBy = "users")
+    @JsonBackReference
+    @Setter(AccessLevel.NONE)
+    private Set<ClassRoomEntity> classRooms = new HashSet<>();
 
     public @NotNull SimpleUserModel toSimpleModel()
     {

@@ -1,5 +1,7 @@
 package de.gaz.eedu.user;
 
+import de.gaz.eedu.course.ClassRoomEntity;
+import de.gaz.eedu.course.ClassRoomService;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.entity.EntityService;
@@ -56,7 +58,7 @@ import java.util.function.Function;
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
-    private final CourseService courseService;
+    private final ClassRoomService classRoomService;
     @Getter(AccessLevel.NONE)
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
@@ -103,15 +105,23 @@ import java.util.function.Function;
             Long[] groups = userEntity.getGroups().stream().map(GroupEntity::getId).toArray(Long[]::new);
             userEntity.detachGroups(this, groups);
 
+            ClassRoomService classService = getClassRoomService();
+            CourseService courseService = classService.getCourseService();
+
             // Remove this user from all courses
-            Consumer<CourseEntity> detach = course -> course.detachUser(getCourseService(), userEntity.getId());
+            Consumer<CourseEntity> detachCourses = course -> course.detachUser(courseService, userEntity.getId());
             int coursesSize = userEntity.getCourses().size();
-            userEntity.getCourses().forEach(detach);
+            userEntity.getCourses().forEach(detachCourses);
+
+            // Remove this user from all classes
+            Consumer<ClassRoomEntity> detachClasses = clazz -> clazz.detachUser(classService, userEntity.getId());
+            int classSize = userEntity.getClassRooms().size();
+            userEntity.getClassRooms().forEach(detachClasses);
 
             getRepository().deleteById(id);
 
-            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups and {} courses.";
-            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize);
+            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups, {} courses and {} classes.";
+            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize, classSize);
             return true;
         }).orElse(false);
     }

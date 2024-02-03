@@ -96,11 +96,17 @@ VALUES ('German'),
        ('Informatics'),
        ('Dummy');
 
-INSERT INTO course_entity(name, subject_id)
-VALUES ('Q1-German', 1),
-       ('5e-Math', 2),
-       ('2e-Informatics', 3),
-       ('Dummy', 4);
+INSERT INTO class_room_entity(name)
+VALUES ('Q1'),
+       ('3e'),
+       ('7l'),
+       ('dummy');
+
+INSERT INTO course_entity(name, subject_id, class_room_id)
+VALUES ('Q1-German', 1, 1),
+       ('5e-Math', 2, 1),
+       ('2e-Informatics', 3, 3),
+       ('Dummy', 4, 4);
 ---
 
 INSERT INTO chat_entity (time_of_creation)
@@ -115,13 +121,13 @@ VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232),
        (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348),
        (4, 0, 'ich habe 45 grad fieber', 87293933);
 
-INSERT INTO chat_entity_messages (chat_id, message_id)
+MERGE INTO chat_entity_messages (chat_id, message_id)
 VALUES (1, 1),
        (2, 2),
        (3, 3),
        (4, 4);
 
-INSERT INTO chat_entity_users (chat_id, user_id)
+MERGE INTO chat_entity_users (chat_id, user_id)
 VALUES (1, 1),
        (1, 3),
 
@@ -161,6 +167,17 @@ VALUES (1, 1),
 MERGE INTO course_users(course_id, user_id)
 VALUES (1, 1),
 
+       (2, 1),
+       (2, 2),
+
+       (3, 1),
+       (3, 2),
+       (3, 3),
+
+       (4, 4);
+
+MERGE INTO class_users (class_id, user_id)
+VALUES (1, 1),
        (2, 1),
        (2, 2),
 
