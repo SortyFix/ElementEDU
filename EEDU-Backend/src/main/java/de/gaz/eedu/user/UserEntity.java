@@ -145,7 +145,6 @@ import java.util.stream.Stream;
         return getLastName() + ", " + getFirstName();
     }
 
-
     /**
      * Attaches various groups to the user and saves the state using the provided user service.
      * The groups are specified via their entities.
