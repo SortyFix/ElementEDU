@@ -68,9 +68,13 @@ import java.util.function.Supplier;
     {
         return getRepository().findById(id).map(twoFactor ->
         {
-            boolean disabled = twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
+            long userID = twoFactor.getUser().getId();
+            twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
             getRepository().deleteById(id); // delete anyway, as the user has no connection
-            return disabled;
+
+            String deleteMessage = "Deleted two factor entity {} from the system and disassociated it from user {}.";
+            LOGGER.info(deleteMessage, twoFactor.getId(), userID);
+            return true;
         }).orElse(false);
     }
 

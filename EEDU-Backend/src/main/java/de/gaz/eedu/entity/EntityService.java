@@ -8,6 +8,7 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,6 +125,8 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
         return getRepository().findById(id).map(entry ->
         {
             getRepository().deleteById(id);
+            String deleteMessage = "The {} has deleted the entity {}.";
+            LoggerFactory.getLogger(EntityService.class).info(deleteMessage, getClass().getSimpleName(), id);
             return true;
         }).orElse(false);
     }
