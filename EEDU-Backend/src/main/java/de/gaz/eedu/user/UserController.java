@@ -8,11 +8,11 @@ import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,16 +36,17 @@ import java.util.function.Function;
  *
  * @author ivo
  */
-@RestController @RequestMapping(value = "/user") public class UserController extends EntityController<UserService,
+@RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService,
         UserModel, UserCreateModel>
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
 
-
-    public UserController(@Autowired UserService entityService)
+    @Override
+    protected @NotNull UserService getEntityService()
     {
-        super(entityService);
+        return userService;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
@@ -80,17 +81,17 @@ import java.util.function.Function;
     public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
     {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
-        if (getEntityService().getRepository().findById(userID).map(isAllowed).orElse(false))
+        if (getEntityService().loadEntityByID(userID).map(isAllowed).orElse(false))
         {
             return login(loginModel);
         }
-        logger.warn("A user tried to access the advanced token of another user. The request has been rejected.");
+        LOGGER.warn("A user tried to access the advanced token of another user. The request has been rejected.");
         throw unauthorizedThrowable();
     }
 
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
     {
-        logger.info("The server has recognized an incoming login request.");
+        LOGGER.info("The server has recognized an incoming login request.");
 
         return getEntityService().login(userLoginModel)
                 .map(ResponseEntity::ok)
