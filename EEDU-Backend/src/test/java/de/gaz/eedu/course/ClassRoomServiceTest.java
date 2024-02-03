@@ -2,6 +2,8 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
+import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.course.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
@@ -33,8 +35,14 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoom
         super(service);
     }
 
-    @Override
-    protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval()
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUser()
+    {
+        return Stream.of(new ArrayTestData<>(1, new Long[]{1L}),
+                new ArrayTestData<>(2, new Long[]{1L}),
+                new ArrayTestData<>(3, new Long[]{2L, 3L}));
+    }
+
+    @Override protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval()
     {
         ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b");
         ClassRoomModel classRoomModel = new ClassRoomModel(5L, "5b", new UserModel[0], new CourseModel[0]);
@@ -48,20 +56,12 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoom
         });
     }
 
-    @Override
-    protected @NotNull ClassRoomCreateModel occupiedCreateModel()
+    @Override protected @NotNull ClassRoomCreateModel occupiedCreateModel()
     {
         return new ClassRoomCreateModel("Q1");
     }
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> userTestData()
-    {
-        return Stream.of(new ArrayTestData<>(1, new Long[]{1L}),
-                new ArrayTestData<>(2, new Long[]{1L}),
-                new ArrayTestData<>(3, new Long[]{2L, 3L}));
-    }
-
-    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("userTestData")
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
     public void testGetUsers(@NotNull ArrayTestData<Long> data)
     {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->

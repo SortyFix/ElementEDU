@@ -1,6 +1,6 @@
 package de.gaz.eedu.course.model;
 
-import de.gaz.eedu.course.ClassRoomEntity;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.CreationModel;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;

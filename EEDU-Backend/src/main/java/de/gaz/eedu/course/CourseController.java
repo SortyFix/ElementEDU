@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/course")
+//TODO manage access
+
+@RestController @RequestMapping("/course")
 @RequiredArgsConstructor
 public class CourseController extends EntityController<CourseService, CourseModel, CourseCreateModel>
 {

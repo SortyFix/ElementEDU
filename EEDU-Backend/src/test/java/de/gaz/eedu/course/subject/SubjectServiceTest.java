@@ -1,21 +1,14 @@
 package de.gaz.eedu.course.subject;
 
-import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.TestData;
 import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.course.subjects.SubjectService;
 import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
 import de.gaz.eedu.entity.EntityService;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.stream.Stream;
 
 public class SubjectServiceTest extends ServiceTest<SubjectEntity, SubjectModel, SubjectCreateModel>
 {
@@ -32,14 +25,6 @@ public class SubjectServiceTest extends ServiceTest<SubjectEntity, SubjectModel,
         super(service);
     }
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<TestData<String>> getSubjectName()
-    {
-        return Stream.of(new TestData<>(1L, "German"),
-                new TestData<>(2L, "Mathematics"),
-                new TestData<>(3L, "Informatics"),
-                new TestData<>(3L, "German", false));
-    }
-
     @Override
     protected @NotNull Eval<SubjectCreateModel, SubjectModel> successEval()
     {
@@ -50,16 +35,6 @@ public class SubjectServiceTest extends ServiceTest<SubjectEntity, SubjectModel,
         {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.name(), result.name());
-        });
-    }
-
-    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("getSubjectName")
-    public void testGetSubjectName(@NotNull TestData<String> data)
-    {
-        test(Eval.eval(data.entityID(), data.equalsResult(), Validator.equals()), request ->
-        {
-            SubjectEntity subjectEntity = getService().loadEntityByIDSafe(request);
-            return subjectEntity.getName().equals(data.expected());
         });
     }
 

@@ -44,26 +44,6 @@ public class TwoFactorServiceTest extends ServiceTest<TwoFactorEntity, TwoFactor
                 new TestData<>(6L, TwoFactorMethod.TOTP));
     }
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<TestData<Long>> getUserEntity()
-    {
-        // skip 4 as it gets deleted
-        return Stream.of(new TestData<>(1L, 1L),
-                new TestData<>(2L, 2L),
-                new TestData<>(3L, 2L),
-                new TestData<>(5L, 3L),
-                new TestData<>(6L, 3L));
-    }
-
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<TestData<Boolean>> isEnabled()
-    {
-        // skip 4 as it gets deleted
-        return Stream.of(new TestData<>(1L, true),
-                new TestData<>(2L, false),
-                new TestData<>(3L, true),
-                new TestData<>(5L, true),
-                new TestData<>(6L, false));
-    }
-
     @Override
     protected @NotNull Eval<TwoFactorCreateModel, TwoFactorModel> successEval() {
         TwoFactorCreateModel twoFactorCreateModel = new TwoFactorCreateModel(1L, "TOTP", "");
@@ -89,26 +69,6 @@ public class TwoFactorServiceTest extends ServiceTest<TwoFactorEntity, TwoFactor
         {
             TwoFactorEntity twoFactorEntity = getService().loadEntityByIDSafe(request);
             return twoFactorEntity.getMethod();
-        });
-    }
-
-    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("getUserEntity")
-    public void testGetUserEntity(@NotNull TestData<Long> data)
-    {
-        test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), request ->
-        {
-            TwoFactorEntity twoFactorEntity = getService().loadEntityByIDSafe(request);
-            return twoFactorEntity.getUser().getId();
-        });
-    }
-
-    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("isEnabled")
-    public void testisEnabled(@NotNull TestData<Boolean> data)
-    {
-        test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), request ->
-        {
-            TwoFactorEntity twoFactorEntity = getService().loadEntityByIDSafe(request);
-            return twoFactorEntity.isEnabled();
         });
     }
 

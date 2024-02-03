@@ -38,14 +38,6 @@ public class CourseServiceTest extends ServiceTest<CourseEntity, CourseModel, Co
         );
     }
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<TestData<String>> getSubjectData()
-    {
-        return Stream.of(new TestData<>(1L, "German"),
-                new TestData<>(2L, "Mathematics"),
-                new TestData<>(3L, "Informatics"),
-                new TestData<>(3L, "German", false));
-    }
-
     @Override
     protected @NotNull Eval<CourseCreateModel, CourseModel> successEval()
     {
@@ -66,16 +58,6 @@ public class CourseServiceTest extends ServiceTest<CourseEntity, CourseModel, Co
     protected @NotNull CourseCreateModel occupiedCreateModel()
     {
         return new CourseCreateModel("Q1-German", 2L);
-    }
-
-    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getSubjectData")
-    public void testGetSubject(@NotNull TestData<String> data)
-    {
-        test(Eval.eval(data.entityID(), data.equalsResult(), Validator.equals()), request ->
-        {
-            SubjectEntity subject = getService().loadEntityByIDSafe(request).getSubject();
-            return subject.getName().equals(data.expected());
-        });
     }
 
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")

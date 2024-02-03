@@ -1,6 +1,7 @@
 package de.gaz.eedu.course;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;

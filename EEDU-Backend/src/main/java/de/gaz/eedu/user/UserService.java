@@ -1,7 +1,7 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.course.ClassRoomEntity;
-import de.gaz.eedu.course.ClassRoomService;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
+import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.entity.EntityService;
