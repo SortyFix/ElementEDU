@@ -58,7 +58,7 @@ import java.util.function.Function;
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
-    private final ClassRoomService classRoomService;
+    @Getter private final ClassRoomService classRoomService;
     @Getter(AccessLevel.NONE)
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
