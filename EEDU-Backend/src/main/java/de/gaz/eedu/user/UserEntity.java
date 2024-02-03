@@ -56,7 +56,6 @@ import java.util.stream.Stream;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
     @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
-    //finish this line and the sql
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
 
     public @NotNull SimpleUserModel toSimpleModel()

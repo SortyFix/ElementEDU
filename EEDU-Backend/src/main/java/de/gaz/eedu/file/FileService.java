@@ -1,6 +1,7 @@
 package de.gaz.eedu.file;
 
-import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.file.enums.ClearStrategy;
+import de.gaz.eedu.file.exception.UnknownFileException;
 import de.gaz.eedu.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -12,11 +13,11 @@ import xyz.capybara.clamav.ClamavClient;
 import xyz.capybara.clamav.ClamavException;
 import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.*;
 
 @Service @RequiredArgsConstructor public class FileService
@@ -25,7 +26,11 @@ import java.util.*;
 
     private final UserService userService;
 
-    public @NotNull Boolean upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags, @NotNull Boolean illnessNotification) throws IOException, IllegalStateException
+    public @NotNull FileRepository getRepository(){
+        return fileRepository;
+    }
+
+    public @NotNull Boolean upload(@NotNull MultipartFile file, @AuthenticationPrincipal Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<Long> permittedUsers, @NotNull Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
         ScanResult scanResult = null;
         ClamavClient client;
@@ -40,9 +45,7 @@ import java.util.*;
 
         if (scanResult instanceof ScanResult.OK)
         {
-            String date = LocalDate.now().toString();
-            // TEMPORARY!
-            String dropPath = "/upload/files/" + userService.loadEntityByID(authorId).map(UserEntity::getUsername) + "/" + (illnessNotification ? "missing/" + date + "/" : null);
+            String dropPath = pathPrefix + userService.loadEntityByIDSafe(authorId).getFullName() + "/" + pathSuffix;
             Path path = Paths.get(dropPath);
             if (!Files.exists(path))
             {
@@ -56,7 +59,9 @@ import java.util.*;
                 }
             }
 
-            Path uploadPath = Paths.get(dropPath, file.getOriginalFilename());
+            final String originalFileName = file.getOriginalFilename();
+            assert originalFileName != null;
+            Path uploadPath = Paths.get(dropPath, originalFileName);
             return userService.loadEntityByID(authorId).map(currentUser ->
             {
                 try
@@ -64,8 +69,8 @@ import java.util.*;
                     Files.copy(file.getInputStream(), uploadPath);
                     // Current user will be added automatically
                     permittedUsers.add(currentUser.getId());
-                    FileCreateModel createModel = new FileCreateModel(fileName, currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
-                    createEntity(createModel);
+                    FileCreateModel createModel = new FileCreateModel(currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
+                    createEntity(createModel, file);
                     return true;
                 }
                 catch (IOException ioException)
@@ -76,6 +81,92 @@ import java.util.*;
         }
 
         return false;
+    }
+
+    /**
+     * Removes a file entity from the repository and deletes the corresponding file on the filesystem,
+     * based on the provided unique identifier.
+     *
+     * @param id The unique identifier of the file entity to be removed.
+     * @return {@code true} if the file entity is successfully removed along with its associated file,
+     *         {@code false} if the entity with the given identifier is not found.
+     * @throws IllegalArgumentException if the provided id is {@code null}.
+     * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
+     *                              on the file system.
+     */
+    public @NotNull Boolean remove(@NotNull Long id)
+    {
+        return loadEntityById(id).map(fileEntity -> {
+            try
+            {
+                getRepository().deleteById(fileEntity.getId());
+                return Files.deleteIfExists(Paths.get(fileEntity.getFilePath()));
+            }
+            catch (IOException e)
+            {
+                throw new UnknownFileException(id);
+            }
+        }).orElse(false);
+    }
+
+    /**
+     * Clears the contents of a specified directory based on the provided {@link ClearStrategy}.
+     * The method supports different clearing strategies, such as removing all files and subdirectories,
+     * deleting only files, or recursively removing files within subdirectories.
+     *
+     * @param path      The path to the directory to be cleared.
+     * @param strategy  The type of clearing operation to perform on the directory.
+     * @return {@code true} if the directory contents are successfully cleared according to the specified clear type,
+     *         {@code false} otherwise.
+     * @throws IllegalArgumentException if the provided path is {@code null}.
+     * @throws IllegalArgumentException if the provided clearType is {@code null}.
+     */
+    public @NotNull Boolean clearDirectory(@NotNull String path, @NotNull ClearStrategy strategy)
+    {
+        File directory = new File(path);
+        return switch(strategy)
+        {
+            case EVERYTHING -> Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .map(files -> Arrays.stream(files).allMatch(File::delete))
+                    .orElse(false);
+
+            case DIRECT -> Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .map(files -> Arrays.stream(files).filter(File::isFile)
+                            .allMatch(File::delete)).orElse(false);
+
+            case FILES_ONLY -> Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .map(files -> Arrays.stream(files).allMatch(file ->
+                    {
+                        if(file.isDirectory()){
+                            clearDirectory(file.getAbsolutePath(), ClearStrategy.FILES_ONLY);
+                        }
+                        return file.delete();
+                    })).orElse(false);
+
+            case SUBDIRECT -> Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .filter(files -> files.length > 0)
+                    .map(files -> Arrays.stream(files).allMatch(file -> {
+                        if(file.isDirectory()) return clearDirectory(file.getAbsolutePath(), ClearStrategy.FILES_ONLY);
+                        return true;
+                    })).orElse(false);
+        };
+    }
+
+    public Boolean makeDirectory(@NotNull String path)
+    {
+        return new File(path).mkdir();
     }
 
     public @NotNull Optional<FileEntity> loadEntityById(@NotNull Long id)
@@ -89,8 +180,7 @@ import java.util.*;
         try
         {
             return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityById(id).map(
-                    fileEntity -> fileEntity.toModel().filePath()
-                    )))));
+                    fileEntity -> fileEntity.toModel().filePath())))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -113,10 +203,10 @@ import java.util.*;
         return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
-    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
+    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model, @NotNull MultipartFile file)
     {
         return fileRepository.save(model.toEntity(new FileEntity(), obj -> {
-            // TODO: Implement stuff
+            obj.setFileName(file.getOriginalFilename());
             return obj;
         }));
     }

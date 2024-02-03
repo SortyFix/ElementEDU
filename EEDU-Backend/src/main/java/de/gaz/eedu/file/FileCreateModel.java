@@ -7,8 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public record FileCreateModel(@NotNull String name,
-                              @NotNull Long authorId,
+public record FileCreateModel(@NotNull Long authorId,
                               @NotNull String filePath,
                               @NotEmpty Set<Long> permittedUsers,
                               @NotEmpty Set<Long> permittedGroups,
@@ -17,7 +16,6 @@ public record FileCreateModel(@NotNull String name,
     @Contract(pure = true) @Override public @NotNull String toString()
     {
         return "FileCreateModel{" +
-                "fileName='" + name + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", permittedUsers=" + permittedUsers +
                 ", permittedGroups=" + permittedGroups +
@@ -25,9 +23,14 @@ public record FileCreateModel(@NotNull String name,
                 '}';
     }
 
+    @Override
+    public @NotNull String name()
+    {
+        return filePath + " " + System.currentTimeMillis();
+    }
+
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
         FileEntity.builder()
-                .fileName(name)
                 .authorId(authorId)
                 .filePath(filePath)
                 .permittedUsers(permittedUsers) // TODO | 11.12.2023: what?

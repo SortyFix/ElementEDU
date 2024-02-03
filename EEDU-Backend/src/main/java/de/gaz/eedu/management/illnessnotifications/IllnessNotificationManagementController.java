@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +33,22 @@ public class IllnessNotificationManagementController
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/open")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsWithStatusOfUser(@NotNull Long userId, @NotNull IllnessNotificationStatus status){
-        return ResponseEntity.ok(illnessNotificationService.loadEntitiesByUserIdWithStatus(userId, status).stream().map(
-                IllnessNotificationEntity::toModel).collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.loadEntityByID(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                .getIllnessNotificationEntities()
+                .stream()
+                .filter(illnessNotificationEntity -> illnessNotificationEntity.getStatus().equals(status))
+                .map(IllnessNotificationEntity::toModel)
+                .collect(Collectors.toList()));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/all")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsOfUser(@NotNull Long userId){
-        return ResponseEntity.ok(illnessNotificationService.loadEntitiesByUserId(userId).stream().map(
-                IllnessNotificationEntity::toModel).collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.loadEntityByID(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                .getIllnessNotificationEntities()
+                .stream()
+                .map(IllnessNotificationEntity::toModel)
+                .collect(Collectors.toList()));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @GetMapping("/{date}")

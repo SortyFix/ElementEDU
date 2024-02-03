@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.util.Set;
 
-@Entity @AllArgsConstructor @NoArgsConstructor @Builder @Table(name = "file_entity") public class FileEntity implements EntityObject
+@Entity @AllArgsConstructor @NoArgsConstructor @Setter @Getter @Builder @Table(name = "file_entity") public class FileEntity implements EntityObject
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String fileName;
@@ -19,10 +19,5 @@ import java.util.Set;
     public FileModel toModel()
     {
         return new FileModel(id, fileName, authorId, filePath, permittedUsers, permittedGroups, tags);
-    }
-
-    public void setTags(Set<String> tags)
-    {
-        this.tags = tags;
     }
 }
