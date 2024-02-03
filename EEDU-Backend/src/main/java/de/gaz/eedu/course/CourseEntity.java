@@ -8,9 +8,12 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -35,8 +38,45 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @Override
     public CourseModel toModel()
     {
-        //TODO
-        return new CourseModel(getId(), getName(), getSubject().toModel(), new UserModel[0]);
+        return new CourseModel(getId(),
+                getName(),
+                getSubject().toModel(),
+                getUsers().stream().map(UserEntity::toModel).toArray(UserModel[]::new));
+    }
+
+    public boolean attachUser(@NotNull CourseService courseService, @NonNull UserEntity... user)
+    {
+        return saveEntityIfPredicateTrue(courseService, user, this::attachUser);
+    }
+
+    public boolean attachUser(@NonNull UserEntity... user)
+    {
+        // Filter already attached users out
+        Predicate<UserEntity> predicate = requestedGroup -> getUsers().stream().noneMatch(presentUser -> Objects.equals(
+                presentUser,
+                requestedGroup));
+        return this.users.addAll(Arrays.stream(user).filter(predicate).collect(Collectors.toSet()));
+    }
+
+    public boolean detachUser(@NotNull CourseService courseService, @NonNull Long... ids)
+    {
+        return saveEntityIfPredicateTrue(courseService, ids, this::detachUser);
+    }
+
+    public boolean detachUser(@NonNull Long... ids)
+    {
+        List<Long> detachGroupIds = Arrays.asList(ids);
+        return this.users.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
+    }
+
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull CourseService courseService, @NotNull T entity, @NotNull Predicate<T> predicate)
+    {
+        if (predicate.test(entity))
+        {
+            courseService.saveEntity(this);
+            return true;
+        }
+        return false;
     }
 
     @Contract(pure = true)
