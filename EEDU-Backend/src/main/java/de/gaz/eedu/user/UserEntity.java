@@ -1,6 +1,8 @@
 package de.gaz.eedu.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
@@ -58,6 +60,11 @@ import java.util.stream.Stream;
             referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
     //finish this line and the sql
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    @JsonBackReference
+    @Setter(AccessLevel.NONE)
+    private Set<CourseEntity> courses = new HashSet<>();
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
@@ -174,7 +181,7 @@ import java.util.stream.Stream;
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         // Filter already attached groups out
-        Predicate<GroupEntity> predicate = requestedGroup -> this.groups.stream()
+        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream()
                 .noneMatch(presentGroup -> Objects.equals(presentGroup, requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
@@ -231,6 +238,11 @@ import java.util.stream.Stream;
     public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
     {
         return Collections.unmodifiableSet(groups);
+    }
+
+    public @NotNull @Unmodifiable Set<CourseEntity> getCourses()
+    {
+        return Collections.unmodifiableSet(courses);
     }
 
     public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)

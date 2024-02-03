@@ -1,5 +1,7 @@
 package de.gaz.eedu.user;
 
+import de.gaz.eedu.course.CourseEntity;
+import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -53,6 +56,7 @@ import java.util.function.Function;
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
+    private final CourseService courseService;
     @Getter(AccessLevel.NONE)
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
@@ -99,7 +103,15 @@ import java.util.function.Function;
             Long[] groups = userEntity.getGroups().stream().map(GroupEntity::getId).toArray(Long[]::new);
             userEntity.detachGroups(this, groups);
 
+            // Remove this user from all courses
+            Consumer<CourseEntity> detach = course -> course.detachUser(getCourseService(), userEntity.getId());
+            int coursesSize = userEntity.getCourses().size();
+            userEntity.getCourses().forEach(detach);
+
             getRepository().deleteById(id);
+
+            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups and {} courses.";
+            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize);
             return true;
         }).orElse(false);
     }
