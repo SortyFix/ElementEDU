@@ -3,17 +3,23 @@ package de.gaz.eedu.user.privileges;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping("/privilege") public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
+@RestController @RequestMapping("/privilege") @RequiredArgsConstructor
+public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
-    public PrivilegeController(@Autowired PrivilegeService entityService)
+
+    private final PrivilegeService privilegeService;
+
+    @Override
+    protected @NotNull PrivilegeService getEntityService()
     {
-        super(entityService);
+        return privilegeService;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model)
