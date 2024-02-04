@@ -26,36 +26,21 @@ import java.util.stream.Stream;
  *
  * @author ivo
  */
-@Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "course_entity")
+@Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "course_entity")
 public class CourseEntity implements EntityModelRelation<CourseModel>
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
-    private String name;
-    @ManyToMany
-    @JsonManagedReference
+    @ManyToMany @JsonManagedReference
     @JoinTable(name = "course_users", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private final Set<UserEntity> users = new HashSet<>();
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
+    private String name;
+    @ManyToOne @JsonManagedReference @JoinColumn(name = "class_room_id", referencedColumnName = "id")
+    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private ClassRoomEntity classRoom;
 
-    @ManyToOne
-    @JsonManagedReference
-    @JoinColumn(name = "class_room_id", referencedColumnName = "id")
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private ClassRoomEntity classRoom;
-
-    @ManyToOne
-    @JsonManagedReference
-    @JoinColumn(name = "subject_id", referencedColumnName = "id")
+    @ManyToOne @JsonManagedReference @JoinColumn(name = "subject_id", referencedColumnName = "id")
     private SubjectEntity subject;
 
-    @Override
-    public CourseModel toModel()
+    @Override public CourseModel toModel()
     {
         return new CourseModel(getId(),
                 getName(),
@@ -72,7 +57,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * The {@code users} list is modified during the attachment process, representing the updated course membership.
      *
      * @param courseService the {@link CourseService} instance to be used for persisting changes if needed.
-     * @param user         the array of {@link UserEntity} instances to be attached to the group.
+     * @param user          the array of {@link UserEntity} instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
      * @see #attachUser(UserEntity...)
      */
@@ -87,7 +72,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * This method attaches users to the course group, filtering out those already attached based on their equality.
      * It ensures that only unique, non-duplicate users are added.
      * <p>
-     * Note that this method does not persist the changes. 
+     * Note that this method does not persist the changes.
      * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachUser(CourseService, UserEntity...)},
      * or {@link CourseService#saveEntity(EntityModelRelation)}
      *
@@ -159,6 +144,110 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return getUsers().stream().anyMatch(user -> Objects.equals(user.getId(), id));
     }
 
+    /**
+     * Assigns a {@link ClassRoomEntity} to this course and saves the changes using the provided {@link CourseService}..
+     * <p>
+     * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
+     * {@link ClassRoomEntity#getUsers()} with the local {@code users}, accessible through {@link #getUsers()}.
+     * <p>
+     * It's important to note that this method uses the {@link CourseService} to persist changes.
+     *
+     * @param courseService The {@link CourseService} used to save the changes.
+     * @param classRoom     The {@link ClassRoomEntity} to be associated with this course.
+     * @return {@code true} if the association was successful, and changes were saved; false otherwise.
+     */
+    public boolean assignClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
+    {
+        return saveEntityIfPredicateTrue(courseService, classRoom, this::assignClassRoom);
+    }
+
+    /**
+     * Assigns a {@link ClassRoomEntity} to this course.
+     * <p>
+     * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
+     * {@link ClassRoomEntity#getUsers()} with the local {@code users}, accessible through {@link #getUsers()}.
+     *
+     * @param classRoom The {@link ClassRoomEntity} to be associated with this course.
+     * @return {@code true} if the association was successful, and changes were saved; false otherwise.
+     */
+    public boolean assignClassRoom(@NotNull ClassRoomEntity classRoom)
+    {
+        if (!Objects.equals(this.classRoom, classRoom))
+        {
+            this.classRoom = classRoom;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Disassociates the currently assigned {@link ClassRoomEntity} from this course and saves the changes using the provided {@link CourseService}.
+     * <p>
+     * This method calls {@link #disassociateClassroom()} to remove the association between the course and its assigned classroom.
+     * The disassociation is persisted using the provided {@link CourseService}.
+     *
+     * @param courseService The {@link CourseService} used to save the changes.
+     * @return {@code true} if the disassociation was successful, and changes were saved; false otherwise.
+     */
+    public boolean disassociateClassroom(@NotNull CourseService courseService)
+    {
+        // That's what I call an API stretch
+        return saveEntityIfPredicateTrue(courseService, disassociateClassroom(), (value) -> value);
+    }
+
+    /**
+     * Disassociates the currently assigned {@link ClassRoomEntity} from this course.
+     * <p>
+     * This method removes the association between the course and its assigned classroom by setting the
+     * {@code classRoom} property to {@code null}.
+     *
+     * @return {@code true} if the disassociation was successful; false otherwise.
+     */
+    public boolean disassociateClassroom()
+    {
+        if (!hasClassRoomAssigned())
+        {
+            return false;
+        }
+
+        classRoom = null;
+        return true;
+    }
+
+    /**
+     * Retrieves the optional {@link ClassRoomEntity} assigned to this course, if any.
+     * <p>
+     * This method returns an {@link Optional} containing the assigned {@link ClassRoomEntity} if present,
+     * or an empty {@link Optional} if no class is currently assigned to this course.
+     *
+     * @return An {@link Optional} containing the assigned {@link ClassRoomEntity} if present, otherwise an empty {@link Optional}.
+     */
+    public @NotNull Optional<ClassRoomEntity> getClassRoom()
+    {
+        return Optional.ofNullable(classRoom);
+    }
+
+    /**
+     * Checks if a {@link ClassRoomEntity} is assigned to this course.
+     * <p>
+     * This method returns true if a {@link ClassRoomEntity} is currently assigned to this course, indicating
+     * that the course is associated with a specific class. It returns false if no class is currently assigned.
+     *
+     * @return {@code true} if a {@link ClassRoomEntity} is assigned, false otherwise.
+     */
+    public boolean hasClassRoomAssigned()
+    {
+        return getClassRoom().isPresent();
+    }
+
+    /**
+     * Retrieves a set of users associated with this course, including users from the assigned class, if present.
+     * <p>
+     * This method combines the local {@code users} with users from the assigned class (if available) using a
+     * {@link Stream} of {@link UserEntity}. The resulting set is made unmodifiable.
+     *
+     * @return An unmodifiable set of {@link UserEntity} representing the users associated with this course.
+     */
     public @NotNull @Unmodifiable Set<UserEntity> getUsers()
     {
         // add users from class if class is present
@@ -172,7 +261,8 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * This method executes an action inside the predicate and saves this in the repository when the action was successfully
      * performed.
      * <p>
-     * Note that this method uses the {@link CourseService} in order to save the changes instead of the actual repository.
+     * Note that this method uses the {@link CourseService} to persist changes, bypassing direct interaction
+     * with the repository.
      *
      * @param courseService the service that is used to save this entity.
      * @param test          the entity that is given into the predicate.
@@ -190,57 +280,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return false;
     }
 
-    public boolean assignClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
-    {
-        return saveEntityIfPredicateTrue(courseService, classRoom, this::assignClassRoom);
-    }
-
-    public boolean assignClassRoom(@NotNull ClassRoomEntity classRoom)
-    {
-        if (!Objects.equals(this.classRoom, classRoom))
-        {
-            this.classRoom = classRoom;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean disassociateClassroom(@NotNull CourseService courseService)
-    {
-        // That's what I call an API stretch
-        return saveEntityIfPredicateTrue(courseService, disassociateClassroom(), (value) -> value);
-    }
-
-    public boolean disassociateClassroom()
-    {
-        if (!hasClassRoomAssigned())
-        {
-            return false;
-        }
-
-        classRoom = null;
-        return true;
-    }
-
-    public @NotNull Optional<ClassRoomEntity> getClassRoom()
-    {
-        return Optional.ofNullable(classRoom);
-    }
-
-    public boolean hasClassRoomAssigned()
-    {
-        return getClassRoom().isPresent();
-    }
-
-    @Contract(pure = true)
-    @Override
-    public @NotNull String toString()
+    @Contract(pure = true) @Override public @NotNull String toString()
     { // Automatically generated by IntelliJ
         return "CourseEntity{" + "id=" + id + ", name='" + name + '\'' + ", users=" + users + ", subject=" + subject + '}';
     }
 
-    @Override
-    public boolean equals(Object o)
+    @Override public boolean equals(Object o)
     { // Automatically generated by IntelliJ
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
@@ -248,8 +293,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return Objects.equals(getId(), that.getId());
     }
 
-    @Override
-    public int hashCode()
+    @Override public int hashCode()
     { // Automatically generated by IntelliJ
         return Objects.hashCode(getId());
     }
