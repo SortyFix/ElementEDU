@@ -87,6 +87,78 @@ import java.util.stream.Stream;
     }
 
     /**
+     * Applies a specified strategy to retrieve an array of File objects based on the provided path.
+     *
+     * @param strategy The strategy to be applied for file retrieval. Available strategies: <br>
+     *                 - {@link Strategy#EVERYTHING}: Retrieves all files in the specified directory including subdirectories and files in subdirectories. <br>
+     *                 - {@link Strategy#DIRECT}: Retrieves files directly in the specified directory. <br>
+     *                 - {@link Strategy#FILES_ONLY}: Retrieves all files, including those in subdirectories, but excludes subdirectories themselves. <br>
+     *                 - {@link Strategy#SUBDIRECT}: Retrieves files in subdirectories, excluding files in the specified directory.
+     * @param path     The path of the directory from which files are to be retrieved.
+     * @return An Optional containing the array of File objects based on the specified strategy.
+     *         If the strategy is invalid or an exception occurs during the process, an empty Optional is returned.
+     * @throws UnknownDirectoryException if the specified directory is unknown or inaccessible.
+     *                                 This exception is thrown in case of directory-related issues.
+     *                                 The message provides details about the problematic directory.
+     *                                 This exception wraps any underlying exceptions that might occur during the operation.
+     *                                 For example, if there are issues with file I/O or directory traversal.
+     *                                 It indicates that the directory at the specified path is not accessible or does not exist.
+     */
+    public @NotNull List<File> strategize(@NotNull Strategy strategy, @NotNull String path)
+    {
+        File directory = new File(path);
+        final Path start = Paths.get(path);
+
+        return switch(strategy)
+        {
+            case EVERYTHING -> Arrays.asList(Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .orElseThrow(() -> new UnknownDirectoryException(path)));
+
+            case DIRECT -> Arrays.asList(Optional.of(directory)
+                    .filter(File::exists)
+                    .filter(File::isDirectory)
+                    .map(File::listFiles)
+                    .map(files -> Arrays.stream(files).filter(File::isFile)
+                            .toArray(File[]::new)).orElse(new File[0]));
+
+            case FILES_ONLY -> {
+                try (Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
+                {
+                    yield Arrays.asList(Optional.of(pathStream
+                                    .toList()
+                                    .stream().filter(mpath -> !Files.isDirectory(mpath))
+                                    .map(Path::toFile)
+                                    .toArray(File[]::new))
+                            .orElse(new File[0]));
+                }
+                catch(Exception e)
+                {
+                    throw new UnknownDirectoryException(path);
+                }
+            }
+
+            case SUBDIRECT -> {
+                try(Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
+                {
+                    yield Arrays.asList(Optional.of(pathStream
+                                    .filter(mpath -> !mpath.equals(start))
+                                    .filter(mpath -> !Files.isDirectory(mpath))
+                                    .map(Path::toFile)
+                                    .toArray(File[]::new))
+                                    .orElse(new File[0]));
+                }
+                catch(Exception e)
+                {
+                    throw new UnknownDirectoryException(path);
+                }
+            }
+        };
+    }
+
+    /**
      * Removes a file entity from the repository and deletes the corresponding file on the filesystem,
      * based on the provided unique identifier.
      *
@@ -112,81 +184,9 @@ import java.util.stream.Stream;
         }).orElse(false);
     }
 
-    /**
-     * Applies a specified strategy to retrieve an array of File objects based on the provided path.
-     *
-     * @param strategy The strategy to be applied for file retrieval. Available strategies: <br>
-     *                 - {@link Strategy#EVERYTHING}: Retrieves all files in the specified directory including subdirectories and files in subdirectories. <br>
-     *                 - {@link Strategy#DIRECT}: Retrieves files directly in the specified directory. <br>
-     *                 - {@link Strategy#FILES_ONLY}: Retrieves all files, including those in subdirectories, but excludes subdirectories themselves. <br>
-     *                 - {@link Strategy#SUBDIRECT}: Retrieves files in subdirectories, excluding files in the specified directory.
-     * @param path     The path of the directory from which files are to be retrieved.
-     * @return An Optional containing the array of File objects based on the specified strategy.
-     *         If the strategy is invalid or an exception occurs during the process, an empty Optional is returned.
-     * @throws UnknownDirectoryException if the specified directory is unknown or inaccessible.
-     *                                 This exception is thrown in case of directory-related issues.
-     *                                 The message provides details about the problematic directory.
-     *                                 This exception wraps any underlying exceptions that might occur during the operation.
-     *                                 For example, if there are issues with file I/O or directory traversal.
-     *                                 It indicates that the directory at the specified path is not accessible or does not exist.
-     */
-    public @NotNull File[] strategize(@NotNull Strategy strategy, @NotNull String path)
+    public @NotNull Boolean deleteRecursively(@NotNull List<File> files)
     {
-        File directory = new File(path);
-        final Path start = Paths.get(path);
-
-        return switch(strategy)
-        {
-            case EVERYTHING -> Optional.of(directory)
-                    .filter(File::exists)
-                    .filter(File::isDirectory)
-                    .map(File::listFiles)
-                    .orElseThrow(() -> new UnknownDirectoryException(path));
-
-            case DIRECT -> Optional.of(directory)
-                    .filter(File::exists)
-                    .filter(File::isDirectory)
-                    .map(File::listFiles)
-                    .map(files -> Arrays.stream(files).filter(File::isFile)
-                            .toArray(File[]::new)).orElse(new File[0]);
-
-            case FILES_ONLY -> {
-                try (Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
-                {
-                    yield Optional.of(pathStream
-                            .toList()
-                            .stream().filter(mpath -> !Files.isDirectory(mpath))
-                            .map(Path::toFile)
-                            .toArray(File[]::new))
-                            .orElse(new File[0]);
-                }
-                catch(Exception e)
-                {
-                    throw new UnknownDirectoryException(path);
-                }
-            }
-
-            case SUBDIRECT -> {
-                try(Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
-                {
-                    yield Optional.of(pathStream
-                            .filter(mpath -> !mpath.equals(start))
-                            .filter(mpath -> !Files.isDirectory(mpath))
-                            .map(Path::toFile)
-                            .toArray(File[]::new))
-                            .orElse(new File[0]);
-                }
-                catch(Exception e)
-                {
-                    throw new UnknownDirectoryException(path);
-                }
-            }
-        };
-    }
-
-    public @NotNull Boolean deleteRecursively(@NotNull File[] files)
-    {
-        return Arrays.stream(files).allMatch(File::delete);
+        return files.stream().allMatch(File::delete);
     }
 
     public Boolean makeDirectory(@NotNull String path)
