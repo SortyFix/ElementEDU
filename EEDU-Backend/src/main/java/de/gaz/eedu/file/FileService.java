@@ -33,6 +33,20 @@ import java.util.stream.Stream;
         return fileRepository;
     }
 
+    /**
+     * Uploads a file, performs a virus scan using ClamAV, and saves it to the specified directory.
+     *
+     * @param file            The file to be uploaded.
+     * @param authorId        The ID of the author/user initiating the upload.
+     * @param pathPrefix      The prefix for the path where the file will be stored.
+     * @param pathSuffix      The suffix for the path where the file will be stored.
+     * @param permittedUsers  The set of user IDs permitted to access the uploaded file.
+     * @param permittedGroups The set of group IDs permitted to access the uploaded file.
+     * @param tags            The set of tags associated with the uploaded file.
+     * @return True if the upload is successful, false otherwise.
+     * @throws IOException        If an I/O error occurs during the upload or file copying.
+     * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
+     */
     public @NotNull Boolean upload(@NotNull MultipartFile file, @AuthenticationPrincipal Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<Long> permittedUsers, @NotNull Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
         ScanResult scanResult = null;
@@ -158,6 +172,11 @@ import java.util.stream.Stream;
         };
     }
 
+    public @NotNull File getFileOfPath(@NotNull String path)
+    {
+        return new File(path);
+    }
+
     /**
      * Removes a file entity from the repository and deletes the corresponding file on the filesystem,
      * based on the provided unique identifier.
@@ -187,6 +206,36 @@ import java.util.stream.Stream;
     public @NotNull Boolean deleteRecursively(@NotNull List<File> files)
     {
         return files.stream().allMatch(File::delete);
+    }
+
+    public @NotNull Boolean moveRecursively(@NotNull List<File> files, @NotNull String targetPath)
+    {
+        return files.stream().allMatch(file -> {
+            try
+            {
+                Files.move(file.toPath(), Paths.get(targetPath, file.getName()));
+                return true;
+            }
+            catch (IOException e)
+            {
+                return false;
+            }
+        });
+    }
+
+    public @NotNull Boolean copyRecursively(@NotNull List<File> files, @NotNull String targetPath)
+    {
+        return files.stream().allMatch(file -> {
+            try
+            {
+                Files.copy(file.toPath(), Paths.get(targetPath, file.getName()));
+                return true;
+            }
+            catch (IOException e)
+            {
+                return false;
+            }
+        });
     }
 
     public Boolean makeDirectory(@NotNull String path)
