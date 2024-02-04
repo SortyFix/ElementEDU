@@ -1,6 +1,6 @@
 package de.gaz.eedu.file.enums;
 
-public enum ClearStrategy
+public enum Strategy
 {
     /**
      * Delete everything in directory, including subdirectories.
