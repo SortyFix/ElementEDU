@@ -116,7 +116,7 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
             userEntity.getCourses().forEach(detachCourses);
 
             // Remove this user from all classes
-            Function<ClassRoomEntity, Boolean> detachFromClass = clazz -> clazz.detachUsers(userEntity.getId());
+            Function<ClassRoomEntity, Boolean> detachFromClass = clazz -> clazz.detachStudents(userEntity.getId());
             boolean classDetached = userEntity.getClassRoom().map(detachFromClass).orElse(false);
 
             getRepository().deleteById(id);
@@ -125,7 +125,7 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
             LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize);
             if (classDetached)
             {
-                String message = "The user has also been detached from a class";
+                String message = "The user has also been detached from a class.";
                 LOGGER.info(message);
             }
 

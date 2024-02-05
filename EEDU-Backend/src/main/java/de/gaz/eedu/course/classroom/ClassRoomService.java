@@ -52,11 +52,11 @@ public class ClassRoomService implements EntityService<ClassRoomRepository, Clas
         return loadEntityByID(id).map(classRoom ->
         {
             // Remove users from this class
-            Long[] userIds = classRoom.getUsers().stream().map(UserEntity::getId).toArray(Long[]::new);
-            classRoom.detachUsers(this, userIds);
+            Long[] userIds = classRoom.getStudents().stream().map(UserEntity::getId).toArray(Long[]::new);
+            classRoom.detachStudents(this, userIds);
 
             Set<CourseEntity> courses = classRoom.getCourses();
-            courses.forEach(course -> course.disassociateClassroom(getCourseService()));
+            courses.forEach(course -> course.revokeClassroom(getCourseService()));
 
             getRepository().deleteById(id);
 

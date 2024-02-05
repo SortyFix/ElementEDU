@@ -3,7 +3,6 @@ package de.gaz.eedu.course.classroom;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
-import de.gaz.eedu.course.classroom.exception.TutorConflictException;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
@@ -13,6 +12,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -23,7 +25,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 {
     @OneToMany @JsonManagedReference
     @JoinTable(name = "class_users", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    private final Set<UserEntity> users = new HashSet<>();
+    @Getter(AccessLevel.NONE) private final Set<UserEntity> users = new HashSet<>();
     @OneToMany(mappedBy = "classRoom") @JsonBackReference private final Set<CourseEntity> courses = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
@@ -36,39 +38,55 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 
     public @NotNull Optional<UserEntity> getTutor()
     {
-        return getUsers().stream().filter(user -> user.hasRole("teacher")).findFirst();
+        return getStudents().stream().filter(user -> user.hasRole("teacher")).findFirst();
     }
 
-    public boolean attachUsers(@NotNull ClassRoomService classRoomService, @NonNull UserEntity... user)
+    public boolean setTutor(@NotNull ClassRoomService classRoomService, @NotNull UserEntity userEntity)
     {
-        return saveEntityIfPredicateTrue(classRoomService, user, this::attachUsers);
+        return saveEntityIfPredicateTrue(classRoomService, userEntity, this::setTutor);
     }
 
-    public boolean attachUsers(@NonNull UserEntity... user)
+    public boolean setTutor(@NotNull UserEntity userEntity)
     {
-        // Filter already attached users out
-        Predicate<UserEntity> predicate = present -> getUsers().stream().noneMatch(currentUser ->
+        if (!userEntity.hasRole("teacher"))
         {
-            if (present.hasRole("teacher") && currentUser.hasRole("teacher"))
-            {
-                throw new TutorConflictException();
-            }
+            String errorMessage =  "The provided user is not a teacher.";
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, errorMessage, new IllegalArgumentException());
+        }
 
-            return Objects.equals(present, currentUser);
-        });
+        if (this.users.removeIf(user -> userEntity.hasRole("teacher")))
+        {
+            String logMessage = "The tutor from classroom {} has been overridden.";
+            LoggerFactory.getLogger(ClassRoomEntity.class).info(logMessage, getId());
+        }
 
-        return this.users.addAll(Arrays.stream(user).filter(predicate).collect(Collectors.toSet()));
+        return this.users.add(userEntity);
     }
 
-    public boolean detachUsers(@NotNull ClassRoomService classRoomService, @NonNull Long... ids)
+    public boolean attachStudents(@NotNull ClassRoomService classRoomService, @NonNull UserEntity... user)
     {
-        return saveEntityIfPredicateTrue(classRoomService, ids, this::detachUsers);
+        return saveEntityIfPredicateTrue(classRoomService, user, this::attachStudents);
     }
 
-    public boolean detachUsers(@NonNull Long... ids)
+    public boolean attachStudents(@NonNull UserEntity... user)
+    {
+        return this.users.addAll(Arrays.stream(user).filter(noTeacher()).collect(Collectors.toSet()));
+    }
+
+    public boolean detachStudents(@NotNull ClassRoomService classRoomService, @NonNull Long... ids)
+    {
+        return saveEntityIfPredicateTrue(classRoomService, ids, this::detachStudents);
+    }
+
+    public boolean detachStudents(@NonNull Long... ids)
     {
         List<Long> detachGroupIds = Arrays.asList(ids);
         return this.users.removeIf(user -> detachGroupIds.contains(user.getId()));
+    }
+
+    public @NotNull Set<UserEntity> getStudents()
+    {
+        return users.stream().filter(noTeacher()).collect(Collectors.toSet());
     }
 
     private <T> boolean saveEntityIfPredicateTrue(@NotNull ClassRoomService classRoomService, @NotNull T test, @NotNull Predicate<T> predicate)
@@ -79,6 +97,11 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
             return true;
         }
         return false;
+    }
+
+    @Contract(pure = true, value = "-> new") private @NotNull Predicate<UserEntity> noTeacher()
+    {
+        return current -> !current.hasRole("teacher");
     }
 
     @Contract(pure = true) @Override public @NotNull String toString()

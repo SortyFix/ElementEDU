@@ -131,7 +131,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * Assigns a {@link ClassRoomEntity} to this course and saves the changes using the provided {@link CourseService}..
      * <p>
      * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
-     * {@link ClassRoomEntity#getUsers()} with the local {@code users}, accessible through {@link #getUsers()}.
+     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getUsers()}.
      * <p>
      * It's important to note that this method uses the {@link CourseService} to persist changes.
      *
@@ -148,7 +148,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * Assigns a {@link ClassRoomEntity} to this course.
      * <p>
      * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
-     * {@link ClassRoomEntity#getUsers()} with the local {@code users}, accessible through {@link #getUsers()}.
+     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getUsers()}.
      *
      * @param classRoom The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
@@ -166,16 +166,16 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     /**
      * Disassociates the currently assigned {@link ClassRoomEntity} from this course and saves the changes using the provided {@link CourseService}.
      * <p>
-     * This method calls {@link #disassociateClassroom()} to remove the association between the course and its assigned classroom.
+     * This method calls {@link #revokeClassroom()} to remove the association between the course and its assigned classroom.
      * The disassociation is persisted using the provided {@link CourseService}.
      *
      * @param courseService The {@link CourseService} used to save the changes.
      * @return {@code true} if the disassociation was successful, and changes were saved; false otherwise.
      */
-    public boolean disassociateClassroom(@NotNull CourseService courseService)
+    public boolean revokeClassroom(@NotNull CourseService courseService)
     {
         // That's what I call an API stretch
-        return saveEntityIfPredicateTrue(courseService, disassociateClassroom(), (value) -> value);
+        return saveEntityIfPredicateTrue(courseService, revokeClassroom(), (value) -> value);
     }
 
     /**
@@ -186,7 +186,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      *
      * @return {@code true} if the disassociation was successful; false otherwise.
      */
-    public boolean disassociateClassroom()
+    public boolean revokeClassroom()
     {
         if (!hasClassRoomAssigned())
         {
@@ -234,7 +234,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     public @NotNull @Unmodifiable Set<UserEntity> getUsers()
     {
         // add users from class if class is present
-        Stream<UserEntity> userStream = getClassRoom().stream().flatMap(clazz -> clazz.getUsers().stream());
+        Stream<UserEntity> userStream = getClassRoom().stream().flatMap(clazz -> clazz.getStudents().stream());
         return Stream.concat(users.stream(), userStream).collect(Collectors.toUnmodifiableSet());
     }
 

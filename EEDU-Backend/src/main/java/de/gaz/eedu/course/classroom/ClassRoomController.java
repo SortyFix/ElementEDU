@@ -30,7 +30,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
     public @NotNull HttpStatus attachUser(@NotNull @PathVariable Long userId, @NotNull @PathVariable Long classId)
     {
         UserEntity user = getUserService().loadEntityByIDSafe(userId);
-        if(getEntityService().loadEntityByIDSafe(classId).attachUsers(getEntityService(), user))
+        if(getEntityService().loadEntityByIDSafe(classId).attachStudents(getEntityService(), user))
         {
             return HttpStatus.OK;
         }
@@ -40,7 +40,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
     @GetMapping("/detach/{userId}/{classId}")
     public @NotNull HttpStatus detachUser(@NotNull @PathVariable Long userId, @NotNull @PathVariable Long classId)
     {
-        if(getEntityService().loadEntityByIDSafe(classId).detachUsers(userId))
+        if(getEntityService().loadEntityByIDSafe(classId).detachStudents(userId))
         {
             return HttpStatus.OK;
         }

@@ -13,38 +13,41 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-@Service
+@RequiredArgsConstructor @Service
 public class CourseService implements EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     private final CourseRepository courseRepository;
-    @Getter(AccessLevel.PROTECTED)
-    private final SubjectService subjectService;
+    @Getter(AccessLevel.PROTECTED) private final SubjectService subjectService;
 
-    @Override
-    public @NotNull CourseRepository getRepository()
+    @Override public @NotNull CourseRepository getRepository()
     {
         return courseRepository;
     }
 
-    @Transactional
-    @Override
+    @Transactional @Override
     public @NotNull CourseEntity createEntity(@NotNull CourseCreateModel model) throws CreationException
     {
-        if(getRepository().existsByName(model.name()))
+        if (getRepository().existsByName(model.name()))
         {
             throw new NameOccupiedException(model.name());
         }
 
         return saveEntity(model.toEntity(new CourseEntity(), (entity) ->
         {
-            // Remove this course from the subject
+            // add to subject
             entity.setSubject(getSubjectService().loadEntityByIDSafe(model.subjectId()));
-
-            // Remove this course from its class
-            entity.disassociateClassroom();
-
             return entity;
         }));
+    }
+
+    @Transactional @Override public boolean delete(long id)
+    {
+        return loadEntityByID(id).map(entity ->
+        {
+            // Remove this course from its class
+            entity.revokeClassroom();
+
+            return true;
+        }).orElse(false);
     }
 }

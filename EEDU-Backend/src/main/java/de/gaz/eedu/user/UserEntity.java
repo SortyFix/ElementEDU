@@ -65,8 +65,8 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
     @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
     @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
-    @ManyToMany(mappedBy = "users") @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
-    private Set<CourseEntity> courses = new HashSet<>();
+    @ManyToMany(mappedBy = "users") @JsonBackReference @Getter(AccessLevel.NONE)
+    private final Set<CourseEntity> courses = new HashSet<>();
     @ManyToOne @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
@@ -204,7 +204,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      * @param ids         The IDs of the groups to be detached.
      * @return true if a group was successfully detached and the user entity was saved, false otherwise.
      */
-    @Transactional public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
+    public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
     {
         return saveEntityIfPredicateTrue(userService, ids, this::detachGroups);
     }
@@ -369,8 +369,8 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      * that the course is associated with a specific class. It returns false if no class is currently assigned.
      * <p>
      * Note: This method relies on the presence or absence of the assigned {@link ClassRoomEntity} as determined by the
-     * {@link #getClassRoom()} method. To assign a {@link ClassRoomEntity} to this course, use the {@link ClassRoomEntity#attachUsers(UserEntity...)}
-     * method, and to disassociate the current class, use the {@link ClassRoomEntity#detachUsers(Long...)} method.
+     * {@link #getClassRoom()} method. To assign a {@link ClassRoomEntity} to this course, use the {@link ClassRoomEntity#attachStudents(UserEntity...)}
+     * method, and to disassociate the current class, use the {@link ClassRoomEntity#detachStudents(Long...)} method.
      *
      * @return {@code true} if a {@link ClassRoomEntity} is assigned, false otherwise.
      */
