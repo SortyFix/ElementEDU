@@ -43,9 +43,9 @@ import java.util.stream.Collectors;
     }
 
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus generalUpload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus generalUpload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, @NotNull Set<String> privileges, Set<String> tags) throws IOException, IllegalStateException
     {
-        Boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", permittedUsers, permittedGroups, tags);
+        Boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", privileges, tags);
         return uploadSuccessful ? HttpStatus.OK
                 : HttpStatus.FORBIDDEN;
     }

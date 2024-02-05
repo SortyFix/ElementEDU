@@ -5,20 +5,19 @@ import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public record FileCreateModel(@NotNull Long authorId,
                               @NotNull String filePath,
-                              @NotEmpty Set<Long> permittedUsers,
-                              @NotEmpty Set<Long> permittedGroups,
-                              Set<String> tags) implements CreationModel<FileEntity>
+                              @NotEmpty String[] privilege,
+                              String[] tags) implements CreationModel<FileEntity>
 {
     @Contract(pure = true) @Override public @NotNull String toString()
     {
         return "FileCreateModel{" +
                 ", filePath='" + filePath + '\'' +
-                ", permittedUsers=" + permittedUsers +
-                ", permittedGroups=" + permittedGroups +
+                ", allowedPrivileges=" + privilege + '\'' +
                 ", tags='" + tags + '\'' +
                 '}';
     }
@@ -29,13 +28,12 @@ public record FileCreateModel(@NotNull Long authorId,
         return filePath + " " + System.currentTimeMillis();
     }
 
+    @Override
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
-        FileEntity.builder()
-                .authorId(authorId)
-                .filePath(filePath)
-                .permittedUsers(permittedUsers) // TODO | 11.12.2023: what?
-                .permittedGroups(permittedGroups) // TODO | same here
-                .tags(tags);
+        fileEntity.setAuthorId(authorId());
+        fileEntity.setFilePath(filePath());
+        fileEntity.setPrivilege(Arrays.stream(privilege()).collect(Collectors.toSet()));
+        fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         return fileEntity;
     }
 }

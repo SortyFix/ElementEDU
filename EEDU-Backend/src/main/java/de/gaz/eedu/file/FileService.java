@@ -1,15 +1,16 @@
 package de.gaz.eedu.file;
 
 import de.gaz.eedu.file.enums.Strategy;
+import de.gaz.eedu.file.exception.DirectoryExistsException;
 import de.gaz.eedu.file.exception.UnknownDirectoryException;
 import de.gaz.eedu.file.exception.UnknownFileException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
+import de.gaz.eedu.user.privileges.PrivilegeService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.capybara.clamav.ClamavClient;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
     private final FileRepository fileRepository;
 
     private final UserService userService;
+    private final PrivilegeService privilegeService;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
@@ -43,14 +45,13 @@ import java.util.stream.Stream;
      * @param authorId        The ID of the author/user initiating the upload.
      * @param pathPrefix      The prefix for the path where the file will be stored.
      * @param pathSuffix      The suffix for the path where the file will be stored.
-     * @param permittedUsers  The set of user IDs permitted to access the uploaded file.
-     * @param permittedGroups The set of group IDs permitted to access the uploaded file.
+     * @param privilegeEntities The set of string representing the necessary user privilege for access.
      * @param tags            The set of tags associated with the uploaded file.
      * @return True if the upload is successful, false otherwise.
      * @throws IOException        If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
-    public boolean upload(@NotNull MultipartFile file, @AuthenticationPrincipal Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
+    public boolean upload(@NotNull MultipartFile file, @NotNull Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<String> privilegeEntities, Set<String> tags) throws IOException, IllegalStateException
     {
         ScanResult scanResult = null;
 
@@ -66,17 +67,8 @@ import java.util.stream.Stream;
         {
             String dropPath = pathPrefix + userService.loadEntityByIDSafe(authorId).getFullName() + "/" + pathSuffix;
             Path path = Paths.get(dropPath);
-            if (!Files.exists(path))
-            {
-                try
-                {
-                    Files.createDirectories(path);
-                }
-                catch (IOException ioException)
-                {
-                    return false;
-                }
-            }
+
+            makeDirectory(path.toString());
 
             final String originalFileName = file.getOriginalFilename();
             assert originalFileName != null;
@@ -86,9 +78,7 @@ import java.util.stream.Stream;
                 try
                 {
                     Files.copy(file.getInputStream(), uploadPath);
-                    // Current user will be added automatically
-                    permittedUsers.add(currentUser.getId());
-                    FileCreateModel createModel = new FileCreateModel(currentUser.getId(), uploadPath.toString(), permittedUsers, permittedGroups, tags);
+                    FileCreateModel createModel = new FileCreateModel(currentUser.getId(), uploadPath.toString(), privilegeEntities.toArray(String[]::new), tags.toArray(String[]::new));
                     createEntity(createModel, file);
                     return true;
                 }
@@ -242,7 +232,11 @@ import java.util.stream.Stream;
 
     public boolean makeDirectory(@NotNull String path)
     {
-        return new File(path).mkdir();
+        if(!Files.exists(Paths.get(path)))
+        {
+            return new File(path).mkdir();
+        }
+        throw new DirectoryExistsException(path);
     }
 
     public boolean verifyAccess(@NotNull FileEntity fileEntity, @NotNull Long userId)
@@ -250,8 +244,10 @@ import java.util.stream.Stream;
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
         Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
         return userService.loadEntityByIDSafe(userId).getId().equals(fileEntity.toModel().authorId())
-                || !Collections.disjoint(userGroupIds, fileEntity.toModel().permittedGroups())
-                || fileEntity.toModel().permittedUsers().contains(userEntity.getId());
+                || fileEntity.getPrivilege().stream().anyMatch(filePrivilege ->
+                        userEntity.getGroups().stream()
+                .flatMap(groupEntity -> groupEntity.getPrivileges().stream()).anyMatch(userPrivilege -> userPrivilege.getName().equals(filePrivilege))
+        );
     }
 
     public @NotNull Optional<FileEntity> loadEntityById(@NotNull Long id)
@@ -299,7 +295,7 @@ import java.util.stream.Stream;
     /**
      * Deletes the {@link FileEntity} that holds the given <cold>id</cold>
      * parameter value as file id.
-     * @param id
+     * @param id Identifier
      * @return boolean <br>
      * True: Successfully deleted <br>
      * False: Couldn't find {@link FileEntity} with id.

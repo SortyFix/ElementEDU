@@ -59,6 +59,14 @@ CREATE TABLE IF NOT EXISTS file_entity
     file_path VARCHAR(255) NULL
 );
 
+-- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
+CREATE TABLE IF NOT EXISTS file_user_privileges
+(
+    file_id     BIGINT NOT NULL,
+    privilege   VARCHAR(255) NOT NULL,
+    FOREIGN KEY (file_id) REFERENCES file_entity (id)
+);
+
 -- The 'privilege_entity' table stores a set of privileges that can be assigned to a group in the 'group_entity' table.
 CREATE TABLE IF NOT EXISTS file_entity_tags
 (
@@ -97,22 +105,6 @@ CREATE TABLE IF NOT EXISTS group_privileges
     PRIMARY KEY (group_id, privilege_id),
     FOREIGN KEY (privilege_id) REFERENCES privilege_entity (id),
     FOREIGN KEY (group_id) REFERENCES group_entity (id)
-);
-
--- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
-CREATE TABLE IF NOT EXISTS file_user_permissions
-(
-    file_id         BIGINT NOT NULL,
-    permitted_users BIGINT NOT NULL,
-    FOREIGN KEY (file_id) REFERENCES file_entity (id)
-);
-
--- The 'user_groups' table is an associative (junction) table that links users to their groups.
-CREATE TABLE IF NOT EXISTS file_group_permissions
-(
-    file_id          BIGINT NOT NULL,
-    permitted_groups BIGINT NOT NULL,
-    FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity
