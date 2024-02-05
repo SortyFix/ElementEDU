@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 
-public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long timestamp, @NotNull String reason) implements CreationModel<IllnessNotificationEntity>
+public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull String reason, @NotNull Long timestamp, @NotNull Long expirationTime) implements CreationModel<IllnessNotificationEntity>
 {
     @Override public boolean equals(Object o)
     {
@@ -43,6 +43,7 @@ public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Long
         newEntity.setStatus(IllnessNotificationStatus.PENDING);
         newEntity.setReason(reason());
         newEntity.setTimeStamp(timestamp());
+        newEntity.setExpirationTime(expirationTime());
         return newEntity;
     }
 }

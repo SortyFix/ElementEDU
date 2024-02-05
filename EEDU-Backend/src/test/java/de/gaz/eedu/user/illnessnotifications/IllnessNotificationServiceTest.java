@@ -26,8 +26,8 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     protected @NotNull Eval<IllnessNotificationCreateModel, IllnessNotificationModel> successEval()
     {
         Long timestamp = System.currentTimeMillis();
-        IllnessNotificationCreateModel createModel = new IllnessNotificationCreateModel(2L, timestamp, "meine mutter is auf nen legostein getreten und hat meine ps2 beschädigt");
-        IllnessNotificationModel model = new IllnessNotificationModel(5L, 2L, IllnessNotificationStatus.PENDING, timestamp, "meine mutter is auf nen legostein getreten und hat meine ps2 beschädigt");
+        IllnessNotificationCreateModel createModel = new IllnessNotificationCreateModel(2L, "maiau", timestamp, 29312392L);
+        IllnessNotificationModel model = new IllnessNotificationModel(5L, 2L, IllnessNotificationStatus.PENDING, "maiau", timestamp, 29312392L);
 
         return Eval.eval(createModel, model, ((request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
@@ -35,6 +35,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
             Assertions.assertEquals(expect.userId(), result.userId());
             Assertions.assertEquals(expect.timestamp(), result.timestamp());
             Assertions.assertEquals(expect.reason(), result.reason());
+            Assertions.assertEquals(expect.expirationTime(), result.expirationTime());
         }));
     }
 

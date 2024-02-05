@@ -15,10 +15,11 @@ public class IllnessNotificationEntity implements EntityObject, EntityModelRelat
     @Enumerated(EnumType.ORDINAL) private IllnessNotificationStatus status;
     private String reason;
     private Long timeStamp;
+    private Long expirationTime;
 
     @Override
     public IllnessNotificationModel toModel()
     {
-        return new IllnessNotificationModel(id, user.getId(), status, getTimeStamp(), reason);
+        return new IllnessNotificationModel(id, user.getId(), status, reason, getTimeStamp(), getExpirationTime());
     }
 }

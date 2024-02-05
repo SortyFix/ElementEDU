@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS illness_notification_entity
     status          TINYINT NOT NULL,
     reason          VARCHAR(255) NOT NULL,
     time_stamp      BIGINT NOT NULL,
+    expiration_time BIGINT NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );

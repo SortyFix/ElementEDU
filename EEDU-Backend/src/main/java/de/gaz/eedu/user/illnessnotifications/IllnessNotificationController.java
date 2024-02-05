@@ -31,14 +31,14 @@ import java.util.Set;
     }
 
     // TODO: Only for parent accounts
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(@AuthenticationPrincipal Long id, @NotNull String reason)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(@AuthenticationPrincipal Long id, @NotNull String reason, @NotNull Long expirationTime)
     {
         // TODO: Add logic if current day is an exam day
         return userService.loadEntityByID(id).map(userEntity ->
         {
             userEntity.setStatus(UserStatus.EXCUSED);
             IllnessNotificationCreateModel illnessNotificationCreateModel = new IllnessNotificationCreateModel(id,
-                    LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(), reason);
+                    reason, LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(), expirationTime);
             illnessNotificationService.createEntity(illnessNotificationCreateModel);
             return ResponseEntity.ok(true);
         }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false));
