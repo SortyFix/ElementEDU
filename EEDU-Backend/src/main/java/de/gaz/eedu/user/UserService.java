@@ -1,9 +1,9 @@
 package de.gaz.eedu.user;
 
-import de.gaz.eedu.course.classroom.ClassRoomEntity;
-import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
+import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
@@ -54,31 +54,32 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class UserService implements EntityService<UserRepository, UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED)
+public class UserService implements EntityService<UserRepository, UserEntity, UserModel, UserCreateModel>, UserDetailsService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
     @Getter private final ClassRoomService classRoomService;
-    @Getter(AccessLevel.NONE)
-    private final UserRepository userRepository;
+    @Getter(AccessLevel.NONE) private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final ThemeRepository themeRepository;
 
-    @Override
-    public @NotNull UserRepository getRepository()
+    @Override public @NotNull UserRepository getRepository()
     {
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override
+    public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
-        if(getRepository().existsByLoginName(model.loginName()))
+        if (getRepository().existsByLoginName(model.loginName()))
         {
             throw new NameOccupiedException(model.loginName());
         }
 
         String password = model.password();
-        if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
+        if (!password.matches(
+                "^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
         {
             throw new InsecurePasswordException();
         }
@@ -92,7 +93,8 @@ import java.util.function.Function;
         }));
     }
 
-    @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override
+    public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -114,14 +116,19 @@ import java.util.function.Function;
             userEntity.getCourses().forEach(detachCourses);
 
             // Remove this user from all classes
-            Consumer<ClassRoomEntity> detachClasses = clazz -> clazz.detachUsers(classService, userEntity.getId());
-            int classSize = userEntity.getClassRooms().size();
-            userEntity.getClassRooms().forEach(detachClasses);
+            Function<ClassRoomEntity, Boolean> detachFromClass = clazz -> clazz.detachUsers(userEntity.getId());
+            boolean classDetached = userEntity.getClassRoom().map(detachFromClass).orElse(false);
 
             getRepository().deleteById(id);
 
-            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups, {} courses and {} classes.";
-            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize, classSize);
+            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups and {} courses.";
+            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize);
+            if (classDetached)
+            {
+                String message = "The user has also been detached from a class";
+                LOGGER.info(message);
+            }
+
             return true;
         }).orElse(false);
     }
@@ -129,7 +136,9 @@ import java.util.function.Function;
     @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        return userOptional.filter(UserEntity::isAccountNonLocked).map(user -> getAuthorizeService().login(user.toModel(), user.getPassword(), loginModel));
+        return userOptional.filter(UserEntity::isAccountNonLocked).map(user -> getAuthorizeService().login(user.toModel(),
+                user.getPassword(),
+                loginModel));
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
