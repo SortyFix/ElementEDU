@@ -2,7 +2,6 @@ package de.gaz.eedu.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -82,19 +81,14 @@ import java.util.stream.Collectors;
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptySet))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(emptySet));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS, @AuthenticationPrincipal Long userId)
     {
         ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
         return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
-            // Reduce groups in user entity to their ids
-            Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
-            if(userEntity.getId().equals(fileEntity.toModel().authorId())
-                    || !Collections.disjoint(userGroupIds, fileEntity.toModel().permittedGroups())
-                    || fileEntity.toModel().permittedUsers().contains(userEntity.getId()))
+            if(fileService.verifyAccess(fileEntity, userService.loadEntityByIDSafe(userId).getId()))
             {
                 return ResponseEntity.ok(fileService.loadResourceById(fileIdS));
             }
-            // Send back empty resources as request body
             return ResponseEntity.badRequest().body(emptyResource);
         }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }

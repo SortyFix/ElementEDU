@@ -3,7 +3,9 @@ package de.gaz.eedu.file;
 import de.gaz.eedu.file.enums.Strategy;
 import de.gaz.eedu.file.exception.UnknownDirectoryException;
 import de.gaz.eedu.file.exception.UnknownFileException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service @RequiredArgsConstructor public class FileService
@@ -47,14 +50,13 @@ import java.util.stream.Stream;
      * @throws IOException        If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
-    public @NotNull Boolean upload(@NotNull MultipartFile file, @AuthenticationPrincipal Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<Long> permittedUsers, @NotNull Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
+    public boolean upload(@NotNull MultipartFile file, @AuthenticationPrincipal Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
         ScanResult scanResult = null;
-        ClamavClient client;
 
         try
         {
-            client = new ClamavClient("localhost");
+            ClamavClient client = new ClamavClient("localhost");
             client.ping();
             scanResult = client.scan(file.getInputStream());
         }
@@ -101,7 +103,7 @@ import java.util.stream.Stream;
     }
 
     /**
-     * Applies a specified strategy to retrieve an array of File objects based on the provided path.
+     * Applies a specified strategy to retrieve a list of File objects based on the provided path.
      *
      * @param strategy The strategy to be applied for file retrieval. Available strategies: <br>
      *                 - {@link Strategy#EVERYTHING}: Retrieves all files in the specified directory including subdirectories and files in subdirectories. <br>
@@ -188,7 +190,7 @@ import java.util.stream.Stream;
      * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
      *                              on the file system.
      */
-    public @NotNull Boolean remove(@NotNull Long id)
+    public boolean remove(@NotNull Long id)
     {
         return loadEntityById(id).map(fileEntity -> {
             try
@@ -203,12 +205,12 @@ import java.util.stream.Stream;
         }).orElse(false);
     }
 
-    public @NotNull Boolean deleteRecursively(@NotNull List<File> files)
+    public boolean deleteRecursively(@NotNull List<File> files)
     {
         return files.stream().allMatch(File::delete);
     }
 
-    public @NotNull Boolean moveRecursively(@NotNull List<File> files, @NotNull String targetPath)
+    public boolean moveRecursively(@NotNull List<File> files, @NotNull String targetPath)
     {
         return files.stream().allMatch(file -> {
             try
@@ -223,7 +225,7 @@ import java.util.stream.Stream;
         });
     }
 
-    public @NotNull Boolean copyRecursively(@NotNull List<File> files, @NotNull String targetPath)
+    public boolean copyRecursively(@NotNull List<File> files, @NotNull String targetPath)
     {
         return files.stream().allMatch(file -> {
             try
@@ -238,9 +240,18 @@ import java.util.stream.Stream;
         });
     }
 
-    public Boolean makeDirectory(@NotNull String path)
+    public boolean makeDirectory(@NotNull String path)
     {
         return new File(path).mkdir();
+    }
+
+    public boolean verifyAccess(@NotNull FileEntity fileEntity, @NotNull Long userId)
+    {
+        UserEntity userEntity = userService.loadEntityByIDSafe(userId);
+        Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
+        return userService.loadEntityByIDSafe(userId).getId().equals(fileEntity.toModel().authorId())
+                || !Collections.disjoint(userGroupIds, fileEntity.toModel().permittedGroups())
+                || fileEntity.toModel().permittedUsers().contains(userEntity.getId());
     }
 
     public @NotNull Optional<FileEntity> loadEntityById(@NotNull Long id)
