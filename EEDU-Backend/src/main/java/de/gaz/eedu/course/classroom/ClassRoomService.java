@@ -53,7 +53,7 @@ public class ClassRoomService implements EntityService<ClassRoomRepository, Clas
         {
             // Remove users from this class
             Long[] userIds = classRoom.getUsers().stream().map(UserEntity::getId).toArray(Long[]::new);
-            classRoom.detachUser(this, userIds);
+            classRoom.detachUsers(this, userIds);
 
             Set<CourseEntity> courses = classRoom.getCourses();
             courses.forEach(course -> course.disassociateClassroom(getCourseService()));

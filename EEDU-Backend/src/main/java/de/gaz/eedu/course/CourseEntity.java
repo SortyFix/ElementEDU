@@ -59,11 +59,11 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param courseService the {@link CourseService} instance to be used for persisting changes if needed.
      * @param user          the array of {@link UserEntity} instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
-     * @see #attachUser(UserEntity...)
+     * @see #attachUsers(UserEntity...)
      */
-    public boolean attachUser(@NotNull CourseService courseService, @NonNull UserEntity... user)
+    public boolean attachUsers(@NotNull CourseService courseService, @NonNull UserEntity... user)
     {
-        return saveEntityIfPredicateTrue(courseService, user, this::attachUser);
+        return saveEntityIfPredicateTrue(courseService, user, this::attachUsers);
     }
 
     /**
@@ -73,15 +73,15 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * It ensures that only unique, non-duplicate users are added.
      * <p>
      * Note that this method does not persist the changes.
-     * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachUser(CourseService, UserEntity...)},
+     * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachUsers(CourseService, UserEntity...)},
      * or {@link CourseService#saveEntity(EntityModelRelation)}
      *
      * @param user The array of UserEntity instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
-     * @see #attachUser(CourseService, UserEntity...)
+     * @see #attachUsers(CourseService, UserEntity...)
      * @see CourseService#saveEntity(EntityModelRelation)
      */
-    public boolean attachUser(@NonNull UserEntity... user)
+    public boolean attachUsers(@NonNull UserEntity... user)
     {
         // Filter already attached users out
         Predicate<UserEntity> predicate = present -> getUsers().stream().noneMatch(presentUser -> Objects.equals(
@@ -100,11 +100,11 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param courseService The {@link CourseService} instance to be used for saving the changes if necessary.
      * @param ids           The array of IDs corresponding to {@link UserEntity} instances to be detached from the group.
      * @return true if the users were successfully detached, false otherwise.
-     * @see #detachUser(Long...)
+     * @see #detachUsers(Long...)
      */
-    public boolean detachUser(@NotNull CourseService courseService, @NonNull Long... ids)
+    public boolean detachUsers(@NotNull CourseService courseService, @NonNull Long... ids)
     {
-        return saveEntityIfPredicateTrue(courseService, ids, this::detachUser);
+        return saveEntityIfPredicateTrue(courseService, ids, this::detachUsers);
     }
 
     /**
@@ -113,35 +113,18 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * This method detaches users from this course based on their IDs.
      * Note that only users which are part of this course are removed.
      * <p>
-     * To make the changes permanent, the object needs to be saved. This can be achieved by calling {@link #detachUser(CourseService, Long...)}
+     * To make the changes permanent, the object needs to be saved. This can be achieved by calling {@link #detachUsers(CourseService, Long...)}
      * or {@link CourseService#saveEntity(EntityModelRelation)} after detaching the users.
      *
      * @param ids The array of IDs corresponding to {@link UserEntity} instances to be detached from the group.
      * @return true if the users were successfully detached, false otherwise.
-     * @see #detachUser(Long...)
+     * @see #detachUsers(Long...)
      * @see CourseService#saveEntity(EntityModelRelation)
      */
-    public boolean detachUser(@NonNull Long... ids)
+    public boolean detachUsers(@NonNull Long... ids)
     {
         List<Long> detachGroupIds = Arrays.asList(ids);
         return this.users.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
-    }
-
-    /**
-     * This method checks if a specific {@link UserEntity} is part of this course.
-     * <p>
-     * This method checks whether a {@link UserEntity} is part of this course or not.
-     * It does this by checking the ids of each user from {@code getUsers()}.
-     * <p>
-     * Note that {@code getUsers()} also includes the {@link UserEntity} from the {@link ClassRoomEntity} if any
-     * classroom has been set.
-     *
-     * @param id the id of the user which should be checked
-     * @return whether this user is in the course or not.
-     */
-    public boolean inCourse(long id)
-    {
-        return getUsers().stream().anyMatch(user -> Objects.equals(user.getId(), id));
     }
 
     /**

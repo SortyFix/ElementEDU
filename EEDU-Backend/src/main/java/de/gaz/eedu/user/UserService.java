@@ -109,12 +109,12 @@ import java.util.function.Function;
             CourseService courseService = classService.getCourseService();
 
             // Remove this user from all courses
-            Consumer<CourseEntity> detachCourses = course -> course.detachUser(courseService, userEntity.getId());
+            Consumer<CourseEntity> detachCourses = course -> course.detachUsers(courseService, userEntity.getId());
             int coursesSize = userEntity.getCourses().size();
             userEntity.getCourses().forEach(detachCourses);
 
             // Remove this user from all classes
-            Consumer<ClassRoomEntity> detachClasses = clazz -> clazz.detachUser(classService, userEntity.getId());
+            Consumer<ClassRoomEntity> detachClasses = clazz -> clazz.detachUsers(classService, userEntity.getId());
             int classSize = userEntity.getClassRooms().size();
             userEntity.getClassRooms().forEach(detachClasses);
 
