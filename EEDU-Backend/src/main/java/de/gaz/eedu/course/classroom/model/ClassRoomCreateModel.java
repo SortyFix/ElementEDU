@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.model;
+package de.gaz.eedu.course.classroom.model;
 
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.CreationModel;

@@ -1,5 +1,6 @@
-package de.gaz.eedu.course.model;
+package de.gaz.eedu.course.classroom.model;
 
+import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.user.model.UserModel;
 import lombok.NonNull;
