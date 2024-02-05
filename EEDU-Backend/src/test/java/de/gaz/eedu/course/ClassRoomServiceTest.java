@@ -66,7 +66,7 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoom
     {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->
         {
-            Stream<UserEntity> userEntities = getService().loadEntityByIDSafe(data.entityID()).getUsers().stream();
+            Stream<UserEntity> userEntities = getService().loadEntityByIDSafe(data.entityID()).getStudents().stream();
             return userEntities.map(UserEntity::getId).toArray(Long[]::new);
         });
     }
