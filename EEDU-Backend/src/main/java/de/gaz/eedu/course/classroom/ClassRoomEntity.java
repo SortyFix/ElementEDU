@@ -38,7 +38,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 
     public @NotNull Optional<UserEntity> getTutor()
     {
-        return getStudents().stream().filter(user -> user.hasRole("teacher")).findFirst();
+        return getStudents().stream().filter(teacherPredicate(true)).findFirst();
     }
 
     public boolean setTutor(@NotNull ClassRoomService classRoomService, @NotNull UserEntity userEntity)
@@ -48,13 +48,14 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 
     public boolean setTutor(@NotNull UserEntity userEntity)
     {
+        // TODO think about what would happen if user looses role
         if (!userEntity.hasRole("teacher"))
         {
-            String errorMessage =  "The provided user is not a teacher.";
+            String errorMessage = "The specified user lacks the teacher role.";
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, errorMessage, new IllegalArgumentException());
         }
 
-        if (this.users.removeIf(user -> userEntity.hasRole("teacher")))
+        if (this.users.removeIf(teacherPredicate(true)))
         {
             String logMessage = "The tutor from classroom {} has been overridden.";
             LoggerFactory.getLogger(ClassRoomEntity.class).info(logMessage, getId());
@@ -70,7 +71,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 
     public boolean attachStudents(@NonNull UserEntity... user)
     {
-        return this.users.addAll(Arrays.stream(user).filter(noTeacher()).collect(Collectors.toSet()));
+        return this.users.addAll(Arrays.stream(user).filter(teacherPredicate(false)).collect(Collectors.toSet()));
     }
 
     public boolean detachStudents(@NotNull ClassRoomService classRoomService, @NonNull Long... ids)
@@ -86,7 +87,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 
     public @NotNull Set<UserEntity> getStudents()
     {
-        return users.stream().filter(noTeacher()).collect(Collectors.toSet());
+        return users.stream().filter(teacherPredicate(false)).collect(Collectors.toSet());
     }
 
     private <T> boolean saveEntityIfPredicateTrue(@NotNull ClassRoomService classRoomService, @NotNull T test, @NotNull Predicate<T> predicate)
@@ -99,9 +100,10 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
         return false;
     }
 
-    @Contract(pure = true, value = "-> new") private @NotNull Predicate<UserEntity> noTeacher()
+    // TODO: Javadoc. Note! THIS METHOD IS FCKING MINDFUCC
+    @Contract(pure = true, value = "_ -> new") private @NotNull Predicate<UserEntity> teacherPredicate(boolean teacher)
     {
-        return current -> !current.hasRole("teacher");
+        return current -> (teacher == current.hasRole("teacher"));
     }
 
     @Contract(pure = true) @Override public @NotNull String toString()

@@ -35,7 +35,6 @@ public class GroupService implements EntityService<GroupRepository, GroupEntity,
     private final UserService userService; // managed by
     private final PrivilegeRepository privilegeRepository;
 
-
     @Override
     public @NotNull GroupRepository getRepository()
     {

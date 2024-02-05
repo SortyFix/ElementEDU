@@ -169,10 +169,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
-        // Filter already granted privileges out
-        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream().noneMatch(
-                presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
-        return privileges.addAll(Arrays.stream(privilegeEntity).filter(privilegeEntityPredicate).collect(Collectors.toSet()));
+        return privileges.addAll(Arrays.stream(privilegeEntity).collect(Collectors.toSet()));
     }
 
     /**
