@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 /**
  * Represents a classroom entity in the database.
  *
+ * @author ivo
  * @see EntityModelRelation
  * @see ClassRoomModel
- * @author ivo
  */
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "class_room_entity")
 public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
@@ -209,6 +209,16 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
         return this.users.removeIf(user -> detachGroupIds.contains(user.getId()));
     }
 
+    public boolean detachStudents(@NotNull ClassRoomService classRoomService)
+    {
+        return saveEntityIfPredicateTrue(classRoomService, detachStudents(), value -> value);
+    }
+
+    public boolean detachStudents()
+    {
+        return users.removeIf(teacherPredicate(false));
+    }
+
     /**
      * Retrieves an unmodifiable set of students for the current classroom.
      * <p>
@@ -242,6 +252,16 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
             return true;
         }
         return false;
+    }
+
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.users.isEmpty())
+        {
+            return false;
+        }
+        this.users.clear();
+        return true;
     }
 
     /**

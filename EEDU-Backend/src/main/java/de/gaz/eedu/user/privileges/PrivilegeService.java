@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -31,27 +30,17 @@ import java.util.Set;
 
     @Override public @NotNull PrivilegeEntity createEntity(@NotNull PrivilegeCreateModel privilegeCreateModel) throws CreationException
     {
-        getRepository().findByName(privilegeCreateModel.name()).ifPresent(occupiedName ->
+        if(getRepository().existsByName(privilegeCreateModel.name()))
         {
-            throw new NameOccupiedException(occupiedName.getName());
-        });
+            throw new NameOccupiedException(privilegeCreateModel.name());
+        }
 
         return getRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity()));
     }
 
-    @Override public boolean delete(long id)
+    @Override public void deleteRelations(@NotNull PrivilegeEntity entry)
     {
-        return getRepository().findById(id).map(privilegeEntity ->
-        {
-            // Delete this privilege from the groups
-            Set<GroupEntity> groups = privilegeEntity.getGroupEntities();
-            groups.forEach(group -> group.revokePrivilege(getGroupService(), privilegeEntity.getId()));
-
-            getRepository().deleteById(id);
-
-            String deleteMessage = "The privilege {} has been deleted and disassociated it from {} groups";
-            LoggerFactory.getLogger(PrivilegeService.class).info(deleteMessage, privilegeEntity.getId(), groups.size());
-            return true;
-        }).orElse(false);
+        Set<GroupEntity> groups = entry.getGroupEntities();
+        groups.forEach(group -> group.revokePrivilege(getGroupService(), entry.getId()));
     }
 }

@@ -12,7 +12,6 @@ import de.gaz.eedu.user.privileges.PrivilegeRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,9 +41,11 @@ public class GroupService implements EntityService<GroupRepository, GroupEntity,
 
     @Override
     public @NotNull GroupEntity createEntity(@NotNull GroupCreateModel createModel) throws CreationException {
-        getRepository().findByName(createModel.name()).map(toModel()).ifPresent(occupiedModel -> {
-            throw new NameOccupiedException(occupiedModel.name());
-        });
+
+        if(getRepository().existsByName(createModel.name()))
+        {
+            throw new NameOccupiedException(createModel.name());
+        }
 
         Set<UserEntity> users = Stream.of(createModel.users()).map(getUserService()::loadEntityByID).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
         GroupEntity groupEntity = getRepository().save(createModel.toEntity(new GroupEntity(users), group -> {
@@ -58,21 +58,11 @@ public class GroupService implements EntityService<GroupRepository, GroupEntity,
         return groupEntity;
     }
 
-    @Override
-    public boolean delete(long id) {
-        return getRepository().findById(id).map(groupEntity -> {
-
-            // Delete this entity from the users
-            Set<UserEntity> users = groupEntity.getUsers();
-            users.forEach(user -> user.detachGroups(groupEntity.getId()));
-            getUserService().saveEntity(users);
-
-            // Delete privileges from this entity
-            Long[] privilegeIDs = groupEntity.getPrivileges().stream().map(PrivilegeEntity::getId).toArray(Long[]::new);
-            groupEntity.revokePrivilege(this, privilegeIDs);
-
-            getRepository().deleteById(id);
-            return true;
-        }).orElse(false);
+    @Override public void deleteRelations(@NotNull GroupEntity entry)
+    {
+        // Delete this entity from the users
+        Set<UserEntity> users = entry.getUsers();
+        users.forEach(user -> user.detachGroups(entry.getId()));
+        getUserService().saveEntity(users);
     }
 }

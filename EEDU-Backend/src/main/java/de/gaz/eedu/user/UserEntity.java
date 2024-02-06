@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
-    @ManyToMany(mappedBy = "users") @JsonBackReference @Getter(AccessLevel.NONE)
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
     private final Set<CourseEntity> courses = new HashSet<>();
     @Enumerated UserStatus status;
     //finish this line and the sql
@@ -63,11 +63,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     private boolean enabled, locked;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     private Set<TwoFactorEntity> twoFactors = new HashSet<>();
-    @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
+    private ThemeEntity themeEntity;
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
     @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
     @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
-    @ManyToOne @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
+    @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
     public @NotNull SimpleUserModel toSimpleModel()
@@ -382,6 +383,16 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
+    }
+
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.groups.isEmpty())
+        {
+            return false;
+        }
+        this.groups.clear();
+        return true;
     }
 
     @Override public String toString()

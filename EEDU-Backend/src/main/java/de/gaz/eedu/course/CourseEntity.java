@@ -34,6 +34,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     private final Set<UserEntity> users = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String name;
+
     @ManyToOne @JsonManagedReference @JoinColumn(name = "class_room_id", referencedColumnName = "id")
     @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private ClassRoomEntity classRoom;
 
@@ -261,6 +262,16 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
             return true;
         }
         return false;
+    }
+
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.users.isEmpty())
+        {
+            return false;
+        }
+        this.users.clear();
+        return true;
     }
 
     @Contract(pure = true) @Override public @NotNull String toString()

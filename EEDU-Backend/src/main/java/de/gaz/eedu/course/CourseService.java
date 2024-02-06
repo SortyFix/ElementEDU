@@ -39,15 +39,4 @@ public class CourseService implements EntityService<CourseRepository, CourseEnti
             return entity;
         }));
     }
-
-    @Transactional @Override public boolean delete(long id)
-    {
-        return loadEntityByID(id).map(entity ->
-        {
-            // Remove this course from its class
-            entity.revokeClassroom();
-
-            return true;
-        }).orElse(false);
-    }
 }

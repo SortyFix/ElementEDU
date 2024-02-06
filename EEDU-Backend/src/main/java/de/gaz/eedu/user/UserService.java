@@ -1,14 +1,11 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.course.CourseEntity;
-import de.gaz.eedu.course.CourseService;
-import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
-import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
@@ -34,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -69,8 +65,8 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
         return userRepository;
     }
 
-    @Transactional @Override
-    public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull UserEntity createEntity(
+            @NotNull UserCreateModel model) throws CreationException
     {
         if (getRepository().existsByLoginName(model.loginName()))
         {
@@ -93,52 +89,28 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
         }));
     }
 
-    @Transactional @Override
-    public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override public @NotNull UserDetails loadUserByUsername(
+            @NotNull String username) throws UsernameNotFoundException
     {
         return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    @Override public boolean delete(long id)
+    @Override public void deleteRelations(@NotNull UserEntity entry)
     {
-        return getRepository().findById(id).map(userEntity ->
-        {
-            // Delete groups from this user
-            Long[] groups = userEntity.getGroups().stream().map(GroupEntity::getId).toArray(Long[]::new);
-            userEntity.detachGroups(this, groups);
+        // detach user from courses
+        Set<CourseEntity> courses = entry.getCourses();
+        courses.forEach(courseEntity -> courseEntity.detachUsers(entry.getId()));
+        getClassRoomService().getCourseService().saveEntity(courses);
 
-            ClassRoomService classService = getClassRoomService();
-            CourseService courseService = classService.getCourseService();
-
-            // Remove this user from all courses
-            Consumer<CourseEntity> detachCourses = course -> course.detachUsers(courseService, userEntity.getId());
-            int coursesSize = userEntity.getCourses().size();
-            userEntity.getCourses().forEach(detachCourses);
-
-            // Remove this user from all classes
-            Function<ClassRoomEntity, Boolean> detachFromClass = clazz -> clazz.detachStudents(userEntity.getId());
-            boolean classDetached = userEntity.getClassRoom().map(detachFromClass).orElse(false);
-
-            getRepository().deleteById(id);
-
-            String deleteMessage = "Deleted user {} from the system. Additionally, the user has been disassociated from {} groups and {} courses.";
-            LOGGER.info(deleteMessage, userEntity.getId(), groups.length, coursesSize);
-            if (classDetached)
-            {
-                String message = "The user has also been detached from a class.";
-                LOGGER.info(message);
-            }
-
-            return true;
-        }).orElse(false);
+        // detach user from class
+        entry.getClassRoom().ifPresent(clazz -> clazz.detachStudents(getClassRoomService(), entry.getId()));
     }
 
     @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        return userOptional.filter(UserEntity::isAccountNonLocked).map(user -> getAuthorizeService().login(user.toModel(),
-                user.getPassword(),
-                loginModel));
+        Function<UserEntity, String> auth = user -> getAuthorizeService().login(user, user.getPassword(), loginModel);
+        return userOptional.filter(UserEntity::isAccountNonLocked).map(auth);
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)

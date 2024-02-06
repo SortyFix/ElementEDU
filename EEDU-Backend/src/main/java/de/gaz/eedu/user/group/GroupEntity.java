@@ -45,7 +45,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     private String name;
     private boolean twoFactorRequired;
 
-    @ManyToMany(mappedBy = "groups") @JsonBackReference @Setter(AccessLevel.PRIVATE)
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.PRIVATE)
     private Set<UserEntity> users = new HashSet<>();
 
     @ManyToMany @JsonManagedReference
@@ -233,6 +233,16 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges()
     {
         return Collections.unmodifiableSet(privileges);
+    }
+
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.privileges.isEmpty())
+        {
+            return false;
+        }
+        this.privileges.clear();
+        return true;
     }
 
     @Override public String toString()

@@ -64,20 +64,6 @@ import java.util.function.Supplier;
         throw new CreationException(HttpStatus.CONFLICT);
     }
 
-    @Override public boolean delete(long id)
-    {
-        return getRepository().findById(id).map(twoFactor ->
-        {
-            long userID = twoFactor.getUser().getId();
-            twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
-            getRepository().deleteById(id); // delete anyway, as the user has no connection
-
-            String deleteMessage = "Deleted two factor entity {} from the system and disassociated it from user {}.";
-            LOGGER.info(deleteMessage, twoFactor.getId(), userID);
-            return true;
-        }).orElse(false);
-    }
-
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
@@ -87,7 +73,7 @@ import java.util.function.Supplier;
         return userEntity.getTwoFactor(method)
                 .map(mapper)
                 .filter(Boolean::booleanValue)
-                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims));
+                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.getId(), claims));
     }
 
     public boolean enable(@NotNull TwoFactorMethod method, @NotNull String code, @NotNull Claims claims)
