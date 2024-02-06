@@ -8,19 +8,27 @@ CREATE TABLE IF NOT EXISTS theme_entity
     name             VARCHAR(255) NULL
 );
 
+CREATE TABLE IF NOT EXISTS class_room_entity
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
 -- The 'file_entity_tags' table is used to keep track of tags applied to file entities in the 'file_entity' table.
 CREATE TABLE IF NOT EXISTS user_entity
 (
-    enabled    BIT          NOT NULL,
-    locked     BIT          NOT NULL,
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    theme_id   BIGINT       NULL,
-    first_name VARCHAR(255) NULL,
-    last_name  VARCHAR(255) NULL,
-    login_name VARCHAR(255) NULL,
-    password   VARCHAR(255) NULL,
-    status     TINYINT NULL,
-    FOREIGN KEY (theme_id) REFERENCES theme_entity (id)
+    enabled       BIT          NOT NULL,
+    locked        BIT          NOT NULL,
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    theme_id      BIGINT       NULL,
+    first_name    VARCHAR(255) NULL,
+    last_name     VARCHAR(255) NULL,
+    login_name    VARCHAR(255) NULL,
+    password      VARCHAR(255) NULL,
+    status        TINYINT      NULL,
+    class_room_id BIGINT       NULL,
+    FOREIGN KEY (theme_id) REFERENCES theme_entity (id),
+    FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
 -- The 'file_group_permissions' table is used to keep track of file permissions based on user groups. It defines which groups have access to which files.
@@ -45,7 +53,7 @@ CREATE TABLE IF NOT EXISTS two_factor_entity
     id      BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT       NOT NULL,
     data    VARCHAR(255) NULL,
-    method  TINYINT NULL,
+    method  TINYINT      NULL,
     secret  VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
@@ -70,11 +78,11 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id         BIGINT NOT NULL,
-    status          TINYINT NOT NULL,
-    reason          VARCHAR(255) NOT NULL,
-    time_stamp      BIGINT NOT NULL,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT       NOT NULL,
+    status     TINYINT      NOT NULL,
+    reason     VARCHAR(255) NOT NULL,
+    time_stamp BIGINT       NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
@@ -117,42 +125,37 @@ CREATE TABLE IF NOT EXISTS file_group_permissions
 
 CREATE TABLE IF NOT EXISTS chat_entity
 (
-    chat_id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    time_of_creation    BIGINT NOT NULL
+    chat_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    time_of_creation BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity_users
 (
-    chat_id         BIGINT NOT NULL,
-    user_id         BIGINT NOT NULL,
+    chat_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
     PRIMARY KEY (chat_id, user_id),
     FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity_messages
 (
-    chat_id         BIGINT NOT NULL,
-    message_id      BIGINT NOT NULL,
+    chat_id    BIGINT NOT NULL,
+    message_id BIGINT NOT NULL,
     PRIMARY KEY (chat_id, message_id),
     FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
 );
 
 CREATE TABLE IF NOT EXISTS message_entity
 (
-    message_id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id       BIGINT NOT NULL,
-    body            VARCHAR(255) NOT NULL,
-    timestamp       BIGINT NOT NULL,
-    status          TINYINT,
+    message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id  BIGINT       NOT NULL,
+    body       VARCHAR(255) NOT NULL,
+    timestamp  BIGINT       NOT NULL,
+    status     TINYINT,
     FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
 -- Courses
-CREATE TABLE IF NOT EXISTS class_room_entity
-(
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS subject_entity
 (
@@ -178,12 +181,3 @@ CREATE TABLE IF NOT EXISTS course_users
     FOREIGN KEY (course_id) REFERENCES course_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
-
-CREATE TABLE IF NOT EXISTS class_users
-(
-    class_id BIGINT NOT NULL,
-    user_id  BIGINT NOT NULL,
-    PRIMARY KEY (class_id, user_id),
-    FOREIGN KEY (class_id) REFERENCES class_room_entity (id),
-    FOREIGN KEY (user_id) REFERENCES user_entity (id)
-)

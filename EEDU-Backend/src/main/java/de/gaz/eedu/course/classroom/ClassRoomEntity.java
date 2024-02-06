@@ -23,9 +23,10 @@ import java.util.stream.Collectors;
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "class_room_entity")
 public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 {
-    @OneToMany @JsonManagedReference
-    @JoinTable(name = "class_users", joinColumns = @JoinColumn(name = "class_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @Getter(AccessLevel.NONE) private final Set<UserEntity> users = new HashSet<>();
+    @OneToMany(mappedBy = "classRoom")
+    @JsonManagedReference
+    private final Set<UserEntity> users = new HashSet<>();
+
     @OneToMany(mappedBy = "classRoom") @JsonBackReference private final Set<CourseEntity> courses = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;

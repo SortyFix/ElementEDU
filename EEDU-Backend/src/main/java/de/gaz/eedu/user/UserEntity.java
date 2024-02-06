@@ -52,6 +52,8 @@ import java.util.stream.Stream;
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
+    @ManyToMany(mappedBy = "users") @JsonBackReference @Getter(AccessLevel.NONE)
+    private final Set<CourseEntity> courses = new HashSet<>();
     @Enumerated UserStatus status;
     //finish this line and the sql
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
@@ -65,10 +67,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
     @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
     @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
-    @ManyToMany(mappedBy = "users") @JsonBackReference @Getter(AccessLevel.NONE)
-    private final Set<CourseEntity> courses = new HashSet<>();
-    @ManyToOne @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
-    private @Nullable ClassRoomEntity classRoom;
+    @ManyToOne @JsonBackReference private @Nullable ClassRoomEntity classRoom;
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
@@ -379,8 +378,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return getClassRoom().isPresent();
     }
 
-    @Transactional
-    public void setThemeEntity(@NotNull UserService userService, @NotNull ThemeEntity themeEntity)
+    @Transactional public void setThemeEntity(@NotNull UserService userService, @NotNull ThemeEntity themeEntity)
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
