@@ -80,7 +80,7 @@ import java.security.SecureRandom;
                     "The system was not able to attach the admin group to the default user. This is very unusual " +
                             "behaviour. Please consider rechecking all information.");
         }
-
+        LOGGER.info(userEntity.getClassRoom().toString());
         LOGGER.info("A default user has been created");
         LOGGER.info("-".repeat(20));
         LOGGER.info("USERNAME: {}", "root");

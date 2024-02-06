@@ -181,3 +181,12 @@ CREATE TABLE IF NOT EXISTS course_users
     FOREIGN KEY (course_id) REFERENCES course_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
+
+CREATE TABLE IF NOT EXISTS class_room_users
+(
+    class_room_id  BIGINT NOT NULL,
+    user_id  BIGINT NOT NULL,
+    PRIMARY KEY (class_room_id, user_id),
+    FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+)

@@ -48,6 +48,7 @@ public class ClassRoomService implements EntityService<ClassRoomRepository, Clas
             // Remove users from this class
             Long[] userIds = classRoom.getStudents().stream().map(UserEntity::getId).toArray(Long[]::new);
             classRoom.detachStudents(this, userIds);
+            classRoom.unsetTutor();
 
             Set<CourseEntity> courses = classRoom.getCourses();
             courses.forEach(course -> course.revokeClassroom(getCourseService()));

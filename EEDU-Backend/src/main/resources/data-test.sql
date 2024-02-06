@@ -48,6 +48,12 @@ VALUES ('Light', 0x000000, 0x000000, 0x000000),
        ('Dark', 0x000000, 0x000000, 0x000000),
        ('dummy', 0x000000, 0x000000, 0x000000);
 
+INSERT INTO class_room_entity(name)
+VALUES ('Q1'),
+       ('3e'),
+       ('7l'),
+       ('dummy');
+
 /* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
 INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', TRUE,
@@ -96,12 +102,6 @@ VALUES ('German'),
        ('Informatics'),
        ('Dummy');
 
-INSERT INTO class_room_entity(name)
-VALUES ('Q1'),
-       ('3e'),
-       ('7l'),
-       ('dummy');
-
 INSERT INTO course_entity(name, subject_id, class_room_id)
 VALUES ('Q1-German', 1, 1),
        ('5e-Math', 2, 1),
@@ -122,49 +122,55 @@ VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232),
        (4, 0, 'ich habe 45 grad fieber', 87293933);
 
 MERGE INTO chat_entity_messages (chat_id, message_id)
-VALUES (1, 1),
-       (2, 2),
-       (3, 3),
-       (4, 4);
+    VALUES (1, 1),
+           (2, 2),
+           (3, 3),
+           (4, 4);
 
 MERGE INTO chat_entity_users (chat_id, user_id)
-VALUES (1, 1),
-       (1, 3),
+    VALUES (1, 1),
+           (1, 3),
 
-       (2, 2),
-       (2, 4),
+           (2, 2),
+           (2, 4),
 
-       (3, 2),
-       (3, 3),
+           (3, 2),
+           (3, 3),
 
-       (4, 1),
-       (4, 4);
+           (4, 1),
+           (4, 4);
 
 MERGE INTO user_groups (user_id, group_id)
-VALUES (1, 1),
+    VALUES (1, 1),
 
-       (2, 1),
-       (2, 2),
+           (2, 1),
+           (2, 2),
 
-       (3, 1),
-       (3, 2),
-       (3, 3),
+           (3, 1),
+           (3, 2),
+           (3, 3),
 
-       (4, 4);
+           (4, 4);
 
 MERGE INTO group_privileges (group_id, privilege_id)
-VALUES (1, 1),
+    VALUES (1, 1),
 
-       (2, 1),
-       (2, 2),
+           (2, 1),
+           (2, 2),
 
-       (3, 1),
-       (3, 2),
-       (3, 3),
+           (3, 1),
+           (3, 2),
+           (3, 3),
 
-       (4, 4);
+           (4, 4);
 
-MERGE INTO course_users(course_id, user_id)
-VALUES (2, 2),
-       (3, 1),
-       (4, 4);
+MERGE INTO course_users (course_id, user_id)
+    VALUES (2, 2),
+           (3, 1),
+           (4, 4);
+
+MERGE INTO class_room_users (class_room_id, user_id)
+    VALUES (1, 1),
+           (2, 2),
+           (2, 3),
+           (4, 4);
