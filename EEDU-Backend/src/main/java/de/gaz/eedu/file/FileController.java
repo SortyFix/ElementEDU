@@ -45,14 +45,14 @@ import java.util.stream.Collectors;
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
     @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus generalUpload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, @NotNull Set<String> privileges, Set<String> tags) throws IOException, IllegalStateException
     {
-        Boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", privileges, tags);
+        boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", privileges, tags);
         return uploadSuccessful ? HttpStatus.OK
                 : HttpStatus.FORBIDDEN;
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public HttpStatus deleteFile(@NotNull Long id)
     {
-        return userService.getRepository().findByLoginName(currentUsername).flatMap(userEntity -> fileService.loadEntityById(id).map(fileEntity -> {
+        return userService.getRepository().findByLoginName(currentUsername).flatMap(userEntity -> fileService.loadEntityByID(id).map(fileEntity -> {
             if (fileEntity.toModel().authorId().equals(userEntity.getId())) {
                 try {
                     Path path = Paths.get(fileEntity.toModel().filePath());
@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
     @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(@NotNull Long id, @NotNull Set<String> newTags)
     {
         Set<String> emptySet = new HashSet<>();
-        return fileService.loadEntityById(id).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
+        return fileService.loadEntityByID(id).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
             // Check if currently logged-in user ID matches the author ID of the file
             if(userEntity.getId().equals(fileEntity.toModel().authorId())){
                 fileEntity.setTags(newTags);
@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS, @AuthenticationPrincipal Long userId)
     {
         ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
-        return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
+        return fileService.loadEntityByID(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
             if(fileService.verifyAccess(fileEntity, userService.loadEntityByIDSafe(userId).getId()))
             {
                 return ResponseEntity.ok(fileService.loadResourceById(fileIdS));

@@ -1,13 +1,13 @@
 package de.gaz.eedu.file;
 
+import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.file.enums.Strategy;
 import de.gaz.eedu.file.exception.DirectoryExistsException;
 import de.gaz.eedu.file.exception.UnknownDirectoryException;
 import de.gaz.eedu.file.exception.UnknownFileException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
-import de.gaz.eedu.user.privileges.PrivilegeService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,15 +24,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service @RequiredArgsConstructor public class FileService
+@Service @RequiredArgsConstructor public class FileService implements EntityService<FileRepository, FileEntity, FileModel, FileCreateModel>
 {
     private final FileRepository fileRepository;
 
     private final UserService userService;
-    private final PrivilegeService privilegeService;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
@@ -51,6 +49,7 @@ import java.util.stream.Stream;
      * @throws IOException        If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
+    @Transactional
     public boolean upload(@NotNull MultipartFile file, @NotNull Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<String> privilegeEntities, Set<String> tags) throws IOException, IllegalStateException
     {
         ScanResult scanResult = null;
@@ -79,7 +78,7 @@ import java.util.stream.Stream;
                 {
                     Files.copy(file.getInputStream(), uploadPath);
                     FileCreateModel createModel = new FileCreateModel(currentUser.getId(), uploadPath.toString(), privilegeEntities.toArray(String[]::new), tags.toArray(String[]::new));
-                    createEntity(createModel, file);
+                    createEntity(createModel);
                     return true;
                 }
                 catch (IOException ioException)
@@ -164,6 +163,14 @@ import java.util.stream.Stream;
         };
     }
 
+    /**
+     * Returns the file at the specified path as a {@link File} object.
+     *
+     * @param path A non-null string representing the file or directory specified.
+     * @return {@link File} object representing the file or directory specified.
+     * @throws NullPointerException if the path is {@code null}.
+     * @see File
+     */
     public @NotNull File getFileOfPath(@NotNull String path)
     {
         return new File(path);
@@ -180,9 +187,12 @@ import java.util.stream.Stream;
      * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
      *                              on the file system.
      */
-    public boolean remove(@NotNull Long id)
+
+    @Override
+    @Transactional
+    public boolean delete(long id)
     {
-        return loadEntityById(id).map(fileEntity -> {
+        return loadEntityByID(id).map(fileEntity -> {
             try
             {
                 getRepository().deleteById(fileEntity.getId());
@@ -195,11 +205,42 @@ import java.util.stream.Stream;
         }).orElse(false);
     }
 
+    /**
+     * Recursively deletes a list of files and directories.
+     *
+     * This method attempts to delete each file and directory in the provided list.
+     * If any deletion operation fails, false will be returned. If all deletions
+     * are successful, the method returns true.
+     *
+     * @param files A list of java.io.File objects representing the files and directories
+     *              to be deleted recursively.
+     * @return true if all files and directories were successfully deleted; false otherwise.
+     * @throws NullPointerException if the provided list of files is null.
+     * @throws SecurityException    If a security manager exists and denies delete access to any of the files.
+     * @see File#delete()
+     */
     public boolean deleteRecursively(@NotNull List<File> files)
     {
         return files.stream().allMatch(File::delete);
     }
 
+
+    /**
+     * Recursively moves a list of files and directories to a specified target path.
+     *
+     * This method iterates over the provided list of files and attempts to move each file
+     * or directory to the specified target path. If any move operation fails, the method will
+     * return false. If all moves are successful, the method returns true.
+     *
+     * @param files       A list of java.io.File objects representing the files and directories
+     *                    to be moved recursively.
+     * @param targetPath  The target path to which the files and directories should be moved.
+     * @return true if all files and directories were successfully moved; false otherwise.
+     * @throws NullPointerException if the provided list of files or targetPath is null.
+     * @throws SecurityException    If a security manager denies access to the files or the target path.
+     * @see Files#move(java.nio.file.Path, java.nio.file.Path, java.nio.file.CopyOption...)
+     * @see File#getName()
+     */
     public boolean moveRecursively(@NotNull List<File> files, @NotNull String targetPath)
     {
         return files.stream().allMatch(file -> {
@@ -242,7 +283,6 @@ import java.util.stream.Stream;
     public boolean verifyAccess(@NotNull FileEntity fileEntity, @NotNull Long userId)
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
-        Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
         return userService.loadEntityByIDSafe(userId).getId().equals(fileEntity.toModel().authorId())
                 || fileEntity.getPrivilege().stream().anyMatch(filePrivilege ->
                         userEntity.getGroups().stream()
@@ -250,17 +290,12 @@ import java.util.stream.Stream;
         );
     }
 
-    public @NotNull Optional<FileEntity> loadEntityById(@NotNull Long id)
-    {
-        // Return empty FileEntity if not found
-        return fileRepository.findById(id);
-    }
-
+    @Transactional
     public @NotNull ByteArrayResource loadResourceById(@NotNull Long id)
     {
         try
         {
-            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityById(id).map(
+            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityByID(id).map(
                     fileEntity -> fileEntity.toModel().filePath())))));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -284,27 +319,12 @@ import java.util.stream.Stream;
         return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
-    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model, @NotNull MultipartFile file)
+    @Override
+    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
         return fileRepository.save(model.toEntity(new FileEntity(), obj -> {
-            obj.setFileName(file.getOriginalFilename());
+            obj.setFileName(getFileOfPath(model.filePath()).getName());
             return obj;
         }));
-    }
-
-    /**
-     * Deletes the {@link FileEntity} that holds the given <cold>id</cold>
-     * parameter value as file id.
-     * @param id Identifier
-     * @return boolean <br>
-     * True: Successfully deleted <br>
-     * False: Couldn't find {@link FileEntity} with id.
-     */
-    public boolean delete(@NotNull Long id){
-        return fileRepository.findById(id).map(fileEntity ->
-        {
-            fileRepository.deleteById(id);
-            return true;
-        }).orElse(false);
     }
 }
