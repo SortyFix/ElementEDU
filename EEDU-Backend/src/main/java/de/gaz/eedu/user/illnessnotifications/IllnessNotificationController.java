@@ -45,9 +45,10 @@ import java.util.Set;
     }
 
     // Same here
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse/upload") public ResponseEntity<Boolean> upload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
+    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse/upload") public ResponseEntity<Boolean> uploadIllnessNotification(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
-        Boolean uploadSuccessful = fileService.upload(file, fileName, authorId, permittedUsers, permittedGroups, tags,true);
+        String currentDate = LocalDate.now().toString();
+        boolean uploadSuccessful = fileService.upload(file, authorId, "/illnesses/", currentDate, permittedUsers, permittedGroups, tags);
         return uploadSuccessful ? ResponseEntity.ok(true) : ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
     }
 

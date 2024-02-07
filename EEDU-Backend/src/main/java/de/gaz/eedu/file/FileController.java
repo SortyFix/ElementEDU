@@ -2,7 +2,6 @@ package de.gaz.eedu.file;
 
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -44,9 +43,9 @@ import java.util.stream.Collectors;
     }
 
     // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus uploadFile(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus generalUpload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, Set<Long> permittedUsers, Set<Long> permittedGroups, Set<String> tags) throws IOException, IllegalStateException
     {
-        Boolean uploadSuccessful = fileService.upload(file, fileName, authorId, permittedUsers, permittedGroups, tags, false);
+        Boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", permittedUsers, permittedGroups, tags);
         return uploadSuccessful ? HttpStatus.OK
                 : HttpStatus.FORBIDDEN;
     }
@@ -82,19 +81,14 @@ import java.util.stream.Collectors;
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptySet))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(emptySet));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS, @AuthenticationPrincipal Long userId)
     {
         ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
         return fileService.loadEntityById(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
-            // Reduce groups in user entity to their ids
-            Set<Long> userGroupIds = Arrays.stream(userEntity.toModel().groups()).map(SimpleUserGroupModel::id).collect(Collectors.toSet());
-            if(userEntity.getId().equals(fileEntity.toModel().authorId())
-                    || !Collections.disjoint(userGroupIds, fileEntity.toModel().permittedGroups())
-                    || fileEntity.toModel().permittedUsers().contains(userEntity.getId()))
+            if(fileService.verifyAccess(fileEntity, userService.loadEntityByIDSafe(userId).getId()))
             {
                 return ResponseEntity.ok(fileService.loadResourceById(fileIdS));
             }
-            // Send back empty resources as request body
             return ResponseEntity.badRequest().body(emptyResource);
         }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }

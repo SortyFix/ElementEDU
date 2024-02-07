@@ -71,6 +71,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
+
     public @NotNull SimpleUserModel toSimpleModel()
     {
         return new SimpleUserModel(getId(),
