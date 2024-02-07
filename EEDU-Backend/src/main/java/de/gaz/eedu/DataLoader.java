@@ -67,20 +67,20 @@ import java.security.SecureRandom;
         GroupCreateModel groupCreateModel = new GroupCreateModel("admin", true, new Long[0], new Long[0]);
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
-        themeService.getRepository().findByName(themeCreateModel.name()).orElseGet(() -> themeService.createEntity(themeCreateModel));
+        themeService.getRepository().findByName(themeCreateModel.name())
+                .orElseGet(() -> themeService.createEntity(themeCreateModel));
 
-        PrivilegeEntity privilegeEntity = privilegeService.getRepository().findByName(privilegeCreateModel.name()).orElseGet(() -> privilegeService.createEntity(privilegeCreateModel));
-        GroupEntity groupEntity = groupService.getRepository().findByName(groupCreateModel.name()).orElseGet(() -> groupService.createEntity(groupCreateModel));
+        PrivilegeEntity privilegeEntity = privilegeService.getRepository().findByName(privilegeCreateModel.name())
+                .orElseGet(() -> privilegeService.createEntity(privilegeCreateModel));
+        GroupEntity groupEntity = groupService.getRepository().findByName(groupCreateModel.name())
+                .orElseGet(() -> groupService.createEntity(groupCreateModel));
         UserEntity userEntity = userService.createEntity(userCreateModel);
-
         groupEntity.grantPrivilege(groupService, privilegeEntity);
         if (!userEntity.attachGroups(userService, groupEntity))
         {
             throw new IllegalStateException(
-                    "The system was not able to attach the admin group to the default user. This is very unusual " +
-                            "behaviour. Please consider rechecking all information.");
+                    "The system was not able to attach the admin group to the default user. This is very unusual behaviour. Please consider rechecking all information.");
         }
-
         LOGGER.info("A default user has been created");
         LOGGER.info("-".repeat(20));
         LOGGER.info("USERNAME: {}", "root");

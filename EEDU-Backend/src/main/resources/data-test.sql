@@ -48,6 +48,12 @@ VALUES ('Light', 0x000000, 0x000000, 0x000000),
        ('Dark', 0x000000, 0x000000, 0x000000),
        ('dummy', 0x000000, 0x000000, 0x000000);
 
+INSERT INTO class_room_entity(name)
+VALUES ('Q1'),
+       ('3e'),
+       ('7l'),
+       ('dummy');
+
 /* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
 INSERT INTO user_entity (first_name, last_name, login_name, password, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', TRUE,
@@ -80,14 +86,28 @@ VALUES ('READ'),
 INSERT INTO two_factor_entity(method, data, secret, enabled, user_id)
 VALUES (0, 'mustermann@example.com', '', true, 1),
 
-       (0, 'mustermann@example.com', '', true, 2),
+       (0, 'mustermann@example.com', '', false, 2),
        (1, '555 5555555', '', true, 2),
 
        (0, 'mustermann@examle.com', '', true, 3),
        (1, '555 5555555', '', true, 3),
-       (2, NULL, '', true, 3),
+       (2, NULL, '', false, 3),
 
        (2, NULL, '', true, 4);
+
+--- Courses
+INSERT INTO subject_entity(name)
+VALUES ('German'),
+       ('Mathematics'),
+       ('Informatics'),
+       ('Dummy');
+
+INSERT INTO course_entity(name, subject_id, class_room_id)
+VALUES ('Q1-German', 1, 1),
+       ('5e-Math', 2, 1),
+       ('2e-Informatics', 3, 3),
+       ('Dummy', 4, 4);
+---
 
 INSERT INTO chat_entity (time_of_creation)
 VALUES (90234802),
@@ -101,45 +121,56 @@ VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 3500000
        (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000),
        (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000);
 
-INSERT INTO chat_entity_messages (chat_id, message_id)
-VALUES (1, 1),
-       (2, 2),
-       (3, 3),
-       (4, 4);
+MERGE INTO chat_entity_messages (chat_id, message_id)
+    VALUES (1, 1),
+           (2, 2),
+           (3, 3),
+           (4, 4);
 
-INSERT INTO chat_entity_users (chat_id, user_id)
-VALUES (1, 1),
-       (1, 3),
+MERGE INTO chat_entity_users (chat_id, user_id)
+    VALUES (1, 1),
+           (1, 3),
 
-       (2, 2),
-       (2, 4),
+           (2, 2),
+           (2, 4),
 
-       (3, 2),
-       (3, 3),
+           (3, 2),
+           (3, 3),
 
-       (4, 1),
-       (4, 4);
+           (4, 1),
+           (4, 4);
 
 MERGE INTO user_groups (user_id, group_id)
-VALUES (1, 1),
+    VALUES (1, 1),
 
-       (2, 1),
-       (2, 2),
+           (2, 1),
+           (2, 2),
 
-       (3, 1),
-       (3, 2),
-       (3, 3),
+           (3, 1),
+           (3, 2),
+           (3, 3),
 
-       (4, 4);
+           (4, 4);
 
 MERGE INTO group_privileges (group_id, privilege_id)
-VALUES (1, 1),
+    VALUES (1, 1),
 
-       (2, 1),
-       (2, 2),
+           (2, 1),
+           (2, 2),
 
-       (3, 1),
-       (3, 2),
-       (3, 3),
+           (3, 1),
+           (3, 2),
+           (3, 3),
 
-       (4, 4);
+           (4, 4);
+
+MERGE INTO course_users (course_id, user_id)
+    VALUES (2, 2),
+           (3, 1),
+           (4, 4);
+
+MERGE INTO class_room_users (class_room_id, user_id)
+    VALUES (1, 1),
+           (2, 2),
+           (2, 3),
+           (4, 4);

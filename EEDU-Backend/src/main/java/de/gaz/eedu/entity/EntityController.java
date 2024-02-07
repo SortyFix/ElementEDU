@@ -23,7 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityController.class);
-    @Getter(AccessLevel.PROTECTED) private final S entityService;
+
+    protected abstract @NotNull S getEntityService();
 
     /**
      * This method is responsible for creating a new entity based on the provided model.

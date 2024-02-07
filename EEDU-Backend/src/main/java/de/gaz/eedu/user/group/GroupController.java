@@ -3,18 +3,25 @@ package de.gaz.eedu.user.group;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping("/group") public class GroupController extends EntityController<GroupService,
+@RestController
+@RequestMapping("/group")
+@RequiredArgsConstructor
+public class GroupController extends EntityController<GroupService,
         GroupModel, GroupCreateModel>
 {
-    public GroupController(@Autowired GroupService entityService)
+
+    private final GroupService groupService;
+
+    @Override
+    protected @NotNull GroupService getEntityService()
     {
-        super(entityService);
+        return groupService;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<GroupModel> create(@NotNull @RequestBody GroupCreateModel model)

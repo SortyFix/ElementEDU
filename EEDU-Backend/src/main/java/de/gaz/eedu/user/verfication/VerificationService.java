@@ -1,14 +1,14 @@
 package de.gaz.eedu.user.verfication;
 
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.model.LoginModel;
-import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
+import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
-import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -33,6 +33,7 @@ import java.util.function.Function;
  * This includes tasks such as generating JWT tokens, validating tokens and implementing two-factor authentication mechanisms. It provides methods to generate login tokens for users with support for advanced features like two-factor authentication. Each of these methods ensures secure and accurate operations by incorporating measures like assigning unique user IDs and setting expiration limits on tokens.
  * <p>
  * This class is annotated with the @Service annotation, denoting that it's a service component in the Spring context. The Spring framework will detect and register this class for dependency injection, where it can be autowired into other components in the application.
+ *
  * @author ivo
  */
 @Service public class VerificationService
@@ -44,15 +45,14 @@ import java.util.function.Function;
      * <p>
      * This method generates a JWT token for a user that is logging in. The process varies based on whether the user has set up two-factor authentication or not and whether the login model is of type `AdvancedUserLoginModel`. In case where two-factor authentication is enabled, the `twoFactor` method is used to generate the token, otherwise the `authorizeToken` method is used.
      *
-     * @param user the user's account information
+     * @param user       the user's account information
      * @param loginModel the login credentials provided by the user
      * @return a JWT token in string format for the provided user
-     *
-     * @throws NullPointerException if `user` or `loginModel` is null
+     * @throws NullPointerException     if `user` or `loginModel` is null
      * @throws IllegalArgumentException if user's ID is not valid or `user.twoFactor()` returns invalid TwoFactorModels
-     * @throws IllegalStateException when there is an issue in JWT generation related to key generation or compacting the token
+     * @throws IllegalStateException    when there is an issue in JWT generation related to key generation or compacting the token
      */
-    public @NotNull String loginUserToken(@NotNull UserModel user, @NotNull LoginModel loginModel)
+    public @NotNull String loginUserToken(@NotNull UserEntity user, @NotNull LoginModel loginModel)
     {
         boolean advanced = loginModel instanceof AdvancedUserLoginModel;
         Instant expiry = getExpiry(loginModel);
@@ -60,16 +60,16 @@ import java.util.function.Function;
         TwoFactorMethod[] factorMethods = getMethods(user);
         if (factorMethods.length > 0)
         {
-            return twoFactorToken(user.id(), expiry, advanced, factorMethods);
+            return twoFactorToken(user.getId(), expiry, advanced, factorMethods);
         }
 
         // user has no two factor set up, but his group requires it
-        if (Arrays.stream(user.groups()).anyMatch(SimpleUserGroupModel::requiresTwoFactor))
+        if (user.getGroups().stream().anyMatch(GroupEntity::isTwoFactorRequired))
         {
-            return twoFactorRequired(user.id(), expiry, advanced);
+            return twoFactorRequired(user.getId(), expiry, advanced);
         }
 
-        return authorizeToken(user, expiry, advanced);
+        return authorizeToken(user.getId(), expiry, advanced);
     }
 
     /**
@@ -79,15 +79,11 @@ import java.util.function.Function;
      *
      * @param user the user whose two-factor methods are to be retrieved
      * @return an array of distinct enabled two-factor methods
-     *
      * @throws NullPointerException if `user` is null or if `user.twoFactor()` returns null
      */
-    private @NotNull TwoFactorMethod @NotNull [] getMethods(@NotNull UserModel user)
+    private @NotNull TwoFactorMethod @NotNull [] getMethods(@NotNull UserEntity user)
     {
-        return Arrays.stream(user.twoFactor())
-                .filter(TwoFactorModel::enabled)
-                .map(TwoFactorModel::method)
-                .distinct()
+        return user.getTwoFactors().stream().filter(TwoFactorEntity::isEnabled).map(TwoFactorEntity::getMethod)
                 .toArray(TwoFactorMethod[]::new);
     }
 
@@ -96,18 +92,17 @@ import java.util.function.Function;
      * <p>
      * This method generates a JWT token for a user that is going through a two-factor authentication process. The token contains various claims such as user ID, expiry, whether it's an advanced token, and the two-factor method(s) that will be used. The type of JWT token varies based on the number of two-factor methods provided.
      *
-     * @param userID the user's ID
-     * @param expiry the expiration time of the token
-     * @param advanced a flag indicating whether it's an advanced token
+     * @param userID          the user's ID
+     * @param expiry          the expiration time of the token
+     * @param advanced        a flag indicating whether it's an advanced token
      * @param twoFactorMethod the method(s) used for two-factor authentication
      * @return a JWT token in string format
-     *
-     * @throws NullPointerException if `expiry` or `twoFactorMethod` is null or if `twoFactorMethod` has null elements
+     * @throws NullPointerException     if `expiry` or `twoFactorMethod` is null or if `twoFactorMethod` has null elements
      * @throws IllegalArgumentException if `twoFactorMethod` is empty
-     * @throws IllegalStateException if there is an issue with JWT generation related to key generation or compacting the token
+     * @throws IllegalStateException    if there is an issue with JWT generation related to key generation or compacting the token
      */
-    public @NotNull String twoFactorToken(long userID, @NotNull Instant expiry, boolean advanced,
-            @NotNull TwoFactorMethod @NotNull ... twoFactorMethod)
+    public @NotNull String twoFactorToken(long userID,
+            @NotNull Instant expiry, boolean advanced, @NotNull TwoFactorMethod @NotNull ... twoFactorMethod)
     {
         KeyType keyType = getKeyType(twoFactorMethod);
 
@@ -160,8 +155,7 @@ import java.util.function.Function;
      *
      * @param twoFactorMethod the two-factor methods used for authentication
      * @return a KeyType instance containing the JwtTokenType and the method(s) used for two-factor authentication
-     *
-     * @throws NullPointerException if `twoFactorMethod` is null or if `twoFactorMethod` has null elements
+     * @throws NullPointerException     if `twoFactorMethod` is null or if `twoFactorMethod` has null elements
      * @throws IllegalArgumentException if `twoFactorMethod` is empty
      */
     private @NotNull VerificationService.KeyType getKeyType(@NotNull TwoFactorMethod @NotNull [] twoFactorMethod)
@@ -184,22 +178,21 @@ import java.util.function.Function;
      * <p>
      * The method authorizes the given UserModel and returns a JWT token string. The token type is set as AUTHORIZED or ADVANCED_AUTHORIZATION based on the 'advanced' parameter. User's ID is included as a claim in the token.
      *
-     * @param userModel the UserModel to be authorized
-     * @param expiry the time at which the JWT token expires
+     * @param userID   the user to be authorized
+     * @param expiry   the time at which the JWT token expires
      * @param advanced a flag indicating whether an advanced authorization token is to be generated
      * @return a JWT token in string format
-     *
-     * @throws NullPointerException if userModel is null, or expiry is null
-     * @throws IllegalArgumentException if userModel's ID is invalid
+     * @throws NullPointerException     if user is null, or expiry is null
+     * @throws IllegalArgumentException if user's ID is invalid
      */
-    public @NotNull String authorizeToken(@NotNull UserModel userModel, @NotNull Instant expiry, boolean advanced)
+    public @NotNull String authorizeToken(long userID, @NotNull Instant expiry, boolean advanced)
     {
         JwtTokenType jwtTokenType = JwtTokenType.AUTHORIZED;
         if (advanced)
         {
             jwtTokenType = JwtTokenType.ADVANCED_AUTHORIZATION;
         }
-        return generateKey(jwtTokenType, expiry, new ClaimHolder<>("userID", userModel.id()));
+        return generateKey(jwtTokenType, expiry, new ClaimHolder<>("userID", userID));
     }
 
     /**
@@ -209,7 +202,6 @@ import java.util.function.Function;
      *
      * @param loginModel the LoginModel based on which the expiration instant is determined
      * @return the instant indicating when the login session expires
-     *
      * @throws NullPointerException if loginModel is null
      */
     private @NotNull Instant getExpiry(@NotNull LoginModel loginModel)
@@ -230,9 +222,8 @@ import java.util.function.Function;
      *
      * @param temporalAmount the temporal amount to be added to the current system time
      * @return the instant time after adding the provided temporal amount to current system time
-     *
      * @throws NullPointerException if temporalAmount is null
-     * @throws DateTimeException if temporalAmount exceeds the capacity of Instant (something like 292 million years lol)
+     * @throws DateTimeException    if temporalAmount exceeds the capacity of Instant (something like 292 million years lol)
      */
     private @NotNull Instant getExpiry(@NotNull TemporalAmount temporalAmount)
     {
@@ -245,16 +236,15 @@ import java.util.function.Function;
      * The method encapsulates the provided JwtTokenType, Instant expiry timestamp and ClaimHolder(s) into a JWT token. It internally calls the overloaded version of this method with the JwtTokenType's name as the subject.
      *
      * @param jwtTokenType name of the JwtTokenType, which will be the subject of the JWT token
-     * @param expiry timestamp representing when the JWT token is set to expire
-     * @param claims variable arguments representing the claims to be put in the JWT token
+     * @param expiry       timestamp representing when the JWT token is set to expire
+     * @param claims       variable arguments representing the claims to be put in the JWT token
      * @return a JWT token in string format
-     *
-     * @throws NullPointerException if jwtTokenType is null, or expiry is null, or claims are null
+     * @throws NullPointerException     if jwtTokenType is null, or expiry is null, or claims are null
      * @throws IllegalArgumentException if JwtTokenType name does not comply with JWT subject rules
-     * @throws IllegalStateException if HMAC-SHA secret key generation errors out during the JWT creation.
+     * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
      */
-    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry,
-            @NotNull ClaimHolder<?>... claims)
+    private @NotNull String generateKey(
+            @NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull ClaimHolder<?>... claims)
     {
         return generateKey(jwtTokenType.name(), expiry, claims);
     }
@@ -266,26 +256,20 @@ import java.util.function.Function;
      *
      * @param subject subject field for the JWT token. Typically identifying the principal that the JWT claims about.
      * @param expires timestamp representing when the JWT token is set to expire
-     * @param claims variable arguments representing the claims to be put into the JWT token
+     * @param claims  variable arguments representing the claims to be put into the JWT token
      * @return a JWT token in string format
-     *
-     * @throws NullPointerException if subject is null, or expires is null, or claims are null
-     * @throws IllegalStateException if HMAC-SHA secret key generation errors out during the JWT creation.
+     * @throws NullPointerException     if subject is null, or expires is null, or claims are null
+     * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
      * @throws IllegalArgumentException if provided subject does not comply with JWT subject rules
      */
-    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires,
-            @NotNull ClaimHolder<?>... claims)
+    private @NotNull String generateKey(
+            @NotNull String subject, @NotNull Instant expires, @NotNull ClaimHolder<?>... claims)
     {
         Map<String, Object> jwtClaims = new HashMap<>();
         Arrays.stream(claims).forEach(claim -> jwtClaims.put(claim.key(), claim.content()));
 
-        return Jwts.builder()
-                .subject(subject)
-                .claims(jwtClaims)
-                .expiration(Date.from(expires))
-                .issuedAt(new Date())
-                .signWith(getKey())
-                .compact();
+        return Jwts.builder().subject(subject).claims(jwtClaims).expiration(Date.from(expires)).issuedAt(new Date())
+                .signWith(getKey()).compact();
     }
 
     /**
@@ -293,17 +277,16 @@ import java.util.function.Function;
      * <p>
      * The method first parses the JWT token to extract its content, i.e., claims. It then uses these claims to identify the user and determine their authorities. If token is valid, it returns an Optional UsernamePasswordAuthenticationToken representing the authenticated user. This token contains the user's ID, authorities, and the original token claims.
      *
-     * @param token              JWT token to be validated
-     * @param authorityFactory   factory to generate authorities from JWT token and user ID
+     * @param token            JWT token to be validated
+     * @param authorityFactory factory to generate authorities from JWT token and user ID
      * @return UsernamePasswordAuthenticationToken wrapped in an Optional if validation is successful, empty Optional otherwise.
-     *
      * @throws UnsupportedJwtException  if argument passed is not a JWT token
      * @throws MalformedJwtException    if JWT token is not correctly structured
      * @throws SignatureException       if JWT token's signature does not match computed signature
-     * @throws IllegalArgumentException  if JWT token's compact value is null or empty, JWT claims string is null or empty, JWT claims map is empty, or any required claim is missing
+     * @throws IllegalArgumentException if JWT token's compact value is null or empty, JWT claims string is null or empty, JWT claims map is empty, or any required claim is missing
      */
-    @NotNull public Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token,
-            @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
+    @NotNull public Optional<UsernamePasswordAuthenticationToken> validate(
+            @NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
         Claims tokenContent = Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
         long userID = tokenContent.get("userID", Long.class);
@@ -328,14 +311,14 @@ import java.util.function.Function;
      *   <li>TWO_FACTOR_SELECTION, TWO_FACTOR_PENDING - only single authority is generated</li>
      * </ul>
      *
-     * @param jwtTokenType       the JwtTokenType identifying the type of JWT token
-     * @param authorityFactory   factory used to generate user authorities according to user ID
-     * @param userID             the ID of the user whose authorities are to be generated
+     * @param jwtTokenType     the JwtTokenType identifying the type of JWT token
+     * @param authorityFactory factory used to generate user authorities according to user ID
+     * @param userID           the ID of the user whose authorities are to be generated
      * @return an unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
-     *
      * @throws IllegalStateException if the jwtTokenType does not match any case in the switch statement
      */
-    @Unmodifiable @NotNull private Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
+    @Unmodifiable @NotNull private Collection<? extends GrantedAuthority> getAuthorities(
+            @NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
     {
         return switch (jwtTokenType)
         {
@@ -360,7 +343,7 @@ import java.util.function.Function;
      * The HMAC SHAKey algorithm is a type of Mac (Message Authentication Code) algorithm that combines the power of Hash algorithms with the strength of AES (Advanced Encryption Standard). This method takes the predefined 'secret' string value, converts it to a byte array using UTF-8 encoding, and then generates a HMAC SHAKey from that byte array. The resulting SecretKey can be used for further cryptographic operations that require a secret key, like creating or verifying a JWT (JSON Web Token).
      *
      * @return a SecretKey derived from the 'secret' string value using HMAC SHAKey algorithm and UTF-8 encoded bytes.
-     * @throws IllegalStateException if UTF-8 encoding is not supported or 'secret' string value cannot be converted to bytes.
+     * @throws IllegalStateException    if UTF-8 encoding is not supported or 'secret' string value cannot be converted to bytes.
      * @throws IllegalArgumentException if 'secret' string value is null or empty.
      */
     private @NotNull SecretKey getKey()
@@ -376,9 +359,9 @@ import java.util.function.Function;
      * With this class multiple objects can be added to such a list as key and value are both included within this
      * object.
      *
-     * @param key the key of the claim.
+     * @param key     the key of the claim.
      * @param content the content of the claim.
-     * @param <T> the type of the content.
+     * @param <T>     the type of the content.
      */
     private record ClaimHolder<T>(@NotNull String key, @NotNull T content) {}
 
@@ -388,7 +371,7 @@ import java.util.function.Function;
      * This record class private inner class pairs a method for holding a ClaimHolder, and a JwtTokenType. The ClaimHolder is a generic type that can hold any type of claim, i.e., it might be a claim about the user identity, a claim about the user's authorization, etc. The JwtTokenType is an enumerated type that can hold the type of JWT token, i.e., it might be an access token, refresh token, etc.
      *
      * @param method A particular method for holding a claim holder. It is wrapped in a ClaimHolder generic class.
-     * @param type An enumerated type representing the type of JWT token.
+     * @param type   An enumerated type representing the type of JWT token.
      */
     private record KeyType(ClaimHolder<?> method, JwtTokenType type) {}
 }

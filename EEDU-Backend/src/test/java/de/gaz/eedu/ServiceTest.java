@@ -1,7 +1,9 @@
 package de.gaz.eedu;
 
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.*;
+import de.gaz.eedu.entity.model.CreationModel;
+import de.gaz.eedu.entity.model.EntityModel;
+import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.OccupiedException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@code ServiceTest} is an abstract class, providing a generic way to test services.
@@ -254,6 +260,26 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
          * and doesn't produce any side effects. The "pureness" of this method allows for safe
          * usage in any context, even in a multi-threaded environment.
          * </p>
+         * <p>
+         * Example Usage:
+         * </p>
+         * <pre>{@code
+         * // Define a sample request
+         * MyRequest request = new SomeRequest();
+         *
+         * // Define the expected result
+         *
+         * String expectedResult = "some result";
+         *
+         * Validator<MyRequest, String> equalityValidator = Validator.equals();
+         * test(Eval.eval(request, expectedResult, equalityValidator), (request) ->
+         * {
+         *      // Perform the actual operation that produces the result
+         *      String actualResult = performOperation(request);
+         *      return actualResult;
+         * });
+         **
+        }</pre>
          *
          * @param <R> The type of the request.
          * @param <E> The type of the expected and the result of the request.
@@ -264,6 +290,64 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
         @Contract(pure = true) static <R, E> @NotNull Validator<R, E> equals()
         {
             return (request, expected, result) -> Assertions.assertEquals(expected, result);
+        }
+
+        /**
+         * This method returns a {@link Validator} that performs an array equality check between the expected and actual results
+         * using the {@link Assertions#assertTrue(boolean)} method from JUnit.
+         * The contract of this method is to always return a new instance every time it is called.
+         * <p>
+         * The {@code @Contract(pure = true)} annotation indicates that this method is pure, which means that the returned
+         * {@link Validator} doesn't depend on any mutable state and doesn't produce any side effects. The "pureness" of this method
+         * allows for safe usage in any context, even in a multi-threaded environment.
+         * </p>
+         * <p>
+         * The array equality check is performed by converting the expected array into a {@link Set} using the
+         * {@link Arrays#stream(Object[])} and {@link Collectors#toSet()} methods, and then iterating through the actual result
+         * array to ensure each element is present in the expected set. If any element in the result array is not present in the
+         * expected set, an assertion failure will be triggered using {@link Assertions#assertTrue(boolean)}.
+         * </p>
+         * <p>
+         * Example Usage:
+         * </p>
+         * <pre>{@code
+         * // Define a sample request
+         * MyRequest request = new SomeRequest();
+         *
+         * // Define the expected array of results
+         *
+         * String[] expectedResults = {
+         *      "result1",
+         *      "result2",
+         *      "result3"
+         * };
+         *
+         * Validator<MyRequest, String[]> arrayValidator = Validator.arrayEquals();
+         * test(Eval.eval(request, expectedResults, arrayValidator), (request) ->
+         * {
+         *      // Perform the actual operation that produces the result array
+         *      String[] actualResults = performOperation(request);
+         *      return actualResults;
+         * });
+         *
+         * }</pre>
+         *
+         * @param <R> The type of the request.
+         * @param <E> The type of the elements in the expected and result arrays.
+         * @return A new instance of {@link Validator} for array equality checks.
+         * @see Validator
+         * @see Assertions#assertTrue(boolean)
+         */
+        @Contract(pure = true) static <R, E> @NotNull Validator<R, E[]> arrayEquals()
+        {
+            return (request, expect, result) ->
+            {
+                Set<E> expected = Arrays.stream(expect).collect(Collectors.toSet());
+                for (E current : result)
+                {
+                    Assertions.assertTrue(expected.contains(current));
+                }
+            };
         }
     }
 

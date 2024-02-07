@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -81,10 +82,10 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
      * @param groupID the current group id to be tested for granting privilege. These are adjustable in the
      *                {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupGrantPrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional public void testGroupGrantPrivilege(long groupID)
     {
-        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
-        GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
+        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByIDSafe(3);
+        GroupEntity groupEntity = getService().loadEntityByIDSafe(groupID);
         test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
     }
 
@@ -104,7 +105,7 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
      * @param groupID the current group id that should be tested for the privilege revocation. These IDs can be modified inside
      *                the {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testGroupRevokePrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional public void testGroupRevokePrivilege(long groupID)
     {
         GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
         test(Eval.eval(3L /* privilegeId */, groupID == 3, Validator.equals()), groupEntity::revokePrivilege);

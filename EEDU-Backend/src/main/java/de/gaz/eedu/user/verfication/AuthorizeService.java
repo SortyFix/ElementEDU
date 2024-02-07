@@ -1,7 +1,7 @@
 package de.gaz.eedu.user.verfication;
 
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.LoginModel;
-import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
 import de.gaz.eedu.user.verfication.authority.InvalidTokenException;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -30,11 +30,12 @@ import java.util.Optional;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    @Transactional public @Nullable String login(@NotNull UserModel model, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
+    @Transactional public @Nullable String login(
+            @NotNull UserEntity user, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
     {
         if (getPasswordEncoder().matches(loginModel.password(), hashedPassword))
         {
-            return getVerificationService().loginUserToken(model, loginModel);
+            return getVerificationService().loginUserToken(user, loginModel);
         }
         return null; //passwords do not match
     }
@@ -42,22 +43,26 @@ import java.util.Optional;
     public @NotNull String selectTwoFactor(@NotNull TwoFactorMethod twoFactorMethod, @NotNull Claims claims)
     {
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
-        return getVerificationService().twoFactorToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), twoFactorMethod);
+        return getVerificationService().twoFactorToken(claimDecoder.userID(),
+                claimDecoder.expiry(),
+                claimDecoder.advanced(),
+                twoFactorMethod);
     }
 
-    @Transactional public @Nullable String authorize(@NotNull UserModel userModel, @NotNull Claims claims)
+    @Transactional public @Nullable String authorize(long userID, @NotNull Claims claims)
     {
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
 
-        if(claimDecoder.userID() != userModel.id())
+        if (claimDecoder.userID() != userID)
         {
             return null;
         }
 
-        return getVerificationService().authorizeToken(userModel, claimDecoder.expiry(), claimDecoder.advanced());
+        return getVerificationService().authorizeToken(userID, claimDecoder.expiry(), claimDecoder.advanced());
     }
 
-    public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory)
+    public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(
+            @NotNull String token, @NotNull AuthorityFactory authorityFactory)
     {
         return getVerificationService().validate(token, authorityFactory);
     }
@@ -78,8 +83,8 @@ import java.util.Optional;
      *     <li>advanced</li>
      * </ul>
      *
-     * @param userID the id of the user.
-     * @param expiry the expiry of the token, or the token created with the current token.
+     * @param userID   the id of the user.
+     * @param expiry   the expiry of the token, or the token created with the current token.
      * @param advanced if the token has advanced access to user management areas.
      */
     private record ClaimDecoder(long userID, @NotNull Instant expiry, boolean advanced)

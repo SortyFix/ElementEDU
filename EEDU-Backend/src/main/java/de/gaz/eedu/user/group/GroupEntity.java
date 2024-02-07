@@ -37,23 +37,20 @@ import java.util.stream.Stream;
  * @see UserEntity
  * @see PrivilegeEntity
  */
-@Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity") public class GroupEntity implements EntityModelRelation<GroupModel>
+@Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity")
+public class GroupEntity implements EntityModelRelation<GroupModel>
 {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
     private boolean twoFactorRequired;
 
-    @ManyToMany(mappedBy = "groups")
-    @JsonBackReference
-    @Setter(AccessLevel.PRIVATE)
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.PRIVATE)
     private Set<UserEntity> users = new HashSet<>();
 
-    @ManyToMany
-    @JsonManagedReference
-    @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name =
-		    "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id",
-		    referencedColumnName = "id")) private Set<PrivilegeEntity> privileges;
+    @ManyToMany @JsonManagedReference
+    @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
+    private Set<PrivilegeEntity> privileges;
 
     /**
      * Creates an instance with a {@link Set} of users.
@@ -84,7 +81,8 @@ import java.util.stream.Stream;
     @Override public @NotNull GroupModel toModel()
     {
         return new GroupModel(getId(),
-                getName(), isTwoFactorRequired(),
+                getName(),
+                isTwoFactorRequired(),
                 getUsers().stream().map(UserEntity::toSimpleModel).toArray(SimpleUserModel[]::new),
                 getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).toArray(SimplePrivilegeModel[]::new));
     }
@@ -100,15 +98,14 @@ import java.util.stream.Stream;
      * convention is that it enables method level security.
      *
      * @return a new {@link org.springframework.security.core.authority.SimpleGrantedAuthority} object which
-     *         incorporates the adjusted (prefixed) name/role. SimpleGrantedAuthority is a basic,
-     *         immutable implementation of {@link org.springframework.security.core.GrantedAuthority}.
-     *
+     * incorporates the adjusted (prefixed) name/role. SimpleGrantedAuthority is a basic,
+     * immutable implementation of {@link org.springframework.security.core.GrantedAuthority}.
      * @see org.springframework.security.core.authority.SimpleGrantedAuthority
      * @see org.springframework.security.core.GrantedAuthority
      */
     private @NotNull GrantedAuthority toRole()
     {
-        return new SimpleGrantedAuthority("ROLE_" + getName());
+        return new SimpleGrantedAuthority("ROLE_" + getName().toUpperCase());
     }
 
     /**
@@ -124,8 +121,7 @@ import java.util.stream.Stream;
      * result in an UnsupportedOperationException.
      *
      * @return an unmodifiable set of {@link org.springframework.security.core.GrantedAuthority} objects, each
-     *         representing a user authority (privilege). It may be empty but is never null.
-     *
+     * representing a user authority (privilege). It may be empty but is never null.
      * @see org.springframework.security.core.GrantedAuthority
      */
     private @NotNull @Unmodifiable Set<GrantedAuthority> getAuthorities()
@@ -146,8 +142,8 @@ import java.util.stream.Stream;
      * @param privilegeEntity the privileges to be granted.
      * @return true if a privilege was successfully granted and the group entity was saved, false otherwise.
      */
-    @Transactional public boolean grantPrivilege(@NotNull GroupService groupService,
-		    @NotNull PrivilegeEntity... privilegeEntity)
+    @Transactional
+    public boolean grantPrivilege(@NotNull GroupService groupService, @NotNull PrivilegeEntity... privilegeEntity)
     {
         if (grantPrivilege(privilegeEntity))
         {
@@ -173,12 +169,7 @@ import java.util.stream.Stream;
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
-        // Filter already granted privileges out
-        Predicate<PrivilegeEntity> privilegeEntityPredicate = requestedPrivilege -> privileges.stream()
-                .noneMatch(presentPrivilege -> Objects.equals(presentPrivilege, requestedPrivilege));
-        return privileges.addAll(Arrays.stream(privilegeEntity)
-                .filter(privilegeEntityPredicate)
-                .collect(Collectors.toSet()));
+        return privileges.addAll(Arrays.stream(privilegeEntity).collect(Collectors.toSet()));
     }
 
     /**
@@ -244,6 +235,16 @@ import java.util.stream.Stream;
         return Collections.unmodifiableSet(privileges);
     }
 
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.privileges.isEmpty())
+        {
+            return false;
+        }
+        this.privileges.clear();
+        return true;
+    }
+
     @Override public String toString()
     {
         return "GroupEntity{" + "id=" + id + ", name='" + name + '\'' + ", users=" + users + ", privileges=" + privileges + '}';
@@ -251,8 +252,8 @@ import java.util.stream.Stream;
 
     @Override public boolean equals(Object object)
     { // Automatically generated by IntelliJ
-        if (this == object) {return true;}
-        if (object == null || getClass() != object.getClass()) {return false;}
+        if (this == object) { return true; }
+        if (object == null || getClass() != object.getClass()) { return false; }
         GroupEntity that = (GroupEntity) object;
         return Objects.equals(getId(), that.getId());
     }
