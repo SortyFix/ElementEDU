@@ -7,10 +7,11 @@ import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorCreateModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -35,19 +36,31 @@ import java.util.Optional;
  * @see TwoFactorModel
  * @see TwoFactorCreateModel
  */
-@RestController @RequestMapping("/user/login/twofactor") public class TwoFactorController extends EntityController<TwoFactorService, TwoFactorModel, TwoFactorCreateModel>
+@RestController
+@RequestMapping("/user/login/twofactor")
+@RequiredArgsConstructor
+public class TwoFactorController extends EntityController<TwoFactorService, TwoFactorModel, TwoFactorCreateModel>
 {
-    /**
-     * This is the constructor of the {@code TwoFactorController}. It uses the {@link Autowired}
-     * annotation to request the dependency injection of the {@link TwoFactorService} instance.
-     * The {@link TwoFactorService} instance is then passed to a constructor of the parent class {@link EntityController}.
-     * The related dependencies are injected by spring's IOC container during runtime startup.
-     *
-     * @param entityService TwoFactorService instance
-     */
-    public TwoFactorController(@Autowired TwoFactorService entityService)
+
+    private final TwoFactorService twoFactorService;
+
+    @Override
+    protected @NotNull TwoFactorService getEntityService()
     {
-        super(entityService);
+        return twoFactorService;
+    }
+
+    @PreAuthorize("(#id == authentication.principal)")
+    @DeleteMapping("/delete/{id}")
+    @Override
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
+        {
+            throw unauthorizedThrowable();
+        }
+        return super.delete(id);
     }
 
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
@@ -111,7 +124,6 @@ import java.util.Optional;
     public @NotNull ResponseEntity<String> verify(@PathVariable @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (isAuthorized(authentication, JwtTokenType.TWO_FACTOR_PENDING))
         {
             TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));

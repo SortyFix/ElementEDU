@@ -9,4 +9,6 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
 
     @NotNull Optional<GroupEntity> findByName(@NotNull String name);
 
+    boolean existsByName(@NotNull String name);
+
 }

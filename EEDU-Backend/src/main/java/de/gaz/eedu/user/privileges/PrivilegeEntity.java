@@ -23,7 +23,7 @@ import java.util.Set;
     private Long id;
     private String name;
     @JsonBackReference
-    @ManyToMany(mappedBy = "privileges")
+    @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
     private Set<GroupEntity> groupEntities;
 
     public @NotNull SimpleGrantedAuthority toAuthority()

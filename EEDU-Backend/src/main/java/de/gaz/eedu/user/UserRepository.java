@@ -2,6 +2,7 @@ package de.gaz.eedu.user;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -14,11 +15,10 @@ import java.util.Optional;
  *
  * @author ivo
  */
+@Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @NotNull Optional<UserEntity> findByLoginName(@NotNull String loginName);
 
-    @NotNull Collection<UserEntity> findUserByFirstName(@NotNull String firstname);
-
-    @NotNull Collection<UserEntity> findUserByLastName(@NotNull String lastName);
+    @NotNull boolean existsByLoginName(@NotNull String loginName);
 }

@@ -1,6 +1,9 @@
 package de.gaz.eedu.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.course.CourseEntity;
+import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
@@ -14,8 +17,9 @@ import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,19 +48,29 @@ import java.util.stream.Stream;
  * @see GroupEntity
  * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
+@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity")
+public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
+    private final Set<CourseEntity> courses = new HashSet<>();
     @Enumerated UserStatus status;
+    //finish this line and the sql
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
+    List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference private Set<TwoFactorEntity> twoFactors = new HashSet<>();
-    @ManyToOne @JoinColumn(name = "theme_id") @JsonManagedReference private ThemeEntity themeEntity;
-    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(name = "user_groups", joinColumns =
-    @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id",
-            referencedColumnName = "id")) private Set<GroupEntity> groups = new HashSet<>();
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
+    private Set<TwoFactorEntity> twoFactors = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
+    private ThemeEntity themeEntity;
+    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
+    @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
+    @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
+    private @Nullable ClassRoomEntity classRoom;
+
 
     public @NotNull SimpleUserModel toSimpleModel()
     {
@@ -74,11 +88,12 @@ import java.util.stream.Stream;
     {
         Function<GroupEntity, SimpleUserGroupModel> mapper = (entity) ->
         {
-            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges()
-                    .stream()
-                    .map(PrivilegeEntity::toSimpleModel)
+            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel)
                     .toArray(SimplePrivilegeModel[]::new);
-            return new SimpleUserGroupModel(entity.getId(), entity.getName(), entity.isTwoFactorRequired(), privilegeModels);
+            return new SimpleUserGroupModel(entity.getId(),
+                    entity.getName(),
+                    entity.isTwoFactorRequired(),
+                    privilegeModels);
         };
 
         return new UserModel(getId(),
@@ -137,7 +152,6 @@ import java.util.stream.Stream;
         return getLastName() + ", " + getFirstName();
     }
 
-
     /**
      * Attaches various groups to the user and saves the state using the provided user service.
      * The groups are specified via their entities.
@@ -173,7 +187,7 @@ import java.util.stream.Stream;
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         // Filter already attached groups out
-        Predicate<GroupEntity> predicate = requestedGroup -> this.groups.stream()
+        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream()
                 .noneMatch(presentGroup -> Objects.equals(presentGroup, requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
@@ -191,7 +205,7 @@ import java.util.stream.Stream;
      * @param ids         The IDs of the groups to be detached.
      * @return true if a group was successfully detached and the user entity was saved, false otherwise.
      */
-    @Transactional public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
+    public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
     {
         return saveEntityIfPredicateTrue(userService, ids, this::detachGroups);
     }
@@ -232,14 +246,56 @@ import java.util.stream.Stream;
         return Collections.unmodifiableSet(groups);
     }
 
+    /**
+     * Checks if the user is a member of a group with the specified name.
+     * <p>
+     * This method searches for a {@link GroupEntity} in the user's groups with a matching name. Returns {@code true}
+     * if a matching group is found, indicating the user's membership in that group; otherwise, returns {@code false}.
+     *
+     * @param name The name of the group to check for membership.
+     * @return {@code true} if the user is a member of a group with the specified name; {@code false} otherwise.
+     */
+    public boolean inGroup(@NotNull String name)
+    {
+        return getGroups().stream().anyMatch(groupEntity -> groupEntity.getName().equals(name));
+    }
+
+    /**
+     * Checks if the user has a role with the specified name.
+     * <p>
+     * This method checks if the user has the specified role by converting it to the corresponding authority
+     * with the "ROLE_" prefix. Returns {@code true} if the user has the specified role; otherwise, returns {@code false}.
+     *
+     * @param role The name of the role to check.
+     * @return {@code true} if the user has the specified role; {@code false} otherwise.
+     */
+    public boolean hasRole(@NotNull String role)
+    {
+        return hasAuthority("ROLE_" + role);
+    }
+
+    /**
+     * Checks if the user has the specified authority.
+     * <p>
+     * This method checks if the user has the specified authority. Returns {@code true} if the user has the specified authority;
+     * otherwise, returns {@code false}.
+     *
+     * @param name The name of the authority to check.
+     * @return {@code true} if the user has the specified authority; {@code false} otherwise.
+     */
+    public boolean hasAuthority(@NotNull String name)
+    {
+        return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(name.toUpperCase()));
+    }
+
     public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)
     {
         // Also include not enabled ones, therefore not getter
         return twoFactors.stream().filter(entity -> entity.getMethod().equals(twoFactorMethod)).findFirst();
     }
 
-    @Transactional public boolean initTwoFactor(@NotNull UserService userService,
-		    @NotNull TwoFactorEntity twoFactorEntity)
+    @Transactional public boolean initTwoFactor(
+            @NotNull UserService userService, @NotNull TwoFactorEntity twoFactorEntity)
     {
         return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::initTwoFactor);
     }
@@ -279,17 +335,70 @@ import java.util.stream.Stream;
         return twoFactors.stream().filter(TwoFactorEntity::isEnabled).collect(Collectors.toUnmodifiableSet());
     }
 
-    @Transactional public void setThemeEntity(@NotNull @org.jetbrains.annotations.NotNull UserService userService,
-		    @NotNull ThemeEntity themeEntity)
+    /**
+     * Retrieves an unmodifiable set of {@link CourseEntity} instances associated with this course.
+     * <p>
+     * This method combines the courses directly associated with this course and those associated with its assigned
+     * {@link ClassRoomEntity}, if present. The resulting set is unmodifiable.
+     *
+     * @return An unmodifiable set of {@link CourseEntity} instances associated with this course.
+     */
+    public @NotNull @Unmodifiable Set<CourseEntity> getCourses()
+    {
+        // add courses from class if class is present
+        Stream<CourseEntity> courseStream = getClassRoom().stream().flatMap(clazz -> clazz.getCourses().stream());
+        return Stream.concat(this.courses.stream(), courseStream).collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * Retrieves the optional {@link ClassRoomEntity} assigned to this course, if any.
+     * <p>
+     * This method returns an {@link Optional} containing the assigned {@link ClassRoomEntity} if present,
+     * or an empty {@link Optional} if no class is currently assigned to this course.
+     *
+     * @return An {@link Optional} containing the assigned {@link ClassRoomEntity} if present, otherwise an empty {@link Optional}.
+     */
+    public @NotNull Optional<ClassRoomEntity> getClassRoom()
+    {
+        return Optional.ofNullable(classRoom);
+    }
+
+    /**
+     * Checks if a {@link ClassRoomEntity} is assigned to this course.
+     * <p>
+     * This method returns true if a {@link ClassRoomEntity} is currently assigned to this course, indicating
+     * that the course is associated with a specific class. It returns false if no class is currently assigned.
+     * <p>
+     * Note: This method relies on the presence or absence of the assigned {@link ClassRoomEntity} as determined by the
+     * {@link #getClassRoom()} method. To assign a {@link ClassRoomEntity} to this course, use the {@link ClassRoomEntity#attachStudents(UserEntity...)}
+     * method, and to disassociate the current class, use the {@link ClassRoomEntity#detachStudents(Long...)} method.
+     *
+     * @return {@code true} if a {@link ClassRoomEntity} is assigned, false otherwise.
+     */
+    public boolean hasClassRoomAssigned()
+    {
+        return getClassRoom().isPresent();
+    }
+
+    @Transactional public void setThemeEntity(@NotNull UserService userService, @NotNull ThemeEntity themeEntity)
     {
         setThemeEntity(themeEntity);
         userService.saveEntity(this);
     }
 
+    @Override public boolean deleteManagedRelations()
+    {
+        if(this.groups.isEmpty())
+        {
+            return false;
+        }
+        this.groups.clear();
+        return true;
+    }
+
     @Override public String toString()
     { // Automatically generated using intellij
-        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' +
-		        ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
     }
 
     @Override public boolean equals(Object object)
@@ -305,8 +414,9 @@ import java.util.stream.Stream;
         return Objects.hash(getId());
     }
 
-    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity,
-		    @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(
+            @NotNull UserService userService,
+            @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

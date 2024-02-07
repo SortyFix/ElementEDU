@@ -64,16 +64,6 @@ import java.util.function.Supplier;
         throw new CreationException(HttpStatus.CONFLICT);
     }
 
-    @Override public boolean delete(long id)
-    {
-        return getRepository().findById(id).map(twoFactor ->
-        {
-            boolean disabled = twoFactor.getUser().disableTwoFactor(getUserService(), twoFactor.getId());
-            getRepository().deleteById(id); // delete anyway, as the user has no connection
-            return disabled;
-        }).orElse(false);
-    }
-
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
@@ -83,7 +73,7 @@ import java.util.function.Supplier;
         return userEntity.getTwoFactor(method)
                 .map(mapper)
                 .filter(Boolean::booleanValue)
-                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.toModel(), claims));
+                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.getId(), claims));
     }
 
     public boolean enable(@NotNull TwoFactorMethod method, @NotNull String code, @NotNull Claims claims)

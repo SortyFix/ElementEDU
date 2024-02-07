@@ -7,4 +7,7 @@ import java.util.Optional;
 
 public interface PrivilegeRepository extends JpaRepository<PrivilegeEntity, Long> {
     @NotNull Optional<PrivilegeEntity> findByName(@NotNull String name);
+
+    boolean existsByName(@NotNull String name);
+
 }
