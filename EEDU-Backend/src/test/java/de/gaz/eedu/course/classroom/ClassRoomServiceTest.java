@@ -1,9 +1,7 @@
-package de.gaz.eedu.course;
+package de.gaz.eedu.course.classroom;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.course.classroom.ClassRoomEntity;
-import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;

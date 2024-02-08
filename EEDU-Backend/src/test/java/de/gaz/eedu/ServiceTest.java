@@ -7,17 +7,23 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.OccupiedException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * {@code ServiceTest} is an abstract class, providing a generic way to test services.
@@ -46,11 +52,9 @@ import java.util.stream.Collectors;
  *            It must extend from the {@code EDUEntity}.
  * @param <M> The model of the entity for the service under test.
  * @param <C> The creation model for the entity, used when creating new instances.
- *
  * @author ivo
  */
-@SpringBootTest
-@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) @SpringBootTest @ActiveProfiles("test")
 public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
     private final EntityService<?, E, M, C> service;
@@ -194,34 +198,17 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
         evaluator.evaluateResult(tester.execute(evaluator.request()));
     }
 
-    /**
-     * This is a parameterized test for the delete functionality of a service. The method's behavior
-     * is verified by providing different input values (ids) along with an expected boolean value.
-     *
-     * <p>
-     * The test runs multiple iterations over a collection of long values, which represent ids of entities.
-     * At each iteration, an id is passed to the 'delete' method of the service.
-     * The return value (a boolean which indicates whether the deletion was successful or not)
-     * is collected and compared to an expected value. The expected value is "true" if id is 4 and "false" otherwise.
-     * </p>
-     *
-     * <p>
-     * The test is designed to verify that the delete operation works correctly for the given set of ids
-     * and that the correct boolean value is returned in each case.
-     * </p>
-     *
-     * @param id The id of the entity to be deleted. It's provided by value source.
-     * @see ParameterizedTest
-     * @see ValueSource
-     */
-    @ParameterizedTest(name = "{index} => request={0}")
-    @ValueSource(longs = {
-            4L,
-            15L
-    })
-    public void testDeleteEntitySuccess(long id)
+
+    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("deleteEntities") @NullSource public void testDeleteEntitySuccess(
+            @Nullable TestData<Boolean> data)
     {
-        Assertions.assertEquals(id == 4, getService().delete(id));
+        Assumptions.assumeTrue(Objects.nonNull(data));
+        test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), (id) -> getService().delete(id));
+    }
+
+    @Contract(pure = true, value = "-> new") protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    {
+        return Stream.empty();
     }
 
     /**
@@ -237,18 +224,8 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
      * @param <R> The type of the request which is to be validated.
      * @param <E> The type of the expected and result which needs equivalent to perform validation.
      */
-    @FunctionalInterface
-    protected interface Validator<R, E>
+    @FunctionalInterface protected interface Validator<R, E>
     {
-        /**
-         * Evaluates a request, expected result and actual result.
-         *
-         * @param request The request which is to be validated.
-         * @param expect The expected result of the request.
-         * @param result The result of the request which is to be compared to the expected result.
-         */
-        void evaluate(@NotNull R request, @NotNull E expect, @NotNull E result);
-
         /**
          * This method returns a {@link Validator} that performs an equality check
          * between the expected and actual results using the {@link Assertions#assertEquals} method from JUnit.
@@ -278,8 +255,8 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
          *      String actualResult = performOperation(request);
          *      return actualResult;
          * });
-         **
-        }</pre>
+         * *
+         * }</pre>
          *
          * @param <R> The type of the request.
          * @param <E> The type of the expected and the result of the request.
@@ -349,6 +326,15 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
                 }
             };
         }
+
+        /**
+         * Evaluates a request, expected result and actual result.
+         *
+         * @param request The request which is to be validated.
+         * @param expect  The expected result of the request.
+         * @param result  The result of the request which is to be compared to the expected result.
+         */
+        void evaluate(@NotNull R request, @NotNull E expect, @NotNull E result);
     }
 
     /**
@@ -359,8 +345,7 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
      * @param <R> The type of the request which the tester will execute.
      * @param <E> The type of the result after tester's execution.
      */
-    @FunctionalInterface
-    protected interface Tester<R, E>
+    @FunctionalInterface protected interface Tester<R, E>
     {
         /**
          * Executes a given request and returns the result of the execution.
@@ -382,26 +367,26 @@ public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends En
      * expected and actual result of the request.
      * </p>
      *
-     * @param request The request which is to be validated.
-     * @param expect The expected result of the request.
+     * @param request   The request which is to be validated.
+     * @param expect    The expected result of the request.
      * @param validator The validator which is used to validate the request's result.
-     * @param <R> The type of the request.
-     * @param <E> The type of the expected result.
+     * @param <R>       The type of the request.
+     * @param <E>       The type of the expected result.
      */
     protected record Eval<R, E>(@NotNull R request, @NotNull E expect, @NotNull ServiceTest.Validator<R, E> validator)
     {
         /**
          * Factory method for creating a new instance of Eval.
          *
-         * @param request The request which is to be validated.
-         * @param expect The expected result of the request.
+         * @param request   The request which is to be validated.
+         * @param expect    The expected result of the request.
          * @param validator The validator which is used to validate the request's result.
-         * @param <R> The type of the request.
-         * @param <E> The type of the expected result.
+         * @param <R>       The type of the request.
+         * @param <E>       The type of the expected result.
          * @return A new instance of Eval.
          */
-        @Contract("_, _, _ -> new") public static <R, E> @NotNull Eval<R, E> eval(@NotNull R request,
-                @NotNull E expect, @NotNull Validator<R, E> validator)
+        @Contract("_, _, _ -> new") public static <R, E> @NotNull Eval<R, E> eval(
+                @NotNull R request, @NotNull E expect, @NotNull Validator<R, E> validator)
         {
             return new Eval<>(request, expect, validator);
         }
