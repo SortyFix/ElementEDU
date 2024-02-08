@@ -115,17 +115,23 @@ VALUES (90234802),
        (33400000),
        (75839435);
 
-INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time)
-VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 35000000),
-       (2, 0, 'ich mag kein erdkunde', 239482094, 35000000),
-       (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000),
-       (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000);
+INSERT INTO file_entity (file_name, author_id)
+VALUES ('howtostaysingleforever.m4a', 1),
+       ('ivo_hausaufgaben.exe', 2),
+       ('informatik_themen_fr_kühnel.docx', 3),
+       ('ivo_präsentation_cover.svg', 2);
+
+INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time, file_entity_id)
+VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 35000000, 1),
+       (2, 0, 'ich mag kein erdkunde', 239482094, 35000000, 2),
+       (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000, 3),
+       (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000, 4);
 
 MERGE INTO chat_entity_messages (chat_id, message_id)
-    VALUES (1, 1),
-           (2, 2),
-           (3, 3),
-           (4, 4);
+VALUES (1, 1),
+       (2, 2),
+       (3, 3),
+       (4, 4);
 
 MERGE INTO chat_entity_users (chat_id, user_id)
     VALUES (1, 1),

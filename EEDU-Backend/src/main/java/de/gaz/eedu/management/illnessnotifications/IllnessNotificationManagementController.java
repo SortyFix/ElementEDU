@@ -56,13 +56,14 @@ public class IllnessNotificationManagementController
         return ResponseEntity.ok(illnessNotificationService.loadEntitiesByDate(date).stream().map(IllnessNotificationEntity::toModel).collect(Collectors.toList()));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/respond")
-    public ResponseEntity<Boolean> respondToNotification(@NotNull Long notificationId, @NotNull IllnessNotificationStatus status)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/respond/{notificationId}/{status}")
+    public ResponseEntity<Boolean> respondToNotification(@NotNull @PathVariable Long notificationId, @NotNull
+    @PathVariable IllnessNotificationStatus status)
     {
         return illnessNotificationService.loadEntityByID(notificationId).map(illnessNotificationEntity -> {
             illnessNotificationEntity.setStatus(status);
             userService.loadEntityByID(illnessNotificationEntity.getUser().getId()).ifPresentOrElse(userEntity ->
-                            userEntity.setStatus(status == IllnessNotificationStatus.ACCEPTED ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
+                            userEntity.setStatus(status.equals(IllnessNotificationStatus.ACCEPTED) ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
                     () -> ResponseEntity.status(HttpStatus.FORBIDDEN).body(false));
             return ResponseEntity.ok(true);
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(false));

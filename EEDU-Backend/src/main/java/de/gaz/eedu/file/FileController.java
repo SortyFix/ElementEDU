@@ -13,19 +13,20 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController @RequestMapping(value = "/file") public class FileController
 {
     private final @NotNull UserService userService;
     private final @NotNull FileService fileService;
-    private @NotNull String currentUsername;
+    private String currentUsername;
 
     public FileController(@Autowired @NotNull UserService userService, @Autowired @NotNull FileService fileService)
     {
@@ -42,55 +43,60 @@ import java.util.stream.Collectors;
                 .ifPresent(username -> this.currentUsername = username);
     }
 
-    // ANY DIRECTORIES/FILE PATHS IN THIS CONTROLLER ARE TEMPORARY!
-    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus generalUpload(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, @NotNull Set<String> privileges, Set<String> tags) throws IOException, IllegalStateException
+    @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus uploadFile(
+            @AuthenticationPrincipal Long userId, @NotNull MultipartFile file, @NotNull String[] authorities, @NotNull String[] tags)
     {
-        boolean uploadSuccessful = fileService.upload(file, authorId,"/general/upload/", "/", privileges, tags);
-        return uploadSuccessful ? HttpStatus.OK
-                : HttpStatus.FORBIDDEN;
+        FileEntity fileEntity = new FileCreateModel(userId,
+                file.getName(),
+                authorities,
+                tags).toEntity(new FileEntity());
+        try
+        {
+            fileEntity.upload(file);
+            return HttpStatus.OK;
+        }
+        catch (IOException e)
+        {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public HttpStatus deleteFile(@NotNull Long id)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/delete") public HttpStatus deleteFile(
+            @AuthenticationPrincipal Long user_id, @NotNull Long file_id)
     {
-        return userService.getRepository().findByLoginName(currentUsername).flatMap(userEntity -> fileService.loadEntityByID(id).map(fileEntity -> {
-            if (fileEntity.toModel().authorId().equals(userEntity.getId())) {
-                try {
-                    Path path = Paths.get(fileEntity.toModel().filePath());
-                    Files.delete(path);
-                    fileService.delete(id);
-                    return HttpStatus.OK;
-                } catch (IOException ioException) {
-                    return HttpStatus.INTERNAL_SERVER_ERROR;
-                }
+        UserEntity userEntity = userService.loadEntityByIDSafe(user_id);
+        fileService.loadEntityByID(file_id).map(fileEntity ->
+        {
+            if (fileEntity.getAuthorId().equals(userEntity.getId()))
+            {
+                fileService.delete(file_id);
+                return HttpStatus.OK;
             }
             return HttpStatus.UNAUTHORIZED;
-        })).orElse(HttpStatus.NOT_FOUND);
+        });
+        return HttpStatus.NOT_FOUND;
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public ResponseEntity<Set<String>> modifyTags(@NotNull Long id, @NotNull Set<String> newTags)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/modify/tags") public HttpStatus modifyTags(
+            @AuthenticationPrincipal Long userId, @NotNull Long id, @NotNull Set<String> newTags)
     {
-        Set<String> emptySet = new HashSet<>();
-        return fileService.loadEntityByID(id).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
-            // Check if currently logged-in user ID matches the author ID of the file
-            if(userEntity.getId().equals(fileEntity.toModel().authorId())){
-                fileEntity.setTags(newTags);
-                return ResponseEntity.ok(newTags);
-            }
-            // Return empty sets if error occurs
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(emptySet);
-        }).orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(emptySet))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(emptySet));
+        FileEntity fileEntity = fileService.loadEntityByIDSafe(id);
+        if (fileEntity.getId().equals(userService.loadEntityByIDSafe(userId).getId()))
+        {
+            fileEntity.setTags(newTags);
+            return HttpStatus.OK;
+        }
+        return HttpStatus.UNAUTHORIZED;
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileIdS}") public ResponseEntity<ByteArrayResource> downloadFileWithID(@PathVariable Long fileIdS, @AuthenticationPrincipal Long userId)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}") public ResponseEntity<ByteArrayResource> downloadFileWithID(
+            @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
     {
-        ByteArrayResource emptyResource = new ByteArrayResource(new byte[0]);
-        return fileService.loadEntityByID(fileIdS).map(fileEntity -> userService.getRepository().findByLoginName(currentUsername).map(userEntity -> {
-            if(fileService.verifyAccess(fileEntity, userService.loadEntityByIDSafe(userId).getId()))
-            {
-                return ResponseEntity.ok(fileService.loadResourceById(fileIdS));
-            }
-            return ResponseEntity.badRequest().body(emptyResource);
-        }).orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).body(emptyResource))).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        if (fileService.loadEntityByIDSafe(fileId).hasAccess(userService.loadEntityByIDSafe(userId)))
+        {
+            return ResponseEntity.ok(fileService.loadResourceById(fileId));
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/me/info") public ResponseEntity<List<FileModel>> getCurrentUserFilesInfo(){

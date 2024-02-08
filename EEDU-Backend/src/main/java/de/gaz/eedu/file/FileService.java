@@ -1,9 +1,6 @@
 package de.gaz.eedu.file;
 
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.file.enums.Strategy;
-import de.gaz.eedu.file.exception.DirectoryExistsException;
-import de.gaz.eedu.file.exception.UnknownDirectoryException;
 import de.gaz.eedu.file.exception.UnknownFileException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -12,19 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import xyz.capybara.clamav.ClamavClient;
-import xyz.capybara.clamav.ClamavException;
-import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service @RequiredArgsConstructor public class FileService implements EntityService<FileRepository, FileEntity, FileModel, FileCreateModel>
 {
@@ -34,133 +28,6 @@ import java.util.stream.Stream;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
-    }
-
-    /**
-     * Uploads a file, performs a virus scan using ClamAV, and saves it to the specified directory.
-     *
-     * @param file            The file to be uploaded.
-     * @param authorId        The ID of the author/user initiating the upload.
-     * @param pathPrefix      The prefix for the path where the file will be stored.
-     * @param pathSuffix      The suffix for the path where the file will be stored.
-     * @param privilegeEntities The set of string representing the necessary user privilege for access.
-     * @param tags            The set of tags associated with the uploaded file.
-     * @return True if the upload is successful, false otherwise.
-     * @throws IOException        If an I/O error occurs during the upload or file copying.
-     * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
-     */
-    @Transactional
-    public boolean upload(@NotNull MultipartFile file, @NotNull Long authorId, @NotNull String pathPrefix, @NotNull String pathSuffix, @NotNull Set<String> privilegeEntities, Set<String> tags) throws IOException, IllegalStateException
-    {
-        ScanResult scanResult = null;
-
-        try
-        {
-            ClamavClient client = new ClamavClient("localhost");
-            client.ping();
-            scanResult = client.scan(file.getInputStream());
-        }
-        catch (ClamavException | IllegalStateException ignored) { }
-
-        if (scanResult instanceof ScanResult.OK)
-        {
-            String dropPath = pathPrefix + userService.loadEntityByIDSafe(authorId).getFullName() + "/" + pathSuffix;
-            Path path = Paths.get(dropPath);
-
-            makeDirectory(path.toString());
-
-            final String originalFileName = file.getOriginalFilename();
-            assert originalFileName != null;
-            Path uploadPath = Paths.get(dropPath, originalFileName);
-            return userService.loadEntityByID(authorId).map(currentUser ->
-            {
-                try
-                {
-                    Files.copy(file.getInputStream(), uploadPath);
-                    FileCreateModel createModel = new FileCreateModel(currentUser.getId(), uploadPath.toString(), privilegeEntities.toArray(String[]::new), tags.toArray(String[]::new));
-                    createEntity(createModel);
-                    return true;
-                }
-                catch (IOException ioException)
-                {
-                    return false;
-                }
-            }).orElse(false);
-        }
-
-        return false;
-    }
-
-    /**
-     * Applies a specified strategy to retrieve a list of File objects based on the provided path.
-     *
-     * @param strategy The strategy to be applied for file retrieval. Available strategies: <br>
-     *                 - {@link Strategy#EVERYTHING}: Retrieves all files in the specified directory including subdirectories and files in subdirectories. <br>
-     *                 - {@link Strategy#DIRECT}: Retrieves files directly in the specified directory. <br>
-     *                 - {@link Strategy#FILES_ONLY}: Retrieves all files, including those in subdirectories, but excludes subdirectories themselves. <br>
-     *                 - {@link Strategy#SUBDIRECT}: Retrieves files in subdirectories, excluding files in the specified directory.
-     * @param path     The path of the directory from which files are to be retrieved.
-     * @return An Optional containing the array of File objects based on the specified strategy.
-     *         If the strategy is invalid or an exception occurs during the process, an empty Optional is returned.
-     * @throws UnknownDirectoryException if the specified directory is unknown or inaccessible.
-     *                                 This exception is thrown in case of directory-related issues.
-     *                                 The message provides details about the problematic directory.
-     *                                 This exception wraps any underlying exceptions that might occur during the operation.
-     *                                 For example, if there are issues with file I/O or directory traversal.
-     *                                 It indicates that the directory at the specified path is not accessible or does not exist.
-     */
-    public @NotNull List<File> strategize(@NotNull Strategy strategy, @NotNull String path)
-    {
-        File directory = new File(path);
-        final Path start = Paths.get(path);
-
-        return switch(strategy)
-        {
-            case EVERYTHING -> Arrays.asList(Optional.of(directory)
-                    .filter(File::exists)
-                    .filter(File::isDirectory)
-                    .map(File::listFiles)
-                    .orElseThrow(() -> new UnknownDirectoryException(path)));
-
-            case DIRECT -> Arrays.asList(Optional.of(directory)
-                    .filter(File::exists)
-                    .filter(File::isDirectory)
-                    .map(File::listFiles)
-                    .map(files -> Arrays.stream(files).filter(File::isFile)
-                            .toArray(File[]::new)).orElse(new File[0]));
-
-            case FILES_ONLY -> {
-                try (Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
-                {
-                    yield Arrays.asList(Optional.of(pathStream
-                                    .toList()
-                                    .stream().filter(mpath -> !Files.isDirectory(mpath))
-                                    .map(Path::toFile)
-                                    .toArray(File[]::new))
-                            .orElse(new File[0]));
-                }
-                catch(Exception e)
-                {
-                    throw new UnknownDirectoryException(path);
-                }
-            }
-
-            case SUBDIRECT -> {
-                try(Stream<Path> pathStream = Files.walk(start, Integer.MAX_VALUE, FileVisitOption.FOLLOW_LINKS))
-                {
-                    yield Arrays.asList(Optional.of(pathStream
-                                    .filter(mpath -> !mpath.equals(start))
-                                    .filter(mpath -> !Files.isDirectory(mpath))
-                                    .map(Path::toFile)
-                                    .toArray(File[]::new))
-                                    .orElse(new File[0]));
-                }
-                catch(Exception e)
-                {
-                    throw new UnknownDirectoryException(path);
-                }
-            }
-        };
     }
 
     /**
@@ -187,7 +54,6 @@ import java.util.stream.Stream;
      * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
      *                              on the file system.
      */
-
     @Override
     @Transactional
     public boolean delete(long id)
@@ -207,10 +73,11 @@ import java.util.stream.Stream;
 
     /**
      * Recursively deletes a list of files and directories.
-     *
+     * <p>
      * This method attempts to delete each file and directory in the provided list.
-     * If any deletion operation fails, false will be returned. If all deletions
-     * are successful, the method returns true.
+     *      * If any deletion operation fails, false will be returned. If all deletions
+     *      * are successful, the method returns true.
+     * </p>
      *
      * @param files A list of java.io.File objects representing the files and directories
      *              to be deleted recursively.
@@ -222,62 +89,6 @@ import java.util.stream.Stream;
     public boolean deleteRecursively(@NotNull List<File> files)
     {
         return files.stream().allMatch(File::delete);
-    }
-
-
-    /**
-     * Recursively moves a list of files and directories to a specified target path.
-     *
-     * This method iterates over the provided list of files and attempts to move each file
-     * or directory to the specified target path. If any move operation fails, the method will
-     * return false. If all moves are successful, the method returns true.
-     *
-     * @param files       A list of java.io.File objects representing the files and directories
-     *                    to be moved recursively.
-     * @param targetPath  The target path to which the files and directories should be moved.
-     * @return true if all files and directories were successfully moved; false otherwise.
-     * @throws NullPointerException if the provided list of files or targetPath is null.
-     * @throws SecurityException    If a security manager denies access to the files or the target path.
-     * @see Files#move(java.nio.file.Path, java.nio.file.Path, java.nio.file.CopyOption...)
-     * @see File#getName()
-     */
-    public boolean moveRecursively(@NotNull List<File> files, @NotNull String targetPath)
-    {
-        return files.stream().allMatch(file -> {
-            try
-            {
-                Files.move(file.toPath(), Paths.get(targetPath, file.getName()));
-                return true;
-            }
-            catch (IOException e)
-            {
-                return false;
-            }
-        });
-    }
-
-    public boolean copyRecursively(@NotNull List<File> files, @NotNull String targetPath)
-    {
-        return files.stream().allMatch(file -> {
-            try
-            {
-                Files.copy(file.toPath(), Paths.get(targetPath, file.getName()));
-                return true;
-            }
-            catch (IOException e)
-            {
-                return false;
-            }
-        });
-    }
-
-    public boolean makeDirectory(@NotNull String path)
-    {
-        if(!Files.exists(Paths.get(path)))
-        {
-            return new File(path).mkdir();
-        }
-        throw new DirectoryExistsException(path);
     }
 
     public boolean verifyAccess(@NotNull FileEntity fileEntity, @NotNull Long userId)
@@ -295,8 +106,7 @@ import java.util.stream.Stream;
     {
         try
         {
-            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityByID(id).map(
-                    fileEntity -> fileEntity.toModel().filePath())))));
+            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityByID(id).map(FileEntity::getFilePath)))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -309,9 +119,9 @@ import java.util.stream.Stream;
      * <code>String</code>
      * @return <code>{@literal Set<}{@link FileEntity}{@literal >}</code>
      */
-    public @NotNull Set<FileEntity> loadEntitiesByTag(@NotNull String tag)
+    public @NotNull Set<FileEntity> loadEntitiesByTags(@NotNull String tag)
     {
-        return fileRepository.findFileEntitiesByTags(tag);
+        return fileRepository.findFileEntitiesByTags(Collections.singleton(tag));
     }
 
     public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
@@ -319,12 +129,9 @@ import java.util.stream.Stream;
         return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
-    @Override
+    @Override @Transactional
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        return fileRepository.save(model.toEntity(new FileEntity(), obj -> {
-            obj.setFileName(getFileOfPath(model.filePath()).getName());
-            return obj;
-        }));
+        return saveEntity(model.toEntity(new FileEntity()));
     }
 }

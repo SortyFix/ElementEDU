@@ -1,56 +1,57 @@
 package de.gaz.eedu.user.illnessnotifications;
 
-import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.UserStatus;
+import de.gaz.eedu.file.FileCreateModel;
+import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
+import de.gaz.eedu.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Set;
 
-
+@RequiredArgsConstructor
 @RestController @RequestMapping(value = "/illness/me") public class IllnessNotificationController
 {
     private final UserService userService;
     private final FileService fileService;
     private final IllnessNotificationService illnessNotificationService;
 
-    public IllnessNotificationController(@NotNull UserService userService, @NotNull FileService fileService, @NotNull IllnessNotificationService illnessNotificationService)
-    {
-        this.userService = userService;
-        this.fileService = fileService;
-        this.illnessNotificationService = illnessNotificationService;
-    }
-
     // TODO: Only for parent accounts
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(@AuthenticationPrincipal Long id, @NotNull String reason, @NotNull Long expirationTime)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(
+            @AuthenticationPrincipal Long id, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
     {
         // TODO: Add logic if current day is an exam day
         return userService.loadEntityByID(id).map(userEntity ->
         {
-            userEntity.setStatus(UserStatus.EXCUSED);
-            IllnessNotificationCreateModel illnessNotificationCreateModel = new IllnessNotificationCreateModel(id,
-                    reason, LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(), expirationTime);
-            illnessNotificationService.createEntity(illnessNotificationCreateModel);
+            FileEntity fileEntity = fileService.createEntity(new FileCreateModel(id,
+                    file.getName(),
+                    new String[] { "Management" },
+                    new String[] { "illness_notification" }));
+            try
+            {
+                fileEntity.upload(file);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+            illnessNotificationService.createEntity(new IllnessNotificationCreateModel(id,
+                    reason,
+                    LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(),
+                    expirationTime,
+                    fileEntity.getId()));
             return ResponseEntity.ok(true);
-        }).orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false));
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
-
-    // Same here
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse/upload") public ResponseEntity<Boolean> uploadIllnessNotification(@NotNull MultipartFile file, @NotNull String fileName, @AuthenticationPrincipal Long authorId, @NotNull Set<String> privileges, Set<String> tags) throws IOException, IllegalStateException
-    {
-        String currentDate = LocalDate.now().toString();
-        boolean uploadSuccessful = fileService.upload(file, authorId, "/illnesses/", currentDate, privileges, tags);
-        return uploadSuccessful ? ResponseEntity.ok(true) : ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
-    }
-
-
 }

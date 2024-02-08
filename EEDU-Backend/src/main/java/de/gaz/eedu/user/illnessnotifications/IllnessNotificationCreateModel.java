@@ -1,13 +1,14 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.user.UserEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 
-public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull String reason, @NotNull Long timestamp, @NotNull Long expirationTime) implements CreationModel<IllnessNotificationEntity>
+public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull String reason, @NotNull Long timestamp,
+                                             @NotNull Long expirationTime,
+                                             @NotNull Long fileId) implements CreationModel<IllnessNotificationEntity>
 {
     @Override public boolean equals(Object o)
     {
@@ -34,16 +35,10 @@ public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Stri
     @Override
     public @NotNull IllnessNotificationEntity toEntity(@NotNull IllnessNotificationEntity entity)
     {
+        entity.setStatus(IllnessNotificationStatus.PENDING);
+        entity.setReason(reason());
+        entity.setTimeStamp(timestamp());
+        entity.setExpirationTime(expirationTime());
         return entity;
-    }
-
-    public @NotNull IllnessNotificationEntity toINEntity(@NotNull UserEntity userEntity){
-        IllnessNotificationEntity newEntity = new IllnessNotificationEntity();
-        newEntity.setUser(userEntity);
-        newEntity.setStatus(IllnessNotificationStatus.PENDING);
-        newEntity.setReason(reason());
-        newEntity.setTimeStamp(timestamp());
-        newEntity.setExpirationTime(expirationTime());
-        return newEntity;
     }
 }

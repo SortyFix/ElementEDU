@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
--- The 'file_group_permissions' table is used to keep track of file permissions based on user groups. It defines which groups have access to which files.
+-- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS group_entity
 (
     two_factor_required BIT          NOT NULL,
@@ -61,10 +61,9 @@ CREATE TABLE IF NOT EXISTS two_factor_entity
 -- The 'illness_notification_entity' table keeps a record of all illness notifications sent by users. This includes a unique notification id, the user id of the sender, the reason for the notification and its status.
 CREATE TABLE IF NOT EXISTS file_entity
 (
-    author_id BIGINT       NULL,
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    file_name VARCHAR(255) NULL,
-    file_path VARCHAR(255) NULL
+    author_id BIGINT       NULL,
+    file_name VARCHAR(255) NULL
 );
 
 -- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
@@ -83,7 +82,7 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
     FOREIGN KEY (file_entity_id) REFERENCES file_entity (id)
 );
 
--- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
+
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -92,8 +91,10 @@ CREATE TABLE IF NOT EXISTS illness_notification_entity
     reason          VARCHAR(255) NOT NULL,
     time_stamp      BIGINT NOT NULL,
     expiration_time BIGINT NOT NULL,
+    file_entity_id BIGINT NOT NULL,
 
-    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+    FOREIGN KEY (user_id) REFERENCES user_entity (id),
+    FOREIGN KEY (file_entity_id) REFERENCES file_entity (id)
 );
 
 -- The 'theme_entity' table contains various themes that can be applied to the user interface. Each theme includes specific colors for different elements of the interface.
