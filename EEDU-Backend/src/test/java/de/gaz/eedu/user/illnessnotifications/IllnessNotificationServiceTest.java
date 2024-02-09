@@ -44,11 +44,4 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     {
         throw new OccupiedException();
     }
-
-    @Override
-    public void testDeleteEntitySuccess(long id)
-    {
-        // It is necessary to delete ID 3 as ID 4 has already been deleted
-        Assertions.assertEquals(id == 3, getService().delete(id));
-    }
 }
