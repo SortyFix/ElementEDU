@@ -46,9 +46,32 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #loadById(long)
      * @see Transactional
      */
-    @Transactional(readOnly = true) default @NotNull Optional<E> loadEntityByID(long id)
+    @Transactional(readOnly = true) default @NotNull Optional<E> loadEntityById(long id)
     {
         return getRepository().findById(id);
+    }
+
+    /**
+     * Loads multiple {@link E} by their ids.
+     * <p>
+     * This method loads multiple {@link E} from the databased on their id.
+     * If one of the entities does not exist, it won't be in the returned {@link Set}.
+     * <p>
+     * Note that the set will never be {@code null} but will instead be empty if no matching {@link E} was found.
+     *
+     * <p>
+     * The {@link Transactional} marks that this method performs a database query. The {@link Transactional#readOnly()}
+     * makes sure this method only reads from the database but doesn't perform any write operations.
+     * </p>
+     *
+     * @param id an array of all ids that should be loaded.
+     * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
+     * @see #loadById(Long...) 
+     * @see Transactional
+     */
+    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Long... id)
+    {
+        return Set.copyOf(getRepository().findAllById(List.of(id)));
     }
 
     /**
@@ -69,9 +92,9 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #findAll()
      * @see Transactional
      */
-    @Transactional(readOnly = true) default @NotNull @Unmodifiable List<E> findAllEntities()
+    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<E> findAllEntities()
     {
-        return getRepository().findAll();
+        return Set.copyOf(getRepository().findAll());
     }
 
     /**
@@ -252,7 +275,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
     /**
      * Loads an {@link E} by its id.
      * <p>
-     * Unlike the method {@link #loadEntityByID(long)} this method does not return an {@link Optional}.
+     * Unlike the method {@link #loadEntityById(long)} this method does not return an {@link Optional}.
      * If the given id does not exist, this method will instead throw an {@link EntityUnknownException}.
      * <p>
      * Example Usage:
@@ -270,11 +293,11 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @return the entity from the database.
      * @throws EntityUnknownException is thrown when the entity with the provided id is not present in the database.
      * @see #loadByIdSafe(long)
-     * @see #loadEntityByID(long)
+     * @see #loadEntityById(long)
      */
     @Transactional(readOnly = true) default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
     {
-        return loadEntityByID(id).orElseThrow(() -> new EntityUnknownException(id));
+        return loadEntityById(id).orElseThrow(() -> new EntityUnknownException(id));
     }
 
     /**
@@ -292,6 +315,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
     {
         return toModel().apply(loadEntityByIDSafe(id));
     }
+
 
     /**
      * Loads a {@link M} by its id.
@@ -317,7 +341,12 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      */
     @Transactional(readOnly = true) default @NotNull Optional<M> loadById(long id)
     {
-        return loadEntityByID(id).map(toModel());
+        return loadEntityById(id).map(toModel());
+    }
+
+    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<M> loadById(@NotNull Long... id)
+    {
+        return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }
 
     @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<M> findAll()

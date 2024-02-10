@@ -118,7 +118,7 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
         try
         {
             Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
-            AuthorityFactory authorityFactory = (id) -> loadEntityByID(id).map(function).orElse(new HashSet<>());
+            AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
             return getAuthorizeService().validate(token, authorityFactory);
         }
         catch (ExpiredJwtException ignored)

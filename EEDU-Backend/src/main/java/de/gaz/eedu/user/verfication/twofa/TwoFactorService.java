@@ -45,7 +45,7 @@ import java.util.function.Supplier;
     @Override public @NotNull TwoFactorEntity createEntity(@NotNull TwoFactorCreateModel model) throws CreationException
     {
         Supplier<EntityUnknownException> exceptionSupplier = () -> new EntityUnknownException(model.userID());
-        UserEntity userEntity = getUserService().loadEntityByID(model.userID()).orElseThrow(exceptionSupplier);
+        UserEntity userEntity = getUserService().loadEntityById(model.userID()).orElseThrow(exceptionSupplier);
 
         TwoFactorEntity twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
         {

@@ -81,7 +81,7 @@ import java.util.stream.Stream;
             final String originalFileName = file.getOriginalFilename();
             assert originalFileName != null;
             Path uploadPath = Paths.get(dropPath, originalFileName);
-            return userService.loadEntityByID(authorId).map(currentUser ->
+            return userService.loadEntityById(authorId).map(currentUser ->
             {
                 try
                 {

@@ -33,17 +33,17 @@ public class IllnessNotificationManagementController
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/open")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsWithStatusOfUser(@NotNull Long userId, @NotNull IllnessNotificationStatus status){
-        return ResponseEntity.ok(userService.loadEntityByID(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
-                .getIllnessNotificationEntities()
-                .stream()
-                .filter(illnessNotificationEntity -> illnessNotificationEntity.getStatus().equals(status))
-                .map(IllnessNotificationEntity::toModel)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.loadEntityById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
+                                            .getIllnessNotificationEntities()
+                                            .stream()
+                                            .filter(illnessNotificationEntity -> illnessNotificationEntity.getStatus().equals(status))
+                                            .map(IllnessNotificationEntity::toModel)
+                                            .collect(Collectors.toList()));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/all")
     public ResponseEntity<List<IllnessNotificationModel>> getNotificationsOfUser(@NotNull Long userId){
-        return ResponseEntity.ok(userService.loadEntityByID(userId)
+        return ResponseEntity.ok(userService.loadEntityById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
                 .getIllnessNotificationEntities()
                 .stream()
@@ -59,9 +59,9 @@ public class IllnessNotificationManagementController
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/respond")
     public ResponseEntity<Boolean> respondToNotification(@NotNull Long notificationId, @NotNull IllnessNotificationStatus status)
     {
-        return illnessNotificationService.loadEntityByID(notificationId).map(illnessNotificationEntity -> {
+        return illnessNotificationService.loadEntityById(notificationId).map(illnessNotificationEntity -> {
             illnessNotificationEntity.setStatus(status);
-            userService.loadEntityByID(illnessNotificationEntity.getUser().getId()).ifPresentOrElse(userEntity ->
+            userService.loadEntityById(illnessNotificationEntity.getUser().getId()).ifPresentOrElse(userEntity ->
                             userEntity.setStatus(status == IllnessNotificationStatus.ACCEPTED ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
                     () -> ResponseEntity.status(HttpStatus.FORBIDDEN).body(false));
             return ResponseEntity.ok(true);

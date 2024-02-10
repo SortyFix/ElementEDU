@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -107,7 +106,7 @@ public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, Group
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional public void testGroupRevokePrivilege(long groupID)
     {
-        GroupEntity groupEntity = getService().loadEntityByID(groupID).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
         test(Eval.eval(3L /* privilegeId */, groupID == 3, Validator.equals()), groupEntity::revokePrivilege);
     }
 }

@@ -34,7 +34,7 @@ import java.util.Set;
     @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(@AuthenticationPrincipal Long id, @NotNull String reason)
     {
         // TODO: Add logic if current day is an exam day
-        return userService.loadEntityByID(id).map(userEntity ->
+        return userService.loadEntityById(id).map(userEntity ->
         {
             userEntity.setStatus(UserStatus.EXCUSED);
             IllnessNotificationCreateModel illnessNotificationCreateModel = new IllnessNotificationCreateModel(id,

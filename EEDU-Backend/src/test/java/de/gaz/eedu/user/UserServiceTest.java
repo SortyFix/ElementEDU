@@ -105,8 +105,8 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserAddGroup(long userID)
     {
-        GroupEntity groupEntity = groupService.loadEntityByID(3).orElseThrow(IllegalStateException::new);
-        UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = groupService.loadEntityById(3).orElseThrow(IllegalStateException::new);
+        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
         test(Eval.eval(groupEntity, userID == 2, Validator.equals()), userEntity::attachGroups);
     }
@@ -132,7 +132,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserDetachGroup(long userID)
     {
-        UserEntity userEntity = getService().loadEntityByID(userID).orElseThrow(IllegalStateException::new);
+        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
         test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
     }
 
@@ -153,7 +153,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 true,
                 false,
                 new TwoFactorModel[0],
-                themeService.loadEntityByID(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new),
+                themeService.loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new),
                 new SimpleUserGroupModel[0],
                 UserStatus.PRESENT);
 

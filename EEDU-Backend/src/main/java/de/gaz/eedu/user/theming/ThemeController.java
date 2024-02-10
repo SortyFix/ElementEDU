@@ -37,7 +37,7 @@ public class ThemeController
     @PermitAll @PostMapping("/me/{id}/theme/set") public ResponseEntity<ThemeModel> setTheme(@PathVariable @NotNull Long id, @RequestBody String name){
         logger.info("The server has recognized an incoming theme set request.");
         try{
-            UserEntity userEntity = userService.loadEntityByID(id).orElseThrow(IllegalArgumentException::new);
+            UserEntity userEntity = userService.loadEntityById(id).orElseThrow(IllegalArgumentException::new);
             ThemeEntity loadedEntity = themeService.getRepository().findByName(name).orElseThrow(IllegalArgumentException::new);
             userEntity.setThemeEntity(userService, loadedEntity);
             return ResponseEntity.ok(loadedEntity.toModel());
@@ -53,8 +53,8 @@ public class ThemeController
      * @return ThemeModel
      */
     @PermitAll @GetMapping("/me/{id}/theme/get") public ResponseEntity<ThemeModel> getTheme(@PathVariable @NotNull Long id){
-        if(userService.loadEntityByID(id).isPresent()){
-            return ResponseEntity.ok(userService.loadEntityByID(id).get().getThemeEntity().toModel());
+        if(userService.loadEntityById(id).isPresent()){
+            return ResponseEntity.ok(userService.loadEntityById(id).get().getThemeEntity().toModel());
         }
         else{
             return ResponseEntity.notFound().build();

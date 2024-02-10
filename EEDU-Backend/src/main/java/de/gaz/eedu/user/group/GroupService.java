@@ -47,7 +47,7 @@ public class GroupService implements EntityService<GroupRepository, GroupEntity,
             throw new NameOccupiedException(createModel.name());
         }
 
-        Set<UserEntity> users = Stream.of(createModel.users()).map(getUserService()::loadEntityByID).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        Set<UserEntity> users = Stream.of(createModel.users()).map(getUserService()::loadEntityById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
         GroupEntity groupEntity = getRepository().save(createModel.toEntity(new GroupEntity(users), group -> {
             Stream<Optional<PrivilegeEntity>> privileges = Stream.of(createModel.privileges()).map(getPrivilegeRepository()::findById);
             group.setPrivileges(privileges.map(privilegeEntity -> privilegeEntity.orElse(null)).collect(Collectors.toSet()));

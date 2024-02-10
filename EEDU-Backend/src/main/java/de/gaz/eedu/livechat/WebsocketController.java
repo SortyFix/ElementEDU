@@ -75,7 +75,7 @@ public class WebsocketController
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        boolean usersValid = users.stream().allMatch(user -> userService.loadEntityByID(user).isPresent());
+        boolean usersValid = users.stream().allMatch(user -> userService.loadEntityById(user).isPresent());
 
         if(chatService.loadEntityByUserIDs(users).isEmpty() && usersValid)
         {
@@ -119,9 +119,9 @@ public class WebsocketController
     @PreAuthorize("isAuthenticated()")
     public HttpStatus sendMessage(@AuthenticationPrincipal Long authorId, @NotNull @DestinationVariable Long chatId, @NotNull @RequestBody String body)
     {
-        UserEntity author = userService.loadEntityByID(authorId).orElse(null);
+        UserEntity author = userService.loadEntityById(authorId).orElse(null);
 
-        return chatService.loadEntityByID(chatId).map(chatEntity -> {
+        return chatService.loadEntityById(chatId).map(chatEntity -> {
 
             if (!(chatEntity.getUsers().contains(authorId) && Objects.nonNull(author)))
             {
@@ -148,11 +148,11 @@ public class WebsocketController
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChatModel> joinRoom(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
     {
-        return chatService.loadEntityByID(chatId).map(chatEntity -> {
+        return chatService.loadEntityById(chatId).map(chatEntity -> {
             if(chatEntity.getUsers().contains(userId))
             {
                 chatEntity.getMessages().forEach(
-                        messageId -> messageService.loadEntityByID(messageId).ifPresent(messageEntity ->
+                        messageId -> messageService.loadEntityById(messageId).ifPresent(messageEntity ->
                         {
                             if(!Objects.equals(messageEntity.getAuthor().getId(), userId) && Objects.equals(messageEntity.getStatus(), MessageStatus.UNREAD)){
                                 messageEntity.setStatus(MessageStatus.READ);
@@ -169,7 +169,7 @@ public class WebsocketController
     @PreAuthorize("isAuthenticated()")
     public HttpStatus holdMessage(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
     {
-        return messageService.loadEntityByID(chatId).map(
+        return messageService.loadEntityById(chatId).map(
                 messageEntity -> {
                     if(messageEntity.getAuthor().getId().equals(userId)){
                         if((System.currentTimeMillis() - messageEntity.getTimestamp()) > 20000){
