@@ -2,10 +2,8 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.TestData;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
@@ -41,7 +39,7 @@ public class CourseServiceTest extends ServiceTest<CourseEntity, CourseModel, Co
     @Override
     protected @NotNull Eval<CourseCreateModel, CourseModel> successEval()
     {
-        CourseCreateModel create = new CourseCreateModel("7b-German", 1L);
+        CourseCreateModel create = new CourseCreateModel("7b-German", 1L, null, new Long[0]);
 
         SubjectModel subjectModel = new SubjectModel(1L, "German");
         CourseModel courseModel = new CourseModel(5L, "7b-German", subjectModel, new UserModel[0]);
@@ -57,7 +55,7 @@ public class CourseServiceTest extends ServiceTest<CourseEntity, CourseModel, Co
     @Override
     protected @NotNull CourseCreateModel occupiedCreateModel()
     {
-        return new CourseCreateModel("Q1-German", 2L);
+        return new CourseCreateModel("Q1-German", 2L, null, new Long[0]);
     }
 
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")
