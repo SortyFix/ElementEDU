@@ -81,7 +81,7 @@ import java.util.Set;
      */
     public boolean hasAccess(@NotNull UserEntity userEntity)
     {
-        return userEntity.hasAnyAuthority(getPrivilege());
+        return userEntity.getId().equals(getAuthorId()) || userEntity.hasAnyAuthority(getPrivilege());
     }
 
     /**

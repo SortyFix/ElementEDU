@@ -1,27 +1,24 @@
 package de.gaz.eedu.file;
 
-import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.file.exception.UnknownFileException;
-import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-@Service @RequiredArgsConstructor public class FileService implements EntityService<FileRepository, FileEntity, FileModel, FileCreateModel>
+@Service @RequiredArgsConstructor public class FileService
 {
     private final FileRepository fileRepository;
-
-    private final UserService userService;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
@@ -51,51 +48,23 @@ import java.util.List;
      * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
      *                              on the file system.
      */
-    @Override
+
     @Transactional
-    public boolean delete(long id)
+    public boolean delete(long id, @NotNull Runnable deleteTask)
     {
-        return loadEntityByID(id).map(fileEntity -> {
+        return getRepository().findById(id).map(fileEntity -> {
             try
             {
+                deleteTask.run();
                 getRepository().deleteById(fileEntity.getId());
-                return Files.deleteIfExists(Paths.get(fileEntity.getFilePath()));
+                FileUtils.deleteDirectory(new File(fileEntity.getFilePath()));
+                return true;
             }
-            catch (IOException e)
+            catch (IOException ioException)
             {
-                throw new UnknownFileException(id);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "", ioException);
             }
         }).orElse(false);
-    }
-
-    /**
-     * Recursively deletes a list of files and directories.
-     * <p>
-     * This method attempts to delete each file and directory in the provided list.
-     *      * If any deletion operation fails, false will be returned. If all deletions
-     *      * are successful, the method returns true.
-     * </p>
-     *
-     * @param files A list of java.io.File objects representing the files and directories
-     *              to be deleted recursively.
-     * @return true if all files and directories were successfully deleted; false otherwise.
-     * @throws NullPointerException if the provided list of files is null.
-     * @throws SecurityException    If a security manager exists and denies delete access to any of the files.
-     * @see File#delete()
-     */
-    public boolean deleteRecursively(@NotNull List<File> files)
-    {
-        return files.stream().allMatch(File::delete);
-    }
-
-    public boolean verifyAccess(@NotNull FileEntity fileEntity, @NotNull Long userId)
-    {
-        UserEntity userEntity = userService.loadEntityByIDSafe(userId);
-        return userService.loadEntityByIDSafe(userId).getId().equals(fileEntity.toModel().authorId())
-                || fileEntity.getPrivilege().stream().anyMatch(filePrivilege ->
-                        userEntity.getGroups().stream()
-                .flatMap(groupEntity -> groupEntity.getPrivileges().stream()).anyMatch(userPrivilege -> userPrivilege.getName().equals(filePrivilege))
-        );
     }
 
     @Transactional
@@ -103,7 +72,7 @@ import java.util.List;
     {
         try
         {
-            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(loadEntityByID(id).map(FileEntity::getFilePath)))));
+            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(getRepository().findById(id).map(FileEntity::getFilePath)))));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -114,9 +83,9 @@ import java.util.List;
         return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
-    @Override @Transactional
+    @Transactional
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        return saveEntity(model.toEntity(new FileEntity()));
+        return getRepository().save(model.toEntity(new FileEntity()));
     }
 }
