@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public record FileModel(@NotNull Long id,
                         @NotNull String fileName,
                         @NotNull Long authorId,
+                        @NotNull String dataDirectory,
                         @NotNull String[] privileges,
                         String[] tags) implements EntityModel
 {
@@ -47,6 +48,7 @@ public record FileModel(@NotNull Long id,
         fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         fileEntity.setPrivilege(Arrays.stream(privileges()).collect(Collectors.toSet()));
         fileEntity.setAuthorId(authorId());
+        fileEntity.setDataDirectory(dataDirectory());
         return fileEntity;
     }
 }

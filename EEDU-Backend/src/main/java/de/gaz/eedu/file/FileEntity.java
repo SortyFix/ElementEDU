@@ -17,6 +17,8 @@ import xyz.capybara.clamav.commands.scan.result.ScanResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
@@ -28,11 +30,12 @@ import java.util.Set;
  */
 @Entity @AllArgsConstructor @NoArgsConstructor @Setter @Getter @Builder @Table(name = "file_entity") public class FileEntity implements EntityModelRelation<FileModel>
 {
-    private static final String DATA_DIRECTORY = "/data/";
+    private static final String BASE_DIRECTORY = "data";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String fileName;
     private Long authorId;
+    private String dataDirectory;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "file_user_privileges", joinColumns = @JoinColumn(name = "file_id"))
     private Set<String> privilege;
@@ -43,11 +46,12 @@ import java.util.Set;
     @Override
     public FileModel toModel()
     {
-        return new FileModel(id, fileName, authorId, privilege.toArray(String[]::new), tags.toArray(String[]::new));
+        return new FileModel(id, fileName, authorId, getDataDirectory(), privilege.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
     /**
      * Uploads a file, performs a virus scan using ClamAV, and saves it to the specified directory.
+     * If the directory doesn't already exist, it will be created.
      *
      * @param file The file to be uploaded.
      * @return True if the upload is successful, false otherwise.
@@ -56,6 +60,10 @@ import java.util.Set;
      */
     public boolean upload(@NotNull MultipartFile file) throws IOException
     {
+        Path path = Paths.get(getFilePath());
+
+        if(!Files.isDirectory(path)) new File(getFilePath()).mkdir();
+
         if (virusCheck(file.getInputStream()))
         {
             file.transferTo(Paths.get(getFilePath()));
@@ -84,7 +92,7 @@ import java.util.Set;
      */
     public @NotNull String getFilePath()
     {
-        return String.format("%s/%s/", DATA_DIRECTORY, getId());
+        return String.format("%s/%s/%s/", BASE_DIRECTORY, getDataDirectory(), getId());
     }
 
     /**

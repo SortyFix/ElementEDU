@@ -44,11 +44,12 @@ import java.util.stream.Collectors;
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/upload") public HttpStatus uploadFile(
-            @AuthenticationPrincipal Long userId, @NotNull MultipartFile file, @NotNull String[] authorities, @NotNull String[] tags)
+            @AuthenticationPrincipal Long userId, @NotNull MultipartFile file, @RequestBody @NotNull String[] authorities, @RequestBody @NotNull String directory, @RequestBody @NotNull String[] tags)
     {
         FileEntity fileEntity = new FileCreateModel(userId,
                 file.getName(),
                 authorities,
+                directory,
                 tags).toEntity(new FileEntity());
         try
         {

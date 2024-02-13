@@ -61,9 +61,10 @@ CREATE TABLE IF NOT EXISTS two_factor_entity
 -- The 'illness_notification_entity' table keeps a record of all illness notifications sent by users. This includes a unique notification id, the user id of the sender, the reason for the notification and its status.
 CREATE TABLE IF NOT EXISTS file_entity
 (
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id BIGINT       NULL,
-    file_name VARCHAR(255) NULL
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id       BIGINT       NULL,
+    file_name       VARCHAR(255) NULL,
+    data_directory  VARCHAR(255) NOT NULL
 );
 
 -- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.

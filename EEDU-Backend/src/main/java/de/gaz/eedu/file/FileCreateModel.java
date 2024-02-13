@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public record FileCreateModel(@NotNull Long authorId,
                               @NotNull String fileName,
                               @NotEmpty String[] privilege,
+                              @NotNull String dataDirectory,
                               String[] tags) implements CreationModel<FileEntity>
 {
     @Contract(pure = true)
@@ -35,6 +36,7 @@ public record FileCreateModel(@NotNull Long authorId,
         fileEntity.setAuthorId(authorId());
         fileEntity.setPrivilege(Arrays.stream(privilege()).collect(Collectors.toSet()));
         fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
+        fileEntity.setDataDirectory(dataDirectory());
         return fileEntity;
     }
 }

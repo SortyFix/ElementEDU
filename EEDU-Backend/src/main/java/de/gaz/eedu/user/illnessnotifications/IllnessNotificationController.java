@@ -37,6 +37,7 @@ import java.time.ZoneId;
             FileEntity fileEntity = fileService.createEntity(new FileCreateModel(id,
                     file.getName(),
                     new String[] { "Management" },
+                    "illness_notifications",
                     new String[] { "illness_notification" }));
             try
             {
