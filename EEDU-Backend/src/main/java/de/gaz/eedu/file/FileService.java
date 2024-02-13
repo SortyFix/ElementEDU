@@ -39,7 +39,7 @@ import java.util.List;
 
     /**
      * Removes a file entity from the repository and deletes the corresponding file on the filesystem,
-     * based on the provided unique identifier.
+     * based on the provided unique identifier. Also takes a runnable which shall cleanly clear relations.
      *
      * @param id The unique identifier of the file entity to be removed.
      * @return {@code true} if the file entity is successfully removed along with its associated file,

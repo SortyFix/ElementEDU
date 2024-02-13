@@ -42,7 +42,7 @@ import java.util.List;
         return illnessNotificationRepository.save(model.toEntity(new IllnessNotificationEntity(), (entity ->
         {
             entity.setUser(userService.loadEntityByIDSafe(model.userId()));
-            entity.setFileEntity(fileService.loadEntityByIDSafe(model.fileId()));
+            entity.setFileEntity(fileService.getRepository().getReferenceById(model.fileId()));
             return entity;
         })));
         // same thing:
