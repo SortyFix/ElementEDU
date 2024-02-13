@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileEntity;
@@ -9,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+import java.util.stream.Stream;
 
 public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
@@ -60,5 +63,10 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     protected @NotNull IllnessNotificationCreateModel occupiedCreateModel()
     {
         throw new OccupiedException();
+    }
+
+    @Override
+    protected @NotNull Stream<TestData<Boolean>> deleteEntities() {
+        return Stream.of(new TestData<>(3, true));
     }
 }

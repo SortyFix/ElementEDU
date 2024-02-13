@@ -1,6 +1,7 @@
 package de.gaz.eedu.livechat;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.livechat.chat.ChatCreateModel;
 import de.gaz.eedu.livechat.chat.ChatEntity;
@@ -9,6 +10,8 @@ import de.gaz.eedu.livechat.chat.ChatService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.stream.Stream;
 
 
 public class ChatServiceTest extends ServiceTest<ChatEntity, ChatModel, ChatCreateModel>
@@ -47,5 +50,11 @@ public class ChatServiceTest extends ServiceTest<ChatEntity, ChatModel, ChatCrea
     {
         Long[] users = {1L, 3L};
         return new ChatCreateModel(users, System.currentTimeMillis());
+    }
+
+    @Override
+    protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    {
+        return Stream.of(new TestData<>(4, true));
     }
 }

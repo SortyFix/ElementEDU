@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ThemeServiceTest extends ServiceTest<ThemeEntity, ThemeModel, ThemeCreateModel>
 {
@@ -44,5 +46,11 @@ public class ThemeServiceTest extends ServiceTest<ThemeEntity, ThemeModel, Theme
     @Override protected @NotNull ThemeCreateModel occupiedCreateModel()
     {
         return new ThemeCreateModel("Light", 0x000000, 0x000000, 0xFFFFFF);
+    }
+
+    @Override
+    protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    {
+        return Stream.of(new TestData<>(4, true));
     }
 }

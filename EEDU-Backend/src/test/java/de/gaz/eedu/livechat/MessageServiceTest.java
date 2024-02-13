@@ -1,11 +1,14 @@
 package de.gaz.eedu.livechat;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.livechat.message.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.stream.Stream;
 
 public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel, MessageCreateModel>
 {
@@ -34,5 +37,11 @@ public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel,
     {
         // No occupied test necessary as messages can't be "occupied"
         throw new OccupiedException();
+    }
+
+    @Override
+    protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    {
+        return Stream.of(new TestData<>(4, true));
     }
 }

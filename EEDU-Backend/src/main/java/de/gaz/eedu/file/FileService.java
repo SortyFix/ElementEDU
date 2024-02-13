@@ -15,10 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service @RequiredArgsConstructor public class FileService implements EntityService<FileRepository, FileEntity, FileModel, FileCreateModel>
 {
@@ -110,18 +107,6 @@ import java.util.stream.Collectors;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns a <code>{@literal Set<}{@link FileEntity}{@literal >}</code> containing all FileEntities
-     * matching <code>tag</code>
-     * @param tag
-     * <code>String</code>
-     * @return <code>{@literal Set<}{@link FileEntity}{@literal >}</code>
-     */
-    public @NotNull Set<FileEntity> loadEntitiesByTags(@NotNull String tag)
-    {
-        return fileRepository.findFileEntitiesByTags(Collections.singleton(tag));
     }
 
     public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
