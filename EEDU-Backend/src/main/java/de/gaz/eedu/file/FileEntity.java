@@ -66,7 +66,7 @@ import java.util.Set;
 
         if (virusCheck(file.getInputStream()))
         {
-            file.transferTo(Paths.get(getFilePath()));
+            file.transferTo(path);
             return true;
         }
 
