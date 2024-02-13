@@ -35,7 +35,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     protected @NotNull Eval<IllnessNotificationCreateModel, IllnessNotificationModel> successEval()
     {
         Long timestamp = System.currentTimeMillis();
-        FileEntity fileEntity = fileService.loadEntityByIDSafe(2L);
+        FileEntity fileEntity = fileService.getRepository().getReferenceById(2L);
         IllnessNotificationCreateModel createModel = new IllnessNotificationCreateModel(2L,
                 "maiau",
                 timestamp,
