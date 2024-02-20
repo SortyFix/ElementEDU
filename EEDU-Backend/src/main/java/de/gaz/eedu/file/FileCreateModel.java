@@ -34,6 +34,7 @@ public record FileCreateModel(@NotNull Long authorId,
     @Override
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
         fileEntity.setAuthorId(authorId());
+        fileEntity.setFileName(fileName());
         fileEntity.setPrivilege(Arrays.stream(privilege()).collect(Collectors.toSet()));
         fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         fileEntity.setDataDirectory(dataDirectory());

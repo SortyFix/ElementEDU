@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -42,6 +43,22 @@ import java.util.Set;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "file_entity_tags", joinColumns = @JoinColumn(name = "file_entity_id"))
     private Set<String> tags;
+
+    @Override public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileEntity that = (FileEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(authorId,
+                that.authorId) && Objects.equals(dataDirectory, that.dataDirectory) && Objects.equals(privilege,
+                that.privilege) && Objects.equals(tags, that.tags);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id, fileName, authorId, dataDirectory, privilege, tags);
+    }
 
     @Override
     public FileModel toModel()
