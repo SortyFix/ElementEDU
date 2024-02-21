@@ -5,6 +5,8 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author ivo
  */
-public class PrivilegeServiceTest extends ServiceTest<PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
-    /**
-     * Constructs a new PrivilegeServiceTest instance.
-     *
-     * @param service The PrivilegeService instance to be used in the tests.
-     */
-    public PrivilegeServiceTest(@Autowired PrivilegeService service)
-    {
-        super(service);
-    }
+    @Autowired private PrivilegeService service;
 
     @Override protected @NotNull ServiceTest.Eval<PrivilegeCreateModel, PrivilegeModel> successEval()
     {

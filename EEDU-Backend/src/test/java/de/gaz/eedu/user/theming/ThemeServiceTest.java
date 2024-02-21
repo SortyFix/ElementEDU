@@ -1,8 +1,9 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.user.model.SimpleUserModel;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,21 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ThemeServiceTest extends ServiceTest<ThemeEntity, ThemeModel, ThemeCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
 
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public ThemeServiceTest(@Autowired @NotNull ThemeService service)
-    {
-        super(service);
-    }
+    @Autowired private ThemeService service;
 
     @Override protected @NotNull Eval<ThemeCreateModel, ThemeModel> successEval()
     {

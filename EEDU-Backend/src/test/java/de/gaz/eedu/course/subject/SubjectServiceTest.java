@@ -5,25 +5,16 @@ import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.course.subjects.SubjectService;
 import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
-import de.gaz.eedu.entity.EntityService;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SubjectServiceTest extends ServiceTest<SubjectEntity, SubjectModel, SubjectCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class SubjectServiceTest extends ServiceTest<SubjectService, SubjectEntity, SubjectModel, SubjectCreateModel>
 {
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public SubjectServiceTest(@Autowired @NotNull SubjectService service)
-    {
-        super(service);
-    }
+    @Autowired private SubjectService service;
 
     @Override
     protected @NotNull Eval<SubjectCreateModel, SubjectModel> successEval()

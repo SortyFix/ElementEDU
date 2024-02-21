@@ -5,10 +5,11 @@ import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -18,18 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Stream;
 
-public class ClassRoomServiceTest extends ServiceTest<ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel> {
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public ClassRoomServiceTest(@Autowired @NotNull ClassRoomService service) {
-        super(service);
-    }
+@Getter(AccessLevel.PROTECTED)
+public class ClassRoomServiceTest extends ServiceTest<ClassRoomService, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel> {
+
+    @Autowired private ClassRoomService service;
 
     @Contract(pure = true, value = "-> new")
     private static @NotNull Stream<ArrayTestData<Long>> getUser() {

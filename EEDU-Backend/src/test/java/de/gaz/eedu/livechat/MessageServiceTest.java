@@ -3,15 +3,16 @@ package de.gaz.eedu.livechat;
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.livechat.message.*;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MessageServiceTest extends ServiceTest<MessageEntity, MessageModel, MessageCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class MessageServiceTest extends ServiceTest<MessageService, MessageEntity, MessageModel, MessageCreateModel>
 {
-    public MessageServiceTest(@Autowired @NotNull MessageService service){
-        super(service);
-    }
+    @Autowired private MessageService service;
 
     @Override
     protected @NotNull Eval<MessageCreateModel, MessageModel> successEval()

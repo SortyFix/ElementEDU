@@ -1,30 +1,20 @@
 package de.gaz.eedu.livechat;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.livechat.chat.ChatCreateModel;
 import de.gaz.eedu.livechat.chat.ChatEntity;
 import de.gaz.eedu.livechat.chat.ChatModel;
 import de.gaz.eedu.livechat.chat.ChatService;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-public class ChatServiceTest extends ServiceTest<ChatEntity, ChatModel, ChatCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatModel, ChatCreateModel>
 {
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public ChatServiceTest(@Autowired @NotNull ChatService service)
-    {
-        super(service);
-    }
+    @Autowired private ChatService service;
 
     @Override
     protected @NotNull Eval<ChatCreateModel, ChatModel> successEval()

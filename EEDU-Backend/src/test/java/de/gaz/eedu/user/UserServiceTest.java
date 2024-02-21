@@ -13,6 +13,8 @@ import de.gaz.eedu.user.theming.ThemeService;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -39,18 +41,12 @@ import java.util.stream.Stream;
  * @see UserService
  * @see GroupService
  */
-public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserModel, UserCreateModel>
 {
-    private final GroupService groupService;
-    private final ThemeService themeService;
-
-    public UserServiceTest(@Autowired @NotNull UserService service, @Autowired @NotNull GroupService groupService,
-            @Autowired @NotNull ThemeService themeService)
-    {
-        super(service);
-        this.groupService = groupService;
-        this.themeService = themeService;
-    }
+    @Autowired private UserService service;
+    @Autowired private GroupService groupService;
+    @Autowired private ThemeService themeService;
 
     @Contract(pure = true, value = "-> new")
     private static @NotNull Stream<LoginTestData> loginTestData()
@@ -70,7 +66,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
     @MethodSource("loginTestData")
     public void testUserLogin(@NotNull LoginTestData loginTestData)
     {
-        test(loginTestData.createEval(), request -> ((UserService) getService()).login(request).isPresent());
+        test(loginTestData.createEval(), request -> getService().login(request).isPresent());
     }
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()
@@ -103,9 +99,9 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
      * @param userID the current user id that should be tested for the group addition. These can be modified inside
      *               the {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional(Transactional.TxType.REQUIRES_NEW) public void testUserAddGroup(long userID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional public void testUserAddGroup(long userID)
     {
-        GroupEntity groupEntity = groupService.loadEntityById(3).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getGroupService().loadEntityById(3).orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
         test(Eval.eval(groupEntity, userID == 2, Validator.equals()), userEntity::attachGroups);
@@ -153,7 +149,7 @@ public class UserServiceTest extends ServiceTest<UserEntity, UserModel, UserCrea
                 true,
                 false,
                 new TwoFactorModel[0],
-                themeService.loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(IllegalStateException::new),
+                getThemeService().loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(),
                 new SimpleUserGroupModel[0],
                 UserStatus.PRESENT);
 

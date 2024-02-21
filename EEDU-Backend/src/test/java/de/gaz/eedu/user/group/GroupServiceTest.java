@@ -8,6 +8,8 @@ import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,21 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author ivo
  */
-public class GroupServiceTest extends ServiceTest<GroupEntity, GroupModel, GroupCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
-    private final PrivilegeService privilegeService;
-
-    /**
-     * Constructs a new GroupServiceTest instance. If I write more, I'll die, I swear!!!!!
-     *
-     * @param service the GroupService instance to be used in the tests.
-     * @param privilegeService the PrivilegeService instance to be used in the tests.
-     */
-    public GroupServiceTest(@Autowired GroupService service, @Autowired PrivilegeService privilegeService)
-    {
-        super(service);
-        this.privilegeService = privilegeService;
-    }
+    @Autowired private GroupService service;
+    @Autowired private PrivilegeService privilegeService;
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {

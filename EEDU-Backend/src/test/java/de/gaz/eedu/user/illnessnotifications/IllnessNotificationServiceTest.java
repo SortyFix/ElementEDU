@@ -1,26 +1,17 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.OccupiedException;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationService, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public IllnessNotificationServiceTest(@NotNull @Autowired IllnessNotificationService service)
-    {
-        super(service);
-    }
+    @Autowired private IllnessNotificationService service;
 
     @Override
     protected @NotNull Eval<IllnessNotificationCreateModel, IllnessNotificationModel> successEval()

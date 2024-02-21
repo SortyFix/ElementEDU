@@ -55,37 +55,10 @@ import java.util.stream.Stream;
  * @author ivo
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) @SpringBootTest @ActiveProfiles("test")
-public abstract class ServiceTest<E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
+public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
-    private final EntityService<?, E, M, C> service;
 
-    /**
-     * Is a necessary for all children of this class.
-     * Most-likely this value is annotated using {@link org.springframework.beans.factory.annotation.Autowired} which
-     * automatically provides
-     * an instance of this {@link EntityService}.
-     *
-     * @param service which this tests should refer to.
-     */
-    public ServiceTest(@NotNull EntityService<?, E, M, C> service)
-    {
-        this.service = service;
-    }
-
-    /**
-     * This method provides access to the EDUEntityService instance that serves the purpose of carrying out actions
-     * related to entities within the application. This instance is typically initialized during the setup phase of a
-     * test.
-     * It is marked with the {@link NotNull} annotation, meaning that this method should never return null in any
-     * circumstances.
-     *
-     * @return the service instance, never null
-     * @see EntityService
-     */
-    @Contract(pure = true) protected EntityService<?, E, M, C> getService()
-    {
-        return service;
-    }
+    protected abstract @NotNull S getService();
 
     /**
      * This is an abstract method that must be implemented by any class inheriting from this one. The implementation of

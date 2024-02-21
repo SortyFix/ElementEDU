@@ -8,6 +8,8 @@ import de.gaz.eedu.course.subjects.model.SubjectModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -17,12 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Stream;
 
-public class CourseServiceTest extends ServiceTest<CourseEntity, CourseModel, CourseCreateModel>
+@Getter(AccessLevel.PROTECTED)
+public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, CourseModel, CourseCreateModel>
 {
-    public CourseServiceTest(@Autowired @NotNull CourseService courseService)
-    {
-        super(courseService);
-    }
+    @Autowired private CourseService service;
 
     @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUserData()
     {
