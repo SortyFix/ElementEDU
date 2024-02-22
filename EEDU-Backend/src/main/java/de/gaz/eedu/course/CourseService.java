@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
-public class CourseService implements EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
+public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     @Getter(AccessLevel.NONE) private final CourseRepository courseRepository;
     private final SubjectService subjectService;

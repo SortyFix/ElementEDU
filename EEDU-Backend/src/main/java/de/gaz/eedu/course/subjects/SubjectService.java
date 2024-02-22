@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class SubjectService implements EntityService<SubjectRepository, SubjectEntity, SubjectModel, SubjectCreateModel>
+public class SubjectService extends EntityService<SubjectRepository, SubjectEntity, SubjectModel, SubjectCreateModel>
 {
     private final SubjectRepository subjectRepository;
 
