@@ -12,6 +12,7 @@ import de.gaz.eedu.user.privileges.PrivilegeRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,8 @@ import java.util.stream.Stream;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService implements EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
+public class GroupService extends EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
     @Getter(AccessLevel.NONE)
     private final GroupRepository groupRepository;
     private final UserService userService; // managed by

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService implements EntityService<MessageRepository, MessageEntity, MessageModel, MessageCreateModel>
+@Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService extends EntityService<MessageRepository, MessageEntity, MessageModel, MessageCreateModel>
 {
     @Getter(AccessLevel.NONE)
     private final MessageRepository messageRepository;

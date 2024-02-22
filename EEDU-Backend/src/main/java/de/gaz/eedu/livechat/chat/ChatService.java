@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService implements EntityService<ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
+public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
 {
     private final ChatRepository chatRepository;
 

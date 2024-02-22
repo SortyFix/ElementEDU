@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service @AllArgsConstructor
-public class ThemeService implements EntityService<ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
+public class ThemeService extends EntityService<ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
     private final ThemeRepository themeRepository;
 

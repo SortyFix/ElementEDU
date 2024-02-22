@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Service public class IllnessNotificationService implements EntityService<IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
+@Service public class IllnessNotificationService extends EntityService<IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
     private final IllnessNotificationRepository illnessNotificationRepository;
     private final UserRepository userRepository;

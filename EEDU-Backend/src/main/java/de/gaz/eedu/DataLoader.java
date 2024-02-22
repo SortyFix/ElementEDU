@@ -14,6 +14,7 @@ import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +24,15 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
-@Component @RequiredArgsConstructor public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j public class DataLoader implements CommandLineRunner
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
     @Value("${development:false}") private boolean development;
 
-    @Override @Transactional(Transactional.TxType.REQUIRED) public void run(@NotNull String... args)
+    @Override @Transactional public void run(@NotNull String... args)
     {
         if (userService.findAll().isEmpty())
         {
@@ -81,15 +81,15 @@ import java.security.SecureRandom;
             throw new IllegalStateException(
                     "The system was not able to attach the admin group to the default user. This is very unusual behaviour. Please consider rechecking all information.");
         }
-        LOGGER.info("A default user has been created");
-        LOGGER.info("-".repeat(20));
-        LOGGER.info("USERNAME: {}", "root");
-        LOGGER.info("PASSWORD: {}", randomPassword);
-        LOGGER.info("-".repeat(20));
+        log.info("A default user has been created");
+        log.info("-".repeat(20));
+        log.info("USERNAME: {}", "root");
+        log.info("PASSWORD: {}", randomPassword);
+        log.info("-".repeat(20));
 
         if (!development)
         {
-            LOGGER.warn("It's advised to change the password as soon as possible.");
+            log.warn("It's advised to change the password as soon as possible.");
         }
     }
 

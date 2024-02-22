@@ -18,6 +18,7 @@ import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
 import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -48,10 +49,9 @@ import java.util.stream.Stream;
  * @see GroupEntity
  * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity")
+@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") @Slf4j
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
-    private final static Logger LOGGER = LoggerFactory.getLogger(UserEntity.class);
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
     private final Set<CourseEntity> courses = new HashSet<>();
     @Enumerated UserStatus status;
@@ -311,7 +311,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         if (twoFactors.removeIf(entity -> Objects.equals(entity.getMethod(), twoFactorEntity.getMethod())))
         {
             String removalMessage = "A disabled two-factor instance using method {} was overridden from user {}.";
-            LOGGER.warn(removalMessage, twoFactorEntity.getMethod(), getId());
+            log.warn(removalMessage, twoFactorEntity.getMethod(), getId());
         }
 
         return this.twoFactors.add(twoFactorEntity);

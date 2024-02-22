@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService implements EntityService<PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService extends EntityService<PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
 
     @Getter(AccessLevel.NONE)

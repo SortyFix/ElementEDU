@@ -8,6 +8,7 @@ import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.server.ResponseStatusException;
 
-
+@Slf4j
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>>
 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntityController.class);
-
     protected abstract @NotNull S getEntityService();
 
     /**
@@ -45,7 +43,7 @@ import org.springframework.web.server.ResponseStatusException;
      */
     public @NotNull ResponseEntity<M> create(@NotNull C model)
     {
-        LOGGER.info("Received an incoming create request from class {}.", getClass().getSuperclass());
+        log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
             return ResponseEntity.status(HttpStatus.CREATED).body(getEntityService().create(model));
@@ -67,7 +65,7 @@ import org.springframework.web.server.ResponseStatusException;
      */
     public @NotNull Boolean delete(@NotNull Long id)
     {
-        LOGGER.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
+        log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().delete(id);
     }
 
@@ -87,7 +85,7 @@ import org.springframework.web.server.ResponseStatusException;
      */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
-        LOGGER.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
+        log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 

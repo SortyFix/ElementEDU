@@ -9,6 +9,7 @@ import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,11 +37,9 @@ import java.util.function.Function;
  *
  * @author ivo
  */
-@RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService,
+@Slf4j @RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService,
         UserModel, UserCreateModel>
 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     @Override
@@ -85,13 +84,13 @@ import java.util.function.Function;
         {
             return login(loginModel);
         }
-        LOGGER.warn("A user tried to access the advanced token of another user. The request has been rejected.");
+        log.warn("A user tried to access the advanced token of another user. The request has been rejected.");
         throw unauthorizedThrowable();
     }
 
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
     {
-        LOGGER.info("The server has recognized an incoming login request.");
+        log.info("The server has recognized an incoming login request.");
 
         return getEntityService().login(userLoginModel)
                 .map(ResponseEntity::ok)

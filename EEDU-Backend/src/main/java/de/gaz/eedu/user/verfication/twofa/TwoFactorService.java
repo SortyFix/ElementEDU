@@ -15,8 +15,6 @@ import lombok.Getter;
 import org.apache.commons.codec.binary.Base32;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +24,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService implements EntityService<TwoFactorRepository, TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService extends EntityService<TwoFactorRepository, TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TwoFactorService.class);
     private static final int BYTE_SIZE = 20;
     private static final Base32 BASE_32 = new Base32();
     @Getter(AccessLevel.NONE)

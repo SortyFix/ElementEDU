@@ -5,11 +5,10 @@ import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +20,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
-public interface EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
+@Slf4j
+public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
 {
-
-    Logger LOGGER = LoggerFactory.getLogger(EntityService.class);
-
-    @NotNull R getRepository();
+    @NotNull public abstract R getRepository();
 
     /**
      * Loads an entity {@link E} by its id.
@@ -46,7 +43,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #loadById(long)
      * @see Transactional
      */
-    @Transactional(readOnly = true) default @NotNull Optional<E> loadEntityById(long id)
+    @Transactional(readOnly = true) public @NotNull Optional<E> loadEntityById(long id)
     {
         return getRepository().findById(id);
     }
@@ -69,7 +66,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #loadById(Long...) 
      * @see Transactional
      */
-    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Long... id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Long... id)
     {
         return Set.copyOf(getRepository().findAllById(List.of(id)));
     }
@@ -92,7 +89,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #findAll()
      * @see Transactional
      */
-    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<E> findAllEntities()
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> findAllEntities()
     {
         return Set.copyOf(getRepository().findAll());
     }
@@ -114,7 +111,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @throws CreationException is thrown when anything went wrong while creating
      * @see Transactional
      */
-    @Transactional @NotNull E createEntity(@NotNull C model) throws CreationException;
+    @Transactional public abstract @NotNull E createEntity(@NotNull C model) throws CreationException;
 
     /**
      * Deletes an {@link E} from the database.
@@ -144,12 +141,12 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional default boolean delete(long id)
+    @Transactional public boolean delete(long id)
     {
         return getRepository().findById(id).map(entry ->
         {
             String entityName = entry.getClass().getSimpleName();
-            LOGGER.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
+            log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
             {
                 save(entry);
@@ -158,12 +155,12 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
             deleteRelations(entry);
 
             getRepository().deleteById(id);
-            LOGGER.info("The deletion process of the entity {} {} has been successfully executed.", entityName, id);
+            log.info("The deletion process of the entity {} {} has been successfully executed.", entityName, id);
             return true;
         }).orElse(false);
     }
 
-    default void deleteRelations(@NotNull E entry) {}
+    public void deleteRelations(@NotNull E entry) {}
 
     /**
      * Saves multiply {@link E}s in the database.
@@ -209,7 +206,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #saveEntity(EntityModelRelation)
      * @see Transactional
      */
-    @Transactional default @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity)
+    @Transactional public @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity)
     {
         return getRepository().saveAll(entity);
     }
@@ -226,12 +223,12 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see Contract
      * @see Transactional
      */
-    @Contract(pure = true, value = "-> new") @Transactional(readOnly = true) default @NotNull Function<M, E> toEntity()
+    @Contract(pure = true, value = "-> new") @Transactional(readOnly = true) public @NotNull Function<M, E> toEntity()
     {
         return model -> getRepository().findById(model.id()).orElseThrow(() -> new EntityUnknownException(model.id()));
     }
 
-    @Contract(pure = true, value = "-> new") default @NotNull Function<E, M> toModel()
+    @Contract(pure = true, value = "-> new") public @NotNull Function<E, M> toModel()
     {
         return EntityModelRelation::toModel;
     }
@@ -267,7 +264,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #saveEntity(Iterable)
      * @see Transactional
      */
-    @Transactional default <T extends E> @NotNull T saveEntity(@NotNull T entity)
+    @Transactional public <T extends E> @NotNull T saveEntity(@NotNull T entity)
     {
         return saveEntity(Collections.singleton(entity)).get(0);
     }
@@ -295,7 +292,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #loadByIdSafe(long)
      * @see #loadEntityById(long)
      */
-    @Transactional(readOnly = true) default @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
+    @Transactional(readOnly = true) public @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
     {
         return loadEntityById(id).orElseThrow(() -> new EntityUnknownException(id));
     }
@@ -311,7 +308,7 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @see #loadEntityByIDSafe(long)
      * @see #loadById(long)
      */
-    @Transactional(readOnly = true) default @NotNull M loadByIdSafe(long id) throws EntityUnknownException
+    @Transactional(readOnly = true) public @NotNull M loadByIdSafe(long id) throws EntityUnknownException
     {
         return toModel().apply(loadEntityByIDSafe(id));
     }
@@ -339,27 +336,27 @@ public interface EntityService<R extends JpaRepository<E, Long>, E extends Entit
      * @param id of the entity to load.
      * @return an {@link Optional} containing the {@link M} if it exists or a {@link Optional#empty()}.
      */
-    @Transactional(readOnly = true) default @NotNull Optional<M> loadById(long id)
+    @Transactional(readOnly = true) public @NotNull Optional<M> loadById(long id)
     {
         return loadEntityById(id).map(toModel());
     }
 
-    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<M> loadById(@NotNull Long... id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> loadById(@NotNull Long... id)
     {
         return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }
 
-    @Transactional(readOnly = true) default @NotNull @Unmodifiable Set<M> findAll()
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> findAll()
     {
         return findAllEntities().stream().map(toModel()).collect(Collectors.toSet());
     }
 
-    @Transactional default @NotNull M create(@NotNull C model)
+    @Transactional public @NotNull M create(@NotNull C model)
     {
         return toModel().apply(createEntity(model));
     }
 
-    @Transactional default @NotNull M save(@NotNull E entity)
+    @Transactional public @NotNull M save(@NotNull E entity)
     {
         return toModel().apply(saveEntity(entity));
     }

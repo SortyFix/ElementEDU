@@ -17,9 +17,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,10 +49,9 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class UserService implements EntityService<UserRepository, UserEntity, UserModel, UserCreateModel>, UserDetailsService
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) @Slf4j
+public class UserService extends EntityService<UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     @Getter private final AuthorizeService authorizeService;
     @Getter private final ClassRoomService classRoomService;
     @Getter(AccessLevel.NONE) private final UserRepository userRepository;
@@ -123,7 +121,7 @@ public class UserService implements EntityService<UserRepository, UserEntity, Us
         }
         catch (ExpiredJwtException ignored)
         {
-            LOGGER.warn("An incoming request has been received with an expired token.");
+            log.warn("An incoming request has been received with an expired token.");
         }
         return Optional.empty();
     }
