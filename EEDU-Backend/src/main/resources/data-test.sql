@@ -116,9 +116,9 @@ VALUES (90234802),
        (75839435);
 
 INSERT INTO file_entity (file_name, author_id, data_directory)
-VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde 8b'),
+VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
        ('ivo_hausaufgaben.exe', 2, 'root'),
-       ('informatik_themen_fr_kühnel.docx', 3, 'Informatik Q1'),
+       ('informatik_themen_fr_kühnel.docx', 3, 'Informatik_Q1'),
        ('ivo_präsentation_cover.svg', 2, 'other');
 
 INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time, file_entity_id)

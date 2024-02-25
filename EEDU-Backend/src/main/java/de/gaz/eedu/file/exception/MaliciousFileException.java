@@ -9,7 +9,7 @@ public class MaliciousFileException extends ResponseStatusException
 
     public MaliciousFileException(String path)
     {
-        this(HttpStatus.NOT_FOUND, path);
+        this(HttpStatus.BAD_GATEWAY, path);
     }
 
     public MaliciousFileException(HttpStatus status, String path) {super(status);}

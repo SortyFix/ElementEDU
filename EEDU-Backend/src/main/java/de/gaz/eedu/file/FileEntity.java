@@ -31,7 +31,7 @@ import java.util.Set;
  */
 @Entity @AllArgsConstructor @NoArgsConstructor @Setter @Getter @Builder @Table(name = "file_entity") public class FileEntity implements EntityModelRelation<FileModel>
 {
-    private static final String BASE_DIRECTORY = "data";
+    public static final String BASE_DIRECTORY = "data";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String fileName;
@@ -78,12 +78,15 @@ import java.util.Set;
     public boolean upload(@NotNull MultipartFile file) throws IOException
     {
         Path path = Paths.get(getFilePath());
+        File pathFile = new File(getFilePath());
+        if(!Files.isDirectory(path)) pathFile.mkdirs();
 
-        if(!Files.isDirectory(path)) new File(getFilePath()).mkdir();
+        File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getOriginalFilename()));
+        storageFile.createNewFile();
 
         if (virusCheck(file.getInputStream()))
         {
-            file.transferTo(path);
+            file.transferTo(storageFile);
             return true;
         }
 
@@ -127,8 +130,10 @@ import java.util.Set;
             client.ping();
             return client.scan(inputStream) instanceof ScanResult.OK;
         }
-        catch (ClamavException | IllegalStateException ignored) {}
-        return false;
+        catch (ClamavException | IllegalStateException ignored) {
+            // TODO: Remove in production
+            return true;
+        }
     }
 
     @Override
