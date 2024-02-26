@@ -5,37 +5,39 @@ import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public record FileCreateModel(@NotNull Long authorId,
-                              @NotNull String filePath,
-                              @NotEmpty Set<Long> permittedUsers,
-                              @NotEmpty Set<Long> permittedGroups,
-                              Set<String> tags) implements CreationModel<FileEntity>
+                              @NotNull String fileName,
+                              @NotEmpty String[] privilege,
+                              @NotNull String dataDirectory,
+                              String[] tags) implements CreationModel<FileEntity>
 {
-    @Contract(pure = true) @Override public @NotNull String toString()
+    @Contract(pure = true)
+    @Override public String toString()
     {
         return "FileCreateModel{" +
-                ", filePath='" + filePath + '\'' +
-                ", permittedUsers=" + permittedUsers +
-                ", permittedGroups=" + permittedGroups +
-                ", tags='" + tags + '\'' +
+                "authorId=" + authorId +
+                ", fileName='" + fileName + '\'' +
+                ", privilege=" + Arrays.toString(privilege) +
+                ", tags=" + Arrays.toString(tags) +
                 '}';
     }
 
     @Override
     public @NotNull String name()
     {
-        return filePath + " " + System.currentTimeMillis();
+        return authorId() + " " + System.currentTimeMillis();
     }
 
+    @Override
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
-        FileEntity.builder()
-                .authorId(authorId)
-                .filePath(filePath)
-                .permittedUsers(permittedUsers) // TODO | 11.12.2023: what?
-                .permittedGroups(permittedGroups) // TODO | same here
-                .tags(tags);
+        fileEntity.setAuthorId(authorId());
+        fileEntity.setFileName(fileName());
+        fileEntity.setPrivilege(Arrays.stream(privilege()).collect(Collectors.toSet()));
+        fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
+        fileEntity.setDataDirectory(dataDirectory());
         return fileEntity;
     }
 }

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
--- The 'file_group_permissions' table is used to keep track of file permissions based on user groups. It defines which groups have access to which files.
+-- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS group_entity
 (
     two_factor_required BIT          NOT NULL,
@@ -61,10 +61,18 @@ CREATE TABLE IF NOT EXISTS two_factor_entity
 -- The 'illness_notification_entity' table keeps a record of all illness notifications sent by users. This includes a unique notification id, the user id of the sender, the reason for the notification and its status.
 CREATE TABLE IF NOT EXISTS file_entity
 (
-    author_id BIGINT       NULL,
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    file_name VARCHAR(255) NULL,
-    file_path VARCHAR(255) NULL
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id       BIGINT       NULL,
+    file_name       VARCHAR(255) NULL,
+    data_directory  VARCHAR(255) NOT NULL
+);
+
+-- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
+CREATE TABLE IF NOT EXISTS file_user_privileges
+(
+    file_id     BIGINT NOT NULL,
+    privilege   VARCHAR(255) NOT NULL,
+    FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
 
 -- The 'privilege_entity' table stores a set of privileges that can be assigned to a group in the 'group_entity' table.
@@ -75,16 +83,19 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
     FOREIGN KEY (file_entity_id) REFERENCES file_entity (id)
 );
 
--- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
+
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id    BIGINT       NOT NULL,
-    status     TINYINT      NOT NULL,
-    reason     VARCHAR(255) NOT NULL,
-    time_stamp BIGINT       NOT NULL,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT NOT NULL,
+    status          TINYINT NOT NULL,
+    reason          VARCHAR(255) NOT NULL,
+    time_stamp      BIGINT NOT NULL,
+    expiration_time BIGINT NOT NULL,
+    file_entity_id BIGINT NOT NULL,
 
-    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+    FOREIGN KEY (user_id) REFERENCES user_entity (id),
+    FOREIGN KEY (file_entity_id) REFERENCES file_entity (id)
 );
 
 -- The 'theme_entity' table contains various themes that can be applied to the user interface. Each theme includes specific colors for different elements of the interface.
@@ -105,22 +116,6 @@ CREATE TABLE IF NOT EXISTS group_privileges
     PRIMARY KEY (group_id, privilege_id),
     FOREIGN KEY (privilege_id) REFERENCES privilege_entity (id),
     FOREIGN KEY (group_id) REFERENCES group_entity (id)
-);
-
--- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
-CREATE TABLE IF NOT EXISTS file_user_permissions
-(
-    file_id         BIGINT NOT NULL,
-    permitted_users BIGINT NOT NULL,
-    FOREIGN KEY (file_id) REFERENCES file_entity (id)
-);
-
--- The 'user_groups' table is an associative (junction) table that links users to their groups.
-CREATE TABLE IF NOT EXISTS file_group_permissions
-(
-    file_id          BIGINT NOT NULL,
-    permitted_groups BIGINT NOT NULL,
-    FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity

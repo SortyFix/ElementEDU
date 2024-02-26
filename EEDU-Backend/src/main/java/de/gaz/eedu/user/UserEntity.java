@@ -288,6 +288,18 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(name.toUpperCase()));
     }
 
+    public boolean hasAnyRole(@NotNull Collection<String> roles)
+    {
+        return hasAnyAuthority(roles.stream().map(role -> "ROLE_" + role).collect(Collectors.toSet()));
+    }
+
+    public boolean hasAnyAuthority(@NotNull Collection<String> authorities)
+    {
+        Set<String> loadedAuthorities = getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+        return authorities.stream().anyMatch(loadedAuthorities::contains);
+    }
+
     public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)
     {
         // Also include not enabled ones, therefore not getter

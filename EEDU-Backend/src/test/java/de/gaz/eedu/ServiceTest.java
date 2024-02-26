@@ -5,6 +5,7 @@ import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.OccupiedException;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -104,7 +105,7 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
      *
      * @see #successEval()
      */
-    @Test public void testCreateEntitySuccess()
+    @Test @Transactional public void testCreateEntitySuccess()
     {
         Eval<C, M> success = successEval();
         success.evaluateResult(getService().create(success.request()));
