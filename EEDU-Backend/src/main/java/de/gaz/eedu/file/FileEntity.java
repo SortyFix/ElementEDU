@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,16 +73,22 @@ import java.util.Set;
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
+
     public boolean upload(@NotNull MultipartFile file) throws IOException
     {
-        Path path = Paths.get(getFilePath());
         File pathFile = new File(getFilePath());
-        if(!Files.isDirectory(path)) pathFile.mkdirs();
 
-        File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getOriginalFilename()));
-        storageFile.createNewFile();
+        if(pathFile.isFile())
+        {
+            Files.delete(pathFile.toPath());
+        }
 
-        if (virusCheck(file.getInputStream()))
+        FileUtils.deleteDirectory(pathFile);
+        boolean directoryCreated = pathFile.mkdirs();
+
+        File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getName()));
+
+        if (virusCheck(file.getInputStream()) && directoryCreated && storageFile.createNewFile())
         {
             file.transferTo(storageFile);
             return true;

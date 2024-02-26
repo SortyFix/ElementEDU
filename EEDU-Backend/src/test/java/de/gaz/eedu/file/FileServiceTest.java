@@ -1,14 +1,16 @@
 package de.gaz.eedu.file;
 
 import jakarta.transaction.Transactional;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -20,9 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class FileServiceTest
 {
-    @Autowired private FileRepository fileRepository;
     @Autowired private FileService fileService;
-    @Autowired private WebApplicationContext webApplicationContext;
 
     @Test
     @Transactional
@@ -30,6 +30,7 @@ class FileServiceTest
     {
         FileCreateModel fileCreateModel = new FileCreateModel(3L, "roblox.exe", new String[]{"PRIVILEGE_ALL"}, "other", new String[]{"mathe"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+
         assertNotNull(fileEntity.getId());
         assertEquals(fileCreateModel.authorId(), fileEntity.getAuthorId());
         assertEquals(fileCreateModel.fileName(), fileEntity.getFileName());
@@ -42,18 +43,21 @@ class FileServiceTest
     @Transactional
     public void testUpload() throws Exception
     {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "hello.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "Hello, World".getBytes()
-        );
-
-        FileCreateModel fileCreateModel = new FileCreateModel(2L, "hello.txt", new String[]{"PRIVILEGE_ALL"}, "other", new String[]{"mathe"});
+        MockMultipartFile partFile = new MockMultipartFile("dummyfile.txt", getClass().getClassLoader().getResourceAsStream("dummyfile.txt"));
+        FileCreateModel fileCreateModel = new FileCreateModel(2L, "dummyfile.txt", new String[]{"PRIVILEGE_ALL"}, "other", new String[]{"mathe"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
 
-        assertTrue(fileEntity.upload(file));
-        assertTrue(Files.exists(Path.of(fileEntity.getFilePath(), file.getOriginalFilename())));
+        assertTrue(fileEntity.upload(partFile));
+        assertTrue(Files.exists(Path.of(fileEntity.getFilePath(), partFile.getOriginalFilename())));
+    }
+
+    @AfterAll
+    public static void onExit() throws IOException
+    {
+        File directory = new File("/data");
+        if(directory.exists()){
+            FileUtils.deleteDirectory(new File("/data"));
+        }
     }
 
     private <T> boolean setsContainSameData(T[] array, @NotNull Set<T> set)
