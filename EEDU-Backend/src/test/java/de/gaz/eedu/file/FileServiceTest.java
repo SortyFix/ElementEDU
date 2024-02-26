@@ -35,6 +35,7 @@ class FileServiceTest
         assertTrue(setsContainSameData(fileCreateModel.tags(), fileEntity.getTags()));
     }
 
+    // Clean data directory after test. Will implement auto clean soon.
     @Test
     @Transactional
     public void testBatchUpload() throws Exception
@@ -59,15 +60,6 @@ class FileServiceTest
 
         assertTrue(fileService.delete(1L, () -> {}));
     }
-
-//    @AfterAll
-//    public static void onExit() throws IOException
-//    {
-//        File directory = new File("/data");
-//        if(directory.exists()){
-//            FileUtils.deleteDirectory(new File("/data"));
-//        }
-//    }
 
     private <T> boolean setsContainSameData(T[] array, @NotNull Set<T> set)
     {
