@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+
 @Service @RequiredArgsConstructor public class FileService
 {
     private final FileRepository fileRepository;
@@ -86,6 +87,22 @@ import java.util.List;
     @Transactional
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        return getRepository().save(model.toEntity(new FileEntity()));
+        FileEntity fileEntity = getRepository().save(model.toEntity(new FileEntity()));
+
+        try
+        {
+            if(Files.exists(Path.of(fileEntity.getFilePath())))
+            {
+                return fileEntity;
+            }
+
+            fileEntity.createDirectory();
+        }
+        catch (IOException ioException)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return fileEntity;
     }
 }

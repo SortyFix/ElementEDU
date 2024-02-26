@@ -69,47 +69,39 @@ import java.util.Set;
      * Uploads a file, performs a virus scan using ClamAV, and saves it to the specified directory.
      * If the directory doesn't already exist, it will be created.
      *
-     * @param file The file to be uploaded.
+     * @param batch The batch to be uploaded.
      * @return True if the upload is successful, false otherwise.
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
-
-    public boolean upload(@NotNull MultipartFile file) throws IOException
+    public boolean uploadBatch(@NotNull MultipartFile... batch) throws IOException
     {
-        boolean directoryCreated = createDirectory();
-
-        File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getName()));
-
-        if (virusCheck(file.getInputStream()) && directoryCreated && storageFile.createNewFile())
-        {
-            file.transferTo(storageFile);
-            return true;
-        }
-
-        throw new MaliciousFileException(file.getName());
-    }
-
-    public boolean uploadBatch(@NotNull MultipartFile[] batch) throws IOException
-    {
-        boolean directoryCreated = createDirectory();
-
         Arrays.stream(batch).forEach(file ->
         {
-            File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getName()));
+            String fileName = Objects.requireNonNull(file.getName());
+            File storageFile = new File(getFilePath(), fileName);
 
             try
             {
-                if (virusCheck(file.getInputStream()) && directoryCreated && storageFile.createNewFile())
+                if (virusCheck(file.getInputStream()))
                 {
                     file.transferTo(storageFile);
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new MaliciousFileException(file.getName());
             }
         });
 
         return true;
+    }
+
+    public static String removeExtension(String fname) {
+        int pos = fname.lastIndexOf('.');
+        if(pos > -1)
+            return fname.substring(0, pos);
+        else
+            return fname;
     }
 
     public boolean createDirectory() throws IOException

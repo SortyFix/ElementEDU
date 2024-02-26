@@ -41,7 +41,7 @@ import java.time.ZoneId;
                     new String[] { "illness_notification" }));
             try
             {
-                fileEntity.upload(file);
+                fileEntity.uploadBatch(file);
             }
             catch (IOException e)
             {
