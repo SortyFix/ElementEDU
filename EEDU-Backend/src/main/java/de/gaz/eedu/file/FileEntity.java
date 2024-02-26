@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -76,15 +77,7 @@ import java.util.Set;
 
     public boolean upload(@NotNull MultipartFile file) throws IOException
     {
-        File pathFile = new File(getFilePath());
-
-        if(pathFile.isFile())
-        {
-            Files.delete(pathFile.toPath());
-        }
-
-        FileUtils.deleteDirectory(pathFile);
-        boolean directoryCreated = pathFile.mkdirs();
+        boolean directoryCreated = createDirectory();
 
         File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getName()));
 
@@ -95,6 +88,41 @@ import java.util.Set;
         }
 
         throw new MaliciousFileException(file.getName());
+    }
+
+    public boolean uploadBatch(@NotNull MultipartFile[] batch) throws IOException
+    {
+        boolean directoryCreated = createDirectory();
+
+        Arrays.stream(batch).forEach(file ->
+        {
+            File storageFile = new File(getFilePath(), Objects.requireNonNull(file.getName()));
+
+            try
+            {
+                if (virusCheck(file.getInputStream()) && directoryCreated && storageFile.createNewFile())
+                {
+                    file.transferTo(storageFile);
+                }
+            } catch (IOException e) {
+                throw new MaliciousFileException(file.getName());
+            }
+        });
+
+        return true;
+    }
+
+    public boolean createDirectory() throws IOException
+    {
+        File pathFile = new File(getFilePath());
+
+        if(pathFile.isFile())
+        {
+            Files.delete(pathFile.toPath());
+        }
+
+        FileUtils.deleteDirectory(pathFile);
+        return pathFile.mkdirs();
     }
 
     /**

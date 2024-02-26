@@ -51,6 +51,22 @@ class FileServiceTest
         assertTrue(Files.exists(Path.of(fileEntity.getFilePath(), partFile.getOriginalFilename())));
     }
 
+    @Test
+    @Transactional
+    public void testBatchUpload() throws Exception
+    {
+        MockMultipartFile[] batch = new MockMultipartFile[]{
+                new MockMultipartFile("batchfile1.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
+                new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
+                new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
+        };
+        FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+
+        assertTrue(fileEntity.uploadBatch(batch));
+        assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
+    }
+
     @AfterAll
     public static void onExit() throws IOException
     {
