@@ -59,6 +59,18 @@ import java.util.Set;
         return Objects.hash(id, fileName, authorId, dataDirectory, privilege, tags);
     }
 
+    @Override public String toString()
+    {
+        return "FileEntity{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", authorId=" + authorId +
+                ", dataDirectory='" + dataDirectory + '\'' +
+                ", privilege=" + privilege +
+                ", tags=" + tags +
+                '}';
+    }
+
     @Override
     public FileModel toModel()
     {
@@ -95,15 +107,6 @@ import java.util.Set;
 
         return true;
     }
-
-    public static String removeExtension(String fname) {
-        int pos = fname.lastIndexOf('.');
-        if(pos > -1)
-            return fname.substring(0, pos);
-        else
-            return fname;
-    }
-
     public boolean createDirectory() throws IOException
     {
         File pathFile = new File(getFilePath());

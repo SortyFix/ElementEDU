@@ -59,7 +59,9 @@ class FileServiceTest
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
 
-        assertTrue(fileService.delete(1L, () -> {}));
+        System.out.println(fileEntity.toString());
+
+        assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }
 
     private <T> boolean setsContainSameData(T[] array, @NotNull Set<T> set)
