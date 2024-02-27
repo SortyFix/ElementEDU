@@ -53,6 +53,7 @@ class FileServiceTest
     }
 
     @Test
+    @Transactional
     public void testDelete()
     {
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
