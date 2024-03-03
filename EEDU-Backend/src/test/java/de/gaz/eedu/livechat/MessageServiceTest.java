@@ -22,14 +22,13 @@ public class MessageServiceTest extends ServiceTest<MessageService, MessageEntit
     {
         Long currentTime = System.currentTimeMillis();
         MessageCreateModel messageCreateModel =
-                new MessageCreateModel(1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime, MessageStatus.UNREAD);
-        MessageModel messageModel = new MessageModel(5L, 1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime, MessageStatus.UNREAD);
+                new MessageCreateModel(1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime);
+        MessageModel messageModel = new MessageModel(5L, 1L, "america is a nation that can be defined in a single word; itafutefufutefu", currentTime);
         return Eval.eval(messageCreateModel, messageModel, ((request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.authorId(), result.authorId());
             Assertions.assertEquals(expect.body(), result.body());
             Assertions.assertEquals(expect.timeStamp(),result.timeStamp());
-            Assertions.assertEquals(expect.status(), result.status());
         }));
     }
 

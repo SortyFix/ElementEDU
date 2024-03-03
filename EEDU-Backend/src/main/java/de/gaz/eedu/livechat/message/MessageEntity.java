@@ -15,11 +15,10 @@ public class MessageEntity implements EntityObject, EntityModelRelation<MessageM
     private UserEntity author;
     private String body;
     private Long timestamp;
-    @Enumerated private MessageStatus status;
 
     @Override
     public MessageModel toModel()
     {
-        return new MessageModel(messageId, author.getId(), body, timestamp, status);
+        return new MessageModel(messageId, author.getId(), body, timestamp);
     }
 }
