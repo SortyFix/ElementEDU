@@ -62,7 +62,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * The request body should contain a list of user IDs representing the participants in the chat room. A room must have at least two users to be valid.
      * </p>
      * <p>
-     * If the number of users is less than two, the response will be a {@link org.springframework.http.HttpStatus#FORBIDDEN} status.
+     * If the number of users is less than two, the response will be a {@link HttpStatus#FORBIDDEN} status.
      * </p>
      * <p>
      * Checks are performed to ensure the validity of the provided user IDs:
@@ -70,17 +70,17 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      *     <li>Verifies that all provided user IDs exist in the system.</li>
      *     <li>Ensures that the current user initiating the request is included in the list of users.</li>
      * </ul>
-     * If any of these checks fail, the response will be a {@link org.springframework.http.HttpStatus#FORBIDDEN} status.
+     * If any of these checks fail, the response will be a {@link HttpStatus#FORBIDDEN} status.
      * </p>
      * <p>
-     * Additionally, checks if a chat room already exists with the same set of users. If such a chat room exists, the response will be a {@link org.springframework.http.HttpStatus#CONFLICT} status.
+     * Additionally, checks if a chat room already exists with the same set of users. If such a chat room exists, the response will be a {@link HttpStatus#CONFLICT} status.
      * </p>
      * <p>
-     * If all validation checks pass, a new chat room is created with the specified users, and a {@link org.springframework.http.ResponseEntity} containing the created chat room's details is returned with a {@link org.springframework.http.HttpStatus#OK} status.
+     * If all validation checks pass, a new chat room is created with the specified users, and a {@link ResponseEntity} containing the created chat room's details is returned with a {@link HttpStatus#OK} status.
      * </p>
      *
      * @param users       A list of user IDs representing the participants in the chat room.
-     * @return A {@link org.springframework.http.ResponseEntity} containing the details of the created chat room if successful, or an appropriate HTTP status indicating the outcome.
+     * @return A {@link ResponseEntity} containing the details of the created chat room if successful, or an appropriate HTTP status indicating the outcome.
      */
 
     @Transactional
@@ -116,7 +116,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * <ul>
      *     <li>Verifies that the authenticated user is authorized to send messages in the specified chat.</li>
      *     <li>Determines the message status based on the number of users in the chat: GROUP for chats with more than two users,
-     *         UNREAD for two-user chats, and returns a {@link org.springframework.http.HttpStatus#BAD_REQUEST} status if the chat size is invalid.</li>
+     *         UNREAD for two-user chats, and returns a {@link HttpStatus#BAD_REQUEST} status if the chat size is invalid.</li>
      *     <li>Creates a new message entity with the provided author ID, message body, timestamp, and message status.</li>
      *     <li>Adds the new message to the chat's list of messages.</li>
      *     <li>Sends the message to the WebSocket topic associated with the chat.</li>
@@ -126,10 +126,10 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * @param authorId The ID of the authenticated user initiating the request, considered as the author of the message.
      * @param chatId   The ID of the chat to which the message is being sent.
      * @param body     The text content of the message being sent.
-     * @return A {@link org.springframework.http.HttpStatus} indicating the outcome of the message sending operation.
-     *         Returns {@link org.springframework.http.HttpStatus#OK} if the operation is successful,
-     *         {@link org.springframework.http.HttpStatus#UNAUTHORIZED} if the user is not authorized to send messages in the chat,
-     *         or {@link org.springframework.http.HttpStatus#BAD_REQUEST} if there's an issue with the chat size.
+     * @return A {@link HttpStatus} indicating the outcome of the message sending operation.
+     *         Returns {@link HttpStatus#OK} if the operation is successful,
+     *         {@link HttpStatus#UNAUTHORIZED} if the user is not authorized to send messages in the chat,
+     *         or {@link HttpStatus#BAD_REQUEST} if there's an issue with the chat size.
      */
     @Transactional
     public @NotNull HttpStatus sendMessage(@NotNull Long authorId, @NotNull @DestinationVariable Long chatId, @NotNull @RequestBody String body)
@@ -137,15 +137,18 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
         UserEntity author = userService.loadEntityById(authorId).orElse(null);
 
         return loadEntityById(chatId).map(chatEntity -> {
+            MessageCreateModel messageCreateModel = null;
 
             if (!(chatEntity.getUsers().contains(authorId) && Objects.nonNull(author)))
             {
                 return HttpStatus.UNAUTHORIZED;
             }
 
-            MessageCreateModel messageCreateModel =   chatEntity.getUsers().size() > 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis())
-                    : chatEntity.getUsers().size() == 2 ? new MessageCreateModel(authorId, body, System.currentTimeMillis())
-                    : null;
+            if(chatEntity.getUsers().size() >= 2)
+            {
+                messageCreateModel = new MessageCreateModel(authorId, body, System.currentTimeMillis());
+            }
+            
             if(Objects.isNull(messageCreateModel))
             {
                 return HttpStatus.BAD_REQUEST;
