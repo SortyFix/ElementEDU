@@ -3,13 +3,14 @@ package de.gaz.eedu.livechat.chat;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
-import de.gaz.eedu.livechat.WSConfig;
+import de.gaz.eedu.livechat.WSIdentifiers;
 import de.gaz.eedu.livechat.message.MessageCreateModel;
 import de.gaz.eedu.livechat.message.MessageEntity;
 import de.gaz.eedu.livechat.message.MessageService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,14 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Getter
 public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
 {
     private final ChatRepository chatRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
     private final UserService userService;
-    private final WSConfig wsConfig;
+    private final WSIdentifiers wsIdentifiers;
 
     @Override
     public @NotNull ChatRepository getRepository()
@@ -81,6 +83,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * @return A {@link org.springframework.http.ResponseEntity} containing the details of the created chat room if successful, or an appropriate HTTP status indicating the outcome.
      */
 
+    @Transactional
     public @NotNull ChatModel createChat(@NotNull List<Long> users)
     {
         if(users.size() < 2)
@@ -150,7 +153,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
 
             MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
             chatEntity.getMessages().add(messageEntity.getMessageId());
-            messagingTemplate.convertAndSend(wsConfig.getBroker() + "/" + chatId, messageEntity.toModel());
+            messagingTemplate.convertAndSend(wsIdentifiers.getBroker() + "/" + chatId, messageEntity.toModel());
 
             return HttpStatus.OK;
         }).orElse(HttpStatus.UNAUTHORIZED);
