@@ -27,7 +27,7 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, Privileg
 
     @Override protected @NotNull ServiceTest.Eval<PrivilegeCreateModel, PrivilegeModel> successEval()
     {
-        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("test", new GroupEntity[0]);
+        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("test", new Long[0]);
         PrivilegeModel privilegeModel = new PrivilegeModel(5L, "TEST", new SimplePrivilegeGroupModel[0]);
         return Eval.eval(privilegeCreateModel, privilegeModel, (request, expect, result) ->
         {
@@ -38,6 +38,6 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, Privileg
 
     @Override protected @NotNull PrivilegeCreateModel occupiedCreateModel()
     {
-        return new PrivilegeCreateModel("READ", new GroupEntity[0]);
+        return new PrivilegeCreateModel("READ", new Long[0]);
     }
 }

@@ -2,7 +2,6 @@ package de.gaz.eedu.user.verfication.twofa;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService extends EntityService<TwoFactorRepository, TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
 {
@@ -38,27 +36,17 @@ import java.util.function.Supplier;
         return twoFactorRepository;
     }
 
-
     @Override public @NotNull TwoFactorEntity createEntity(@NotNull TwoFactorCreateModel model) throws CreationException
     {
-        Supplier<EntityUnknownException> exceptionSupplier = () -> new EntityUnknownException(model.userID());
-        UserEntity userEntity = getUserService().loadEntityById(model.userID()).orElseThrow(exceptionSupplier);
+        UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
+        TwoFactorEntity twoFactorEntity = populateEntity(model, userEntity);
 
-        TwoFactorEntity twoFactorEntity = model.toEntity(new TwoFactorEntity(userEntity), (entity ->
-        {
-            entity.setSecret(generateBase32());
-            return entity;
-        }));
+        validate(userEntity.initTwoFactor(twoFactorEntity), new CreationException(HttpStatus.CONFLICT));
 
-        if (userEntity.initTwoFactor(twoFactorEntity))
-        {
-            getRepository().save(twoFactorEntity);
-            getUserService().save(userEntity);
+        getRepository().save(twoFactorEntity);
+        getUserService().save(userEntity);
 
-            return twoFactorEntity;
-        }
-
-        throw new CreationException(HttpStatus.CONFLICT);
+        return twoFactorEntity;
     }
 
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)
@@ -81,8 +69,8 @@ import java.util.function.Supplier;
         return userEntity.getTwoFactor(method).map(mapper).orElse(false);
     }
 
-    @Contract(pure = true, value = "_ -> new")
     @NotNull
+    @Contract(pure = true, value = "_ -> new")
     private Function<TwoFactorEntity, Boolean> verifyMapper(@NotNull String code)
     {
         return twoFactorEntity ->
@@ -96,8 +84,8 @@ import java.util.function.Supplier;
         };
     }
 
-    @Contract(pure = true, value = "_ -> new")
     @NotNull
+    @Contract(pure = true, value = "_ -> new")
     private Function<TwoFactorEntity, Boolean> enableMapper(@NotNull String code)
     {
         return new Function<>()
@@ -120,11 +108,31 @@ import java.util.function.Supplier;
         };
     }
 
+    /**
+     * This method populates an {@link TwoFactorEntity}.
+     * <p>
+     * This method creates a new {@link TwoFactorEntity} by a {@link TwoFactorCreateModel}.
+     *
+     * @param model      the two-factor model to create the {@link TwoFactorEntity}.
+     * @param userEntity the entity associated with.
+     * @return the created {@link TwoFactorEntity}.
+     */
+    @Contract(value = "_, _ -> new", pure = true) private @NotNull TwoFactorEntity populateEntity(@NotNull TwoFactorCreateModel model, @NotNull UserEntity userEntity)
+    {
+        return model.toEntity(new TwoFactorEntity(userEntity), (entity ->
+        {
+            entity.setSecret(generateBase32());
+            return entity;
+        }));
+    }
+
+    @Contract(pure = true, value = "-> new")
     public @NotNull String generateBase32()
     {
         return new String(BASE_32.encode(getRandomBytes()));
     }
 
+    @Contract(pure = true, value = "-> new")
     private byte @NotNull [] getRandomBytes()
     {
         SecureRandom secureRandom = new SecureRandom();

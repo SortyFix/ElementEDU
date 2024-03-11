@@ -17,16 +17,17 @@ CREATE TABLE IF NOT EXISTS class_room_entity
 -- The 'file_entity_tags' table is used to keep track of tags applied to file entities in the 'file_entity' table.
 CREATE TABLE IF NOT EXISTS user_entity
 (
-    enabled       BIT          NOT NULL,
-    locked        BIT          NOT NULL,
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    theme_id      BIGINT       NULL,
-    first_name    VARCHAR(255) NULL,
-    last_name     VARCHAR(255) NULL,
-    login_name    VARCHAR(255) NULL,
-    password      VARCHAR(255) NULL,
-    status        TINYINT      NULL,
-    class_room_id BIGINT       NULL,
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name     VARCHAR(255) NULL,
+    last_name      VARCHAR(255) NULL,
+    login_name     VARCHAR(255) NULL,
+    password       VARCHAR(255) NULL,
+    system_account BIT      NOT NULL,
+    enabled        BIT          NOT NULL,
+    locked         BIT          NOT NULL,
+    theme_id       BIGINT       NULL,
+    status         TINYINT      NULL,
+    class_room_id  BIGINT       NULL,
     FOREIGN KEY (theme_id) REFERENCES theme_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );

@@ -8,9 +8,8 @@ import de.gaz.eedu.user.theming.ThemeEntity;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
-public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName,
-                              @NotEmpty(message = "Password must not be empty.") @NotNull String password,
-                              @NotNull Boolean enabled, @NotNull Boolean locked, @NotNull UserStatus status) implements CreationModel<UserEntity>
+public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName, @NotNull String password,
+                              @NotNull Boolean enabled, @NotNull Boolean locked, @NotNull UserStatus status, @NotNull Long theme, @NotNull Long[] groups) implements CreationModel<UserEntity>
 {
     @Override public @NotNull String name()
     {
@@ -24,8 +23,8 @@ public record UserCreateModel(@NotNull String firstName, @NotNull String lastNam
         userEntity.setLoginName(loginName());
         userEntity.setEnabled(enabled());
         userEntity.setLocked(locked());
-        userEntity.setThemeEntity(new ThemeCreateModel("default " + System.currentTimeMillis(), 0x050033, 0xb0abd6, 0x000000).toEntity(new ThemeEntity()));
         userEntity.setStatus(status());
+        userEntity.setSystemAccount(false);
         return userEntity;
     }
 }

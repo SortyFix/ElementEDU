@@ -55,26 +55,17 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     @Override
     public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION))
-        {
-            throw unauthorizedThrowable();
-        }
+        validate(isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION), unauthorizedThrowable());
         return super.delete(id);
     }
 
     @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(JwtTokenType.TWO_FACTOR_REQUIRED);
+        validate(hasAdvanced || hasRequired, unauthorizedThrowable());
 
-        boolean hasAdvanced = isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION);
-        boolean hasRequired = isAuthorized(authentication, JwtTokenType.TWO_FACTOR_REQUIRED);
-
-        if (hasAdvanced || hasRequired)
-        {
-            return super.create(model);
-        }
-        throw unauthorizedThrowable();
+        return super.create(model);
     }
 
     /**
@@ -93,21 +84,18 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     @GetMapping("/enable/{method}/{code}")
     public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull TwoFactorMethod method, @PathVariable String code, @RequestAttribute("claims") Claims claims)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(JwtTokenType.TWO_FACTOR_REQUIRED);
 
-        boolean hasAdvanced = isAuthorized(authentication, JwtTokenType.ADVANCED_AUTHORIZATION);
-        boolean hasRequired = isAuthorized(authentication, JwtTokenType.TWO_FACTOR_REQUIRED);
+        validate((hasAdvanced || hasRequired), unauthorizedThrowable());
+        validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
 
-        if ((hasAdvanced || hasRequired) && getEntityService().enable(method, code, claims))
+        if (hasRequired) // return login token after user has setup two factor
         {
-            if (hasRequired) // return login token after user has setup two factor
-            {
-                Optional<String> token = getEntityService().verify(method, code, claims);
-                return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
-            }
-            return ResponseEntity.ok(null);
+            Optional<String> token = getEntityService().verify(method, code, claims);
+            return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
         }
-        throw unauthorizedThrowable();
+        return ResponseEntity.ok(null);
     }
 
     /**
@@ -123,15 +111,12 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     @GetMapping("/verify/{code}")
     public @NotNull ResponseEntity<String> verify(@PathVariable @NotNull String code, @RequestAttribute("claims") @NotNull Claims claims)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (isAuthorized(authentication, JwtTokenType.TWO_FACTOR_PENDING))
-        {
-            TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
-            Optional<String> verifyToken = getEntityService().verify(method, code, claims);
-            return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
-        }
+        validate(isAuthorized(JwtTokenType.TWO_FACTOR_PENDING), unauthorizedThrowable());
 
-        throw unauthorizedThrowable();
+        TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
+        Optional<String> verifyToken = getEntityService().verify(method, code, claims);
+
+        return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
     /**
@@ -147,11 +132,8 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
      */
     @GetMapping("/select/{method}") public @NotNull ResponseEntity<String> select(@PathVariable @NotNull TwoFactorMethod method, @RequestAttribute("claims") Claims claims)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!isAuthorized(authentication, JwtTokenType.TWO_FACTOR_SELECTION))
-        {
-            throw unauthorizedThrowable();
-        }
+        validate(isAuthorized(JwtTokenType.TWO_FACTOR_SELECTION), unauthorizedThrowable());
+
         AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
         return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
     }

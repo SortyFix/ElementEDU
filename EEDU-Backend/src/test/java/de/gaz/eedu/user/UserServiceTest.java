@@ -1,6 +1,7 @@
 package de.gaz.eedu.user;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
@@ -71,7 +72,12 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()
     {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, UserStatus.PRESENT);
+        return new UserCreateModel("Max", "musterman", "max.mustermann", "Password123!", true, false, UserStatus.PRESENT, 1L, new Long[0]);
+    }
+
+    @Override protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    {
+        return Stream.of(new TestData<>(4, true));
     }
 
     /**
@@ -141,7 +147,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
                 "Password123!",
                 true,
                 false,
-                UserStatus.PRESENT);
+                UserStatus.PRESENT, 1L, new Long[0]);
         final UserModel expected = new UserModel(5L,
                 "jonas",
                 "yonas",
@@ -213,7 +219,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
      */
     @Contract(value = "_ -> new", pure = true) private @NotNull UserCreateModel generatePasswordModel(@NotNull String password)
     {
-        return new UserCreateModel("jonas", "yonas", "jonas.yonas$", password, true, false, UserStatus.PRESENT);
+        return new UserCreateModel("jonas", "yonas", "jonas.yonas$", password, true, false, UserStatus.PRESENT, 1L, new Long[0]);
     }
 
     public record LoginTestData(@NotNull Boolean expected, @NotNull String userName, @NotNull String password)

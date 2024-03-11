@@ -35,7 +35,12 @@ import java.util.Set;
             throw new NameOccupiedException(privilegeCreateModel.name());
         }
 
-        return getRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity()));
+        return getRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity(), (entity ->
+        {
+            Set<GroupEntity> groupEntities = getGroupService().loadEntityById(privilegeCreateModel.groupEntities());
+            entity.setGroupEntities(groupEntities);
+            return entity;
+        })));
     }
 
     @Override public void deleteRelations(@NotNull PrivilegeEntity entry)

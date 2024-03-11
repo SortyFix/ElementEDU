@@ -6,6 +6,7 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
+import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -82,7 +84,8 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
             entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
-            entity.setThemeEntity(themeRepository.getReferenceById(1L));
+            entity.setThemeEntity(themeRepository.getReferenceById(model.theme()));
+            entity.attachGroups(getGroupRepository().findAllById(List.of(model.groups())).toArray(GroupEntity[]::new));
             return entity;
         }));
     }
