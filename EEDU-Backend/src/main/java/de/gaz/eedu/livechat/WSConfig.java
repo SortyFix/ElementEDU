@@ -1,25 +1,26 @@
 package de.gaz.eedu.livechat;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@AllArgsConstructor
+@Component
 @Getter
 public class WSConfig implements WebSocketMessageBrokerConfigurer
 {
-    private final String broker = "/topic";
-    private final String apd = "/app";
-    private final String endpoint = "/ws-endpoint";
+    private WSIdentifiers wsIdentifiers;
 
     /**
      * Configures the message broker for WebSocket communication in the application.
-     *
      * Enables a simple message broker with the specified destinations and sets the application destination prefixes.
      * The simple message broker allows the application to send messages to connected clients and subscribe to specific
      * destination prefixes for message broadcasting.
@@ -33,13 +34,12 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer
      */
     @Override
     public void configureMessageBroker(@NotNull MessageBrokerRegistry config){
-        config.enableSimpleBroker(broker);
-        config.setApplicationDestinationPrefixes(apd);
+        config.enableSimpleBroker(wsIdentifiers.getBroker());
+        config.setApplicationDestinationPrefixes(wsIdentifiers.getApd());
     }
 
     /**
      * Registers STOMP (Simple Text Oriented Messaging Protocol) endpoints for WebSocket communication in the application.
-     *
      * STOMP is a messaging protocol that defines the format and rules for data exchange over WebSocket.
      * This method configures the WebSocket endpoint, allows cross-origin resource sharing, and adds SockJS support
      * for fallback options in case WebSocket is not supported by the client.
@@ -53,6 +53,6 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer
      */
     @Override
     public void registerStompEndpoints(@NotNull StompEndpointRegistry registry){
-        registry.addEndpoint(endpoint).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint(wsIdentifiers.getEndpoint()).setAllowedOrigins("*").withSockJS();
     }
 }

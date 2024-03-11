@@ -5,7 +5,7 @@ import de.gaz.eedu.user.UserEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull Long timestamp, @NotNull MessageStatus status) implements CreationModel<MessageEntity>
+public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull Long timestamp) implements CreationModel<MessageEntity>
 {
     @Contract(pure = true) @Override public @NotNull String toString()
     {
@@ -32,7 +32,6 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @
         messageEntity.setAuthor(author);
         messageEntity.setBody(body());
         messageEntity.setTimestamp(timestamp());
-        messageEntity.setStatus(MessageStatus.UNREAD);
         return messageEntity;
     }
 }

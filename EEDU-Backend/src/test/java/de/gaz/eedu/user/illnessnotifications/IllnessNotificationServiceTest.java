@@ -5,13 +5,17 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
@@ -19,6 +23,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
 {
     @Autowired private IllnessNotificationService service;
     @Autowired private FileService fileService;
+    @Autowired private IllnessNotificationService illnessNotificationService;
 
     @Override
     protected @NotNull Eval<IllnessNotificationCreateModel, IllnessNotificationModel> successEval()
@@ -46,6 +51,16 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
             Assertions.assertEquals(expect.reason(), result.reason());
             Assertions.assertEquals(expect.expirationTime(), result.expirationTime());
         }));
+    }
+
+    @Test
+    @Transactional
+    protected void illnessNotificationUploadTest() throws IOException
+    {
+        MockMultipartFile mockFile = new MockMultipartFile("illnessnotification.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt"));
+        boolean excused = illnessNotificationService.excuse(1L, "Am sick", 39423943L, mockFile);
+
+        Assertions.assertTrue(excused);
     }
 
     @Override

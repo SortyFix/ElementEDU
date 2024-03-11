@@ -48,9 +48,7 @@ import java.util.Set;
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FileEntity that = (FileEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(fileName, that.fileName) && Objects.equals(authorId,
-                that.authorId) && Objects.equals(dataDirectory, that.dataDirectory) && Objects.equals(privilege,
-                that.privilege) && Objects.equals(tags, that.tags);
+        return Objects.equals(id, that.id);
     }
 
     @Override
@@ -59,6 +57,22 @@ import java.util.Set;
         return Objects.hash(id, fileName, authorId, dataDirectory, privilege, tags);
     }
 
+    @Override public String toString()
+    {
+        return "FileEntity{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", authorId=" + authorId +
+                ", dataDirectory='" + dataDirectory + '\'' +
+                ", privilege=" + privilege +
+                ", tags=" + tags +
+                '}';
+    }
+
+    /**
+     * Converts the FileEntity to a FileModel DTO.
+     * @return FileModel with the necessary attributes of the FileEntity.
+     */
     @Override
     public FileModel toModel()
     {
@@ -66,8 +80,13 @@ import java.util.Set;
     }
 
     /**
-     * Uploads a file, performs a virus scan using ClamAV, and saves it to the specified directory.
-     * If the directory doesn't already exist, it will be created.
+     * Uploads a batch of files, performs a virus scan using ClamAV, and saves them to the specified directory. <br>
+     * Files will be stored in the following fashion:
+     * <p>
+     *     <code>
+     *         BASE_DIRECTORY/dataDirectory/fileEntityId/[file]
+     *     </code>
+     * </p>
      *
      * @param batch The batch to be uploaded.
      * @return True if the upload is successful, false otherwise.
@@ -96,15 +115,20 @@ import java.util.Set;
         return true;
     }
 
-    public static String removeExtension(String fname) {
-        int pos = fname.lastIndexOf('.');
-        if(pos > -1)
-            return fname.substring(0, pos);
-        else
-            return fname;
-    }
-
-    public boolean createDirectory() throws IOException
+    /**
+     * Creates the directory based on the dataDirectory attribute of the {@link FileEntity}.
+     * <p>
+     * Note that files within the directory bounds with an ID of a FileEntity (e.g. 4.txt)
+     * will be removed once a directory called <code>/4</code> is created.
+     * </p>
+     * <p>
+     * The directory will be created in the following fashion:
+     * <code>BASE_DIRECTORY/dataDirectory/fileEntityId</code>
+     * </p>
+     *
+     * @throws IOException
+     */
+    public void createDirectory() throws IOException
     {
         File pathFile = new File(getFilePath());
 
@@ -114,7 +138,7 @@ import java.util.Set;
         }
 
         FileUtils.deleteDirectory(pathFile);
-        return pathFile.mkdirs();
+        pathFile.mkdirs();
     }
 
     /**
@@ -160,6 +184,16 @@ import java.util.Set;
         }
     }
 
+    /**
+     * Deletes the managed relations directory associated with the current object.
+     *
+     * @return Current implementation always returns false.
+     *
+     * @throws ResponseStatusException with an internal server error if the deletion fails.
+     *
+     * @see FileUtils#deleteDirectory(File)
+     * @see #getFilePath()
+     */
     @Override
     public boolean deleteManagedRelations()
     {
