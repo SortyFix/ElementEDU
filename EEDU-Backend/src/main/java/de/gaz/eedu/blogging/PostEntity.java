@@ -3,13 +3,10 @@ package de.gaz.eedu.blogging;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
