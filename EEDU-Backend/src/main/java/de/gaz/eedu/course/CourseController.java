@@ -3,6 +3,8 @@ package de.gaz.eedu.course;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -11,16 +13,10 @@ import org.springframework.web.bind.annotation.*;
 //TODO manage access
 
 @RestController @RequestMapping("/course")
-@RequiredArgsConstructor
+@RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class CourseController extends EntityController<CourseService, CourseModel, CourseCreateModel>
 {
-    private final CourseService courseService;
-
-    @Override
-    protected @NotNull CourseService getEntityService()
-    {
-        return courseService;
-    }
+    private final CourseService service;
 
     @PostMapping("/create")
     @Override

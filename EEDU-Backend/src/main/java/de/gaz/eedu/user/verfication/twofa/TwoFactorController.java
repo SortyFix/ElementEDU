@@ -12,9 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -45,7 +44,7 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     private final TwoFactorService twoFactorService;
 
     @Override
-    protected @NotNull TwoFactorService getEntityService()
+    protected @NotNull TwoFactorService getService()
     {
         return twoFactorService;
     }
@@ -88,11 +87,11 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
         boolean hasRequired = isAuthorized(JwtTokenType.TWO_FACTOR_REQUIRED);
 
         validate((hasAdvanced || hasRequired), unauthorizedThrowable());
-        validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
+        validate(getService().enable(method, code, claims), new ResponseStatusException(HttpStatus.BAD_REQUEST));
 
         if (hasRequired) // return login token after user has setup two factor
         {
-            Optional<String> token = getEntityService().verify(method, code, claims);
+            Optional<String> token = getService().verify(method, code, claims);
             return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
         }
         return ResponseEntity.ok(null);
@@ -114,7 +113,7 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
         validate(isAuthorized(JwtTokenType.TWO_FACTOR_PENDING), unauthorizedThrowable());
 
         TwoFactorMethod method = TwoFactorMethod.valueOf(claims.get("method", String.class));
-        Optional<String> verifyToken = getEntityService().verify(method, code, claims);
+        Optional<String> verifyToken = getService().verify(method, code, claims);
 
         return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
@@ -134,7 +133,7 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
     {
         validate(isAuthorized(JwtTokenType.TWO_FACTOR_SELECTION), unauthorizedThrowable());
 
-        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
+        AuthorizeService authorizeService = getService().getUserService().getAuthorizeService();
         return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
     }
 }

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
 {
-    @NotNull public abstract R getRepository();
+    @NotNull protected abstract R getRepository();
 
     /**
      * Loads an entity {@link E} by its id.

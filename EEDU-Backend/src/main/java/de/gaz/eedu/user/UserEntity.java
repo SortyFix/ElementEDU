@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +60,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     private boolean systemAccount;
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     private Set<TwoFactorEntity> twoFactors = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
     private ThemeEntity themeEntity;
@@ -414,8 +412,24 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     }
 
     @Override public String toString()
-    { // Automatically generated using intellij
-        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+    {
+        return "UserEntity{" +
+                "courses=" + courses +
+                ", status=" + status +
+                ", illnessNotificationEntities=" + illnessNotificationEntities +
+                ", id=" + id +
+                ", systemAccount=" + systemAccount +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", locked=" + locked +
+                ", twoFactors=" + twoFactors +
+                ", themeEntity=" + themeEntity +
+                ", groups=" + groups +
+                ", classRoom=" + classRoom +
+                '}';
     }
 
     @Override public boolean equals(Object object)

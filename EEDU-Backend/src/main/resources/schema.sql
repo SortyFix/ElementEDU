@@ -169,6 +169,16 @@ CREATE TABLE IF NOT EXISTS course_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
+CREATE TABLE IF NOT EXISTS course_appointment
+(
+    id        BIGINT PRIMARY KEY AUTO_INCREMENT,
+    week_day  TINYINT NOT NULL,
+    start     BIGINT  NOT NULL,
+    course_id BIGINT  NOT NULL,
+    duration  NUMERIC NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES course_entity (id)
+);
+
 CREATE TABLE IF NOT EXISTS course_users
 (
     course_id BIGINT NOT NULL,

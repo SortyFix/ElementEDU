@@ -22,16 +22,10 @@ import java.util.List;
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
 public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
-    @Getter(AccessLevel.NONE) private final CourseRepository courseRepository;
+    private final CourseRepository repository;
     private final SubjectService subjectService;
-
     private final UserRepository userRepository;
     private final ClassRoomRepository classRoomRepository;
-
-    @Override public @NotNull CourseRepository getRepository()
-    {
-        return courseRepository;
-    }
 
     @Transactional @Override public @NotNull CourseEntity createEntity(
             @NotNull CourseCreateModel model) throws CreationException

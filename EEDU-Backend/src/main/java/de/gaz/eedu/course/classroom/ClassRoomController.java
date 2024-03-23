@@ -25,7 +25,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
 
     @Getter(AccessLevel.PROTECTED) private final UserService userService;
 
-    @Override protected @NotNull ClassRoomService getEntityService()
+    @Override protected @NotNull ClassRoomService getService()
     {
         return userService.getClassRoomService();
     }
@@ -34,17 +34,17 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
     {
         LOGGER.info("Received incoming request for attaching user(s) {} from classroom {}.", users, classId);
 
-        ClassRoomEntity classRoom = getEntityService().loadEntityByIDSafe(classId);
+        ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classId);
         UserEntity[] userArray = getUserService().loadEntityById(users).toArray(UserEntity[]::new);
 
-        return classRoom.attachStudents(getEntityService(), userArray) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return classRoom.attachStudents(getService(), userArray) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     @GetMapping("/detach/{classId}") public @NotNull HttpStatus detachUser(@NotNull @PathVariable Long classId, @NotNull @RequestBody Long... users)
     {
         LOGGER.info("Received incoming request for detaching user(s) {} from classroom {}.", users, classId);
-        ClassRoomEntity classRoom = getEntityService().loadEntityByIDSafe(classId);
-        return classRoom.detachStudents(getEntityService(), users) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classId);
+        return classRoom.detachStudents(getService(), users) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel> create(@NotNull @RequestBody ClassRoomCreateModel model)

@@ -53,7 +53,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
 
         // add classroom to courses after entity was saved.
         // assign courses
-        List<CourseEntity> courseEntities = getCourseService().getRepository().findAllById(List.of(model.courses()));
+        Set<CourseEntity> courseEntities = getCourseService().loadEntityById(model.courses());
         courseEntities.forEach(courseEntity -> courseEntity.assignClassRoom(classRoomEntity));
         getCourseService().saveEntity(courseEntities);
 

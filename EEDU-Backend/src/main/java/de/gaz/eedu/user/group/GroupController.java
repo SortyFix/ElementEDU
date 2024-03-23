@@ -19,7 +19,7 @@ public class GroupController extends EntityController<GroupService,
     private final GroupService groupService;
 
     @Override
-    protected @NotNull GroupService getEntityService()
+    protected @NotNull GroupService getService()
     {
         return groupService;
     }

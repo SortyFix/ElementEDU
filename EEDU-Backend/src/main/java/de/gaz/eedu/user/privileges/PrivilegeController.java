@@ -16,7 +16,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
     private final PrivilegeService privilegeService;
 
     @Override
-    protected @NotNull PrivilegeService getEntityService()
+    protected @NotNull PrivilegeService getService()
     {
         return privilegeService;
     }

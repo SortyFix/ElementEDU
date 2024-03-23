@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Slf4j
 @AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
 {
-    protected abstract @NotNull S getEntityService();
+    protected abstract @NotNull S getService();
 
     /**
      * This method is responsible for creating a new entity based on the provided model.
@@ -42,7 +42,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
-            return ResponseEntity.status(HttpStatus.CREATED).body(getEntityService().create(model));
+            return ResponseEntity.status(HttpStatus.CREATED).body(getService().create(model));
         }
         catch (CreationException creationException)
         {
@@ -62,7 +62,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
     public @NotNull Boolean delete(@NotNull Long id)
     {
         log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getEntityService().delete(id);
+        return getService().delete(id);
     }
 
     /**
@@ -82,7 +82,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return getService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     protected boolean isAuthorized(@NotNull String authority)
