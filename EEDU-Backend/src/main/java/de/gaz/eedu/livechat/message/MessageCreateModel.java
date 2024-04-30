@@ -16,12 +16,6 @@ public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @
     }
 
     @Override
-    public @NotNull String name()
-    {
-        return System.currentTimeMillis() + " " + authorId();
-    }
-
-    @Override
     public @NotNull MessageEntity toEntity(@NotNull MessageEntity messageEntity)
     {
         return messageEntity;

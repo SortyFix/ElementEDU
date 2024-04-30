@@ -11,10 +11,6 @@ import org.jetbrains.annotations.NotNull;
 public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName, @NotNull String password,
                               @NotNull Boolean enabled, @NotNull Boolean locked, @NotNull UserStatus status, @NotNull Long theme, @NotNull Long[] groups) implements CreationModel<UserEntity>
 {
-    @Override public @NotNull String name()
-    {
-        return loginName;
-    }
 
     @Override public @NotNull UserEntity toEntity(@NotNull UserEntity userEntity)
     {

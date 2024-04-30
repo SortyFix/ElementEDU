@@ -2,8 +2,10 @@ package de.gaz.eedu.course.appointment;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.model.CourseAppointmentModel;
+import de.gaz.eedu.course.appointment.n.AppointmentEntryEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,7 +16,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Setter @Entity @Getter @NoArgsConstructor
 public class CourseAppointmentEntity implements EntityModelRelation<CourseAppointmentModel>
@@ -26,6 +30,10 @@ public class CourseAppointmentEntity implements EntityModelRelation<CourseAppoin
     private WeekDay weekDay;
     private Duration duration;
 
+    @OneToMany(mappedBy = "course_appointment_id") @JsonManagedReference
+    @Getter(AccessLevel.NONE)
+    private final Set<AppointmentEntryEntity> entries = new HashSet<>();
+
     @Override public @NotNull CourseAppointmentModel toModel()
     {
         return new CourseAppointmentModel(getId(), getWeekDay(), getStart(), getDuration());
@@ -34,6 +42,26 @@ public class CourseAppointmentEntity implements EntityModelRelation<CourseAppoin
     @Contract(pure = true, value = "-> new") @Override public @NotNull String toString()
     {
         return "CourseAppointmentEntity{" + "id=" + id + ", weekDay=" + weekDay + ", course=" + course + ", start=" + start + ", duration=" + duration + '}';
+    }
+
+    public boolean setAppointmentEntry(@NotNull CourseAppointmentService service, @NotNull AppointmentEntryEntity entry)
+    {
+        if(setAppointmentEntry(entry))
+        {
+            service.saveEntity(this);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setAppointmentEntry(@NotNull AppointmentEntryEntity entry)
+    {
+        return entries.add(entry);
+    }
+
+    public @NotNull AppointmentEntryEntity[] getEntries()
+    {
+        return entries.toArray(AppointmentEntryEntity[]::new);
     }
 
     @Override public boolean equals(Object object)
