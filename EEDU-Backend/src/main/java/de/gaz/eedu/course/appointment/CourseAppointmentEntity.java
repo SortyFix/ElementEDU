@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.model.CourseAppointmentModel;
-import de.gaz.eedu.course.appointment.n.AppointmentEntryEntity;
+import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

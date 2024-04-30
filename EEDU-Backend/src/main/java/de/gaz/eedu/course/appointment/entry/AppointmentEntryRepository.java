@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.appointment.n;
+package de.gaz.eedu.course.appointment.entry;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

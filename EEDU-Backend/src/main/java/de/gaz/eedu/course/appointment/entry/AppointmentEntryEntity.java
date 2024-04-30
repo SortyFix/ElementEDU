@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.appointment.n;
+package de.gaz.eedu.course.appointment.entry;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.appointment.CourseAppointmentEntity;
