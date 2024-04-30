@@ -7,10 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 public record CourseAppointmentCreateModel(@NotNull WeekDay weekDay, @NotNull Long course) implements CreationModel<CourseAppointmentEntity>
 {
-    @Override public @NotNull String name()
-    {
-        throw new UnsupportedOperationException();
-    }
 
     @Override public @NotNull CourseAppointmentEntity toEntity(@NotNull CourseAppointmentEntity entity)
     {

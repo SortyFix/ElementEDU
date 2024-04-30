@@ -8,12 +8,6 @@ import org.jetbrains.annotations.NotNull;
 public record TwoFactorCreateModel(@NotNull Long userID, @NotNull String method,
                                    @NotNull String data) implements CreationModel<TwoFactorEntity>
 {
-
-    @Override public @NotNull String name()
-    {
-        return method;
-    }
-
     @Override public @NotNull TwoFactorEntity toEntity(@NotNull TwoFactorEntity entity)
     {
         entity.setEnabled(false);
