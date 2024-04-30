@@ -30,7 +30,7 @@ public class CourseAppointmentEntity implements EntityModelRelation<CourseAppoin
     private WeekDay weekDay;
     private Duration duration;
 
-    @OneToMany(mappedBy = "course_appointment_id") @JsonManagedReference
+    @OneToMany(mappedBy = "courseAppointment") @JsonManagedReference
     @Getter(AccessLevel.NONE)
     private final Set<AppointmentEntryEntity> entries = new HashSet<>();
 
