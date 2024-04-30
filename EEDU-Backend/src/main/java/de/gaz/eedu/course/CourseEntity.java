@@ -7,6 +7,7 @@ import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.persistence.*;
@@ -46,6 +47,9 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE)
     private final Set<CourseAppointmentEntity> courseAppointmentEntities = new HashSet<>();
 
+    @ManyToOne @JoinColumn(name = "repository", referencedColumnName = "id", unique = true)
+    private FileEntity repository;
+
     @Override public CourseModel toModel()
     {
         return new CourseModel(getId(),
@@ -56,12 +60,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
                 CourseAppointmentModel[]::new));
     }
 
-    public boolean setAppointment(@NotNull CourseService courseService, @NotNull CourseAppointmentEntity... courseAppointmentEntity)
+    public boolean addAppointment(@NotNull CourseService courseService, @NotNull CourseAppointmentEntity... courseAppointmentEntity)
     {
-        return saveEntityIfPredicateTrue(courseService, courseAppointmentEntity, this::setAppointment);
+        return saveEntityIfPredicateTrue(courseService, courseAppointmentEntity, this::addAppointment);
     }
 
-    public boolean setAppointment(@NotNull CourseAppointmentEntity... courseAppointmentEntity)
+    public boolean addAppointment(@NotNull CourseAppointmentEntity... courseAppointmentEntity)
     {
         Predicate<CourseAppointmentEntity> notPart = current -> !Objects.equals(this, current.getCourse());
         return courseAppointmentEntities.addAll(Arrays.stream(courseAppointmentEntity).filter(notPart).toList());

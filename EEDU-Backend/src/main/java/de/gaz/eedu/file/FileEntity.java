@@ -93,12 +93,12 @@ import java.util.Set;
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
-    public boolean uploadBatch(@NotNull MultipartFile... batch) throws IOException
+    public boolean uploadBatch(String directory, @NotNull MultipartFile... batch) throws IOException
     {
         Arrays.stream(batch).forEach(file ->
         {
             String fileName = Objects.requireNonNull(file.getName());
-            File storageFile = new File(getFilePath(), fileName);
+            File storageFile = new File(getFilePath(directory), fileName);
 
             try
             {
@@ -128,9 +128,9 @@ import java.util.Set;
      *
      * @throws IOException
      */
-    public void createDirectory() throws IOException
+    public void createDirectory(String directory) throws IOException
     {
-        File pathFile = new File(getFilePath());
+        File pathFile = new File(getFilePath(directory));
 
         if(pathFile.isFile())
         {

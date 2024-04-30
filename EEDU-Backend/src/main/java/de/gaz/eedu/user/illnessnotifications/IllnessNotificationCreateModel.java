@@ -25,13 +25,6 @@ public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull Stri
         return Objects.hash(userId, timestamp, reason);
     }
 
-    // Please check this. I'm not sure here.
-    @Override
-    public @NotNull String name()
-    {
-        return reason + " " + timestamp();
-    }
-
     @Override
     public @NotNull IllnessNotificationEntity toEntity(@NotNull IllnessNotificationEntity entity)
     {
