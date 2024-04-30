@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     last_name      VARCHAR(255) NULL,
     login_name     VARCHAR(255) NULL,
     password       VARCHAR(255) NULL,
-    system_account BIT      NOT NULL,
+    system_account BIT          NOT NULL,
     enabled        BIT          NOT NULL,
     locked         BIT          NOT NULL,
     theme_id       BIGINT       NULL,
@@ -62,17 +62,17 @@ CREATE TABLE IF NOT EXISTS two_factor_entity
 -- The 'illness_notification_entity' table keeps a record of all illness notifications sent by users. This includes a unique notification id, the user id of the sender, the reason for the notification and its status.
 CREATE TABLE IF NOT EXISTS file_entity
 (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id       BIGINT       NULL,
-    file_name       VARCHAR(255) NULL,
-    data_directory  VARCHAR(255) NOT NULL
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id      BIGINT       NULL,
+    file_name      VARCHAR(255) NULL,
+    data_directory VARCHAR(255) NOT NULL
 );
 
 -- The 'two_factor_entity' table keeps track of users' two-factor authentication settings.
 CREATE TABLE IF NOT EXISTS file_user_privileges
 (
-    file_id     BIGINT NOT NULL,
-    privilege   VARCHAR(255) NOT NULL,
+    file_id   BIGINT       NOT NULL,
+    privilege VARCHAR(255) NOT NULL,
     FOREIGN KEY (file_id) REFERENCES file_entity (id)
 );
 
@@ -88,12 +88,12 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 CREATE TABLE IF NOT EXISTS illness_notification_entity
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id         BIGINT NOT NULL,
-    status          TINYINT NOT NULL,
+    user_id         BIGINT       NOT NULL,
+    status          TINYINT      NOT NULL,
     reason          VARCHAR(255) NOT NULL,
-    time_stamp      BIGINT NOT NULL,
-    expiration_time BIGINT NOT NULL,
-    file_entity_id BIGINT NOT NULL,
+    time_stamp      BIGINT       NOT NULL,
+    expiration_time BIGINT       NOT NULL,
+    file_entity_id  BIGINT       NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES user_entity (id),
     FOREIGN KEY (file_entity_id) REFERENCES file_entity (id)
@@ -164,12 +164,13 @@ CREATE TABLE IF NOT EXISTS course_entity
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
     name          VARCHAR(255) NOT NULL,
     subject_id    BIGINT       NOT NULL,
+    repository_id BIGINT       NOT NULL,
     class_room_id BIGINT       NULL,
     FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
-CREATE TABLE IF NOT EXISTS course_appointment
+CREATE TABLE IF NOT EXISTS course_appointment_entity
 (
     id        BIGINT PRIMARY KEY AUTO_INCREMENT,
     week_day  TINYINT NOT NULL,
@@ -177,6 +178,15 @@ CREATE TABLE IF NOT EXISTS course_appointment
     course_id BIGINT  NOT NULL,
     duration  NUMERIC NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id)
+);
+
+CREATE TABLE IF NOT EXISTS appointment_entry_entity
+(
+    id                    BIGINT PRIMARY KEY,
+    description           VARCHAR(255) NULL,
+    homework              VARCHAR(255) NULL,
+    course_appointment_id BIGINT       NOT NULL,
+    FOREIGN KEY (course_appointment_id) REFERENCES course_appointment_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS course_users
@@ -190,8 +200,8 @@ CREATE TABLE IF NOT EXISTS course_users
 
 CREATE TABLE IF NOT EXISTS class_room_users
 (
-    class_room_id  BIGINT NOT NULL,
-    user_id  BIGINT NOT NULL,
+    class_room_id BIGINT NOT NULL,
+    user_id       BIGINT NOT NULL,
     PRIMARY KEY (class_room_id, user_id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE

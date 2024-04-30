@@ -47,7 +47,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE)
     private final Set<CourseAppointmentEntity> courseAppointmentEntities = new HashSet<>();
 
-    @ManyToOne @JoinColumn(name = "repository", referencedColumnName = "id", unique = true)
+    @ManyToOne @JoinColumn(name = "repository_id", referencedColumnName = "id", unique = true)
     private FileEntity repository;
 
     @Override public CourseModel toModel()
