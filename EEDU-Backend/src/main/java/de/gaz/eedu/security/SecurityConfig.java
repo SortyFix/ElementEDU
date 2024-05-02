@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -22,8 +23,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
     @Bean public @NotNull SecurityFilterChain filterChain(@NotNull HttpSecurity http) throws Exception
     {
-        http.csrf(AbstractHttpConfigurer::disable).addFilterBefore(new JwtAuthorizationFilter(userService),
-                UsernamePasswordAuthenticationFilter.class).authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        JwtAuthorizationFilter authorizationFilter = new JwtAuthorizationFilter(userService);
+        HttpSecurity security = http.csrf(AbstractHttpConfigurer::disable);
+        security.addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class).authorizeHttpRequests(auth ->
+        {
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl registry = auth.anyRequest();
+            registry.permitAll();
+        });
 
         return http.build();
     }
