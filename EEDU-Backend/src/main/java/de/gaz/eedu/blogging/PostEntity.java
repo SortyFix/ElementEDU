@@ -2,7 +2,6 @@ package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
-import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +13,9 @@ import java.util.Set;
 public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
-    @ManyToOne(targetEntity = UserEntity.class)
-    @JoinColumn(name = "author_id", referencedColumnName = "id")
-    private UserEntity author;
+    private String author;
     private String title;
+    private String thumbnailURL;
     private String body;
     private Long timeOfCreation;
     @ElementCollection(fetch = FetchType.EAGER)
@@ -46,7 +44,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     @Override
     public PostModel toModel()
     {
-        return new PostModel(id, author.getId(), title, body, timeOfCreation,
+        return new PostModel(id, author, title, thumbnailURL, body, timeOfCreation,
                 privileges.toArray(String[]::new), tags.toArray(String[]::new));
     }
 }

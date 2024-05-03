@@ -21,8 +21,6 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     @Override
     public @NotNull PostEntity createEntity(@NotNull PostCreateModel model) throws CreationException
     {
-        PostEntity entity = model.toEntity(new PostEntity());
-        entity.setAuthor(userService.loadEntityByIDSafe(model.authorId()));
-        return entity;
+        return model.toEntity(new PostEntity());
     }
 }

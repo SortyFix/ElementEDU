@@ -190,11 +190,11 @@ CREATE TABLE IF NOT EXISTS class_room_users
 CREATE TABLE IF NOT EXISTS post_entity
 (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    author_id BIGINT NOT NULL,
+    author VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
+    thumbnailurl VARCHAR(255) NOT NULL,
     body VARCHAR(255) NOT NULL,
-    time_of_creation BIGINT NOT NULL,
-    FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
+    time_of_creation BIGINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS post_user_privileges
