@@ -25,8 +25,11 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     private String body;
     private Long timeOfCreation;
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "post_user_privileges", joinColumns = @JoinColumn(name = "post_id"))
-    private Set<String> privileges;
+    @CollectionTable(name = "post_user_read_privileges", joinColumns = @JoinColumn(name = "post_id"))
+    private Set<String> readPrivileges;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "post_user_edit_privileges", joinColumns = @JoinColumn(name = "post_id"))
+    private Set<String> editPrivileges;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
     private Set<String> tags;
@@ -36,15 +39,13 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PostEntity that = (PostEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(author, that.author) && Objects.equals(title,
-                that.title) && Objects.equals(body, that.body) && Objects.equals(timeOfCreation,
-                that.timeOfCreation) && Objects.equals(privileges, that.privileges) && Objects.equals(tags, that.tags);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(id, author, title, body, timeOfCreation, privileges, tags);
+        return Objects.hash(id, author, title, body, timeOfCreation, readPrivileges, editPrivileges, tags);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
             byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));
             String encodedThumbnail = Base64.getEncoder().encodeToString(fileContent);
             return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
-                    privileges.toArray(String[]::new), tags.toArray(String[]::new));
+                    readPrivileges.toArray(String[]::new), editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
         }
         catch(IOException ioException)
         {

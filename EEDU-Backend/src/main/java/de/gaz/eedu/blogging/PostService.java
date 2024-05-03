@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 @RequiredArgsConstructor
 public class PostService extends EntityService<PostRepository, PostEntity, PostModel, PostCreateModel>
 {
@@ -26,12 +29,41 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         return model.toEntity(new PostEntity());
     }
 
+    public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
+    {
+        return userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getReadPrivileges());
+    }
+
+    public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
+    {
+        return userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getEditPrivileges());
+    }
+
     public @NotNull PostModel getModel(@NotNull Long userId, @NotNull Long postId)
     {
-        if(userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getPrivileges()))
+        if(userHasReadAuthority(userId, postId))
         {
             return postRepository.getReferenceById(postId).toModel();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found: " + postId);
+    }
+
+    public @NotNull PostModel editModel(@NotNull Long userId, @NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String thumbnailURL, @NotNull String body,
+            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    {
+        if(userHasEditAuthority(userId, postId))
+        {
+            PostEntity postEntity = getRepository().getReferenceById(postId);
+            postEntity.setAuthor(author);
+            postEntity.setTitle(title);
+            postEntity.setThumbnailURL(thumbnailURL);
+            postEntity.setBody(body);
+            postEntity.setReadPrivileges(new HashSet<>(Arrays.asList(readPrivileges)));
+            postEntity.setEditPrivileges(new HashSet<>(Arrays.asList(editPrivileges)));
+            postEntity.setTags(new HashSet<>(Arrays.asList(tags)));
+            postRepository.save(postEntity);
+            return postEntity.toModel();
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }

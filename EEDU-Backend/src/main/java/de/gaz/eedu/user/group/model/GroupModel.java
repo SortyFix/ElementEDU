@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.group.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
-import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,6 +12,7 @@ import java.util.Objects;
 
 public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
                          @NotNull Boolean requiresTwoFactor,
+                         @NotNull Boolean canPost,
                          @NotNull SimpleUserModel[] users,
                          @NotNull SimplePrivilegeModel[] privileges) implements EntityModel
 {

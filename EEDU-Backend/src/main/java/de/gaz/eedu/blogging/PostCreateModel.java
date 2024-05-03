@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public record PostCreateModel(@NotNull String author, @NotNull String title, @NotNull String thumbnailURL, @NotNull String body,
-                              @NotNull String[] privileges, @NotNull String[] tags) implements CreationModel<PostEntity>
+                              @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags) implements CreationModel<PostEntity>
 {
 
     @Override
@@ -23,7 +23,8 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         entity.setBody(body());
         entity.setAuthor(author());
         entity.setThumbnailURL(thumbnailURL());
-        entity.setPrivileges(Arrays.stream(privileges()).collect(Collectors.toSet()));
+        entity.setReadPrivileges(Arrays.stream(readPrivileges()).collect(Collectors.toSet()));
+        entity.setEditPrivileges(Arrays.stream(editPrivileges()).collect(Collectors.toSet()));
         entity.setTimeOfCreation(System.currentTimeMillis());
         entity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         return entity;

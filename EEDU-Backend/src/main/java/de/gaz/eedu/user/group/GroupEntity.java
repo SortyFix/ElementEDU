@@ -44,6 +44,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
     private boolean twoFactorRequired;
+    private boolean ableToPost;
 
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.PRIVATE)
     private Set<UserEntity> users = new HashSet<>();
@@ -83,6 +84,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
         return new GroupModel(getId(),
                 getName(),
                 isTwoFactorRequired(),
+                isAbleToPost(),
                 getUsers().stream().map(UserEntity::toSimpleModel).toArray(SimpleUserModel[]::new),
                 getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).toArray(SimplePrivilegeModel[]::new));
     }
