@@ -7,10 +7,9 @@ public class MaliciousFileException extends ResponseStatusException
 {
     private String path;
 
-    public MaliciousFileException(String path)
+    public MaliciousFileException(String path, Throwable cause)
     {
-        this(HttpStatus.BAD_GATEWAY, path);
+        super(HttpStatus.BAD_GATEWAY, null, cause);
+        this.path = path;
     }
-
-    public MaliciousFileException(HttpStatus status, String path) {super(status);}
 }

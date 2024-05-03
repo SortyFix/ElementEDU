@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
 @Slf4j
-public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
+public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
 {
     @NotNull public abstract R getRepository();
 
@@ -145,6 +145,8 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
     {
         return getRepository().findById(id).map(entry ->
         {
+            validate(entry.isDeletable(), unauthorizedThrowable());
+
             String entityName = entry.getClass().getSimpleName();
             log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
@@ -217,6 +219,17 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * This method creates a {@link Function} turning a {@link M} into an {@link E}.
      * Note that most likely, it will just the id to load the current entity from the database instead of actually
      * translating it. Therefore, it has the {@link Transactional} annotation.
+     * <p>
+     * Example Usage:
+     * <pre>
+     * {@code
+     * EntityService service = new SomeServiceImplementation();
+     * M model = new SomeM();
+     *
+     * E translated = service.toEntity().apply(model)
+     * }
+     * </pre>
+     * </p>
      *
      * @return a function for transforming a {@link M} into a {@link E}
      * @see Function

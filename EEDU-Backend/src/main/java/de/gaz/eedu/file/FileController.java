@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
     }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}") public ResponseEntity<ByteArrayResource> downloadFileWithID(
-            @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
+            @AuthenticationPrincipal Long userId, @PathVariable Long fileId) throws IOException
     {
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
         if (fileService.getRepository().findById(fileId).map(access).orElse(false))

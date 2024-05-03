@@ -11,12 +11,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public record PrivilegeCreateModel(@NotNull String name,
-                                   @NotNull GroupEntity[] groupEntities) implements CreationModel<PrivilegeEntity>
+                                   @NotNull Long[] groupEntities) implements CreationModel<PrivilegeEntity>
 {
     @Override public @NotNull PrivilegeEntity toEntity(@NotNull PrivilegeEntity privilegeEntity)
     {
         privilegeEntity.setName(name().toUpperCase()); // Make privileges always uppercase
-        privilegeEntity.setGroupEntities(Arrays.stream(groupEntities).collect(Collectors.toSet()));
         return privilegeEntity;
     }
 

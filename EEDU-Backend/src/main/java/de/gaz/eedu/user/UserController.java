@@ -53,21 +53,17 @@ import java.util.function.Function;
         return super.create(model);
     }
 
-    @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or (#id == authentication.principal)") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        if (!isAuthorized(SecurityContextHolder.getContext().getAuthentication(), JwtTokenType.AUTHORIZED))
-        {
-            throw unauthorizedThrowable();
-        }
+        validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
         return super.getData(id);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
     @PermitAll
     @PostMapping("/login")
     public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel loginModel)
@@ -80,20 +76,20 @@ import java.util.function.Function;
     public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
     {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
-        if (getEntityService().loadEntityById(userID).map(isAllowed).orElse(false))
+
+        validate(getEntityService().loadEntityById(userID).map(isAllowed).orElse(false), () ->
         {
-            return login(loginModel);
-        }
-        log.warn("A user tried to access the advanced token of another user. The request has been rejected.");
-        throw unauthorizedThrowable();
+            log.warn("A user tried to access the advanced token of another user. The request has been rejected.");
+            return unauthorizedThrowable();
+        });
+
+        return login(loginModel);
+
     }
 
-    private @NotNull ResponseEntity<String> login(@NotNull LoginModel userLoginModel)
+    private @NotNull ResponseEntity<String> login(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
-
-        return getEntityService().login(userLoginModel)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null));
+        return getEntityService().login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 }

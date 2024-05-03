@@ -11,20 +11,21 @@ import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
+import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
-@Component @RequiredArgsConstructor @Slf4j public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
     private final GroupService groupService;
@@ -50,40 +51,18 @@ import java.security.SecureRandom;
      * It creates the following objects: A user named root, a group named admin and a privilege named ADMIN.
      * This {@link PrivilegeEntity} can then be added to the {@link GroupEntity}. Then the {@link UserEntity} is
      * attached to the admin group.
-     * <p>
-     * TODO implement two factor, so this account can be secured right after it gets accessed
      */
     private void createDefaultUser()
     {
         String randomPassword = randomPassword(15);
-        ThemeCreateModel themeCreateModel = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000);
-        UserCreateModel userCreateModel = new UserCreateModel("root",
-                "root",
-                "root",
-                randomPassword,
-                true,
-                false,
-                UserStatus.PROSPECTIVE);
-        GroupCreateModel groupCreateModel = new GroupCreateModel("admin", true, new Long[0], new Long[0]);
-        PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("ADMIN", new GroupEntity[0]);
 
-        themeService.getRepository().findByName(themeCreateModel.name())
-                .orElseGet(() -> themeService.createEntity(themeCreateModel));
+        PrivilegeEntity privilegeEntity = createDefaultPrivilege();
+        GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
+        UserEntity userEntity = createDefaultUser(randomPassword, createDefaultTheme(), groupEntity);
 
-        PrivilegeEntity privilegeEntity = privilegeService.getRepository().findByName(privilegeCreateModel.name())
-                .orElseGet(() -> privilegeService.createEntity(privilegeCreateModel));
-        GroupEntity groupEntity = groupService.getRepository().findByName(groupCreateModel.name())
-                .orElseGet(() -> groupService.createEntity(groupCreateModel));
-        UserEntity userEntity = userService.createEntity(userCreateModel);
-        groupEntity.grantPrivilege(groupService, privilegeEntity);
-        if (!userEntity.attachGroups(userService, groupEntity))
-        {
-            throw new IllegalStateException(
-                    "The system was not able to attach the admin group to the default user. This is very unusual behaviour. Please consider rechecking all information.");
-        }
         log.info("A default user has been created");
         log.info("-".repeat(20));
-        log.info("USERNAME: {}", "root");
+        log.info("USERNAME: {}", userEntity.getLoginName());
         log.info("PASSWORD: {}", randomPassword);
         log.info("-".repeat(20));
 
@@ -91,6 +70,33 @@ import java.security.SecureRandom;
         {
             log.warn("It's advised to change the password as soon as possible.");
         }
+    }
+
+    private @NotNull PrivilegeEntity createDefaultPrivilege()
+    {
+        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
+        return getPrivilegeService().createEntity(privilege);
+    }
+
+    private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
+    {
+        GroupCreateModel group = new GroupCreateModel("admin", true, new Long[0], new Long[] {privilegeEntity.getId()});
+        return getGroupService().createEntity(group);
+    }
+
+    private @NotNull ThemeEntity createDefaultTheme()
+    {
+        ThemeCreateModel theme = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000); //TODO use real values
+        return getThemeService().createEntity(theme);
+    }
+
+    private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    {
+        // long line -.-
+        UserCreateModel user = new UserCreateModel("root", "root", "root", password, true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
+        UserEntity userEntity = getUserService().createEntity(user);
+        userEntity.setSystemAccount(true);
+        return getUserService().saveEntity(userEntity);
     }
 
     @SuppressWarnings({

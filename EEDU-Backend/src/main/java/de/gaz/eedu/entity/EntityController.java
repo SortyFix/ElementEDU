@@ -5,22 +5,18 @@ import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Slf4j
-@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>>
+@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
 {
     protected abstract @NotNull S getEntityService();
 
@@ -89,36 +85,26 @@ import org.springframework.web.server.ResponseStatusException;
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull String authority)
+    protected boolean isAuthorized(@NotNull String authority)
     {
-        return isAuthorized(authentication, authority, SimpleGrantedAuthority.class);
+        return isAuthorized(authority, SimpleGrantedAuthority.class);
     }
 
-    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
+    protected boolean isAuthorized(@NotNull JwtTokenType jwtTokenType)
     {
-        return authentication.getAuthorities()
-                .stream()
-                .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
+        return isAuthorized(jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
     }
 
-    /**
-     * Checks whether a request has a certain authority.
-     * <p>
-     * This method references the {@link #isAuthorized(Authentication, String, Class)} and checks
-     * if a user has a permission based on a {@link JwtTokenType}.
-     *
-     * @param authentication the current requests authentication
-     * @param jwtTokenType   the token that the authentication should have to be authorized
-     * @return whether a {@link Authentication} has the given token type authority
-     */
-    protected boolean isAuthorized(@NotNull Authentication authentication, @NotNull JwtTokenType jwtTokenType)
+    protected boolean isAuthorized(@NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
     {
-        return isAuthorized(authentication, jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
+        return getAuthentication().getAuthorities()
+                                  .stream()
+                                  .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
+                                  .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
-    protected @NotNull ResponseStatusException unauthorizedThrowable()
+    private @NotNull Authentication getAuthentication()
     {
-        return new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

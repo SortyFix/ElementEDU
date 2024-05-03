@@ -59,6 +59,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
+    private boolean systemAccount;
     private String firstName, lastName, loginName, password;
     private boolean enabled, locked;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
@@ -71,7 +72,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
-
     public @NotNull SimpleUserModel toSimpleModel()
     {
         return new SimpleUserModel(getId(),
@@ -82,6 +82,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 isLocked(),
                 getThemeEntity().toSimpleModel(),
                 getStatus());
+    }
+
+    @Override public boolean isDeletable()
+    {
+        return !systemAccount;
     }
 
     @Override public UserModel toModel()
