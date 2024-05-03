@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public record PostModel(@NotNull Long id, @NotNull String author, @NotNull String title,
-                        @NotNull String thumbnailURL, @NotNull String body, @NotNull Long timeOfCreation, @NotNull String[] privileges,
+                        @NotNull String thumbnailBlob, @NotNull String body, @NotNull Long timeOfCreation, @NotNull String[] privileges,
                         @NotNull String[] tags) implements EntityModel
 {
     @Override public boolean equals(Object o)

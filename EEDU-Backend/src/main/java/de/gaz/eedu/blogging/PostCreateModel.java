@@ -24,6 +24,7 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         entity.setAuthor(author());
         entity.setThumbnailURL(thumbnailURL());
         entity.setPrivileges(Arrays.stream(privileges()).collect(Collectors.toSet()));
+        entity.setTimeOfCreation(System.currentTimeMillis());
         entity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         return entity;
     }

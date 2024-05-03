@@ -5,7 +5,13 @@ import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,8 +50,17 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     @Override
     public PostModel toModel()
     {
-        return new PostModel(id, author, title, thumbnailURL, body, timeOfCreation,
-                privileges.toArray(String[]::new), tags.toArray(String[]::new));
+        try
+        {
+            byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));
+            String encodedThumbnail = Base64.getEncoder().encodeToString(fileContent);
+            return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
+                    privileges.toArray(String[]::new), tags.toArray(String[]::new));
+        }
+        catch(IOException ioException)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Not found: " + thumbnailURL, ioException);
+        }
     }
 }
 
