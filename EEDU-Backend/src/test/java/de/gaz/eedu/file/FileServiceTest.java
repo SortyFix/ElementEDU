@@ -47,9 +47,24 @@ class FileServiceTest
         };
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
-
-        assertTrue(fileEntity.uploadBatch(batch));
+        assertDoesNotThrow(() -> fileEntity.uploadBatch("", batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
+    }
+
+    @Test
+    @Transactional
+    public void testBatchUploadToSubdirectory() throws Exception
+    {
+        String subdirectory = "testdir";
+        MockMultipartFile[] batch = new MockMultipartFile[]{
+                new MockMultipartFile("batchfile1.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
+                new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
+                new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
+        };
+        FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+        assertDoesNotThrow(() -> fileEntity.uploadBatch(subdirectory, batch));
+        assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(subdirectory), mockMultipartFile.getOriginalFilename()))));
     }
 
     @Test
