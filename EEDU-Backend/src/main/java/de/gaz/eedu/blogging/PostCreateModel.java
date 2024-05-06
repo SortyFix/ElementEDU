@@ -34,7 +34,6 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
 
     public @NotNull Set<String> combinePrivileges()
     {
-        return Stream.concat(Arrays.stream(readPrivileges()).collect(Collectors.toSet()).stream(), Arrays.stream(editPrivileges()).collect(Collectors.toSet()).stream()).collect(
-                Collectors.toSet());
+        return Stream.concat(Arrays.stream(readPrivileges()), Arrays.stream(editPrivileges())).collect(Collectors.toSet());
     }
 }
