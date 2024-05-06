@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,8 +18,6 @@ import xyz.capybara.clamav.commands.scan.result.ScanResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -93,26 +92,26 @@ import java.util.Set;
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
-    public boolean uploadBatch(@NotNull MultipartFile... batch) throws IOException
+    public void uploadBatch(@NotNull String subdirectory, @NotNull MultipartFile @NotNull ... batch) throws MaliciousFileException
     {
-        Arrays.stream(batch).forEach(file ->
+        try
         {
-            String fileName = Objects.requireNonNull(file.getName());
-            File storageFile = new File(getFilePath(), fileName);
-
-            try
+            for(MultipartFile file : batch)
             {
+                String fileName = Objects.requireNonNull(file.getName());
+                File storageFile = new File(getFilePath(subdirectory), fileName);
+
+                createDirectory(subdirectory);
                 if (virusCheck(file.getInputStream()))
                 {
                     file.transferTo(storageFile);
                 }
             }
-            catch (IOException e) {
-                throw new MaliciousFileException(file.getName());
-            }
-        });
-
-        return true;
+        }
+        catch (IOException e)
+        {
+            throw new MaliciousFileException(subdirectory, e);
+        }
     }
 
     /**
@@ -128,16 +127,9 @@ import java.util.Set;
      *
      * @throws IOException
      */
-    public void createDirectory() throws IOException
+    public void createDirectory(@NotNull String subdirectory) throws IOException
     {
-        File pathFile = new File(getFilePath());
-
-        if(pathFile.isFile())
-        {
-            Files.delete(pathFile.toPath());
-        }
-
-        FileUtils.deleteDirectory(pathFile);
+        File pathFile = new File(getFilePath(subdirectory));
         pathFile.mkdirs();
     }
 
@@ -160,7 +152,13 @@ import java.util.Set;
      */
     public @NotNull String getFilePath()
     {
-        return String.format("%s/%s/%s/", BASE_DIRECTORY, getDataDirectory(), getId());
+        return String.format("%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId());
+    }
+
+    public @NotNull String getFilePath(@Nullable String subdirectory)
+    {
+        // TODO: Check if slash is ók
+        return String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
     }
 
     /**

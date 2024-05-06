@@ -14,12 +14,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.*;
 
 
 @Service @RequiredArgsConstructor public class FileService
 {
     private final FileRepository fileRepository;
+    private Zipper zipper;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
@@ -69,14 +70,22 @@ import java.util.List;
     }
 
     @Transactional
-    public @NotNull ByteArrayResource loadResourceById(@NotNull Long id)
+    public @NotNull ByteArrayResource loadResourceById(@NotNull Long id) throws IOException
     {
-        try
+        File directory = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        File[] files = directory.listFiles();
+
+        if (files == null || files.length == 0)
         {
-            return new ByteArrayResource(Files.readAllBytes(Path.of(String.valueOf(getRepository().findById(id).map(FileEntity::getFilePath)))));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+
+        if (files.length == 1)
+        {
+            return new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath())));
+        }
+
+        return zipper.zipBatch(files);
     }
 
     public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
@@ -87,22 +96,6 @@ import java.util.List;
     @Transactional
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        FileEntity fileEntity = getRepository().save(model.toEntity(new FileEntity()));
-
-        try
-        {
-            if(Files.exists(Path.of(fileEntity.getFilePath())))
-            {
-                return fileEntity;
-            }
-
-            fileEntity.createDirectory();
-        }
-        catch (IOException ioException)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return fileEntity;
+        return getRepository().save(model.toEntity(new FileEntity()));
     }
 }

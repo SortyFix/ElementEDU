@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
+import de.gaz.eedu.file.exception.MaliciousFileException;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
 import jakarta.transaction.Transactional;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -49,9 +49,9 @@ import java.util.List;
 
         try
         {
-            fileEntity.uploadBatch(file);
+            fileEntity.uploadBatch("", file);
         }
-        catch (IOException e)
+        catch (MaliciousFileException e)
         {
             throw new RuntimeException(e);
         }
