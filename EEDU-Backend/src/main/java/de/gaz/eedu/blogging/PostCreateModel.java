@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public record PostCreateModel(@NotNull String author, @NotNull String title, @NotNull String thumbnailURL, @NotNull String body,
                               @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags) implements CreationModel<PostEntity>
@@ -33,8 +34,7 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
 
     public @NotNull Set<String> combinePrivileges()
     {
-        Set<String> readPrivilegeSet = Arrays.stream(readPrivileges()).collect(Collectors.toSet());
-        readPrivilegeSet.addAll(Arrays.stream(editPrivileges()).collect(Collectors.toSet()));
-        return readPrivilegeSet;
+        return Stream.concat(Arrays.stream(readPrivileges()).collect(Collectors.toSet()).stream(), Arrays.stream(editPrivileges()).collect(Collectors.toSet()).stream()).collect(
+                Collectors.toSet());
     }
 }
