@@ -36,7 +36,6 @@ CREATE TABLE IF NOT EXISTS user_entity
 CREATE TABLE IF NOT EXISTS group_entity
 (
     two_factor_required BIT          NOT NULL,
-    able_to_post        BIT          NOT NULL,
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     name                VARCHAR(255) NULL
 );
@@ -201,14 +200,14 @@ CREATE TABLE IF NOT EXISTS post_entity
 CREATE TABLE IF NOT EXISTS post_user_read_privileges
 (
     post_id BIGINT NOT NULL,
-    privileges VARCHAR(255) NOT NULL,
+    read_privileges VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_user_edit_privileges
 (
     post_id BIGINT NOT NULL,
-    privileges VARCHAR(255) NOT NULL,
+    edit_privileges VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 

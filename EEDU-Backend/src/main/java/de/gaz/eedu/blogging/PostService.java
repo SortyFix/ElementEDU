@@ -2,10 +2,15 @@ package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.file.FileCreateModel;
+import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
@@ -16,6 +21,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 {
     private PostRepository postRepository;
     private UserService userService;
+
+    @Value("${blog.write}") private final String writePrivilege;
 
     @Override
     public @NotNull PostRepository getRepository()
@@ -63,6 +70,20 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
             postEntity.setTags(new HashSet<>(Arrays.asList(tags)));
             postRepository.save(postEntity);
             return postEntity.toModel();
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public @NotNull PostModel createPost(@NotNull Long userId, @NotNull String author, @NotNull String title, @NotNull MultipartFile thumbnail, @NotNull String body,
+            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    {
+        if(userService.loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
+        {
+            FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), readPrivileges, "blog", tags).toEntity(new FileEntity());
+            thumbnailFile.uploadBatch("", thumbnail);
+            return createEntity(new PostCreateModel(author, title,
+                    thumbnailFile.getFilePath(), body, readPrivileges, editPrivileges, tags)).toModel();
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
