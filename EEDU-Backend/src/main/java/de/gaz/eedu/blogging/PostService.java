@@ -36,6 +36,15 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         return model.toEntity(new PostEntity());
     }
 
+    public void deleteEntity(@NotNull Long userId, @NotNull Long postId)
+    {
+        if(userHasEditAuthority(userId, postId))
+        {
+            postRepository.delete(postRepository.getReferenceById(postId));
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
     public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
     {
         return userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getReadPrivileges());
