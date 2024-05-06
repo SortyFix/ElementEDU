@@ -36,6 +36,17 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         return model.toEntity(new PostEntity());
     }
 
+    /**
+     * Deletes a post from the database.
+     * <p>
+     *     Requires the user loaded by the given <code>userId</code>
+     *     to maintain edit authority over the requested post.
+     * </p>
+     * @param userId
+     * @param postId
+     * @throws de.gaz.eedu.exception.EntityUnknownException If post or user could not be found in the database.
+     * @throws org.springframework.web.client.HttpClientErrorException.Unauthorized If the user does not own the privileges to edit a post.
+     */
     public void deleteEntity(@NotNull Long userId, @NotNull Long postId)
     {
         if(userHasEditAuthority(userId, postId))

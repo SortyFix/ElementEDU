@@ -24,6 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
     @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete") public void deletePost(@AuthenticationPrincipal Long userId, @NotNull Long postId)
     {
-        deletePost(userId, postId);
+        postService.deleteEntity(userId, postId);
     }
 }
