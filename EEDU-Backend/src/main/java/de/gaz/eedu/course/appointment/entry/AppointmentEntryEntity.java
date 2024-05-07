@@ -16,12 +16,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.Instant;
 
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
 {
     @Setter(AccessLevel.NONE) @Id private long id;
+    private Instant timeStamp;
     private String description, homework;
+    private boolean submitHomework;
+    // might be null, if submitHome is false, or it should be valid until next appointment
+    @Nullable private Long submitUntil;
     @ManyToOne @JoinColumn(name = "course_appointment_id") @JsonBackReference
     private CourseAppointmentEntity courseAppointment;
 
@@ -32,11 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
     public void uploadHomework(@NotNull UserEntity user, @NotNull MultipartFile... files) throws MaliciousFileException
     {
-        if (!getCourseAppointment().getCourse().getUsers().contains(user))
-        {
-            String warnMessage = "Uploading files from user {} to appointment entry {}. But {} is not a part of the course.";
-            log.warn(warnMessage, user.getId(), getId(), user.getId());
-        }
+        validate(user);
 
         String uploadPath = uploadPath(user);
         FileEntity fileEntity = getCourseAppointment().getCourse().getRepository();
@@ -45,8 +50,24 @@ import org.springframework.web.multipart.MultipartFile;
         log.info("User {} has uploaded files to appointment entry {}", user.getId(), getId());
     }
 
+    private void validate(@NotNull UserEntity user)
+    {
+        if (!isSubmitHomework())
+        {
+            String errorMessage = "This homework does not need to be submitted.";
+            IllegalStateException illegalStateException = new IllegalStateException(errorMessage);
+            throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, illegalStateException);
+        }
+
+        if (!getCourseAppointment().getCourse().getUsers().contains(user))
+        {
+            String warnMessage = "Uploading files from user {} to appointment entry {}. But {} is not a part of the course.";
+            log.warn(warnMessage, user.getId(), getId(), user.getId());
+        }
+    }
+
     private @NotNull String uploadPath(@NotNull UserEntity user)
     {
-        return String.format("%s", user.getId());
+        return String.format("%s/%s", getId(), user.getId());
     }
 }

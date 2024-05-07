@@ -1,10 +1,11 @@
 package de.gaz.eedu.course.appointment;
 
 import de.gaz.eedu.course.CourseRepository;
-import de.gaz.eedu.course.appointment.model.CourseAppointmentCreateModel;
-import de.gaz.eedu.course.appointment.model.CourseAppointmentModel;
+import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
+import de.gaz.eedu.course.appointment.model.CourseAppointmentCreateModel;
+import de.gaz.eedu.course.appointment.model.CourseAppointmentModel;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,10 @@ public class CourseAppointmentService extends EntityService<CourseAppointmentRep
     @Transactional public void setAppointmentEntry(@NotNull Long appointmentId, @NotNull AppointmentEntryCreateModel entryCreateModel)
     {
         CourseAppointmentEntity appointmentEntity = loadEntityByIDSafe(appointmentId);
-        //TODO
+        long id = (appointmentEntity.getId() + "-" + entryCreateModel.timeStamp()).hashCode();
+        AppointmentEntryEntity appointmentEntryEntity = entryCreateModel.toEntity(new AppointmentEntryEntity(id));
+        getAppointmentEntryRepository().save(appointmentEntryEntity);
+
+        appointmentEntity.setAppointmentEntry(this, appointmentEntryEntity);
     }
 }
