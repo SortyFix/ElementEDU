@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalField;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -36,21 +37,21 @@ public class CourseAppointmentEntity implements EntityModelRelation<CourseAppoin
 
     @Override public @NotNull CourseAppointmentModel toModel()
     {
-        //TODO
-        return null;
+        return new CourseAppointmentModel(getId(), getTimeStamp().getEpochSecond(), getPeriodSeconds());
     }
 
     private boolean part(@NotNull Instant timeStamp)
     {
-        if(timeStamp.isBefore(getTimeStamp()))
+        if(getTimeStamp().isAfter(timeStamp))
         {
             return false;
         }
+        return sinus(getTimeStamp().getEpochSecond()) == sinus(timeStamp.getEpochSecond());
+    }
 
-        long between = ChronoUnit.SECONDS.between(getTimeStamp(), timeStamp);
-        long period = getPeriod().get(ChronoUnit.DAYS) * 24 * 60 * 60;
-
-        return between % period == 0;
+    private double sinus(long timeStamp)
+    {
+        return Math.sin(2 * Math.PI * ((double) timeStamp / (getPeriodSeconds() * 2)));
     }
 
     @Override public String toString()
@@ -82,6 +83,11 @@ public class CourseAppointmentEntity implements EntityModelRelation<CourseAppoin
     public @NotNull AppointmentEntryEntity[] getEntries()
     {
         return entries.toArray(AppointmentEntryEntity[]::new);
+    }
+
+    public long getPeriodSeconds()
+    {
+        return this.getPeriod().getDays() * 24 * 60 * 60;
     }
 
     @Override public boolean equals(Object object)

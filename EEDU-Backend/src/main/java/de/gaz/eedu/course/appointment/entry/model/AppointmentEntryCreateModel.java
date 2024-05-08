@@ -1,5 +1,6 @@
 package de.gaz.eedu.course.appointment.entry.model;
 
+import de.gaz.eedu.InstantArgumentAdapter;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
@@ -7,10 +8,11 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
-public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable String description,
+public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Long duration, @Nullable String description,
                                           @Nullable String homework, @Nullable Boolean submitHomework,
                                           @Nullable Long submitUntil) implements CreationModel<AppointmentEntryEntity>
 {
@@ -21,7 +23,7 @@ public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Str
         entity.setHomework(homework());
         entity.setSubmitHomework(submitHomework());
         validateSubmitUntil();
-        entity.setSubmitUntil(submitUntil());
+        entity.setSubmitUntil(getSubmitUntil());
         return entity;
     }
 
@@ -43,5 +45,11 @@ public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Str
     @Override public @NotNull Boolean submitHomework()
     {
         return Objects.requireNonNullElse(submitHomework, false);
+    }
+
+    public @Nullable Instant getSubmitUntil()
+    {
+        InstantArgumentAdapter adapter = new InstantArgumentAdapter();
+        return adapter.convertToEntityAttribute(submitUntil());
     }
 }
