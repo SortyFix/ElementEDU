@@ -28,11 +28,11 @@ import java.util.Objects;
 {
     @Setter(AccessLevel.NONE) @Id private long id;
     private Instant timeStamp;
+    private Duration duration;
     private String description, homework;
     private boolean submitHomework;
     // might be null, if submitHome is false, or it should be valid until next appointment
     @Nullable private Instant submitUntil;
-    @Nullable private Duration duration;
     @ManyToOne @JoinColumn(name = "course_appointment_id") @JsonBackReference
     private CourseAppointmentEntity courseAppointment;
 
