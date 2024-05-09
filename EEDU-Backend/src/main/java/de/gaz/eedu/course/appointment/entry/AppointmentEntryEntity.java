@@ -22,7 +22,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
 {
@@ -66,7 +70,7 @@ import java.util.Objects;
         }
 
         // has expired
-        if(Instant.now().isAfter(getSubmitUntil()))
+        if (Instant.now().isAfter(getSubmitUntil()))
         {
             String errorMessage = String.format("The resource %s no longer accepts uploading files.", getId());
             throw new ResponseStatusException(HttpStatus.GONE, errorMessage);
@@ -82,9 +86,22 @@ import java.util.Objects;
 
     public @NotNull Instant getSubmitUntil()
     {
-        return Objects.requireNonNullElseGet(submitUntil, () -> {
-            // TODO implement null scenario for submitUntil & isSubmitHomework = true
-            return null;
+        return Objects.requireNonNullElseGet(submitUntil, () ->
+        {
+            Stream<AppointmentEntryEntity> stream = Arrays.stream(getCourseAppointment().getEntries());
+            List<AppointmentEntryEntity> entities = stream.sorted(Comparator.comparingLong((entity ->
+            {
+                Instant timeStamp = entity.getTimeStamp();
+                return timeStamp.getEpochSecond();
+            }))).toList();
+
+            int index = entities.indexOf(AppointmentEntryEntity.this);
+            if (index == -1)
+            {
+                //TODO error
+                return null;
+            }
+            return entities.get(index + 1).getTimeStamp(); // TODO indexoutofbounds
         });
     }
 
