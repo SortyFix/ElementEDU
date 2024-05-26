@@ -1,7 +1,8 @@
 package de.gaz.eedu.course.appointment.entry;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import de.gaz.eedu.course.appointment.CourseAppointmentEntity;
+import de.gaz.eedu.course.CourseEntity;
+import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
@@ -22,11 +23,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
 {
@@ -37,8 +33,10 @@ import java.util.stream.Stream;
     private boolean submitHomework;
     // might be null, if submitHome is false, or it should be valid until next appointment
     @Nullable private Instant submitUntil;
-    @ManyToOne @JoinColumn(name = "course_appointment_id") @JsonBackReference
-    private CourseAppointmentEntity courseAppointment;
+    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
+    private CourseEntity course;
+    @Nullable @ManyToOne @JoinColumn(name = "scheduled_appointment_id") @JsonBackReference
+    private ScheduledAppointmentEntity scheduledAppointment;
 
     public AppointmentEntryEntity(long id)
     {
@@ -53,7 +51,7 @@ import java.util.stream.Stream;
         check(user);
 
         String uploadPath = uploadPath(user);
-        FileEntity fileEntity = getCourseAppointment().getCourse().getRepository();
+        FileEntity fileEntity = getCourse().getRepository();
         fileEntity.uploadBatch(uploadPath, files);
 
         log.info("User {} has uploaded files to appointment entry {}", user.getId(), getId());
@@ -77,7 +75,7 @@ import java.util.stream.Stream;
         }
 
         // user not in course (warning)
-        if (!getCourseAppointment().getCourse().getUsers().contains(user))
+        if (!getCourse().getUsers().contains(user))
         {
             String warnMessage = "Uploading files from user {} to appointment entry {}. But {} is not a part of the course.";
             log.warn(warnMessage, user.getId(), getId(), user.getId());
@@ -86,23 +84,7 @@ import java.util.stream.Stream;
 
     public @NotNull Instant getSubmitUntil()
     {
-        return Objects.requireNonNullElseGet(submitUntil, () ->
-        {
-            Stream<AppointmentEntryEntity> stream = Arrays.stream(getCourseAppointment().getEntries());
-            List<AppointmentEntryEntity> entities = stream.sorted(Comparator.comparingLong((entity ->
-            {
-                Instant timeStamp = entity.getTimeStamp();
-                return timeStamp.getEpochSecond();
-            }))).toList();
-
-            int index = entities.indexOf(AppointmentEntryEntity.this);
-            if (index == -1)
-            {
-                //TODO error
-                return null;
-            }
-            return entities.get(index + 1).getTimeStamp(); // TODO indexoutofbounds
-        });
+        return Instant.now(); // HAHAHAHHA
     }
 
     private @NotNull String uploadPath(@NotNull UserEntity user)

@@ -170,23 +170,29 @@ CREATE TABLE IF NOT EXISTS course_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
-CREATE TABLE IF NOT EXISTS course_appointment_entity
+CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
 (
-    id        BIGINT PRIMARY KEY AUTO_INCREMENT,
-    week_day  TINYINT NOT NULL,
-    start     BIGINT  NOT NULL,
-    course_id BIGINT  NOT NULL,
-    duration  NUMERIC NOT NULL,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id  BIGINT         NOT NULL,
+    time_stamp BIGINT         NOT NULL,
+    duration   DECIMAL(21, 0) NOT NULL,
+    period     VARBINARY(255) NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
-    id                    BIGINT PRIMARY KEY,
-    description           VARCHAR(255) NULL,
-    homework              VARCHAR(255) NULL,
-    course_appointment_id BIGINT       NOT NULL,
-    FOREIGN KEY (course_appointment_id) REFERENCES course_appointment_entity (id)
+    id                       BIGINT PRIMARY KEY,
+    time_stamp               BIGINT         NOT NULL,
+    duration                 DECIMAL(21, 0) NOT NULL,
+    description              VARCHAR(255),
+    homework                 VARCHAR(255),
+    submit_homework          BOOLEAN        NOT NULL,
+    submit_until             BIGINT         NULL,
+    course_appointment_id    BIGINT         NOT NULL,
+    scheduled_appointment_id BIGINT         NULL,
+    FOREIGN KEY (course_appointment_id) REFERENCES course_entity (id),
+    FOREIGN KEY (scheduled_appointment_id) REFERENCES scheduled_appointment_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS course_users

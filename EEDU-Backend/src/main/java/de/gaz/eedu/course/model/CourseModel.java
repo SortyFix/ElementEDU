@@ -1,6 +1,6 @@
 package de.gaz.eedu.course.model;
 
-import de.gaz.eedu.course.appointment.model.CourseAppointmentModel;
+import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.user.model.UserModel;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public record CourseModel(@NotNull Long id, @NotNull String name, @NotNull SubjectModel subject,
-                          @NotNull UserModel[] users, @NotNull CourseAppointmentModel[] appointments) implements EntityModel
+                          @NotNull UserModel[] users, @NotNull ScheduledAppointmentModel[] appointments) implements EntityModel
 {
 
     @Contract(pure = true)
