@@ -33,6 +33,7 @@ import java.util.Optional;
     @Transactional public @Nullable String login(
             @NotNull UserEntity user, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
     {
+        System.out.println(hashedPassword + " -> " + loginModel.password());
         if (getPasswordEncoder().matches(loginModel.password(), hashedPassword))
         {
             return getVerificationService().loginUserToken(user, loginModel);

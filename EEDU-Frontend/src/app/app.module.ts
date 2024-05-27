@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { HttpClientModule } from "@angular/common/http";
+import {HttpClientModule, provideHttpClient, withFetch} from "@angular/common/http";
 import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
@@ -25,9 +25,11 @@ import {NgOptimizedImage} from "@angular/common";
         MatIconModule,
         HttpClientModule,
         MatButtonModule,
-        NgOptimizedImage
+        NgOptimizedImage,
     ],
-    providers: [],
+    providers: [
+        provideHttpClient(withFetch()),
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

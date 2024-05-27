@@ -2,8 +2,8 @@ plugins {
     id "com.github.node-gradle.node" version "7.0.1"
 }
 
-def nodejs = "20.5.0"
-def npm = "10.2.1"
+def nodejs = "20.9.0"
+def npm = "10.8.0"
 
 node {
     version = nodejs
