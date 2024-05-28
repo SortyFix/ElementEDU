@@ -8,19 +8,19 @@ import de.gaz.eedu.user.verfication.JwtTokenType;
 import de.gaz.eedu.user.verfication.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verfication.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -41,6 +41,7 @@ import java.util.function.Function;
         UserModel, UserCreateModel>
 {
     private final UserService userService;
+    @Value("${development:false}") private boolean development;
 
     @Override
     protected @NotNull UserService getEntityService()
@@ -58,17 +59,33 @@ import java.util.function.Function;
         return super.delete(id);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') or (#id == authentication.principal)") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
+    @PreAuthorize("isAuthenticated() and (hasAuthority('ADMIN') or (#id == authentication.principal))") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
         validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
         return super.getData(id);
     }
 
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal Long userId)
+    {
+        validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
+        return super.getData(userId);
+    }
+
     @PermitAll
     @PostMapping("/login")
-    public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel loginModel)
+    public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel loginModel, HttpServletResponse response)
     {
-        return login(loginModel);
+        return login(loginModel).map(token ->
+        {
+            Cookie cookie = new Cookie("jwtToken", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setDomain("localhost");
+            cookie.setMaxAge(loginModel.keepLoggedIn() ? (14 * 24 * 60 * 60) : (24 * 60 * 60)); // 2 Weeks or 1 day
+            response.addCookie(cookie);
+            return ResponseEntity.ok(token);
+        }).orElseThrow(this::unauthorizedThrowable);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -83,13 +100,13 @@ import java.util.function.Function;
             return unauthorizedThrowable();
         });
 
-        return login(loginModel);
+        return login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
 
     }
 
-    private @NotNull ResponseEntity<String> login(@NotNull LoginModel loginModel)
+    private @NotNull Optional<String> login(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
-        return getEntityService().login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        return getEntityService().login(loginModel);
     }
 }

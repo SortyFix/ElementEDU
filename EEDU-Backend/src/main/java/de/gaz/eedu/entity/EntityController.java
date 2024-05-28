@@ -103,7 +103,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
                                   .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
-    private @NotNull Authentication getAuthentication()
+    protected @NotNull Authentication getAuthentication()
     {
         return SecurityContextHolder.getContext().getAuthentication();
     }

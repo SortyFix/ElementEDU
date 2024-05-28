@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,7 +16,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@EnableWebSecurity @EnableMethodSecurity @EnableWebMvc @Configuration @AllArgsConstructor public class SecurityConfig
+@EnableWebSecurity @EnableMethodSecurity @EnableWebMvc @Configuration @AllArgsConstructor
+public class SecurityConfig implements WebMvcConfigurer
 {
 
     private final UserService userService;
@@ -28,14 +30,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         return http.build();
     }
 
-    @Bean public @NotNull WebMvcConfigurer corsMappingConfigurer()
+    @Override
+    public void addCorsMappings(@NotNull CorsRegistry registry)
     {
-        return new WebMvcConfigurer()
-        {
-            @Override public void addCorsMappings(@NotNull CorsRegistry registry)
-            {
-                registry.addMapping("/").allowedOrigins("*"); //TODO change in production
-            }
-        };
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowedOrigins("http://localhost:4200/")
+                .allowCredentials(true)
+                .exposedHeaders(HttpHeaders.SET_COOKIE)
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .maxAge(3600);
     }
 }
