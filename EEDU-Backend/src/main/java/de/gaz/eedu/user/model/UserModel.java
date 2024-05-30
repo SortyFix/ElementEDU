@@ -1,14 +1,13 @@
 package de.gaz.eedu.user.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
-import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.theming.SimpleThemeModel;
-import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
+import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -35,7 +34,7 @@ import java.util.Objects;
  */
 public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull String lastName,
                         @NotNull String loginName, @NotNull Boolean enabled, @NotNull Boolean locked,
-                        @NotNull TwoFactorModel[] twoFactor, @NotNull SimpleThemeModel theme,
+                        @NotNull CredentialModel[] twoFactor, @NotNull SimpleThemeModel theme,
                         @NotNull SimpleUserGroupModel[] groups, @NotNull UserStatus status) implements EntityModel
 {
 

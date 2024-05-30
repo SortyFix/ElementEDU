@@ -11,8 +11,8 @@ import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
-import de.gaz.eedu.user.verfication.model.UserLoginModel;
-import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
+import de.gaz.eedu.user.verification.model.UserLoginModel;
+import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -154,7 +154,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
                 "jonas.yonas",
                 true,
                 false,
-                new TwoFactorModel[0],
+                new CredentialModel[0],
                 getThemeService().loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(),
                 new SimpleUserGroupModel[0],
                 UserStatus.PRESENT);

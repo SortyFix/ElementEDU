@@ -1,0 +1,138 @@
+package de.gaz.eedu.user.verification.credentials;
+
+import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.verification.AuthorizeService;
+import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
+import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
+import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+/**
+ * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
+ * providing endpoints related to Two-Factor Authentication(2FA) for user login. It maps to the
+ * path "/user/login/twofactor" for all its endpoint methods.
+ * Class has a constructor which auto wires the {@link CredentialService} from
+ * Spring's container and delegates the service instance to its superclass {@link EntityController}
+ * The various methods in this controller allow operations related to 2FA like creating 2FA details,
+ * enabling 2FA for a specific method, verifying a provided 2FA code and selecting a 2FA method.
+ *
+ * @author Ivo
+ * @see org.springframework.stereotype.Controller
+ * @see org.springframework.web.bind.annotation.RestController
+ * @see org.springframework.web.bind.annotation.RequestMapping
+ * @see EntityController
+ * @see CredentialService
+ * @see CredentialModel
+ * @see CredentialCreateModel
+ */
+@RestController
+@RequestMapping("/user/login/twofactor")
+@RequiredArgsConstructor
+public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
+{
+
+    private final CredentialService credentialService;
+
+    @Override
+    protected @NotNull CredentialService getEntityService()
+    {
+        return credentialService;
+    }
+
+    @PreAuthorize("(#id == authentication.principal)")
+    @DeleteMapping("/delete/{id}")
+    @Override
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    {
+        validate(isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION), unauthorizedThrowable());
+        return super.delete(id);
+    }
+
+    @PostMapping("/create") @Override public @NotNull ResponseEntity<CredentialModel> create(@NotNull @RequestBody CredentialCreateModel model)
+    {
+        boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED);
+        validate(hasAdvanced || hasRequired, unauthorizedThrowable());
+
+        return super.create(model);
+    }
+
+    /**
+     * This method verifies the provided two-factor authentication code for a specific method. It is
+     * a GET API mapped to "/enable/{method}/{code}" path. The method and code are specified as
+     * path variables. JWT token of type {@link JwtTokenType#ADVANCED_AUTHORIZATION} is checked for the
+     * validity of the request. If authorization level is not satisfied, HTTP 401 Unauthorized
+     * response is returned. If authorization is satisfied, it attempts to verify two-factor
+     * authentication and returns success response accordingly.
+     *
+     * @param method This is the two factor method for which verification is done.
+     * @param code   This is the provided verification code.
+     * @param claims These are the claims associated with the JWT token.
+     * @return A {@link HttpStatus} representing the state of the request.
+     */
+    @GetMapping("/enable/{method}")
+    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims)
+    {
+        boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
+        boolean hasRequired = isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED);
+
+        validate((hasAdvanced || hasRequired), unauthorizedThrowable());
+        validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
+
+        if (hasRequired) // return login token after user has setup two factor
+        {
+            Optional<String> token = getEntityService().verify(method, code, claims);
+            return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        }
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * This method takes a string code and Jwt claim as input parameters, to
+     * verify a provided 2FA code. If the request JWT Token type is {@link JwtTokenType#CREDENTIAL_PENDING}
+     * and the code verification is successful, it returns a successful response. If the
+     * verification fails, it returns an HTTP 401 Unauthorized response.
+     *
+     * @param code   This is the provided Two-Factor Authentication code.
+     * @param claims These are the claims associated with the associated JWT token.
+     * @return Returns ResponseEntity of type {@link String}.
+     */
+    @GetMapping("/verify")
+    public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute("claims") @NotNull Claims claims)
+    {
+        validate(isAuthorized(JwtTokenType.CREDENTIAL_PENDING), unauthorizedThrowable());
+
+        CredentialMethod method = CredentialMethod.valueOf(claims.get("method", String.class));
+        Optional<String> verifyToken = getEntityService().verify(method, code, claims);
+
+        return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+    }
+
+    /**
+     * This method implements the API mapped to the "/select/{method}" path to
+     * facilitate the selection of a Two-Factor Authentication method. It checks if
+     * the JWT Token type is {@link JwtTokenType#CREDENTIAL_SELECTION}. If the check is not satisfied,
+     * it returns an HTTP 401 Unauthorized response, else it returns the Two Factor method
+     * selection response.
+     *
+     * @param method This is the provided Two-Factor Authentication method.
+     * @param claims These are the claims associated with the associated JWT token.
+     * @return ResponseEntity of type {@link String}.
+     */
+    @GetMapping("/select/{method}") public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute("claims") Claims claims)
+    {
+        validate(isAuthorized(JwtTokenType.CREDENTIAL_SELECTION), unauthorizedThrowable());
+
+        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
+        return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
+    }
+}
