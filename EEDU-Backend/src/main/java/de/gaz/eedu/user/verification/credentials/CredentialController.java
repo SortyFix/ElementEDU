@@ -7,8 +7,11 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,7 +42,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {
-
+    @Value("${development}") private final boolean development = false;
     private final CredentialService credentialService;
 
     @Override
@@ -79,7 +82,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
      * @param claims These are the claims associated with the JWT token.
      * @return A {@link HttpStatus} representing the state of the request.
      */
-    @GetMapping("/enable/{method}")
+    @PostMapping("/enable/{method}")
     public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims)
     {
         boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
@@ -106,15 +109,28 @@ public class CredentialController extends EntityController<CredentialService, Cr
      * @param claims These are the claims associated with the associated JWT token.
      * @return Returns ResponseEntity of type {@link String}.
      */
-    @GetMapping("/verify")
-    public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute("claims") @NotNull Claims claims)
+    @PostMapping("/verify")
+    public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute("claims") @NotNull Claims claims, @NotNull HttpServletResponse response)
     {
         validate(isAuthorized(JwtTokenType.CREDENTIAL_PENDING), unauthorizedThrowable());
 
         CredentialMethod method = CredentialMethod.valueOf(claims.get("method", String.class));
         Optional<String> verifyToken = getEntityService().verify(method, code, claims);
 
-        return verifyToken.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        return verifyToken.map(token ->
+        {
+            if(!claims.get("advanced", Boolean.class))
+            {
+                Cookie cookie = new Cookie("token", token);
+                cookie.setPath("/");
+                cookie.setDomain("localhost");
+                cookie.setMaxAge(3600);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(!development);
+                response.addCookie(cookie);
+            }
+            return ResponseEntity.ok(token);
+        }).orElseThrow(this::unauthorizedThrowable);
     }
 
     /**

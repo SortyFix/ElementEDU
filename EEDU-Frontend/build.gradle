@@ -33,11 +33,3 @@ tasks.register("installAngularCli", NpmTask).configure {
 tasks.register("npmUpdate", NpmTask).configure {
     args = ["update"]
 }
-
-tasks.register("installAngularCliForce", NpmTask).configure {
-    args = ["install", "@angular/cli@${angularVersion}"]
-}
-
-tasks.register("npmUpdateForce", NpmTask).configure {
-    args = ["update"]
-}

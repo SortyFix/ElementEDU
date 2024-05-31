@@ -46,7 +46,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
 
         checkHeader(request).or(() -> checkCookies(request)).ifPresentOrElse(token ->
         {
-            System.out.println(token);
             Consumer<UsernamePasswordAuthenticationToken> tokenConsumer = (usernamePasswordToken) ->
             {
                 log.info("The authorization token was successfully validated.");
@@ -78,7 +77,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
             return Optional.empty();
         }
         log.info("Authorization cookie detected. Proceed to validate token.");
-        Predicate<Cookie> isJwtToken = cookie -> Objects.equals("jwtToken", cookie.getName());
+        Predicate<Cookie> isJwtToken = cookie -> Objects.equals("token", cookie.getName());
         return Stream.of(cookies).filter(isJwtToken).findFirst().map(Cookie::getValue);
     }
 }

@@ -1,6 +1,6 @@
 import {Component, ViewEncapsulation} from '@angular/core';
 import {MatDialog} from "@angular/material/dialog";
-import {AuthModalComponent} from "./user/login/auth-modal/auth-modal.component";
+import {AuthModalComponent} from "./user/login/authentication/auth-modal/auth-modal.component";
 
 @Component({
   selector: 'app-root',
@@ -10,13 +10,15 @@ import {AuthModalComponent} from "./user/login/auth-modal/auth-modal.component";
 })
 export class AppComponent {
 
+    display: boolean = true;
+
     constructor(public dialog: MatDialog) {
     }
 
     openDialog()
     {
         const dialogRef = this.dialog.open(AuthModalComponent, {
-            width: '400px',
+            width: '500px',
             backdropClass: 'blur-background'
         })
         dialogRef.afterClosed().subscribe(result =>

@@ -1,0 +1,18 @@
+<form (ngSubmit)="onSubmit()">
+    <app-dialog-header icon="person" title="Login"></app-dialog-header>
+    <mat-dialog-content>
+        <mat-form-field appearance="outline" style="width: 100%; margin-top: 5px;">
+            <mat-label>Login Name</mat-label>
+            <input [(ngModel)]="loginName" autofocus matInput
+                   name="loginName" placeholder="Enter your login name..." required>
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+            <mat-checkbox [ngModel]="rememberMe" class="centered-icon" name="rememberMe"></mat-checkbox>
+            <mat-label (click)="rememberMe = !rememberMe">Remember me</mat-label>
+        </div>
+        <app-default-dialog-actions submit="Login"></app-default-dialog-actions>
+    </mat-dialog-actions>
+</form>
+
