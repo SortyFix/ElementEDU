@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.credentials.implementations.Credential;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
@@ -37,6 +38,7 @@ import java.util.function.Function;
     {
         UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
         CredentialEntity credentialEntity = populateEntity(model, userEntity);
+        credentialEntity.getMethod().getCredential().creation(credentialEntity);
 
         validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
 
@@ -51,58 +53,37 @@ import java.util.function.Function;
         long userID = claims.get("userID", Long.class);
         UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
 
-        Function<CredentialEntity, Boolean> mapper = authentication -> verifyMapper(code).apply(authentication);
-        return userEntity.getCredentials(method)
-                .map(mapper)
-                .filter(Boolean::booleanValue)
-                .map(entity -> getUserService().getAuthorizeService().authorize(userEntity.getId(), claims));
+        return userEntity.getCredentials(method).map(credentialEntity ->
+        {
+            Credential credential = credentialEntity.getMethod().getCredential();
+            if (credentialEntity.isEnabled() && credential.verify(credentialEntity, code))
+            {
+                return getUserService().getAuthorizeService().authorize(userEntity.getId(), claims);
+            }
+            return null;
+        });
     }
 
+    @Transactional
     public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
-        Function<CredentialEntity, Boolean> mapper = authentication -> enableMapper(code).apply(authentication);
-        return userEntity.getCredentials(method).map(mapper).orElse(false);
-    }
-
-    @NotNull
-    @Contract(pure = true, value = "_ -> new")
-    private Function<CredentialEntity, Boolean> verifyMapper(@NotNull String code)
-    {
-        return credential ->
+        Function<CredentialEntity, Boolean> mapper = credentialEntity ->
         {
-            if (!credential.isEnabled())
+            if (credentialEntity.isEnabled())
             {
                 return false;
             }
 
-            return credential.getMethod().getCredential().verify(credential, code);
-        };
-    }
-
-    @NotNull
-    @Contract(pure = true, value = "_ -> new")
-    private Function<CredentialEntity, Boolean> enableMapper(@NotNull String code)
-    {
-        return new Function<>()
-        {
-            @Transactional @Override public Boolean apply(@NotNull CredentialEntity credentialEntity)
+            if (credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
             {
-                if (credentialEntity.isEnabled())
-                {
-                    return false;
-                }
-
-                if (credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
-                {
-                    credentialEntity.setEnabled(true);
-                    save(credentialEntity);
-                    return true;
-                }
-                return false;
+                credentialEntity.setEnabled(true);
+                save(credentialEntity);
+                return true;
             }
+            return false;
         };
+        return getUserService().loadEntityByIDSafe(userID).getCredentials(method).map(mapper).orElse(false);
     }
 
     /**
@@ -116,7 +97,7 @@ import java.util.function.Function;
      */
     @Contract(value = "_, _ -> new", pure = true) private @NotNull CredentialEntity populateEntity(@NotNull CredentialCreateModel model, @NotNull UserEntity userEntity)
     {
-        long id = (userEntity.getId() + " " + model.method()).hashCode();
+        long id = model.method().toId(userEntity);
 
         if(getRepository().existsById(id))
         {

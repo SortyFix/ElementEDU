@@ -8,6 +8,7 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 
-@Getter(AccessLevel.PROTECTED) @Service public class AuthorizeService
+@Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor  @Service public class AuthorizeService
 {
     private final VerificationService verificationService;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthorizeService(@Autowired VerificationService verificationService)
+    @Transactional public @Nullable String requestLogin(@NotNull UserEntity user, @NotNull LoginModel loginModel)
     {
-        this.verificationService = verificationService;
-        this.passwordEncoder = new BCryptPasswordEncoder();
-    }
-
-    @Transactional public @Nullable String login(
-            @NotNull UserEntity user, @NotNull String hashedPassword, @NotNull LoginModel loginModel)
-    {
-        if (getPasswordEncoder().matches(loginModel.password(), hashedPassword))
-        {
-            return getVerificationService().loginUserToken(user, loginModel);
-        }
-        return null; //passwords do not match
+        return getVerificationService().requestLogin(user, loginModel);
     }
 
     public @NotNull String selectTwoFactor(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
@@ -65,11 +54,6 @@ import java.util.Optional;
             @NotNull String token, @NotNull AuthorityFactory authorityFactory)
     {
         return getVerificationService().validate(token, authorityFactory);
-    }
-
-    public @NotNull String encode(@NotNull String password)
-    {
-        return getPasswordEncoder().encode(password);
     }
 
     /**

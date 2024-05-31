@@ -4,6 +4,6 @@ import de.gaz.eedu.entity.model.SimpleModel;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import jakarta.validation.constraints.NotNull;
 
-public record SimplePrivilegeGroupModel(long id, @NotNull String name, boolean requiresTwoFactor,
+public record SimplePrivilegeGroupModel(long id, @NotNull String name,
                                         @NotNull SimpleUserModel[] users) implements SimpleModel
 {}

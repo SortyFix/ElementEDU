@@ -35,7 +35,7 @@ import java.util.Optional;
  * @see CredentialCreateModel
  */
 @RestController
-@RequestMapping("/user/login/twofactor")
+@RequestMapping("/user/login/credentials")
 @RequiredArgsConstructor
 public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {

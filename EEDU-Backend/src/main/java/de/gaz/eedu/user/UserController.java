@@ -8,13 +8,10 @@ import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,14 +34,12 @@ import java.util.function.Function;
  *
  * @author ivo
  */
-@Slf4j @RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService,
-        UserModel, UserCreateModel>
+@Slf4j @RestController @RequestMapping(value = "/user") @RequiredArgsConstructor
+public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
 {
     private final UserService userService;
-    @Value("${development:false}") private boolean development;
 
-    @Override
-    protected @NotNull UserService getEntityService()
+    @Override protected @NotNull UserService getEntityService()
     {
         return userService;
     }
@@ -71,26 +66,12 @@ import java.util.function.Function;
         return super.getData(userId);
     }
 
-    @PermitAll
-    @PostMapping("/login")
-    public @NotNull ResponseEntity<@Nullable String> loginUser(@NotNull @RequestBody UserLoginModel loginModel, HttpServletResponse response)
+    @PermitAll @PostMapping("/login") public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel loginModel)
     {
-        return login(loginModel).map(token ->
-        {
-            Cookie cookie = new Cookie("jwtToken", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false);
-            cookie.setPath("/");
-            cookie.setDomain("localhost");
-            cookie.setMaxAge(loginModel.keepLoggedIn() ? (14 * 24 * 60 * 60) : (24 * 60 * 60)); // 2 Weeks or 1 day
-            response.addCookie(cookie);
-            return ResponseEntity.ok(token);
-        }).orElseThrow(this::unauthorizedThrowable);
+        return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/login/advanced")
-    public @NotNull ResponseEntity<String> loginAdvanced(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
+    @PreAuthorize("isAuthenticated()") @PostMapping("/login/advanced") public @NotNull ResponseEntity<String> requestAdvancedLogin(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID)
     {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
 
@@ -100,13 +81,12 @@ import java.util.function.Function;
             return unauthorizedThrowable();
         });
 
-        return login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
-
+        return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    private @NotNull Optional<String> login(@NotNull LoginModel loginModel)
+    private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
-        return getEntityService().login(loginModel);
+        return getEntityService().requestLogin(loginModel);
     }
 }

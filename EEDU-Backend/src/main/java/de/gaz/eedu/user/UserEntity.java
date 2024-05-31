@@ -58,7 +58,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private boolean systemAccount;
-    private String firstName, lastName, loginName, password;
+    private String firstName, lastName, loginName;
     private boolean enabled, locked;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     private Set<CredentialEntity> credentials = new HashSet<>();
@@ -82,6 +82,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 getStatus());
     }
 
+    @Override public String getPassword()
+    {
+        Optional<CredentialEntity> password = getCredentials(CredentialMethod.PASSWORD);
+        return password.map(CredentialEntity::getSecret).orElseThrow(UnsupportedOperationException::new);
+    }
+
     @Override public boolean isDeletable()
     {
         return !systemAccount;
@@ -95,7 +101,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                     .toArray(SimplePrivilegeModel[]::new);
             return new SimpleUserGroupModel(entity.getId(),
                     entity.getName(),
-                    entity.isTwoFactorRequired(),
                     privilegeModels);
         };
 
@@ -403,7 +408,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public String toString()
     { // Automatically generated using intellij
-        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+        return "UserEntity{" + "courses=" + courses + ", status=" + status + ", illnessNotificationEntities=" + illnessNotificationEntities + ", id=" + id + ", systemAccount=" + systemAccount + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", loginName='" + loginName + '\'' + ", enabled=" + enabled + ", locked=" + locked + ", credentials=" + credentials + ", themeEntity=" + themeEntity + ", groups=" + groups + ", classRoom=" + classRoom + '}';
     }
 
     @Override public boolean equals(Object object)

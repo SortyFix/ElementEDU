@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.verification;
 
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
@@ -16,9 +15,11 @@ import io.jsonwebtoken.security.SignatureException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -53,24 +54,17 @@ import java.util.function.Function;
      * @throws IllegalArgumentException if user's ID is not valid or `user.twoFactor()` returns invalid TwoFactorModels
      * @throws IllegalStateException    when there is an issue in JWT generation related to key generation or compacting the token
      */
-    public @NotNull String loginUserToken(@NotNull UserEntity user, @NotNull LoginModel loginModel)
+    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel loginModel)
     {
         boolean advanced = loginModel instanceof AdvancedUserLoginModel;
         Instant expiry = getExpiry(loginModel);
 
-        CredentialMethod[] factorMethods = getMethods(user);
-        if (factorMethods.length > 0)
+        if(user.getCredentials().isEmpty())
         {
-            return credentialToken(user.getId(), expiry, advanced, factorMethods);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        // user has no two factor set up, but his group requires it
-        if (user.getGroups().stream().anyMatch(GroupEntity::isTwoFactorRequired))
-        {
-            return credentialRequired(user.getId(), expiry, advanced);
-        }
-
-        return authorizeToken(user.getId(), expiry, advanced);
+        return credentialToken(user.getId(), expiry, advanced, CredentialMethod.PASSWORD);
     }
 
     /**

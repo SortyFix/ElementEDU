@@ -1,10 +1,13 @@
 package de.gaz.eedu.user.verification.credentials.implementations;
 
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.HashingAlgorithm;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.TOPTHandler;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Objects;
 
 @Getter public enum CredentialMethod {
     PASSWORD(new PasswordCredential(new BCryptPasswordEncoder())),
@@ -17,5 +20,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
     CredentialMethod(@NotNull Credential credential)
     {
         this.credential = credential;
+    }
+
+    public long toId(@NotNull UserEntity user)
+    {
+        return Objects.hash(user.getId(), this.ordinal());
     }
 }

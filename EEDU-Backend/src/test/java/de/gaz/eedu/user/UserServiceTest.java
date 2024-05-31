@@ -50,7 +50,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @Autowired private ThemeService themeService;
 
     @Contract(pure = true, value = "-> new")
-    private static @NotNull Stream<LoginTestData> loginTestData()
+    private static @NotNull Stream<LoginTestData> requestLoginTestData()
     {
         return Stream.of(new LoginTestData(false, "max.mustermann", "123password!"), // password from John
                 new LoginTestData(false, "max.mustermann", "wrongPassword!"), // wrong password
@@ -64,10 +64,10 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     }
 
     @ParameterizedTest(name = "{index} => data={0}")
-    @MethodSource("loginTestData")
-    public void testUserLogin(@NotNull LoginTestData loginTestData)
+    @MethodSource("requestLoginTestData")
+    public void testUserRequestLogin(@NotNull LoginTestData loginTestData)
     {
-        test(loginTestData.createEval(), request -> getService().login(request).isPresent());
+        test(loginTestData.createEval(), request -> getService().requestLogin(request).isPresent());
     }
 
     @Override protected @NotNull UserCreateModel occupiedCreateModel()

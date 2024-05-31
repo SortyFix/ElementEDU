@@ -8,6 +8,4 @@ public interface LoginModel extends Model
 
     @NotNull String loginName();
 
-    @NotNull String password();
-
 }

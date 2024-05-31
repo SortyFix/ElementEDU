@@ -10,6 +10,9 @@ public interface Credential
 
     boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code);
 
-    boolean enable(@NotNull CredentialEntity credentialEntity, @NotNull String code);
+    default boolean enable(@NotNull CredentialEntity credentialEntity, @NotNull String code)
+    {
+        return true;
+    }
 
 }

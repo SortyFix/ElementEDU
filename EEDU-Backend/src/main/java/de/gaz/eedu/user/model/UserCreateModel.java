@@ -8,7 +8,7 @@ import de.gaz.eedu.user.theming.ThemeEntity;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
-public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName, @NotNull String password,
+public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName,
                               @NotNull Boolean enabled, @NotNull Boolean locked, @NotNull UserStatus status, @NotNull Long theme, @NotNull Long[] groups) implements CreationModel<UserEntity>
 {
     @Override public @NotNull String name()

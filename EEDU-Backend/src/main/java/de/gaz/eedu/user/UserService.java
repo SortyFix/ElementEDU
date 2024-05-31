@@ -5,7 +5,6 @@ import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
-import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
@@ -65,33 +64,22 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull UserEntity createEntity(
-            @NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
         if (getRepository().existsByLoginName(model.loginName()))
         {
             throw new NameOccupiedException(model.loginName());
         }
 
-        String password = model.password();
-        if (!password.matches(
-                "^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
-        {
-            throw new InsecurePasswordException();
-        }
-
-        String hashedPassword = getAuthorizeService().encode(model.password());
         return saveEntity(model.toEntity(new UserEntity(), entity ->
         {
-            entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
             entity.setThemeEntity(themeRepository.getReferenceById(model.theme()));
             entity.attachGroups(getGroupRepository().findAllById(List.of(model.groups())).toArray(GroupEntity[]::new));
             return entity;
         }));
     }
 
-    @Transactional @Override public @NotNull UserDetails loadUserByUsername(
-            @NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -107,10 +95,10 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         entry.getClassRoom().ifPresent(clazz -> clazz.detachStudents(getClassRoomService(), entry.getId()));
     }
 
-    @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
+    @Transactional public @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        Function<UserEntity, String> auth = user -> getAuthorizeService().login(user, user.getPassword(), loginModel);
+        Function<UserEntity, String> auth = user -> getAuthorizeService().requestLogin(user, loginModel);
         return userOptional.filter(UserEntity::isAccountNonLocked).map(auth);
     }
 
