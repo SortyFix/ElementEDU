@@ -5,6 +5,7 @@ import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -51,12 +52,17 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     @Override
     public PostModel toModel()
     {
+        String encodedThumbnail = encode();
+        return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
+                    readPrivileges.toArray(String[]::new), editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
+    }
+
+    public @NotNull String encode()
+    {
         try
         {
             byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));
-            String encodedThumbnail = Base64.getEncoder().encodeToString(fileContent);
-            return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
-                    readPrivileges.toArray(String[]::new), editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
+            return Base64.getEncoder().encodeToString(fileContent);
         }
         catch(IOException ioException)
         {

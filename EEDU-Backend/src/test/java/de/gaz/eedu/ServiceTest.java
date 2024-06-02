@@ -20,6 +20,8 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
@@ -69,7 +71,7 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
      *
      * @return the successful {@link Eval} instance for the service under test
      */
-    @Contract(value = "-> new", pure = true) protected abstract @NotNull Eval<C, M> successEval();
+    @Contract(value = "-> new", pure = true) protected abstract @NotNull Eval<C, M> successEval() throws IOException, URISyntaxException;
 
     /**
      * This is another abstract method that must provide a {@link C} type that represents the creation model of an
@@ -105,7 +107,7 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
      *
      * @see #successEval()
      */
-    @Test @Transactional public void testCreateEntitySuccess()
+    @Test @Transactional public void testCreateEntitySuccess() throws IOException, URISyntaxException
     {
         Eval<C, M> success = successEval();
         success.evaluateResult(getService().create(success.request()));

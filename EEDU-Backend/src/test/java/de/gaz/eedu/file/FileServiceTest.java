@@ -73,9 +73,6 @@ class FileServiceTest
     {
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
-
-        System.out.println(fileEntity.toString());
-
         assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }
 

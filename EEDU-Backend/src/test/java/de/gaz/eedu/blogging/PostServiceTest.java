@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 @Getter(AccessLevel.PROTECTED)
@@ -23,8 +25,9 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
     }
 
     @Override
-    protected @NotNull Eval successEval()
+    protected @NotNull Eval<PostCreateModel, PostModel> successEval() throws IOException, URISyntaxException
     {
+        String encodedFile = "VGhpcmQgZWxlbWVudAo=";
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 
         PostCreateModel createModel = new PostCreateModel(
@@ -39,7 +42,7 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
 
         PostModel postModel = new PostModel(2L, "Ivo",
                 "10 Reasons for why",
-                "batchfile1.txt",
+                encodedFile,
                 "burger king",
                 System.currentTimeMillis(),
                 new String[]{"NONE"},
@@ -49,6 +52,7 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
         return Eval.eval(createModel, postModel, (request, expect, result) -> {
             Assertions.assertEquals(createModel.author(), postModel.author());
             Assertions.assertEquals(createModel.title(), postModel.title());
+            Assertions.assertEquals(createModel.toEntity(new PostEntity()).toModel().thumbnailBlob(), encodedFile);
             Assertions.assertArrayEquals(createModel.readPrivileges(), postModel.readPrivileges());
             Assertions.assertArrayEquals(createModel.editPrivileges(), postModel.editPrivileges());
             Assertions.assertArrayEquals(createModel.tags(), postModel.tags());
@@ -59,7 +63,6 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
     @Override
     protected PostCreateModel occupiedCreateModel()
     {
-        // TODO
         throw new OccupiedException();
     }
 }

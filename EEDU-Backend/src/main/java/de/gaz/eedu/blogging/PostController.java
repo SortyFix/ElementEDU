@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+
 @RestController @RequiredArgsConstructor @RequestMapping(value = "/blog") public class PostController
 {
     private final PostService postService;
@@ -29,6 +31,17 @@ import org.springframework.web.server.ResponseStatusException;
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
+    @PreAuthorize("isAuthenticated()") @PostMapping("/edit") public PostModel editPost(@AuthenticationPrincipal Long userId, @NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String body,
+            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    {
+        return postService.editModel(userId, postId, author, title, body, readPrivileges, editPrivileges, tags);
+    }
+
+    @PreAuthorize("isAuthenticated()") @PostMapping("/editThumbnail") public PostModel editThumbnail(@AuthenticationPrincipal Long userId, @NotNull Long postId, @NotNull MultipartFile newThumbnail) throws IOException
+    {
+        return postService.editThumbnail(userId, postId, newThumbnail);
     }
 
     @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete") public void deletePost(@AuthenticationPrincipal Long userId, @NotNull Long postId)
