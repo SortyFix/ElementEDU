@@ -45,22 +45,13 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     /**
      * Deletes a post from the database.
-     * <p>
-     *     Requires the user loaded by the given <code>userId</code>
-     *     to maintain edit authority over the requested post.
-     * </p>
-     * @param userId
-     * @param postId
+     *
      * @throws de.gaz.eedu.exception.EntityUnknownException If post or user could not be found in the database.
      * @throws org.springframework.web.client.HttpClientErrorException.Unauthorized If the user does not own the privileges to edit a post.
      */
     public void deleteEntity(@NotNull Long userId, @NotNull Long postId)
     {
-        if(userHasEditAuthority(userId, postId))
-        {
-            postRepository.delete(postRepository.getReferenceById(postId));
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        postRepository.delete(postRepository.getReferenceById(postId));
     }
 
     public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
@@ -75,11 +66,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     public @NotNull PostModel getModel(@NotNull Long userId, @NotNull Long postId)
     {
-        if(userHasReadAuthority(userId, postId))
-        {
-            return postRepository.getReferenceById(postId).toModel();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found: " + postId);
+        return postRepository.getReferenceById(postId).toModel();
     }
 
     /**
@@ -97,19 +84,15 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel editModel(@NotNull Long userId, @NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String body,
             @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
     {
-        if(userHasEditAuthority(userId, postId))
-        {
-            PostEntity postEntity = getRepository().getReferenceById(postId);
-            postEntity.setAuthor(author);
-            postEntity.setTitle(title);
-            postEntity.setBody(body);
-            postEntity.setReadPrivileges(new HashSet<>(Arrays.asList(readPrivileges)));
-            postEntity.setEditPrivileges(new HashSet<>(Arrays.asList(editPrivileges)));
-            postEntity.setTags(new HashSet<>(Arrays.asList(tags)));
-            postRepository.save(postEntity);
-            return postEntity.toModel();
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        PostEntity postEntity = getRepository().getReferenceById(postId);
+        postEntity.setAuthor(author);
+        postEntity.setTitle(title);
+        postEntity.setBody(body);
+        postEntity.setReadPrivileges(new HashSet<>(Arrays.asList(readPrivileges)));
+        postEntity.setEditPrivileges(new HashSet<>(Arrays.asList(editPrivileges)));
+        postEntity.setTags(new HashSet<>(Arrays.asList(tags)));
+        postRepository.save(postEntity);
+        return postEntity.toModel();
     }
 
     /**
@@ -124,17 +107,13 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
      */
     public @NotNull PostModel editThumbnail(@NotNull Long userId, @NotNull Long postId, @NotNull MultipartFile newThumbnail) throws IOException
     {
-        if(userHasEditAuthority(userId, postId))
-        {
-            PostEntity postEntity = getRepository().getReferenceById(postId);
-            FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
-            FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), postEntity.getReadPrivileges().toArray(new String[0]), "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
-            thumbnailFile.uploadBatch("", newThumbnail);
-            postEntity.setThumbnailURL(thumbnailFile.getFilePath());
-            postRepository.save(postEntity);
-            return postEntity.toModel();
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        PostEntity postEntity = getRepository().getReferenceById(postId);
+        FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
+        FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), postEntity.getReadPrivileges().toArray(new String[0]), "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
+        thumbnailFile.uploadBatch("", newThumbnail);
+        postEntity.setThumbnailURL(thumbnailFile.getFilePath());
+        postRepository.save(postEntity);
+        return postEntity.toModel();
     }
 
     /**

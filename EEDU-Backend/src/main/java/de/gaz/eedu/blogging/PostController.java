@@ -1,6 +1,5 @@
 package de.gaz.eedu.blogging;
 
-import de.gaz.eedu.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -15,37 +14,51 @@ import java.io.IOException;
 @RestController @RequiredArgsConstructor @RequestMapping(value = "/blog") public class PostController
 {
     private final PostService postService;
-    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public PostModel getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
     {
-        return postService.getModel(userId, postId);
-    }
-
-    @PreAuthorize("isAuthenticated()") @PostMapping("/post") public PostModel createPost(@AuthenticationPrincipal Long userId, @NotNull String author, @NotNull String title, @NotNull MultipartFile thumbnail, @NotNull String body,
-            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
-    {
-        if(userService.loadEntityByIDSafe(userId).hasAuthority("can.post"))
+        if(postService.userHasReadAuthority(userId, postId))
         {
-            return postService.createPost(userId, author, title, thumbnail, body, readPrivileges, editPrivileges, tags);
+            return postService.getModel(userId, postId);
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
+    @PreAuthorize("hasAuthority(${blog.write})") @PostMapping("/post") public PostModel createPost(@AuthenticationPrincipal Long userId, @NotNull String author, @NotNull String title, @NotNull MultipartFile thumbnail, @NotNull String body,
+            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    {
+        return postService.createPost(userId, author, title, thumbnail, body, readPrivileges, editPrivileges, tags);
+    }
+
     @PreAuthorize("isAuthenticated()") @PostMapping("/edit") public PostModel editPost(@AuthenticationPrincipal Long userId, @NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String body,
             @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
     {
-        return postService.editModel(userId, postId, author, title, body, readPrivileges, editPrivileges, tags);
+        if(postService.userHasEditAuthority(userId, postId))
+        {
+            return postService.editModel(userId, postId, author, title, body, readPrivileges, editPrivileges, tags);
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/editThumbnail") public PostModel editThumbnail(@AuthenticationPrincipal Long userId, @NotNull Long postId, @NotNull MultipartFile newThumbnail) throws IOException
     {
-        return postService.editThumbnail(userId, postId, newThumbnail);
+        if(postService.userHasEditAuthority(userId, postId))
+        {
+            return postService.editThumbnail(userId, postId, newThumbnail);
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete") public void deletePost(@AuthenticationPrincipal Long userId, @NotNull Long postId)
     {
-        postService.deleteEntity(userId, postId);
+        if(postService.userHasEditAuthority(userId, postId))
+        {
+            postService.deleteEntity(userId, postId);
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }

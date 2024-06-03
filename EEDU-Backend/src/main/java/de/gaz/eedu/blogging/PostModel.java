@@ -3,7 +3,6 @@ package de.gaz.eedu.blogging;
 import de.gaz.eedu.entity.model.EntityModel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public record PostModel(@NotNull Long id, @NotNull String author, @NotNull String title,
@@ -21,9 +20,6 @@ public record PostModel(@NotNull Long id, @NotNull String author, @NotNull Strin
     @Override
     public int hashCode()
     {
-        int result = Objects.hash(id(), author(), title(), body(), timeOfCreation());
-        result = 31 * result + Arrays.hashCode(readPrivileges);
-        result = 31 * result + Arrays.hashCode(tags);
-        return result;
+        return Objects.hash(id());
     }
 }

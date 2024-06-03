@@ -46,7 +46,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     @Override
     public int hashCode()
     {
-        return Objects.hash(id, author, title, body, timeOfCreation, readPrivileges, editPrivileges, tags);
+        return Objects.hash(id);
     }
 
     @Override
