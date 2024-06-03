@@ -22,6 +22,7 @@ import {PasswordFormComponent} from "./password-form/password-form.component";
 import {LoginRequest} from "../authentication/auth-modal/request/login-request";
 import {AuthorizeService} from "../authentication/authorize.service";
 import {animate, state, style, transition, trigger} from "@angular/animations";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-test', standalone: true, imports: [
@@ -47,6 +48,7 @@ import {animate, state, style, transition, trigger} from "@angular/animations";
         PasswordFormComponent,
         NgIf,
         MatCardFooter,
+        MatProgressBar,
     ], templateUrl: './test.component.html', styleUrl: './test.component.scss', animations: [
         trigger('formSwitch', [
             state('loginNameForm', style({
@@ -70,6 +72,7 @@ export class TestComponent implements OnInit
     loginRequest?: LoginRequest;
     errorMessage?: string;
     mobile: boolean = false;
+    showLoadingThing: boolean = false;
 
     constructor(private authorizeService: AuthorizeService) {}
 
@@ -90,6 +93,7 @@ export class TestComponent implements OnInit
 
     onSubmit(data: any)
     {
+        this.showLoadingThing = true;
         if (data == false)
         {
             this.loginRequest = undefined;
@@ -98,14 +102,15 @@ export class TestComponent implements OnInit
 
         if (data instanceof LoginRequest)
         {
-            this.loginRequest = data;
+            this.authorizeService.request(data).subscribe({
+                next: () => this.loginRequest = data,
+                error: (error) =>
+                {
+                    this.errorMessage = this.getErrorMessage(error)
+                }
+            }).add(() => this.showLoadingThing = true)
             return;
         }
-
-        /*        this.authorizeService.request(event).subscribe({
-                    next: () => this.loginRequest = event,
-                    error: (error) => this.errorMessage = this.getErrorMessage(error)
-                })*/
     }
 
     getErrorMessage(error: any): string

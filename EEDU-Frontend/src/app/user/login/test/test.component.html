@@ -1,5 +1,6 @@
 <div class="backdrop-blur">
     <mat-card>
+        <mat-progress-bar [mode]="showLoadingThing ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
         <mat-card-header>
             <mat-card-title>
                 <mat-icon class="centered-icon">person</mat-icon>
@@ -9,8 +10,8 @@
         <mat-card-content>
             <mat-grid-list [cols]="mobile ? 1 : 2">
                 <mat-grid-tile *ngIf="!mobile">
-                    <img alt="account" height="300" ngSrc="assets/favicon.svg" priority style="border-radius: 20px"
-                         width="300">
+                    <img alt="account" height="200" ngSrc="assets/favicon.svg" priority style="border-radius: 20px"
+                         width="200">
                     <!--<img alt="account" height="255" ngSrc="assets/favicon.svg" width="255">-->
                 </mat-grid-tile>
                 <mat-grid-tile>
