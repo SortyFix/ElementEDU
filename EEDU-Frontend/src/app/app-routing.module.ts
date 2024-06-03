@@ -1,12 +1,12 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {CommonModule} from "@angular/common";
-import {RequestLoginComponent} from "./user/login/authentication/auth-modal/request/request-login.component";
+import {TestComponent} from "./user/login/test/test.component";
 
 const routes: Routes = [
     // set 'home' as main page if URL is /localhost:4200/
     //{path: '', pathMatch: "full", component: AppComponent},
-    {path: 'request', component: RequestLoginComponent},
+    {path: 'test', component: TestComponent},
 ];
 
 @NgModule({

@@ -1,7 +1,10 @@
+
+
 <div *ngIf="!isAuthorized">
     <app-request-login *ngIf="!loginRequest" [error]="error" (submit)="onLoginSubmit($event)"></app-request-login>
     <app-password *ngIf="loginRequest" [error]="error" [loginName]="loginRequest.loginName" (submit)="onPasswordSubmit($event)"></app-password>
 </div>
+<!--
 <div *ngIf="isAuthorized">
     <app-dialog-header title="Already logged in!" icon="warning"></app-dialog-header>
     <mat-dialog-content>
@@ -11,3 +14,4 @@
         <app-default-dialog-actions submit="" cancel="Done"></app-default-dialog-actions>
     </mat-dialog-actions>
 </div>
+-->

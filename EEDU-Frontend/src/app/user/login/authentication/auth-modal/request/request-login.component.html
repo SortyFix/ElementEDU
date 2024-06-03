@@ -12,7 +12,8 @@
             <mat-checkbox [ngModel]="rememberMe" class="centered-icon" name="rememberMe"></mat-checkbox>
             <mat-label (click)="rememberMe = !rememberMe">Remember me</mat-label>
         </div>
-        <app-default-dialog-actions submit="Login"></app-default-dialog-actions>
+        <button mat-button mat-dialog-close type="button">Cancel</button>
+        <button mat-stroked-button type="submit">Submit</button>
     </mat-dialog-actions>
 </form>
 

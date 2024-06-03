@@ -3,9 +3,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatCardModule} from '@angular/material/card';
-import {MatMenuModule} from '@angular/material/menu';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {NgOptimizedImage} from "@angular/common";
@@ -23,10 +20,6 @@ import {DialogHeaderComponent} from "./dialog/dialog-header/dialog-header.compon
 import {RequestLoginComponent} from "./user/login/authentication/auth-modal/request/request-login.component";
 import {PasswordComponent} from "./user/login/authentication/auth-modal/password/password.component";
 import {AuthModalComponent} from "./user/login/authentication/auth-modal/auth-modal.component";
-import {
-    SelectCredentialsComponent
-} from "./user/login/authentication/auth-modal/select-credentials/select-credentials.component";
-import {DefaultDialogActionsComponent} from "./dialog/default-dialog-actions/default-dialog-actions.component";
 
 @NgModule({
     declarations: [AppComponent, RequestLoginComponent, PasswordComponent, AuthModalComponent],
@@ -53,8 +46,6 @@ import {DefaultDialogActionsComponent} from "./dialog/default-dialog-actions/def
         MatTooltip,
         DialogCloseButtonComponent,
         DialogHeaderComponent,
-        SelectCredentialsComponent,
-        DefaultDialogActionsComponent,
     ],
     providers: [
         provideHttpClient(withFetch())

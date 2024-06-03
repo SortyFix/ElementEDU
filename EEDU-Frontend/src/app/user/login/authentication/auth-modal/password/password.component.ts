@@ -1,11 +1,9 @@
 import {
-    AfterContentInit,
     AfterViewInit,
     Component,
     ElementRef,
     EventEmitter,
     Input, NgZone,
-    OnInit,
     Output,
     ViewChild
 } from '@angular/core';
