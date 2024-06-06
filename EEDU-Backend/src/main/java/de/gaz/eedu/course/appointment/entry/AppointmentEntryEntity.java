@@ -23,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
 {
@@ -82,9 +84,25 @@ import java.time.Instant;
         }
     }
 
-    public @NotNull Instant getSubmitUntil()
+    public @NotNull Optional<Instant> getSubmitUntil()
     {
-        return Instant.now(); // HAHAHAHHA
+        if(!submitHomework)
+        {
+            // mustn't submit
+            return Optional.empty();
+        }
+
+        if(Objects.nonNull(this.submitUntil)) {
+            return Optional.of(this.submitUntil);
+        }
+
+        if(Objects.nonNull(getScheduledAppointment()))
+        {
+            // defaults to next appointment
+            Instant nextAppointment = getTimeStamp().plus(getScheduledAppointment().getPeriod());
+            return Optional.of(nextAppointment);
+        }
+        return Optional.empty();
     }
 
     private @NotNull String uploadPath(@NotNull UserEntity user)
