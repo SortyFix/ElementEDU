@@ -2,6 +2,7 @@ package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -32,7 +33,7 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         return entity;
     }
 
-    public @NotNull Set<String> combinePrivileges()
+    public @NotNull @Unmodifiable Set<String> combinePrivileges()
     {
         return Stream.concat(Arrays.stream(readPrivileges()), Arrays.stream(editPrivileges())).collect(Collectors.toSet());
     }

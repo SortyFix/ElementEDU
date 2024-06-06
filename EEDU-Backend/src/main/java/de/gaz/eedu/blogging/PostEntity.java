@@ -49,8 +49,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         return Objects.hash(id);
     }
 
-    @Override
-    public PostModel toModel()
+    @Override @NotNull public PostModel toModel()
     {
         String encodedThumbnail = encode();
         return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
