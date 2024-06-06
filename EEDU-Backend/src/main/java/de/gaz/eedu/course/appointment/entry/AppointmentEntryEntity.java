@@ -33,6 +33,7 @@ import java.util.Optional;
     private Duration duration;
     private String description, homework;
     private boolean submitHomework;
+    private Instant publish;
     // might be null, if submitHome is false, or it should be valid until next appointment
     @Nullable private Instant submitUntil;
     @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
@@ -59,7 +60,7 @@ import java.util.Optional;
         log.info("User {} has uploaded files to appointment entry {}", user.getId(), getId());
     }
 
-    private void check(@NotNull UserEntity user)
+    private void check(@NotNull UserEntity user) throws ResponseStatusException
     {
         // not required to submit
         if (!isSubmitHomework())
@@ -69,12 +70,14 @@ import java.util.Optional;
             throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, illegalStateException);
         }
 
-        // has expired
-        if (Instant.now().isAfter(getSubmitUntil()))
-        {
-            String errorMessage = String.format("The resource %s no longer accepts uploading files.", getId());
-            throw new ResponseStatusException(HttpStatus.GONE, errorMessage);
-        }
+        getSubmitUntil().ifPresent(submitUntil -> {
+            // has expired
+            if (Instant.now().isAfter(submitUntil))
+            {
+                String errorMessage = String.format("The resource %s no longer accepts uploading files.", getId());
+                throw new ResponseStatusException(HttpStatus.GONE, errorMessage);
+            }
+        });
 
         // user not in course (warning)
         if (!getCourse().getUsers().contains(user))

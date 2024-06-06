@@ -45,14 +45,14 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         {
             if (Objects.isNull(entryCreateModel.duration()))
             {
-                return connectScheduled(entryCreateModel, course, entity);
+                return attachScheduled(entryCreateModel, course, entity);
             }
             entity.setDuration(Duration.ofSeconds(entryCreateModel.duration()));
             return entity;
         };
     }
 
-    private static AppointmentEntryEntity connectScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
+    private static AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
     {
         Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
         Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.timeStamp());
