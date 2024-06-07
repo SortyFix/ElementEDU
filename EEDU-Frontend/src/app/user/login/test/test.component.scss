@@ -29,17 +29,17 @@ mat-card {
         border-radius: 0;
     }
 }
+
 .form-container {
     width: 90%;
+    display: flex;
 
     .current-form {
         width: 100%;
+        flex-shrink: 0;
+    }
+
+    app-login-name-form {
+        margin-right: 5px;
     }
 }
-
-
-
-
-
-
-

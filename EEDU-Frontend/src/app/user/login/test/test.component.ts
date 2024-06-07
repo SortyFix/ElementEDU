@@ -2,7 +2,8 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {
     MatCard,
     MatCardActions,
-    MatCardContent, MatCardFooter,
+    MatCardContent,
+    MatCardFooter,
     MatCardHeader,
     MatCardSubtitle,
     MatCardTitle
@@ -21,8 +22,9 @@ import {LoginNameFormComponent} from "./login-name-form/login-name-form.componen
 import {PasswordFormComponent} from "./password-form/password-form.component";
 import {LoginRequest} from "../authentication/auth-modal/request/login-request";
 import {AuthorizeService} from "../authentication/authorize.service";
-import {animate, state, style, transition, trigger} from "@angular/animations";
+import {animate, animation, group, query, state, style, transition, trigger} from "@angular/animations";
 import {MatProgressBar} from "@angular/material/progress-bar";
+
 
 @Component({
     selector: 'app-test', standalone: true, imports: [
@@ -50,18 +52,15 @@ import {MatProgressBar} from "@angular/material/progress-bar";
         MatCardFooter,
         MatProgressBar,
     ], templateUrl: './test.component.html', styleUrl: './test.component.scss', animations: [
-        trigger('formSwitch', [
-            state('loginNameForm', style({
-                transform: 'translateX(0%)'
-            })),
-            state('passwordForm', style({
-                transform: 'translateX(-100%)'
-            })),
-            transition('loginNameForm => passwordForm', [
-                animate('0.5s ease-in-out')
-            ]),
-            transition('passwordForm => loginNameForm', [
-                animate('0.5s ease-in-out')
+        trigger('loginNameAnimation', [
+            transition(':leave', [
+                animate('0.3s', style({transform: 'translateX(-100%)'}))
+            ])
+        ]), trigger('passwordAnimation', [
+            transition(':enter', [
+                style({transform: 'translateX(0%)'}), animate('0.3s', style({transform: 'translateX(-100%)'}))
+            ]), transition(':leave', [
+                animate('0.3s', style({transform: 'translateX(-100%)'}))
             ])
         ])
     ]
@@ -102,13 +101,15 @@ export class TestComponent implements OnInit
 
         if (data instanceof LoginRequest)
         {
-            this.authorizeService.request(data).subscribe({
-                next: () => this.loginRequest = data,
-                error: (error) =>
-                {
-                    this.errorMessage = this.getErrorMessage(error)
-                }
-            }).add(() => this.showLoadingThing = true)
+            this.showLoadingThing = false;
+            this.loginRequest = data;
+            /*            this.authorizeService.request(data).subscribe({
+                            next: () => this.loginRequest = data,
+                            error: (error) =>
+                            {
+                                this.errorMessage = this.getErrorMessage(error)
+                            }
+                        }).add(() => this.showLoadingThing = true)*/
             return;
         }
     }
