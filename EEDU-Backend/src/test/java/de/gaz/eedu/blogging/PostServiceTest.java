@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -57,6 +58,26 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
             Assertions.assertArrayEquals(createModel.editPrivileges(), postModel.editPrivileges());
             Assertions.assertArrayEquals(createModel.tags(), postModel.tags());
         });
+    }
+
+    @Test
+    protected void testCollectionEditing()
+    {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+
+        PostEntity entity = getPostService().createEntity(new PostCreateModel(
+                "Ivo",
+                "10 Reasons for why",
+                Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
+                "burger king",
+                new String[]{"Read1", "Read2", "Read3"},
+                new String[]{"Edit1", "Edit2", "Edit3"},
+                new String[]{"Tag1", "Tag2", "Tag3"}
+        ));
+
+        entity.appendTags(getService(),"Tag4", "Tag5");
+
+        Assertions.assertEquals(5, entity.getTags().size());
     }
 
     @NotNull

@@ -29,7 +29,7 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         entity.setReadPrivileges(combinePrivileges());
         entity.setEditPrivileges(Arrays.stream(editPrivileges()).collect(Collectors.toSet()));
         entity.setTimeOfCreation(System.currentTimeMillis());
-        entity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
+        entity.appendTags(tags());
         return entity;
     }
 

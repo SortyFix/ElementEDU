@@ -25,9 +25,9 @@ import java.util.HashSet;
 @RequiredArgsConstructor
 public class PostService extends EntityService<PostRepository, PostEntity, PostModel, PostCreateModel>
 {
-    private PostRepository postRepository;
-    private UserService userService;
-    private FileService fileService;
+    private final PostRepository postRepository;
+    private final UserService userService;
+    private final FileService fileService;
 
     @Value("${blog.write}") private String writePrivilege;
 
@@ -90,7 +90,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         postEntity.setBody(body);
         postEntity.setReadPrivileges(new HashSet<>(Arrays.asList(readPrivileges)));
         postEntity.setEditPrivileges(new HashSet<>(Arrays.asList(editPrivileges)));
-        postEntity.setTags(new HashSet<>(Arrays.asList(tags)));
+        postEntity.appendTags(tags);
         postRepository.save(postEntity);
         return postEntity.toModel();
     }

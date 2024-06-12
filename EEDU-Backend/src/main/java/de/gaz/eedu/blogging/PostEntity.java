@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @Entity @Getter @Setter
 public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
@@ -33,7 +35,37 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     private Set<String> editPrivileges;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
-    private Set<String> tags;
+    private final Set<String> tags = new HashSet<>();
+
+    public boolean attachEditPrivileges(@NotNull PostService service, @NotNull String... privileges)
+    {
+        return updateDatabase(service, privileges, this::attachEditPrivileges);
+    }
+
+    public boolean attachEditPrivileges(@NotNull String... privileges)
+    {
+        return this.editPrivileges.addAll(Set.of(privileges));
+    }
+
+    public boolean attachReadPrivileges(@NotNull PostService service, @NotNull String... privileges)
+    {
+        return updateDatabase(service, privileges, this::attachReadPrivileges);
+    }
+
+    public boolean attachReadPrivileges(@NotNull String... privileges)
+    {
+        return this.readPrivileges.addAll(Set.of(privileges));
+    }
+
+    public boolean appendTags(@NotNull PostService service, @NotNull String... tags)
+    {
+        return updateDatabase(service, tags, this::appendTags);
+    }
+
+    public boolean appendTags(@NotNull String... tags)
+    {
+        return this.tags.addAll(Set.of(tags));
+    }
 
     @Override public boolean equals(Object o)
     {
@@ -67,6 +99,16 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Not found: " + thumbnailURL, ioException);
         }
+    }
+
+    private <T> boolean updateDatabase(@NotNull PostService userService, @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    {
+        if (predicate.test(entity))
+        {
+            userService.saveEntity(this);
+            return true;
+        }
+        return false;
     }
 }
 

@@ -131,12 +131,6 @@ VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 3500000
        (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000, 3),
        (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000, 4);
 
-INSERT INTO post_entity (id, author, title, thumbnailurl, body, time_of_creation)
-VALUES (1, 'Raoul Giebenhain', 'Ellas Traum - Eine Hommage an die Großartigkeit des Theaters', '/idk/random/d.jpg', 'ne', 239434334),
-       (2, 'yonas', 'Ellas Traum - Eine Hommage an die Großartigkeit des Theaters', '/idk/random/d.jpg', 'ne', 239434134),
-       (3, 'Frau Kühnel', 'Ellas Traum - Eine Hommage an die Großartigkeit des Theaters', '/idk/random/d.jpg', 'ne', 43534533),
-       (4, 'Scharius Mlag', 'Ellas Traum - Eine Hommage an die Großartigkeit des Theaters', '/idk/random/d.jpg', 'ne', 2394399334);
-
 MERGE INTO chat_entity_messages (chat_id, message_id)
 VALUES (1, 1),
        (2, 2),
