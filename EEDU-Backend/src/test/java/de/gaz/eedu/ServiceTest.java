@@ -180,9 +180,9 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
         test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), (id) -> getService().delete(id));
     }
 
-    @Contract(pure = true, value = "-> new") protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    @Contract(pure = true, value = "-> new") protected @NotNull TestData<Boolean>[] deleteEntities()
     {
-        return Stream.empty();
+        return new TestData[0];
     }
 
     /**

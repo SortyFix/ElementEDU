@@ -22,9 +22,8 @@ import {LoginNameFormComponent} from "./login-name-form/login-name-form.componen
 import {PasswordFormComponent} from "./password-form/password-form.component";
 import {LoginRequest} from "../authentication/auth-modal/request/login-request";
 import {AuthorizeService} from "../authentication/authorize.service";
-import {animate, animation, group, query, state, style, transition, trigger} from "@angular/animations";
+import {animate, style, transition, trigger} from "@angular/animations";
 import {MatProgressBar} from "@angular/material/progress-bar";
-
 
 @Component({
     selector: 'app-test', standalone: true, imports: [
@@ -67,6 +66,7 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 })
 export class TestComponent implements OnInit
 {
+    animationState: string = "loginForm";
 
     loginRequest?: LoginRequest;
     errorMessage?: string;
@@ -95,6 +95,7 @@ export class TestComponent implements OnInit
         this.showLoadingThing = true;
         if (data == false)
         {
+            this.animationState = "slideLoginNameForm"
             this.loginRequest = undefined;
             return;
         }
@@ -103,6 +104,7 @@ export class TestComponent implements OnInit
         {
             this.showLoadingThing = false;
             this.loginRequest = data;
+            this.animationState = "passwordForm";
             /*            this.authorizeService.request(data).subscribe({
                             next: () => this.loginRequest = data,
                             error: (error) =>

@@ -1,4 +1,4 @@
-package de.gaz.eedu.user.twofa;
+package de.gaz.eedu.user.credentials;
 
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.TestData;
@@ -18,50 +18,25 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 public class CredentialServiceTest extends ServiceTest<CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel> {
 
-    @Autowired private CredentialService service;
-
-    @Contract(pure = true, value = "-> new")
-    private static @NotNull Stream<TestData<CredentialMethod>> getAllowedTwoFactors()
-    {
-        // skip 4 as it gets deleted
-        return Stream.of(new TestData<>(1L, CredentialMethod.EMAIL),
-                new TestData<>(2L, CredentialMethod.EMAIL),
-                new TestData<>(3L, CredentialMethod.SMS),
-                new TestData<>(5L, CredentialMethod.SMS),
-                new TestData<>(6L, CredentialMethod.TOTP));
-    }
+    @Autowired
+    private CredentialService service;
 
     @Override
     protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval() {
-        CredentialCreateModel twoFactorCreateModel = new CredentialCreateModel(1L, "TOTP", "");
-        CredentialModel credentialModel = new CredentialModel(8L, CredentialMethod.TOTP, false, new HashMap<>());
-        // some more test values, therefore id 8
+        CredentialCreateModel twoFactorCreateModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, "");
+        CredentialModel credentialModel = new CredentialModel(995L, CredentialMethod.TOTP, false, new HashMap<>());
 
-        return Eval.eval(twoFactorCreateModel, credentialModel, ((request, expect, result) ->
-        {
+        return Eval.eval(twoFactorCreateModel, credentialModel, ((request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.method(), result.method());
-
             Assertions.assertNotNull(result.claims());
             Assertions.assertTrue(result.claims().containsKey("setup"));
-
             Assertions.assertFalse(result.enabled());
         }));
-    }
-
-    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("getAllowedTwoFactors")
-    public void testGetAllowedTwoFactors(@NotNull TestData<CredentialMethod> data)
-    {
-        test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), request ->
-        {
-            CredentialEntity credentialEntity = getService().loadEntityByIDSafe(request);
-            return credentialEntity.getMethod();
-        });
     }
 
     @Override

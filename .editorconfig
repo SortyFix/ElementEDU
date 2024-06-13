@@ -363,6 +363,18 @@ ij_less_space_before_opening_brace = true
 ij_less_use_double_quotes = true
 ij_less_value_alignment = 0
 
+[*.nbtt]
+indent_style = tab
+max_line_length = 150
+ij_continuation_indent_size = 4
+ij_nbtt_keep_indents_on_empty_lines = false
+ij_nbtt_space_after_colon = true
+ij_nbtt_space_after_comma = true
+ij_nbtt_space_before_colon = true
+ij_nbtt_space_before_comma = false
+ij_nbtt_spaces_within_brackets = false
+ij_nbtt_spaces_within_parentheses = false
+
 [*.proto]
 indent_size = 2
 tab_width = 2
@@ -473,9 +485,9 @@ ij_typescript_align_multiline_ternary_operation = false
 ij_typescript_align_object_properties = 0
 ij_typescript_align_union_types = false
 ij_typescript_align_var_statements = 0
-ij_typescript_array_initializer_new_line_after_left_brace = false
-ij_typescript_array_initializer_right_brace_on_new_line = false
-ij_typescript_array_initializer_wrap = off
+ij_typescript_array_initializer_new_line_after_left_brace = true
+ij_typescript_array_initializer_right_brace_on_new_line = true
+ij_typescript_array_initializer_wrap = on_every_item
 ij_typescript_assignment_wrap = off
 ij_typescript_binary_operation_sign_on_next_line = false
 ij_typescript_binary_operation_wrap = off
@@ -1203,9 +1215,6 @@ ij_yaml_block_mapping_on_new_line = false
 ij_yaml_indent_sequence_value = true
 ij_yaml_keep_indents_on_empty_lines = false
 ij_yaml_keep_line_breaks = true
-ij_yaml_line_comment_add_space = false
-ij_yaml_line_comment_add_space_on_reformat = false
-ij_yaml_line_comment_at_first_column = true
 ij_yaml_sequence_on_new_line = false
 ij_yaml_space_before_colon = false
 ij_yaml_spaces_within_braces = true

@@ -40,8 +40,8 @@ public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, The
     }
 
     @Override
-    protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    protected @NotNull TestData<Boolean>[] deleteEntities()
     {
-        return Stream.of(new TestData<>(4, true));
+        return new TestData[] {new TestData<>(4, true) };
     }
 }

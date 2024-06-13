@@ -20,7 +20,7 @@ import java.util.Map;
     @Enumerated private CredentialMethod method;
     private String data, secret;
     private boolean enabled;
-    @ManyToOne @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
+    @ManyToOne(fetch = FetchType.LAZY) @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
 
     public CredentialEntity(long id, @NotNull UserEntity user)
     {
