@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {map, Observable, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-import {LoginRequest} from "./auth-modal/request/login-request";
+import {LoginRequest} from "./login-name-form/login-request";
 
 @Injectable({
     providedIn: 'root'

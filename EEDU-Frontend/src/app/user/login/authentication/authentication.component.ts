@@ -20,10 +20,10 @@ import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
 import {PasswordFormComponent} from "./password-form/password-form.component";
-import {LoginRequest} from "../authentication/auth-modal/request/login-request";
-import {AuthorizeService} from "../authentication/authorize.service";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {LoginRequest} from "./login-name-form/login-request";
+import {AuthorizeService} from "./authorize.service";
 
 @Component({
     selector: 'app-test', standalone: true, imports: [
@@ -50,7 +50,7 @@ import {MatProgressBar} from "@angular/material/progress-bar";
         NgIf,
         MatCardFooter,
         MatProgressBar,
-    ], templateUrl: './test.component.html', styleUrl: './test.component.scss', animations: [
+    ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [
                 animate('0.3s', style({transform: 'translateX(-100%)'}))
@@ -64,7 +64,7 @@ import {MatProgressBar} from "@angular/material/progress-bar";
         ])
     ]
 })
-export class TestComponent implements OnInit
+export class Authentication implements OnInit
 {
     animationState: string = "loginForm";
 
