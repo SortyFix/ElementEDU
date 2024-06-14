@@ -34,59 +34,55 @@ import java.util.function.Function;
  *
  * @author ivo
  */
-@Slf4j
-@RestController
-@RequestMapping(value = "/user")
-@RequiredArgsConstructor
-public class UserController extends EntityController<UserService, UserModel, UserCreateModel> {
+@Slf4j @RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
+{
     private final UserService userService;
 
-    @Override
-    protected @NotNull UserService getEntityService() {
+    @Override protected @NotNull UserService getEntityService()
+    {
         return userService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create")
-    @Override
-    public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model) {
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override
+    public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
+    {
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping("/delete/{id}")
-    @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long id) {
+    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override
+    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    {
         return super.delete(id);
     }
 
     @PreAuthorize("isAuthenticated() and (hasAuthority('ADMIN') or (#id == authentication.principal))")
-    @GetMapping("/get/{id}")
-    @Override
-    public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id) {
+    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
+    {
         validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
         return super.getData(id);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/get")
-    public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal Long userId) {
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get")
+    public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal Long userId)
+    {
         validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
         return super.getData(userId);
     }
 
-    @PermitAll
-    @PostMapping("/login")
-    public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel loginModel) {
+    @PermitAll @PostMapping("/login")
+    public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel loginModel)
+    {
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/login/advanced")
-    public @NotNull ResponseEntity<String> requestAdvancedLogin(@NotNull @RequestBody AdvancedUserLoginModel loginModel, @AuthenticationPrincipal long userID) {
+    @PreAuthorize("isAuthenticated()") @PostMapping("/login/advanced")
+    public @NotNull ResponseEntity<String> requestAdvancedLogin(@NotNull @RequestBody AdvancedUserLoginModel loginModel,
+                                                                @AuthenticationPrincipal long userID)
+    {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
 
-        validate(getEntityService().loadEntityById(userID).map(isAllowed).orElse(false), () -> {
+        validate(getEntityService().loadEntityById(userID).map(isAllowed).orElse(false), () ->
+        {
             log.warn("A user tried to access the advanced token of another user. The request has been rejected.");
             return unauthorizedThrowable();
         });
@@ -94,13 +90,13 @@ public class UserController extends EntityController<UserService, UserModel, Use
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @GetMapping("/authorized")
-    @PreAuthorize("isAuthenticated()")
-    public void isAuthorized() {
+    @GetMapping("/authorized") @PreAuthorize("isAuthenticated()") public void isAuthorized()
+    {
         validate(isAuthorized(JwtTokenType.AUTHORIZED), this::unauthorizedThrowable);
     }
 
-    private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel) {
+    private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
+    {
         log.info("The server has recognized an incoming login request.");
         return getEntityService().requestLogin(loginModel);
     }
