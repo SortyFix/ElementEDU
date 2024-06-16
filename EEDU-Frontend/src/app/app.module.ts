@@ -15,14 +15,11 @@ import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/mat
 import {MatInput} from "@angular/material/input";
 import {CdkCopyToClipboard} from "@angular/cdk/clipboard";
 import {MatTooltip} from "@angular/material/tooltip";
-import {DialogCloseButtonComponent} from "./dialog/dialog-close-button/dialog-close-button.component";
-import {DialogHeaderComponent} from "./dialog/dialog-header/dialog-header.component";
-import {RequestLoginComponent} from "./user/login/authentication/auth-modal/request/request-login.component";
-import {PasswordComponent} from "./user/login/authentication/auth-modal/password/password.component";
-import {AuthModalComponent} from "./user/login/authentication/auth-modal/auth-modal.component";
+import {Authentication} from "./user/login/authentication/authentication.component";
+import {LoadComponent} from "./load/load.component";
 
 @NgModule({
-    declarations: [AppComponent, RequestLoginComponent, PasswordComponent, AuthModalComponent],
+    declarations: [AppComponent],
     imports: [
         MatLabel,
         FormsModule,
@@ -44,17 +41,14 @@ import {AuthModalComponent} from "./user/login/authentication/auth-modal/auth-mo
         MatSuffix,
         CdkCopyToClipboard,
         MatTooltip,
-        DialogCloseButtonComponent,
-        DialogHeaderComponent,
+        Authentication,
+        Authentication,
+        LoadComponent,
     ],
     providers: [
         provideHttpClient(withFetch())
     ],
     bootstrap: [AppComponent],
-    exports: [
-        RequestLoginComponent,
-        PasswordComponent
-    ]
 })
 export class AppModule {
 

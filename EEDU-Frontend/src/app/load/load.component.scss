@@ -1,0 +1,18 @@
+mat-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 330px;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+
+    mat-card-header {
+        display: flex;
+        justify-content: center;
+    }
+
+    mat-card-content {
+        margin-top: 10px;
+        border-radius: 10px;
+    }
+}

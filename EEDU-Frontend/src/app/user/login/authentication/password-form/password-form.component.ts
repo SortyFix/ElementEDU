@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, signal, WritableSignal} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatAnchor, MatButton, MatIconButton} from "@angular/material/button";
 import {MatCheckbox} from "@angular/material/checkbox";
@@ -25,9 +25,9 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class PasswordFormComponent
 {
-    @Output() submit = new EventEmitter<any>();
+    @Output() readonly submit = new EventEmitter<any>();
+    @Input() errorSignal: WritableSignal<any> = signal('');
     @Input() loginName?: string;
-    @Input() errorMessage?: string;
     password?: string;
     showPassword: boolean = false;
 

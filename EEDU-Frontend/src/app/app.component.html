@@ -1,4 +1,4 @@
 <div class="content">
-    <!-- <button (click)="openDialog()">Test</button> -->
-    <router-outlet></router-outlet>
+    <app-load *ngIf="!load" [errorSignal]="errorSignal"></app-load>
+    <router-outlet *ngIf="load"></router-outlet>
 </div>

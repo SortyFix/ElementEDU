@@ -6,11 +6,11 @@
         <mat-label>Login Name</mat-label>
         <input [(ngModel)]="loginName" autofocus matInput name="loginName" placeholder="Enter your login name..."
                required>
+        <mat-error *ngIf="errorSignal()">{{ errorSignal() }}</mat-error>
     </mat-form-field>
     <div class="action-row">
         <mat-checkbox [(ngModel)]="rememberMe" name="rememberMe">Remember me</mat-checkbox>
         <div class="buttons">
-            <!--<button mat-button mat-dialog-close type="button">Cancel</button>-->
             <button mat-stroked-button type="submit">Login</button>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, signal, WritableSignal} from '@angular/core';
 import {
     MatCard,
     MatCardActions,
@@ -20,7 +20,6 @@ import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
 import {PasswordFormComponent} from "./password-form/password-form.component";
-import {animate, style, transition, trigger} from "@angular/animations";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {LoginRequest} from "./login-name-form/login-request";
 import {AuthorizeService} from "./authorize.service";
@@ -50,26 +49,12 @@ import {AuthorizeService} from "./authorize.service";
         NgIf,
         MatCardFooter,
         MatProgressBar,
-    ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
-        trigger('loginNameAnimation', [
-            transition(':leave', [
-                animate('0.3s', style({transform: 'translateX(-100%)'}))
-            ])
-        ]), trigger('passwordAnimation', [
-            transition(':enter', [
-                style({transform: 'translateX(0%)'}), animate('0.3s', style({transform: 'translateX(-100%)'}))
-            ]), transition(':leave', [
-                animate('0.3s', style({transform: 'translateX(-100%)'}))
-            ])
-        ])
-    ]
+    ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss'
 })
 export class Authentication implements OnInit
 {
-    animationState: string = "loginForm";
-
     loginRequest?: LoginRequest;
-    errorMessage?: string;
+    errorSignal: WritableSignal<any> = signal('');
     mobile: boolean = false;
     showLoadingThing: boolean = false;
 
@@ -92,26 +77,22 @@ export class Authentication implements OnInit
 
     onSubmit(data: any)
     {
-        this.showLoadingThing = true;
         if (data == false)
         {
-            this.animationState = "slideLoginNameForm"
             this.loginRequest = undefined;
             return;
         }
 
+        this.showLoadingThing = true;
         if (data instanceof LoginRequest)
         {
             this.showLoadingThing = false;
-            this.loginRequest = data;
-            this.animationState = "passwordForm";
-            /*            this.authorizeService.request(data).subscribe({
-                            next: () => this.loginRequest = data,
-                            error: (error) =>
-                            {
-                                this.errorMessage = this.getErrorMessage(error)
-                            }
-                        }).add(() => this.showLoadingThing = true)*/
+            this.authorizeService.request(data).subscribe({
+                next: () => this.loginRequest = data, error: (error) =>
+                {
+                    this.errorSignal.set(this.getErrorMessage(error))
+                }
+            }).add(() => this.showLoadingThing = false)
             return;
         }
     }
