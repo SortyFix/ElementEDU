@@ -42,7 +42,6 @@ import {LoadComponent} from "./load/load.component";
         CdkCopyToClipboard,
         MatTooltip,
         Authentication,
-        Authentication,
         LoadComponent,
     ],
     providers: [

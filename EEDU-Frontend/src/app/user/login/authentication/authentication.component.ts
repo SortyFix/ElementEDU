@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, signal, WritableSignal} from '@angular/core';
+import {Component, EventEmitter, HostListener, OnInit, Output, signal, WritableSignal} from '@angular/core';
 import {
     MatCard,
     MatCardActions,
@@ -23,9 +23,10 @@ import {PasswordFormComponent} from "./password-form/password-form.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {LoginRequest} from "./login-name-form/login-request";
 import {AuthorizeService} from "./authorize.service";
+import {UserService} from "../../user.service";
 
 @Component({
-    selector: 'app-test', standalone: true, imports: [
+    selector: 'app-authentication', standalone: true, imports: [
         MatCard,
         MatCardTitle,
         MatCardSubtitle,
@@ -53,6 +54,7 @@ import {AuthorizeService} from "./authorize.service";
 })
 export class Authentication implements OnInit
 {
+    @Output() submit: EventEmitter<any> = new EventEmitter();
     loginRequest?: LoginRequest;
     errorSignal: WritableSignal<any> = signal('');
     mobile: boolean = false;
@@ -85,7 +87,10 @@ export class Authentication implements OnInit
 
         if(typeof data === 'string')
         {
-            this.authorizeService.verifyPassword(data);
+            this.authorizeService.verifyPassword(data).subscribe({
+                next: () => this.submit.emit(),
+                error: error => this.errorSignal.set(this.getErrorMessage(error))
+            }).add(() => this.showLoadingThing = false);
             return;
         }
 

@@ -1,4 +1,3 @@
-version: "3"
 services:
   eedu-dev:
     image: 'mariadb:latest'
@@ -9,3 +8,11 @@ services:
       MYSQL_PASSWORD: spring
     ports:
       - '3306'
+    networks:
+        - eedu-network
+networks:
+    eedu-network:
+        labels:
+            - development
+            - eedu
+        external: true

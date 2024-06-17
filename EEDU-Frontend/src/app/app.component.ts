@@ -11,7 +11,7 @@ export class AppComponent implements OnInit
 {
 
     errorSignal: WritableSignal<string> = signal('')
-    load: boolean = false;
+    backendReached: boolean = false;
 
     constructor(public userService: UserService)
     {
@@ -19,10 +19,23 @@ export class AppComponent implements OnInit
 
     ngOnInit(): void
     {
+        this.backendReached = false;
+        this.loadUserData();
+    }
+
+    loadUserData()
+    {
         // load user data when site loads
         this.userService.loadData().subscribe({
-            next: value => this.load = true, error: error => this.errorSignal.set(this.getErrorMessage(error))
-        });
+            error: error =>
+            {
+                if (error.status == 403) // not logged in
+                {
+                    return;
+                }
+                this.errorSignal.set(this.getErrorMessage(error))
+            }
+        }).add(() => this.backendReached = !this.errorSignal());
     }
 
     private getErrorMessage(error: any): string
@@ -31,9 +44,9 @@ export class AppComponent implements OnInit
         switch (status)
         {
             case 0:
-                return "The service was not able to reach the backend. Are the servers down?"
+                return "Sorry, our servers are having issues right now. Please try again later. We're working to resolve this as soon as possible. Thank you for your patience!";
             default:
-                return "An unknown error was encountered. We are sorry for any inconveniences."
+                return "An unknown error was encountered. We are sorry for any inconveniences.";
         }
     }
 }

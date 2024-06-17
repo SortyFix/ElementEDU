@@ -1,21 +1,37 @@
-<div class="backdrop-blur">
-    <mat-card>
-        @if (errorSignal()) {
-            <mat-progress-bar mode="determinate" color="warn" [value]="100"></mat-progress-bar>
-        } @else {
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
-        <mat-card-header>
-            <mat-card-title>
-                {{
-                    errorSignal() ? "Oops! Something went wrong" : "Loading ElementEDU"
-                }}
-            </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-card-footer>
-                <img priority ngSrc="assets/img/gaz-logo.png" alt="logo" height="300" width="300">
-            </mat-card-footer>
-        </mat-card-content>
-    </mat-card>
+
+<div>
+    <!--@if (errorSignal()) {
+        <mat-progress-bar mode="determinate" color="warn" [value]="100"></mat-progress-bar>
+    } @else {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }-->
+    <h5>{{ errorSignal() ? 'Oops! Something went wrong.' : 'Loading ElementEDU' }}</h5>
+    @if (errorSignal()) {
+        <mat-progress-bar mode="determinate" color="warn" [value]="100"></mat-progress-bar>
+        <h5 class="mat-label-large">{{errorSignal()}}</h5>
+    } @else {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
 </div>
+
+<!--
+<mat-card>
+    @if (errorSignal()) {
+        <mat-progress-bar mode="determinate" color="warn" [value]="100"></mat-progress-bar>
+    } @else {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <mat-card-header>
+        <mat-card-title>
+            {{
+                errorSignal() ? "Oops! Something went wrong" : "Loading ElementEDU"
+            }}
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-card-footer>
+            <img priority ngSrc="assets/img/gaz-logo.png" alt="logo" height="300" width="300">
+        </mat-card-footer>
+    </mat-card-content>
+</mat-card>
+-->

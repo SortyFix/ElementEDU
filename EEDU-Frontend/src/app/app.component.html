@@ -1,4 +1,5 @@
 <div class="content">
-    <app-load *ngIf="!load" [errorSignal]="errorSignal"></app-load>
-    <router-outlet *ngIf="load"></router-outlet>
+    <app-load *ngIf="!backendReached" [errorSignal]="errorSignal"></app-load>
+    <app-authentication *ngIf="backendReached && !userService.loggedIn()" (submit)="loadUserData()"></app-authentication>
+    <router-outlet *ngIf="backendReached && userService.loggedIn()"></router-outlet>
 </div>
