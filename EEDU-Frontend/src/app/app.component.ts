@@ -19,12 +19,10 @@ export class AppComponent implements OnInit
 
     ngOnInit(): void
     {
-        this.userService.isLoggedIn().subscribe({
+        // load user data when site loads
+        this.userService.loadData().subscribe({
             next: value => this.load = true, error: error => this.errorSignal.set(this.getErrorMessage(error))
-        }).add(() =>
-        {
-            console.log("Finish")
-        })
+        });
     }
 
     private getErrorMessage(error: any): string
