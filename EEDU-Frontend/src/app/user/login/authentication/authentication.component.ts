@@ -83,6 +83,12 @@ export class Authentication implements OnInit
             return;
         }
 
+        if(typeof data === 'string')
+        {
+            this.authorizeService.verifyPassword(data);
+            return;
+        }
+
         this.showLoadingThing = true;
         if (data instanceof LoginRequest)
         {
