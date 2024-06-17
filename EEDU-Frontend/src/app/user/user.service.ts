@@ -12,19 +12,23 @@ export class UserService
     {
     }
 
-
-    public isLoggedIn(): Observable<void>
+    public loadData(): Observable<void>
     {
         const userData = localStorage.getItem("userData");
 
-        if(userData)
+        if (userData)
         {
             return of();
         }
 
         return this.getUserdata().pipe(tap<string>({
-            next: value => localStorage.setItem("userData", value),
+            next: value => this.storeUserData(value),
         }), map(() => {}));
+    }
+
+    private storeUserData(userData: any)
+    {
+        localStorage.setItem("userData", userData)
     }
 
     private getUserdata(): Observable<any>

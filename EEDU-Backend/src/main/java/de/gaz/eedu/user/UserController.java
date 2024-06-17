@@ -90,11 +90,6 @@ import java.util.function.Function;
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @GetMapping("/authorized") @PreAuthorize("isAuthenticated()") public void isAuthorized()
-    {
-        validate(isAuthorized(JwtTokenType.AUTHORIZED), this::unauthorizedThrowable);
-    }
-
     private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
