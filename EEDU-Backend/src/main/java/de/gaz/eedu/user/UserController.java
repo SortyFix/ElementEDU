@@ -8,10 +8,13 @@ import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,19 +40,20 @@ import java.util.function.Function;
 @Slf4j @RestController @RequestMapping(value = "/user") @RequiredArgsConstructor public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
 {
     private final UserService userService;
+    @Value("${development}") private final boolean development = false;
 
     @Override protected @NotNull UserService getEntityService()
     {
         return userService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override
+    @PreAuthorize("hasAuthority('${user.create}')") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
     {
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override
+    @PreAuthorize("hasAuthority('${user.delete}')") @DeleteMapping("/delete/{id}") @Override
     public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
@@ -62,7 +66,7 @@ import java.util.function.Function;
         return super.getData(id);
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get")
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @GetMapping("/get")
     public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal Long userId)
     {
         validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
@@ -75,7 +79,20 @@ import java.util.function.Function;
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/login/advanced")
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @GetMapping("/logout")
+    public void logout(@AuthenticationPrincipal long userId, @NotNull HttpServletResponse response)
+    {
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        cookie.setSecure(!development);
+        cookie.setDomain("localhost");
+        cookie.setPath("http://localhost/");
+        response.addCookie(cookie);
+        
+        log.info("User {} has been logged out.", userId);
+    }
+
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PostMapping("/login/advanced")
     public @NotNull ResponseEntity<String> requestAdvancedLogin(@NotNull @RequestBody AdvancedUserLoginModel loginModel,
                                                                 @AuthenticationPrincipal long userID)
     {

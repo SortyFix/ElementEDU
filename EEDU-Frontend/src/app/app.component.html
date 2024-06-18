@@ -1,5 +1,5 @@
 <div class="content">
-    <app-load *ngIf="!backendReached" [errorSignal]="errorSignal"></app-load>
-    <app-authentication *ngIf="backendReached && !userService.loggedIn()" (submit)="loadUserData()"></app-authentication>
-    <router-outlet *ngIf="backendReached && userService.loggedIn()"></router-outlet>
+    <app-load *ngIf="!isLoaded() && !userService.isLoggedIn()" [errorSignal]="errorSignal"></app-load>
+    <app-authentication *ngIf="isLoaded() && !userService.isLoggedIn()"></app-authentication>
+    <router-outlet *ngIf="isLoaded() && userService.isLoggedIn()"></router-outlet>
 </div>

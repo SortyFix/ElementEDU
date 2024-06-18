@@ -1,8 +1,6 @@
 package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.AccessLevel;
@@ -28,11 +26,10 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, Privileg
     @Override protected @NotNull ServiceTest.Eval<PrivilegeCreateModel, PrivilegeModel> successEval()
     {
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("test", new Long[0]);
-        PrivilegeModel privilegeModel = new PrivilegeModel(5L, "TEST", new SimplePrivilegeGroupModel[0]);
+        PrivilegeModel privilegeModel = new PrivilegeModel(5L, "TEST");
         return Eval.eval(privilegeCreateModel, privilegeModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
-            Assertions.assertEquals(expect.groups().length, result.groups().length);
         });
     }
 

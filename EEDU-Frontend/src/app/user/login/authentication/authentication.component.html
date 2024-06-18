@@ -1,35 +1,35 @@
 <div class="backdrop-blur">
     <mat-card>
-        <mat-progress-bar [mode]="showLoadingThing ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
+        <mat-progress-bar [mode]="loadingAnimation ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
 
-            <mat-card-header>
-                <mat-card-title>
-                    <mat-icon class="centered-icon">person</mat-icon>
-                    Login to ElementEDU
-                </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-                <mat-grid-list [cols]="mobile ? 1 : 2">
-                    <mat-grid-tile *ngIf="!mobile">
-                        <img alt="account" height="200" ngSrc="assets/favicon.svg" priority style="border-radius: 20px"
-                             width="200">
-                        <!--<img alt="account" height="255" ngSrc="assets/favicon.svg" width="255">-->
-                    </mat-grid-tile>
-                    <mat-grid-tile>
-                        <div class="form-container">
-                            <app-login-name-form (submit)="onSubmit($event)" *ngIf="!loginRequest"
-                                                 [errorSignal]="errorSignal" class="current-form">
-                            </app-login-name-form>
-                            <app-password-form (submit)="onSubmit($event)" *ngIf="loginRequest"
-                                               [loginName]="'root'" class="current-form">
-                            </app-password-form>
-                        </div>
-                    </mat-grid-tile>
-                </mat-grid-list>
-                <mat-card-footer style="display: flex; justify-content: center">
-                    <a href="styles.scss">Datenschutz</a>
-                </mat-card-footer>
-            </mat-card-content>
+        <mat-card-header>
+            <mat-card-title>
+                <mat-icon class="centered-icon">person</mat-icon>
+                Login to ElementEDU
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-grid-list [cols]="mobile ? 1 : 2">
+                <mat-grid-tile *ngIf="!mobile">
+                    <img alt="account" height="200" ngSrc="assets/favicon.svg" priority style="border-radius: 20px"
+                         width="200">
+                    <!--<img alt="account" height="255" ngSrc="assets/favicon.svg" width="255">-->
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <div class="form-container">
+                        <app-login-name-form (submit)="onSubmit($event)" *ngIf="!loginRequest"
+                                             [errorSignal]="errorSignal" class="current-form">
+                        </app-login-name-form>
+                        <app-password-form (submit)="onSubmit($event)" *ngIf="loginRequest"
+                                           [loginName]="loginRequest.loginName" class="current-form">
+                        </app-password-form>
+                    </div>
+                </mat-grid-tile>
+            </mat-grid-list>
+            <mat-card-footer style="display: flex; justify-content: center">
+                <a href="styles.scss">Datenschutz</a>
+            </mat-card-footer>
+        </mat-card-content>
 
     </mat-card>
 </div>

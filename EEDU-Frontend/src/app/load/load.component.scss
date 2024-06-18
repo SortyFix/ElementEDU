@@ -6,12 +6,11 @@ div {
     transform: translate(-50%, -50%);
     overflow: hidden;
 
-    h5 {
+    p {
         text-align: center;
     }
 
     mat-progress-bar {
-        margin-top: 10px;
         margin-bottom: 10px;
     }
 }

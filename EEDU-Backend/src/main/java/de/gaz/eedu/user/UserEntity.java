@@ -6,16 +6,12 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
-import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -70,18 +66,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
-    public @NotNull SimpleUserModel toSimpleModel()
-    {
-        return new SimpleUserModel(getId(),
-                getFirstName(),
-                getLastName(),
-                getLoginName(),
-                isEnabled(),
-                isLocked(),
-                getThemeEntity().toSimpleModel(),
-                getStatus());
-    }
-
     @Override public String getPassword()
     {
         Optional<CredentialEntity> password = getCredentials(CredentialMethod.PASSWORD);
@@ -95,25 +79,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public UserModel toModel()
     {
-        Function<GroupEntity, SimpleUserGroupModel> mapper = (entity) ->
-        {
-            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel)
-                    .toArray(SimplePrivilegeModel[]::new);
-            return new SimpleUserGroupModel(entity.getId(),
-                    entity.getName(),
-                    privilegeModels);
-        };
-
-        return new UserModel(getId(),
-                getFirstName(),
-                getLastName(),
-                getLoginName(),
-                isEnabled(),
-                isLocked(),
-                getCredentials().stream().map(CredentialEntity::toModel).distinct().toArray(CredentialModel[]::new),
-                getThemeEntity().toSimpleModel(),
-                getGroups().stream().map(mapper).toArray(SimpleUserGroupModel[]::new),
-                getStatus());
+        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), getStatus());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()

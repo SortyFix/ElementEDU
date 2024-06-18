@@ -1,5 +1,6 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
+import {finalize} from "rxjs";
 
 @Component({
     selector: 'app-root',
@@ -11,7 +12,6 @@ export class AppComponent implements OnInit
 {
 
     errorSignal: WritableSignal<string> = signal('')
-    backendReached: boolean = false;
 
     constructor(public userService: UserService)
     {
@@ -19,11 +19,15 @@ export class AppComponent implements OnInit
 
     ngOnInit(): void
     {
-        this.backendReached = false;
         this.loadUserData();
     }
 
-    loadUserData()
+    protected isLoaded(): boolean
+    {
+        return this.userService.hasLoaded() && !this.errorSignal();
+    }
+
+    protected loadUserData(): void
     {
         // load user data when site loads
         this.userService.loadData().subscribe({
@@ -35,7 +39,7 @@ export class AppComponent implements OnInit
                 }
                 this.errorSignal.set(this.getErrorMessage(error))
             }
-        }).add(() => this.backendReached = !this.errorSignal());
+        });
     }
 
     private getErrorMessage(error: any): string

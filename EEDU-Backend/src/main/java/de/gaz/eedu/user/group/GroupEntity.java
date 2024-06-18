@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -79,10 +77,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
 
     @Override public @NotNull GroupModel toModel()
     {
-        return new GroupModel(getId(),
-                getName(),
-                getUsers().stream().map(UserEntity::toSimpleModel).toArray(SimpleUserModel[]::new),
-                getPrivileges().stream().map(PrivilegeEntity::toSimpleModel).toArray(SimplePrivilegeModel[]::new));
+        return new GroupModel(getId(), getName());
     }
 
     /**

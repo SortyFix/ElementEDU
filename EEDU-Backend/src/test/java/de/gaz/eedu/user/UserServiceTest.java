@@ -5,14 +5,11 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
-import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -74,16 +71,12 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", true, false, new CredentialModel[0], getThemeService().loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(), new SimpleUserGroupModel[0], UserStatus.PRESENT);
+        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT);
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
             Assertions.assertEquals(expect.firstName(), result.firstName());
             Assertions.assertEquals(expect.lastName(), result.lastName());
             Assertions.assertEquals(expect.loginName(), result.loginName());
-            Assertions.assertEquals(expect.enabled(), result.enabled());
-            Assertions.assertEquals(expect.locked(), result.locked());
-            Assertions.assertArrayEquals(expect.groups(), result.groups());
-            Assertions.assertEquals(expect.theme(), result.theme());
         });
     }
 
