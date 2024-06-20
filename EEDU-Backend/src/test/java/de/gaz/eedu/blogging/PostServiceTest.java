@@ -75,7 +75,7 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 new String[]{"Tag1", "Tag2", "Tag3"}
         ));
 
-        entity.appendTags(getService(),"Tag4", "Tag5");
+        entity.attachTags(getService(),"Tag4", "Tag5");
 
         Assertions.assertEquals(5, entity.getTags().size());
     }
