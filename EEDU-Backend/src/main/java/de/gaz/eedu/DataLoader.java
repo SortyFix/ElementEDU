@@ -1,6 +1,5 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.blogging.PostService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -32,7 +31,7 @@ import java.security.SecureRandom;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
-    private final PostService postService;
+
     @Value("${development:false}") private boolean development;
 
     @Override @Transactional public void run(@NotNull String... args)

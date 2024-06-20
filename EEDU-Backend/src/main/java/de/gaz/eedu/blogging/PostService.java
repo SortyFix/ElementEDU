@@ -4,10 +4,11 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
-import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.user.UserService;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,26 +19,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class PostService extends EntityService<PostRepository, PostEntity, PostModel, PostCreateModel>
 {
-    private final PostRepository postRepository;
-    private final UserService userService;
-    private final FileService fileService;
+    @Getter private final PostRepository repository;
+    @Getter private final UserService userService;
 
     @Value("${blog.write}") private String writePrivilege;
 
-    @Override
-    public @NotNull PostRepository getRepository()
-    {
-        return postRepository;
-    }
-
-    @Override
     public @NotNull PostEntity createEntity(@NotNull PostCreateModel model) throws CreationException
     {
         return model.toEntity(new PostEntity());
@@ -49,49 +41,41 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
      * @throws de.gaz.eedu.exception.EntityUnknownException If post or user could not be found in the database.
      * @throws org.springframework.web.client.HttpClientErrorException.Unauthorized If the user does not own the privileges to edit a post.
      */
-    public void deleteEntity(@NotNull Long userId, @NotNull Long postId)
+    public void deleteEntity(@NotNull Long postId)
     {
-        postRepository.delete(postRepository.getReferenceById(postId));
+        getRepository().delete(getRepository().getReferenceById(postId));
     }
 
     public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
     {
-        return userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getReadPrivileges());
+        return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
     }
 
     public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
     {
-        return userService.loadEntityByIDSafe(userId).hasAnyAuthority(postRepository.getReferenceById(postId).getEditPrivileges());
+        return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getEditPrivileges());
     }
 
-    public @NotNull PostModel getModel(@NotNull Long userId, @NotNull Long postId)
+    public @NotNull PostModel getModel(@NotNull Long postId)
     {
-        return postRepository.getReferenceById(postId).toModel();
+        return getRepository().getReferenceById(postId).toModel();
     }
 
     /**
      * Edits an existing model by setting and saving all given values.
-     * @param userId the id of the user editing the post; throws <code>UNAUTHORIZED</code> if the user does not have edit privileges.
      * @param postId the id of the post to edit
      * @param author the name of the author; Has no connection to other UserEntities, merely for style
      * @param title the title of the post
      * @param body the body of the post
-     * @param readPrivileges only people with read privileges will be able to read the created post
-     * @param editPrivileges only people with edit privileges will be able to edit the created post
-     * @param tags tags of the post to filter posts with certain tags
      * @return PostModel containing the given values
      */
-    public @NotNull PostModel editModel(@NotNull Long userId, @NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String body,
-            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    public @NotNull PostModel editModel(@NotNull Long postId, @NotNull String author, @NotNull String title, @NotNull String body)
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         postEntity.setAuthor(author);
         postEntity.setTitle(title);
         postEntity.setBody(body);
-        postEntity.setReadPrivileges(new HashSet<>(Arrays.asList(readPrivileges)));
-        postEntity.setEditPrivileges(new HashSet<>(Arrays.asList(editPrivileges)));
-        postEntity.appendTags(tags);
-        postRepository.save(postEntity);
+        getRepository().save(postEntity);
         return postEntity.toModel();
     }
 
@@ -112,7 +96,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), postEntity.getReadPrivileges().toArray(new String[0]), "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
         thumbnailFile.uploadBatch("", newThumbnail);
         postEntity.setThumbnailURL(thumbnailFile.getFilePath());
-        postRepository.save(postEntity);
+        getRepository().save(postEntity);
         return postEntity.toModel();
     }
 
@@ -120,25 +104,19 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
      * Service method to create a new blog post.
      *
      * @param userId the ID of the user creating the post
-     * @param author the name of the author; Has no connection to other UserEntities, merely for style
-     * @param title the title of the post
      * @param thumbnail the uploaded MultipartFile for the post's thumbnail
-     * @param body the body of the post
-     * @param readPrivileges only people with read privileges will be able to read the created post
-     * @param editPrivileges only people with edit privileges will be able to edit the created post
-     * @param tags tags of the post to filter posts with certain tags
+     * @param createModel the template of the post about to be created
      * @return PostModel containing given data
      */
     @Transactional
-    public @NotNull PostModel createPost(@NotNull Long userId, @NotNull String author, @NotNull String title, @NotNull MultipartFile thumbnail, @NotNull String body,
-            @NotNull String[] readPrivileges, @NotNull String[] editPrivileges, @NotNull String[] tags)
+    public @NotNull PostModel createPost(@NotNull Long userId, @NotNull MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
-        if(userService.loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
+        if(getUserService().loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
         {
-            FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), readPrivileges, "blog", tags).toEntity(new FileEntity());
+            FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), createModel.readPrivileges(), "blog", createModel.tags()).toEntity(new FileEntity());
             thumbnailFile.uploadBatch("", thumbnail);
-            return createEntity(new PostCreateModel(author, title,
-                    thumbnailFile.getFilePath(), body, readPrivileges, editPrivileges, tags)).toModel();
+            return createEntity(new PostCreateModel(createModel.author(), createModel.title(),
+                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags())).toModel();
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }

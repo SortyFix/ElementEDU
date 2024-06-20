@@ -29,12 +29,12 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         entity.setReadPrivileges(combinePrivileges());
         entity.setEditPrivileges(Arrays.stream(editPrivileges()).collect(Collectors.toSet()));
         entity.setTimeOfCreation(System.currentTimeMillis());
-        entity.appendTags(tags());
+        entity.attachTags(tags());
         return entity;
     }
 
     public @NotNull @Unmodifiable Set<String> combinePrivileges()
     {
-        return Stream.concat(Arrays.stream(readPrivileges()), Arrays.stream(editPrivileges())).collect(Collectors.toSet());
+        return Stream.concat(Arrays.stream(readPrivileges()), Arrays.stream(editPrivileges())).collect(Collectors.toUnmodifiableSet());
     }
 }

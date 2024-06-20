@@ -47,6 +47,16 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         return this.editPrivileges.addAll(Set.of(privileges));
     }
 
+    public boolean detachEditPrivileges(@NotNull PostService service, @NotNull String... privileges)
+    {
+        return updateDatabase(service, privileges, this::detachEditPrivileges);
+    }
+
+    public boolean detachEditPrivileges(@NotNull String... privileges)
+    {
+        return this.editPrivileges.removeAll(Set.of(privileges));
+    }
+
     public boolean attachReadPrivileges(@NotNull PostService service, @NotNull String... privileges)
     {
         return updateDatabase(service, privileges, this::attachReadPrivileges);
@@ -57,14 +67,34 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         return this.readPrivileges.addAll(Set.of(privileges));
     }
 
-    public boolean appendTags(@NotNull PostService service, @NotNull String... tags)
+    public boolean detachReadPrivileges(@NotNull PostService service, @NotNull String... privileges)
     {
-        return updateDatabase(service, tags, this::appendTags);
+        return updateDatabase(service, privileges, this::detachReadPrivileges);
     }
 
-    public boolean appendTags(@NotNull String... tags)
+    public boolean detachReadPrivileges(@NotNull String... privileges)
+    {
+        return this.readPrivileges.removeAll(Set.of(privileges));
+    }
+
+    public boolean attachTags(@NotNull PostService service, @NotNull String... tags)
+    {
+        return updateDatabase(service, tags, this::attachTags);
+    }
+
+    public boolean attachTags(@NotNull String... tags)
     {
         return this.tags.addAll(Set.of(tags));
+    }
+
+    public boolean detachTags(@NotNull PostService service, @NotNull String... tags)
+    {
+        return updateDatabase(service, tags, this::detachTags);
+    }
+
+    public boolean detachTags(@NotNull String... privileges)
+    {
+        return this.tags.removeAll(Set.of(privileges));
     }
 
     @Override public boolean equals(Object o)
@@ -101,7 +131,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         }
     }
 
-    private <T> boolean updateDatabase(@NotNull PostService userService, @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    private <T> boolean updateDatabase(@NotNull PostService userService, @NotNull T entity, @NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {
