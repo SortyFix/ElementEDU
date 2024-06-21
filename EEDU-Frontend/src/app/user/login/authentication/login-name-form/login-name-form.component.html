@@ -4,8 +4,8 @@
     </h6>
     <mat-form-field appearance="outline">
         <mat-label>Login Name</mat-label>
-        <input [(ngModel)]="loginName" autofocus matInput name="loginName" placeholder="Enter your login name..."
-               required>
+        <input [(ngModel)]="loginName" matInput name="loginName" placeholder="Enter your login name..."
+               required autofocus />
         <mat-error *ngIf="errorSignal()">{{ errorSignal() }}</mat-error>
     </mat-form-field>
     <div class="action-row">

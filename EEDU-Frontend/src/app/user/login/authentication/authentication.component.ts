@@ -9,6 +9,7 @@ import {MatProgressBar} from "@angular/material/progress-bar";
 import {LoginRequest} from "./login-name-form/login-request";
 import {UserService} from "../../user.service";
 import {finalize, MonoTypeOperatorFunction} from "rxjs";
+import {SelectCredentialComponent} from "./select-credential/select-credential.component";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -25,6 +26,7 @@ import {finalize, MonoTypeOperatorFunction} from "rxjs";
         MatCardFooter,
         NgOptimizedImage,
         NgIf,
+        SelectCredentialComponent,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss'
 })
 export class Authentication implements OnInit

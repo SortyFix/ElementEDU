@@ -13,7 +13,6 @@
                 <mat-grid-tile *ngIf="!mobile">
                     <img alt="account" height="200" ngSrc="assets/favicon.svg" priority style="border-radius: 20px; user-select: none"
                          width="200" >
-                    <!--<img alt="account" height="255" ngSrc="assets/favicon.svg" width="255">-->
                 </mat-grid-tile>
                 <mat-grid-tile>
                     <div class="form-container">
@@ -23,6 +22,7 @@
                         <app-password-form (submit)="onSubmit($event)" *ngIf="loginRequest"
                                            [loginName]="loginRequest.loginName" class="current-form">
                         </app-password-form>
+                        <!--<app-select-credential class="current-form"></app-select-credential>-->
                     </div>
                 </mat-grid-tile>
             </mat-grid-list>
@@ -30,6 +30,5 @@
                 <a href="styles.scss">Datenschutz</a>
             </mat-card-footer>
         </mat-card-content>
-
     </mat-card>
 </div>
