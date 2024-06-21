@@ -13,14 +13,14 @@ import {MatIcon} from "@angular/material/icon";
         MatButton,
         MatCheckbox,
         MatDialogClose,
-        MatFormField,
         MatInput,
         MatLabel,
         ReactiveFormsModule,
         MatIcon,
         MatIconButton,
         MatSuffix,
-        MatAnchor
+        MatAnchor,
+        MatFormField
     ], templateUrl: './password-form.component.html', styleUrl: './password-form.component.scss'
 })
 export class PasswordFormComponent
@@ -28,21 +28,21 @@ export class PasswordFormComponent
     @Output() readonly submit = new EventEmitter<any>();
     @Input() errorSignal: WritableSignal<any> = signal('');
     @Input() loginName?: string;
-    password?: string;
-    showPassword: boolean = false;
+    protected password?: string;
+    protected showPassword: boolean = false;
 
-    onShowPassword(event: MouseEvent)
+    protected onShowPassword(event: MouseEvent)
     {
         event.stopPropagation()
         this.showPassword = !this.showPassword;
     }
 
-    onCancel()
+    protected onCancel()
     {
         this.submit.emit(false)
     }
 
-    onSubmit()
+    protected onSubmit()
     {
         if(!this.password)
         {

@@ -23,9 +23,8 @@ export class UserService
         {
             return of();
         }
-
         return this.getUserdata().pipe(tap<UserEntity>({
-            next: (value: UserEntity) => this.storeUserData(value),
+            next: (value: UserEntity) => this.storeUserData(value)
         }), finalize((): void => { this.loaded = true; }), map((): void => {}));
     }
 
@@ -69,14 +68,15 @@ export class UserService
             next: () =>
             {
                 this.token = undefined;
-                this.loadData()
+                this.loadData().subscribe();
             }
         }));
     }
 
     private getUserdata(): Observable<UserEntity>
     {
-        return this.http.get<UserEntity>("http://localhost:8080/user/get", {withCredentials: true});
+        const url: string = "http://localhost:8080/user/get";
+        return this.http.get<UserEntity>(url, {withCredentials: true});
     }
 
     private storeUserData(userData: any)

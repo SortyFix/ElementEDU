@@ -29,7 +29,7 @@ import {finalize, MonoTypeOperatorFunction} from "rxjs";
 })
 export class Authentication implements OnInit
 {
-    @Output() submit: EventEmitter<any> = new EventEmitter();
+    @Output() submit: EventEmitter<void> = new EventEmitter<void>();
     loginRequest?: LoginRequest;
     errorSignal: WritableSignal<any> = signal('');
     mobile: boolean = false;
@@ -57,7 +57,7 @@ export class Authentication implements OnInit
      *
      * @param event The resize event.
      */
-    @HostListener("window:resize", ["$event"]) onResize(event: any)
+    @HostListener("window:resize") onResize()
     {
         this.checkScreenSize()
     }
@@ -90,6 +90,7 @@ export class Authentication implements OnInit
             this.verifyPassword(data);
             return;
         }
+
         else if (data instanceof LoginRequest)
         {
             this.requestCredentials(data)
@@ -125,7 +126,10 @@ export class Authentication implements OnInit
     private verifyPassword(password: string)
     {
         this.userService.verifyPassword(password).pipe(this.finalizeLoading()).subscribe({
-            next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
+            next: () =>
+            {
+                this.submit.emit();
+            }, error: error => this.errorSignal.set(this.getErrorMessage(error))
         });
     }
 
