@@ -20,12 +20,6 @@ import {LoadComponent} from "./load/load.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
-import {CoursesComponent} from "./pages/courses/courses.component";
-import {TimetableComponent} from "./pages/timetable/timetable.component";
-import {NewsComponent} from "./pages/news/news.component";
-import {ChatComponent} from "./pages/chat/chat.component";
-import {SettingsComponent} from "./pages/settings/settings.component";
-import {SchoolComponent} from "./pages/school/school.component";
 
 @NgModule({
     declarations: [
@@ -57,13 +51,7 @@ import {SchoolComponent} from "./pages/school/school.component";
         Authentication,
         LoadComponent,
         NgOptimizedImage,
-        MatSidenavModule,
-        CoursesComponent,
-        TimetableComponent,
-        NewsComponent,
-        ChatComponent,
-        SettingsComponent,
-        SchoolComponent
+        MatSidenavModule
     ],
     providers: [
         provideHttpClient(withFetch())
