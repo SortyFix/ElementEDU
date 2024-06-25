@@ -3,9 +3,11 @@ package de.gaz.eedu.file;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,8 +17,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class FileServiceTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) @SpringBootTest @ActiveProfiles("test")
+public class FileServiceTest
 {
     @Autowired private FileService fileService;
 

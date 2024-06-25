@@ -3,8 +3,8 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.verfication.JwtTokenType;
-import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
+import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +81,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
      */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
-        log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
+        log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
         return getEntityService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
@@ -103,7 +103,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
                                   .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
-    private @NotNull Authentication getAuthentication()
+    protected @NotNull Authentication getAuthentication()
     {
         return SecurityContextHolder.getContext().getAuthentication();
     }

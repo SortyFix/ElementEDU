@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS user_entity
     first_name     VARCHAR(255) NULL,
     last_name      VARCHAR(255) NULL,
     login_name     VARCHAR(255) NULL,
-    password       VARCHAR(255) NULL,
     system_account BIT      NOT NULL,
     enabled        BIT          NOT NULL,
     locked         BIT          NOT NULL,
@@ -35,7 +34,6 @@ CREATE TABLE IF NOT EXISTS user_entity
 -- The 'group_privileges' table is an associative (junction) table that links groups to their privileges.
 CREATE TABLE IF NOT EXISTS group_entity
 (
-    two_factor_required BIT          NOT NULL,
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     name                VARCHAR(255) NULL
 );
@@ -48,7 +46,7 @@ CREATE TABLE IF NOT EXISTS privilege_entity
 );
 
 -- The 'group_entity' table contains information about user groups. Each group can have a unique name and optionally require two-factor authentication.
-CREATE TABLE IF NOT EXISTS two_factor_entity
+CREATE TABLE IF NOT EXISTS credential_entity
 (
     enabled BIT          NOT NULL,
     id      BIGINT AUTO_INCREMENT PRIMARY KEY,

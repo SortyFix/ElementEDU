@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EntityObject,
         EntityModelRelation<ThemeModel>
@@ -25,14 +24,8 @@ import java.util.stream.Collectors;
             CascadeType.PERSIST
     }) @JsonBackReference private Set<UserEntity> users;
 
-    @Contract(pure = true) @NotNull public SimpleThemeModel toSimpleModel()
-    {
-        return new SimpleThemeModel(getId(), getName(), getBackgroundColor(), getWidgetColor(), getTextColor());
-    }
-
     @Override @Contract(pure = true) public @NotNull ThemeModel toModel()
     {
-        return new ThemeModel(getId(), getName(), getBackgroundColor(), getWidgetColor(), getTextColor(),
-                getUsers().stream().map(UserEntity::toSimpleModel).collect(Collectors.toSet()));
+        return new ThemeModel(getId(), getName(), getBackgroundColor(), getWidgetColor(), getTextColor());
     }
 }

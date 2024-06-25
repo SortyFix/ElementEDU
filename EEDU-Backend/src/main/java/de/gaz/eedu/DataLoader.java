@@ -13,6 +13,9 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
+import de.gaz.eedu.user.verification.credentials.CredentialService;
+import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
+import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,9 +28,11 @@ import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
-@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED)
+public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
+    private final CredentialService credentialService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
@@ -59,7 +64,8 @@ import java.security.SecureRandom;
 
         PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(randomPassword, createDefaultTheme(), groupEntity);
+        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
+        setPassword(userEntity, randomPassword);
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -73,6 +79,13 @@ import java.security.SecureRandom;
         }
     }
 
+    private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
+    {
+        CredentialMethod password = CredentialMethod.PASSWORD;
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, randomPassword);
+        getCredentialService().create(credential);
+    }
+
     private @NotNull PrivilegeEntity createDefaultPrivilege()
     {
         PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
@@ -81,7 +94,7 @@ import java.security.SecureRandom;
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", true, new Long[0], new Long[] {privilegeEntity.getId()});
+        GroupCreateModel group = new GroupCreateModel("admin", new Long[0], new Long[] { privilegeEntity.getId() });
         return getGroupService().createEntity(group);
     }
 
@@ -91,12 +104,20 @@ import java.security.SecureRandom;
         return getThemeService().createEntity(theme);
     }
 
-    private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         // long line -.-
-        UserCreateModel user = new UserCreateModel("root", "root", "root", password, true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
+        UserCreateModel user = new UserCreateModel("root",
+                "root",
+                "root",
+                true,
+                false,
+                UserStatus.PROSPECTIVE,
+                themeEntity.getId(),
+                new Long[] { groupEntity.getId() });
         UserEntity userEntity = getUserService().createEntity(user);
         userEntity.setSystemAccount(true);
+
         return getUserService().saveEntity(userEntity);
     }
 

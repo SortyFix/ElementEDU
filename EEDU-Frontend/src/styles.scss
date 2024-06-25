@@ -1,64 +1,21 @@
+@import "@angular/material/prebuilt-themes/azure-blue.css";
 
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
-// Plus imports for other components in your app.
-
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
-@include mat.core();
-
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
-$EEDU-Frontend-primary: mat.define-palette(mat.$indigo-palette);
-$EEDU-Frontend-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-
-// The warn palette is optional (defaults to red).
-$EEDU-Frontend-warn: mat.define-palette(mat.$red-palette);
-
-// Create the theme object. A theme consists of configurations for individual
-// theming systems such as "color" or "typography".
-$EEDU-Frontend-theme: mat.define-light-theme((
-  color: (
-    primary: $EEDU-Frontend-primary,
-    accent: $EEDU-Frontend-accent,
-    warn: $EEDU-Frontend-warn,
-  )
-));
-
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include mat.all-component-themes($EEDU-Frontend-theme);
-
-/* You can add global styles to this file, and also import other style files */
-body {
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    margin: 0;
-    padding: 0;
+.backdrop-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    font-family: 'YourFontName', Fallback, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-html {
-    height: 100%;
-}
 
-@font-face {
-    font-family: 'FreeSans';
-    src: url('assets/fonts/FreeSansBold.otf') format('otf'),
-    url('assets/fonts/FreeSansBold.otf') format('otf');
-}
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-// This class applies styles to make HTML elements unselectable
-.unselectable
+.centered-icon
 {
-    user-select: none;
+    vertical-align: middle;
+    margin-bottom: 4px
 }

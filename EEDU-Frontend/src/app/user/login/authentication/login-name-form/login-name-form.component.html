@@ -1,0 +1,17 @@
+<form (ngSubmit)="onSubmit()">
+    <h6>
+        Enter your Credentials
+    </h6>
+    <mat-form-field appearance="outline">
+        <mat-label>Login Name</mat-label>
+        <input [(ngModel)]="loginName" matInput name="loginName" placeholder="Enter your login name..."
+               required autofocus />
+        <mat-error *ngIf="errorSignal()">{{ errorSignal() }}</mat-error>
+    </mat-form-field>
+    <div class="action-row">
+        <mat-checkbox [(ngModel)]="rememberMe" name="rememberMe">Remember me</mat-checkbox>
+        <div class="buttons">
+            <button mat-stroked-button type="submit">Login</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,9 @@
+<div>
+    <p class="mat-headline-small">{{ errorSignal() ? 'Oops! Something went wrong' : 'Loading ElementEDU' }}</p>
+    @if (errorSignal()) {
+        <mat-progress-bar mode="determinate" color="warn" [value]="100"></mat-progress-bar>
+        <p class="mat-label-large">{{errorSignal()}}</p>
+    } @else {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+</div>

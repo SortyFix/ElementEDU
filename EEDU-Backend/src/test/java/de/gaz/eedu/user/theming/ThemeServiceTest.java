@@ -2,16 +2,11 @@ package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.TestData;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, ThemeModel, ThemeCreateModel>
@@ -21,9 +16,8 @@ public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, The
 
     @Override protected @NotNull Eval<ThemeCreateModel, ThemeModel> successEval()
     {
-        Set<SimpleUserModel> users = new HashSet<>();
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("test", 0x000000, 0x000000, 0x000000);
-        ThemeModel themeModel = new ThemeModel(5L, "test", 0x000000, 0x000000, 0x000000, users);
+        ThemeModel themeModel = new ThemeModel(5L, "test", 0x000000, 0x000000, 0x000000);
         return Eval.eval(themeCreateModel, themeModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
@@ -40,8 +34,8 @@ public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, The
     }
 
     @Override
-    protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    protected @NotNull TestData<Boolean>[] deleteEntities()
     {
-        return Stream.of(new TestData<>(4, true));
+        return new TestData[] {new TestData<>(4, true) };
     }
 }

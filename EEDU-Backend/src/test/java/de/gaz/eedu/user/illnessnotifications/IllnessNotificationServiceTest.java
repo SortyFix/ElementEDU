@@ -70,7 +70,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     }
 
     @Override
-    protected @NotNull Stream<TestData<Boolean>> deleteEntities() {
-        return Stream.of(new TestData<>(3, true));
+    protected @NotNull TestData<Boolean>[] deleteEntities() {
+        return new TestData[] {new TestData<>(3, true) };
     }
 }
