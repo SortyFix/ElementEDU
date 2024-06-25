@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sidebar',
@@ -7,6 +8,8 @@ import { Component } from '@angular/core';
 })
 
 export class SidebarComponent {
+    constructor(public router: Router) { }
+
     sidebar_buttons = [
         {title:'Georg-August-Zinn-Schule', icon_name: 'school'},
         {title:'Dashboard', icon_name: 'dashboard'},
@@ -17,4 +20,9 @@ export class SidebarComponent {
         {title:'Chat', icon_name: 'forum'},
         {title:'Settings', icon_name: 'settings'}
     ]
+
+    protected getCurrentUrl(): string
+    {
+        return this.router.url;
+    }
 }

@@ -7,12 +7,12 @@
         </div>
         <h1 style="text-align: center; margin-top:40px; color: darkblue; font-weight: bold; user-select: none">ElementEDU</h1>
         <div style="margin-top: 40px">
-            <button *ngFor="let item of sidebar_buttons" mat-button class="sidebar-button">
-                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="{{item.icon_name}}"></mat-icon>
+            <button *ngFor="let item of sidebar_buttons" mat-button class="sidebar-button" style="padding-left: 30px">
+                <mat-icon fontIcon="{{item.icon_name}}"></mat-icon>
                 {{ item.title }}
             </button>
-            <button mat-button class="logout-button">
-                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="logout"></mat-icon>
+            <button mat-button class="logout-button" style="padding-left: 30px">
+                <mat-icon fontIcon="logout"></mat-icon>
                 Logout
             </button>
         </div>
@@ -21,5 +21,8 @@
         <button mat-icon-button (click)="drawer.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
+        <div class="page-content">
+            <router-outlet *ngIf="isLoaded() && userService.isLoggedIn()"></router-outlet>
+        </div>
     </mat-drawer-content>
 </mat-drawer-container>

@@ -5,13 +5,6 @@ import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { HttpClientModule } from "@angular/common/http";
 import {NgOptimizedImage} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatDialogModule} from "@angular/material/dialog";
@@ -27,9 +20,14 @@ import {LoadComponent} from "./load/load.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
+import {CoursesComponent} from "./pages/courses/courses.component";
+import {TimetableComponent} from "./pages/timetable/timetable.component";
+import {NewsComponent} from "./pages/news/news.component";
+import {ChatComponent} from "./pages/chat/chat.component";
+import {SettingsComponent} from "./pages/settings/settings.component";
+import {SchoolComponent} from "./pages/school/school.component";
 
 @NgModule({
-    declarations: [AppComponent],
     declarations: [
         AppComponent,
         DashboardComponent,
@@ -59,12 +57,21 @@ import {MatSidenavModule} from "@angular/material/sidenav";
         Authentication,
         LoadComponent,
         NgOptimizedImage,
-        MatSidenavModule
+        MatSidenavModule,
+        CoursesComponent,
+        TimetableComponent,
+        NewsComponent,
+        ChatComponent,
+        SettingsComponent,
+        SchoolComponent
     ],
     providers: [
         provideHttpClient(withFetch())
     ],
     bootstrap: [AppComponent],
+    exports: [
+        SidebarComponent
+    ]
 })
 export class AppModule {
 

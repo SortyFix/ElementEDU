@@ -4,7 +4,8 @@ import {CommonModule} from "@angular/common";
 
 const routes: Routes = [
     // set 'home' as main page if URL is /localhost:4200/
-    {path: '', redirectTo: '/home', pathMatch: "full"}
+    {path: '', redirectTo: '/home', pathMatch: "full"},
+    {}
 ];
 
 @NgModule({
