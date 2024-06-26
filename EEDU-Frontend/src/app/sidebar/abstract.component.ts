@@ -3,11 +3,11 @@ import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  templateUrl: './abstract.component.html',
+  styleUrls: ['./abstract.component.scss']
 })
 
-export class SidebarComponent {
+export class AbstractComponent {
     constructor(public router: Router) { }
 
     sidebar_buttons = [
@@ -20,9 +20,4 @@ export class SidebarComponent {
         {title:'Chat', icon_name: 'forum', route: 'chat'},
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
-
-    protected getCurrentUrl(): string
-    {
-        return this.router.url;
-    }
 }

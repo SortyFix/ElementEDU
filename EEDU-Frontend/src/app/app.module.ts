@@ -18,14 +18,14 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {Authentication} from "./user/login/authentication/authentication.component";
 import {LoadComponent} from "./load/load.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { AbstractComponent } from './sidebar/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 
 @NgModule({
     declarations: [
         AppComponent,
         DashboardComponent,
-        SidebarComponent
+        AbstractComponent
     ],
     imports: [
         MatLabel,
@@ -58,7 +58,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
     ],
     bootstrap: [AppComponent],
     exports: [
-        SidebarComponent
+        AbstractComponent
     ]
 })
 export class AppModule {
