@@ -13,12 +13,14 @@ import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,8 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final ClassRoomRepository classRoomRepository;
     private final AppointmentEntryRepository appointmentEntryRepository;
 
-    private static @NotNull CreationFactory<AppointmentEntryEntity> entityFactory(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
+    @Contract(pure = true, value = "_, _ -> new")
+    private static @NotNull CreationFactory<AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
     {
         return entity ->
         {
@@ -52,7 +55,8 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         };
     }
 
-    private static AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
+    @Contract(pure = true, value = "_,_,_ -> param3")
+    private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
     {
         Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
         Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.timeStamp());
@@ -64,6 +68,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
     }
 
+    @Contract(pure = true, value = "_, _ -> _")
     private static long generateId(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity entity)
     {
         return (entity.getId() + "-" + entryCreateModel.timeStamp()).hashCode();
@@ -107,11 +112,10 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         long id = generateId(entryCreateModel, course);
         if (Arrays.stream(course.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
         {
-            // TODO already existing
-            return;
+            throw new OccupiedException();
         }
 
-        CreationFactory<AppointmentEntryEntity> factory = entityFactory(entryCreateModel, course);
+        CreationFactory<AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
         AppointmentEntryEntity entry = entryCreateModel.toEntity(new AppointmentEntryEntity(id), factory);
         getAppointmentEntryRepository().save(entry);
 

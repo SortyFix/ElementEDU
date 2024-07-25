@@ -42,16 +42,9 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
             return false;
         }
 
-        //TODO performance benchmark
         long delta = timeStamp.getEpochSecond() - getTimeStamp().getEpochSecond();
         return delta % getPeriodSeconds() == 0;
-        //return sinus(getTimeStamp().getEpochSecond()) == sinus(timeStamp.getEpochSecond());
     }
-
-/*    private double sinus(long timeStamp)
-    {
-        return Math.sin(2 * Math.PI * ((double) timeStamp / (getPeriodSeconds() * 2)));
-    }*/
 
     public long getPeriodSeconds()
     {

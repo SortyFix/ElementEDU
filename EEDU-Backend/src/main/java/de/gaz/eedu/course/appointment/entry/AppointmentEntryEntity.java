@@ -41,6 +41,15 @@ import java.util.Optional;
     @Nullable @ManyToOne @JoinColumn(name = "scheduled_appointment_id") @JsonBackReference
     private ScheduledAppointmentEntity scheduledAppointment;
 
+    /**
+     * This constructor creates a new instance of this entity.
+     * <p>
+     * Creates a new instance of this class.
+     * This is required as the class which this appointment is attached to generates the id and passes it.
+     * Normally it's not recommended to use the constructor outside it's use case.
+     *
+     * @param id the generated id.
+     */
     public AppointmentEntryEntity(long id)
     {
         this.id = id;
@@ -89,7 +98,7 @@ import java.util.Optional;
 
     public @NotNull Optional<Instant> getSubmitUntil()
     {
-        if(!submitHomework)
+        if(getHomework().isEmpty())
         {
             // mustn't submit
             return Optional.empty();
@@ -106,6 +115,16 @@ import java.util.Optional;
             return Optional.of(nextAppointment);
         }
         return Optional.empty();
+    }
+
+    public @NotNull Optional<String> getHomework()
+    {
+        if(!isSubmitHomework())
+        {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(this.homework);
     }
 
     private @NotNull String uploadPath(@NotNull UserEntity user)
