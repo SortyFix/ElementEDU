@@ -1,6 +1,6 @@
 <mat-drawer-container class="example-container">
     <!-- SIDEBAR/DRAWER -->
-    <mat-drawer #drawer mode="side" opened class="drawer">
+    <mat-drawer #drawer mode="side" opened class="drawer" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
         <div style="display: flex; justify-content: flex-end; margin-right: 5px">
             <button mat-icon-button (click)="drawer.toggle()">
                 <mat-icon>close</mat-icon>
@@ -22,11 +22,11 @@
     </mat-drawer>
     <!-- MAIN CONTENT -->
     <mat-drawer-content>
-        <button mat-icon-button (click)="drawer.toggle()">
+        <button *ngIf="!drawer.opened" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
         <!-- ROUTER OUTPUT -->
-        <div style="margin-left: 40px;">
+        <div class="page-content" style="{{ drawer.opened ? 'margin-top: 48px' : ''}}">
             <router-outlet></router-outlet>
         </div>
     </mat-drawer-content>
