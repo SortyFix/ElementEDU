@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 
 @Component({
@@ -7,7 +7,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./abstract.component.scss']
 })
 
-export class AbstractComponent {
+export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
 
     constructor(public router: Router) { }
@@ -21,12 +21,21 @@ export class AbstractComponent {
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
 
-    private checkScreenSize()
+    private isMobile()
     {
         this._mobile = window.innerWidth <= 600;
     }
 
     get mobile(): boolean {
         return this._mobile;
+    }
+
+    @HostListener("window:resize") public onResize()
+    {
+        this.isMobile()
+    }
+
+    ngOnInit(): void {
+        this.isMobile();
     }
 }
