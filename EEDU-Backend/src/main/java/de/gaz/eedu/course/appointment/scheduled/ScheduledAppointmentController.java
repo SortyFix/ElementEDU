@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController @RequestMapping("/course/appointment") @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class ScheduledAppointmentController extends EntityController<ScheduledAppointmentService, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
 {
+    // TODO ?? What is this class about?
     private final ScheduledAppointmentService service;
 
     @PostMapping("/create") @Override public @NotNull ResponseEntity<ScheduledAppointmentModel> create(@RequestBody @NotNull ScheduledAppointmentCreateModel model)

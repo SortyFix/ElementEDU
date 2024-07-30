@@ -69,9 +69,9 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     }
 
     @Contract(pure = true, value = "_, _ -> _")
-    private static long generateId(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity entity)
+    private static long generateId(@NotNull Long timeStamp, @NotNull CourseEntity entity)
     {
-        return (entity.getId() + "-" + entryCreateModel.timeStamp()).hashCode();
+        return (entity.getId() + "-" + timeStamp).hashCode();
     }
 
     @Transactional @Override public @NotNull CourseEntity createEntity(@NotNull CourseCreateModel model) throws CreationException
@@ -105,20 +105,52 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         }));
     }
 
-    @Transactional public void createAppointmentEntry(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
+    @Transactional public @NotNull AppointmentEntryEntity getAppointment(@NotNull Long timeStamp, @NotNull Long courseId)
     {
         CourseEntity course = loadEntityByIDSafe(courseId);
+        long id = generateId(courseId, course);
 
-        long id = generateId(entryCreateModel, course);
-        if (Arrays.stream(course.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
+        return Arrays.stream(course.getEntries()).filter(entry -> Objects.equals(entry.getId(), id)).findFirst().orElseGet(() -> {
+
+            AppointmentEntryCreateModel createModel = new AppointmentEntryCreateModel(timeStamp);
+            return createAppointmentUnsafe(id, createModel, course);
+        });
+    }
+
+    @Transactional public void createAppointment(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
+    {
+        CourseEntity courseEntity = loadEntityByIDSafe(courseId);
+
+        long id = generateId(entryCreateModel.timeStamp(), courseEntity);
+        if (Arrays.stream(courseEntity.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
         {
             throw new OccupiedException();
         }
 
+        // intentionally ignore return value
+        createAppointmentUnsafe(id, entryCreateModel, courseEntity);
+    }
+
+    /**
+     * This method generates a new {@link AppointmentEntryEntity}.
+     * <p>
+     * Generates a new {@link AppointmentEntryEntity} from a {@link AppointmentEntryCreateModel}. Unlike {@link #createAppointment(Long, AppointmentEntryCreateModel)}
+     * this method wont check whether it will override an exiting appointment entry.
+     *  TODO I'll improve the doc once I get home
+     *
+     * @param id already computed before. Will be the id of the entity
+     * @param entryCreateModel entry blueprint
+     * @param course the course they are attached to.
+     * @return the newly created entity.
+     */
+    private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
+    {
         CreationFactory<AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
         AppointmentEntryEntity entry = entryCreateModel.toEntity(new AppointmentEntryEntity(id), factory);
         getAppointmentEntryRepository().save(entry);
 
         course.setEntry(this, entry);
+        return entry;
     }
+
 }

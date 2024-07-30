@@ -16,6 +16,12 @@ public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Lon
                                           @Nullable String homework, @Nullable Boolean submitHomework,
                                           @Nullable Long submitUntil) implements CreationModel<AppointmentEntryEntity>
 {
+
+    public AppointmentEntryCreateModel(@NotNull Long timeStamp)
+    {
+        this(timeStamp, null, null, null, false, null);
+    }
+
     @Override public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException
     {
         entity.setTimeStamp(Instant.ofEpochSecond(timeStamp()));
