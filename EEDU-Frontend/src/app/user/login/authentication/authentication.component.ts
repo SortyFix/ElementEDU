@@ -10,6 +10,7 @@ import {LoginRequest} from "./login-name-form/login-request";
 import {UserService} from "../../user.service";
 import {finalize, MonoTypeOperatorFunction} from "rxjs";
 import {SelectCredentialComponent} from "./select-credential/select-credential.component";
+import {animate, style, transition, trigger} from "@angular/animations";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -27,7 +28,19 @@ import {SelectCredentialComponent} from "./select-credential/select-credential.c
         NgOptimizedImage,
         NgIf,
         SelectCredentialComponent,
-    ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss'
+    ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
+        trigger('loginNameAnimation', [
+            transition(':leave', [
+                animate('0.3s', style({transform: 'translateX(-100%)'}))
+            ])
+        ]), trigger('passwordAnimation', [
+            transition(':enter', [
+                style({transform: 'translateX(0%)'}), animate('0.3s', style({transform: 'translateX(-100%)'}))
+            ]), transition(':leave', [
+                animate('0.3s', style({transform: 'translateX(-100%)'}))
+            ])
+        ])
+    ]
 })
 export class Authentication implements OnInit
 {
@@ -56,8 +69,6 @@ export class Authentication implements OnInit
 
     /**
      * Listens for window resize events to check and update the screen size.
-     *
-     * @param event The resize event.
      */
     @HostListener("window:resize") onResize()
     {

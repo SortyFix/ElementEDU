@@ -17,10 +17,11 @@
                 <mat-grid-tile>
                     <div class="form-container">
                         <app-login-name-form (submit)="onSubmit($event)" *ngIf="!loginRequest"
-                                             [errorSignal]="errorSignal" class="current-form">
+                                             [@loginNameAnimation] [errorSignal]="errorSignal" class="current-form">
                         </app-login-name-form>
                         <app-password-form (submit)="onSubmit($event)" *ngIf="loginRequest"
-                                           [loginName]="loginRequest.loginName" class="current-form">
+                                           [@passwordAnimation] [loginName]="loginRequest.loginName"
+                                           class="current-form">
                         </app-password-form>
                         <!--<app-select-credential class="current-form"></app-select-credential>-->
                     </div>
