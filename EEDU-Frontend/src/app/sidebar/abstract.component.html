@@ -1,20 +1,20 @@
 <mat-drawer-container class="example-container">
     <!-- SIDEBAR/DRAWER -->
-    <mat-drawer #drawer mode="side" opened class="drawer">
+    <mat-drawer #drawer mode="side" opened class="drawer" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
         <div style="display: flex; justify-content: flex-end; margin-right: 5px">
             <button mat-icon-button (click)="drawer.toggle()">
                 <mat-icon>close</mat-icon>
             </button>
         </div>
         <h1 style="text-align: center; margin-top:40px; color: darkblue; font-weight: bold; user-select: none">ElementEDU</h1>
-        <div style="margin-top: 40px">
+        <div style="{{ mobile ? 'margin-top: 30%' : 'margin-top: 40px'}}">
             <div *ngFor="let item of sidebar_buttons">
-                <button mat-button class="sidebar-button" style="padding-left: 30px" [routerLink]="[item.route]">
+                <button mat-button class="sidebar-button" style="{{ mobile ? 'padding-left: 30%' : 'padding-left: 30px'}}" [routerLink]="[item.route]" (click)="drawer.toggle()">
                     <mat-icon fontIcon="{{item.icon_name}}"></mat-icon>
                     {{ item.title }}
                 </button>
             </div>
-            <button mat-button class="logout-button" style="padding-left: 30px">
+            <button mat-button class="logout-button" style="padding-left: 30px; {{ mobile ? 'width: 100%' : '' }}">
                 <mat-icon fontIcon="logout"></mat-icon>
                 Logout
             </button>
@@ -22,11 +22,11 @@
     </mat-drawer>
     <!-- MAIN CONTENT -->
     <mat-drawer-content>
-        <button mat-icon-button (click)="drawer.toggle()">
+        <button *ngIf="!drawer.opened" mat-icon-button (click)="drawer.toggle()">
             <mat-icon>menu</mat-icon>
         </button>
         <!-- ROUTER OUTPUT -->
-        <div style="margin-left: 40px;">
+        <div class="page-content" style="{{ drawer.opened ? 'margin-top: 48px' : ''}}">
             <router-outlet></router-outlet>
         </div>
     </mat-drawer-content>
