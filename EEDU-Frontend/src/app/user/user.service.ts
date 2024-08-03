@@ -23,9 +23,19 @@ export class UserService
         {
             return of();
         }
-        return this.getUserdata().pipe(tap<UserEntity>({
-            next: (value: UserEntity) => this.storeUserData(value)
+        return this.fetchUserData().pipe(tap<UserEntity>({
+            next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
         }), finalize((): void => { this.loaded = true; }), map((): void => {}));
+    }
+
+    public get getUserData(): UserEntity
+    {
+        const userData: string | null = localStorage.getItem('userData')
+        if(!this.isLoggedIn() || !userData)
+        {
+            throw new Error("User is not logged in, or user data is corrupt.");
+        }
+        return JSON.parse(userData);
     }
 
     public hasLoaded(): boolean
@@ -73,13 +83,13 @@ export class UserService
         }));
     }
 
-    private getUserdata(): Observable<UserEntity>
+    private fetchUserData(): Observable<UserEntity>
     {
         const url: string = "http://localhost:8080/user/get";
         return this.http.get<UserEntity>(url, {withCredentials: true});
     }
 
-    private storeUserData(userData: any)
+    private storeUserData(userData: string)
     {
         localStorage.setItem("userData", userData)
     }
