@@ -1,6 +1,5 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
-import {finalize} from "rxjs";
 import {Router} from "@angular/router";
 
 @Component({
