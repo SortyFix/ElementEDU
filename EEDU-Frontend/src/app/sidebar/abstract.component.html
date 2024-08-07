@@ -7,14 +7,14 @@
             </button>
         </div>
         <h1 style="text-align: center; margin-top:40px; color: darkblue; font-weight: bold; user-select: none">ElementEDU</h1>
-        <div style="{{ mobile ? 'margin-top: 30%' : 'margin-top: 40px'}}">
+        <div style="{{ mobile ? 'margin-top: 60px' : 'margin-top: 40px'}}">
             <div *ngFor="let item of sidebar_buttons">
                 <button mat-button class="sidebar-button" style="{{ mobile ? 'padding-left: 30%' : 'padding-left: 30px'}}" [routerLink]="[item.route]" (click)="drawer.toggle()">
                     <mat-icon fontIcon="{{item.icon_name}}"></mat-icon>
                     {{ item.title }}
                 </button>
             </div>
-            <button mat-button class="logout-button" style="padding-left: 30px; {{ mobile ? 'width: 100%' : '' }}">
+            <button mat-button class="logout-button" (click)="logout()" style="padding-left: 30px; {{ mobile ? 'width: 100%' : '' }}">
                 <mat-icon fontIcon="logout"></mat-icon>
                 Logout
             </button>

@@ -1,7 +1,7 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
-import {finalize} from "rxjs";
 import {Router} from "@angular/router";
+import {ThemeService} from "./theming/theme.service";
 
 @Component({
     selector: 'app-root',
@@ -14,7 +14,7 @@ export class AppComponent implements OnInit
 
     errorSignal: WritableSignal<string> = signal('')
 
-    constructor(public userService: UserService, public router: Router)
+    constructor(public userService: UserService, public themeService: ThemeService, public router: Router)
     {
     }
 
@@ -32,8 +32,16 @@ export class AppComponent implements OnInit
     {
         // load user data when site loads
         this.userService.loadData().subscribe({
+            next: () =>
+            {
+                console.log("Next");
+                this.themeService.fetchTheme().subscribe((theme: any) =>
+                       localStorage.setItem('themeEntity', theme)
+                );
+            },
             error: error =>
             {
+                console.log("Error while fetching theme data.", error);
                 if (error.status == 403) // not logged in
                 {
                     return;
