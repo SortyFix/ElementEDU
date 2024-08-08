@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {Observable} from "rxjs";
 import {ThemeEntity} from "./theme-entity";
 import {HttpClient} from "@angular/common/http";
-import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 @Injectable({
   providedIn: 'root'
