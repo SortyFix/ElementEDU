@@ -21,6 +21,7 @@ export class AppComponent implements OnInit
     ngOnInit(): void
     {
         this.loadUserData();
+        this.storeUserTheme();
     }
 
     protected isLoaded(): boolean
@@ -32,13 +33,6 @@ export class AppComponent implements OnInit
     {
         // load user data when site loads
         this.userService.loadData().subscribe({
-            next: () =>
-            {
-                console.log("Next");
-                this.themeService.fetchTheme().subscribe((theme: any) =>
-                       localStorage.setItem('themeEntity', theme)
-                );
-            },
             error: error =>
             {
                 console.log("Error while fetching theme data.", error);
@@ -49,6 +43,12 @@ export class AppComponent implements OnInit
                 this.errorSignal.set(this.getErrorMessage(error))
             }
         });
+    }
+
+    // Stores the newly fetched theme inside local storage.
+    protected storeUserTheme() {
+        this.themeService.fetchTheme().subscribe((theme: any) =>
+        localStorage.setItem('userTheme', JSON.stringify(theme)));
     }
 
     private getErrorMessage(error: any): string
