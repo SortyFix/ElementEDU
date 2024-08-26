@@ -1,15 +1,18 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
-import {LoginRequest} from "./login/authentication/login-name-form/login-request";
 import {UserEntity} from "./user-entity";
+import {LoginData} from "./login/authentication/login-data/login-data";
+import {LoginRequest} from "./login/authentication/login-data/login-request";
+import {jwtDecode, JwtPayload} from "jwt-decode";
+import {CredentialMethod} from "./login/authentication/login-data/credential-method";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService
 {
-    private loaded: boolean = false;
+    private _loaded: boolean = false;
     private token?: string;
 
     constructor(private http: HttpClient)
@@ -18,14 +21,14 @@ export class UserService
 
     public loadData(): Observable<void>
     {
-        this.loaded = this.isLoggedIn();
-        if (this.loaded)
+        this._loaded = this.isLoggedIn();
+        if (this._loaded)
         {
             return of();
         }
         return this.fetchUserData().pipe(tap<UserEntity>({
             next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
-        }), finalize((): void => { this.loaded = true; }), map((): void => {}));
+        }), finalize((): void => { this._loaded = true; }), map((): void => {}));
     }
 
     public get getUserData(): UserEntity
@@ -38,9 +41,9 @@ export class UserService
         return JSON.parse(userData);
     }
 
-    public hasLoaded(): boolean
+    public get hasLoaded(): boolean
     {
-        return this.loaded;
+        return this._loaded;
     }
 
     public logout(): Observable<any>
@@ -61,12 +64,22 @@ export class UserService
         return !!localStorage.getItem("userData");
     }
 
-    public request(data: LoginRequest): Observable<void>
+    public request(data: LoginRequest): Observable<LoginData>
     {
         const url = "http://localhost:8080/user/login";
         return this.http.post<string>(url, data, {responseType: "text" as "json"}).pipe(tap<string>({
             next: value => this.token = value
-        }), map(() => {}));
+        }), map((token) => {
+
+            const sub: string | undefined = jwtDecode(token).sub;
+            if(sub == "CREDENTIAL_SELECTION")
+            {
+                const selectToken: JwtPayload & {methods: CredentialMethod[]} = jwtDecode(token);
+                return new LoginData(data.loginName, selectToken.methods);
+            }
+
+            return new LoginData("test", [CredentialMethod.EMAIL]);
+        }));
     }
 
     public verifyPassword(password: string): Observable<string>

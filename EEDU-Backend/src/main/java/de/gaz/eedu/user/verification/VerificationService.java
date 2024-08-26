@@ -63,8 +63,7 @@ import java.util.function.Function;
         {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
-
-        return credentialToken(user.getId(), expiry, advanced, CredentialMethod.PASSWORD);
+        return credentialToken(user.getId(), expiry, advanced, getMethods(user));
     }
 
     /**

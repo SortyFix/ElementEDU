@@ -24,7 +24,7 @@ export class AppComponent implements OnInit
 
     protected isLoaded(): boolean
     {
-        return this.userService.hasLoaded() && !this.errorSignal();
+        return this.userService.hasLoaded && !this.errorSignal();
     }
 
     protected loadUserData(): void

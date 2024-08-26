@@ -5,7 +5,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatError, MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {LoginRequest} from "./login-request";
+import {LoginRequest} from "../login-data/login-request";
 import {NgIf} from "@angular/common";
 
 @Component({

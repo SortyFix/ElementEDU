@@ -7,7 +7,8 @@ public class EmailCredential implements Credential
 {
     @Override public @NotNull String creation(@NotNull CredentialEntity credentialEntity)
     {
-        return null;
+        credentialEntity.setEnabled(true);
+        return "yes"; //TODO implement lol
     }
 
     @Override public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code)

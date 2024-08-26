@@ -6,11 +6,12 @@ import {NgIf, NgOptimizedImage} from "@angular/common";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
 import {PasswordFormComponent} from "./password-form/password-form.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
-import {LoginRequest} from "./login-name-form/login-request";
 import {UserService} from "../../user.service";
 import {finalize, MonoTypeOperatorFunction} from "rxjs";
 import {SelectCredentialComponent} from "./select-credential/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
+import {LoginData} from "./login-data/login-data";
+import {LoginRequest} from "./login-data/login-request";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -45,7 +46,7 @@ import {animate, style, transition, trigger} from "@angular/animations";
 export class Authentication implements OnInit
 {
     @Output() submit: EventEmitter<void> = new EventEmitter<void>();
-    loginRequest?: LoginRequest;
+    loginData?: LoginData;
     errorSignal: WritableSignal<any> = signal('');
     mobile: boolean = false;
     loadingAnimation: boolean = false;
@@ -92,7 +93,7 @@ export class Authentication implements OnInit
     {
         if (data == false)
         {
-            this.loginRequest = undefined;
+            this.loginData = undefined;
             return;
         }
 
@@ -123,7 +124,10 @@ export class Authentication implements OnInit
     private requestCredentials(data: LoginRequest)
     {
         this.userService.request(data).pipe(this.finalizeLoading()).subscribe({
-            next: () => this.loginRequest = data, error: (error) => this.errorSignal.set(this.getErrorMessage(error))
+            next: (loginData) =>
+            {
+                this.loginData = loginData;
+            }, error: (error) => this.errorSignal.set(this.getErrorMessage(error))
         });
     }
 
