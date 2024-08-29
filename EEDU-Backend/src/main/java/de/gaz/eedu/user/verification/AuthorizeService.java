@@ -30,8 +30,8 @@ import java.util.Optional;
 
     public @NotNull String selectTwoFactor(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
     {
-        CredentialMethod[] credentialMethods = (CredentialMethod[]) claims.get("available");
-        if(List.of(credentialMethods).contains(credentialMethod))
+        List<CredentialMethod> credentialMethods = (List<CredentialMethod>) claims.get("available");
+        if(credentialMethods.contains(credentialMethod))
         {
             throw new InvalidTokenException();
         }
