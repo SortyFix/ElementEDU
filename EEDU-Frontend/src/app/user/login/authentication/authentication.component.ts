@@ -1,4 +1,14 @@
-import {Component, EventEmitter, HostListener, OnInit, Output, signal, WritableSignal} from '@angular/core';
+import {
+    ChangeDetectorRef,
+    Component,
+    EventEmitter,
+    HostListener,
+    OnInit,
+    Output,
+    signal,
+    ViewChild,
+    WritableSignal
+} from '@angular/core';
 import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
@@ -12,6 +22,7 @@ import {SelectCredentialComponent} from "./select-credential/select-credential.c
 import {animate, style, transition, trigger} from "@angular/animations";
 import {LoginData} from "./login-data/login-data";
 import {LoginRequest} from "./login-data/login-request";
+import {credentialDisplayName} from "./login-data/credential-method";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -46,10 +57,10 @@ import {LoginRequest} from "./login-data/login-request";
 export class Authentication implements OnInit
 {
     @Output() submit: EventEmitter<void> = new EventEmitter<void>();
-    loginData?: LoginData;
     errorSignal: WritableSignal<any> = signal('');
-    mobile: boolean = false;
-    loadingAnimation: boolean = false;
+    private _loginData?: LoginData;
+    private _mobile: boolean = false;
+    private _loadingAnimation: boolean = false;
 
     /**
      * Constructor to initialize the LoginComponent.
@@ -57,7 +68,8 @@ export class Authentication implements OnInit
      * @param userService The service used for user-related operations such as login and password verification.
      */
     constructor(private userService: UserService)
-    {}
+    {
+    }
 
     /**
      * Lifecycle hook that is called after data-bound properties of a directive are initialized.
@@ -81,7 +93,7 @@ export class Authentication implements OnInit
      */
     checkScreenSize()
     {
-        this.mobile = window.innerWidth <= 600;
+        this._mobile = window.innerWidth <= 600;
     }
 
     /**
@@ -91,21 +103,20 @@ export class Authentication implements OnInit
      */
     onSubmit(data: any)
     {
+
         if (data == false)
         {
-            this.loginData = undefined;
+            this._loginData = undefined;
             return;
         }
 
-        this.loadingAnimation = true;
-
-        if (typeof data === 'string')
+        if(data && typeof data === 'object' && 'method' in data && typeof data.method === 'string' && this.loginData)
         {
-            this.verifyPassword(data);
+            this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
             return;
         }
 
-        else if (data instanceof LoginRequest)
+        if (data instanceof LoginRequest)
         {
             this.requestCredentials(data)
             return;
@@ -124,10 +135,10 @@ export class Authentication implements OnInit
     private requestCredentials(data: LoginRequest)
     {
         this.userService.request(data).pipe(this.finalizeLoading()).subscribe({
-            next: (loginData) =>
-            {
-                this.loginData = loginData;
-            }, error: (error) => this.errorSignal.set(this.getErrorMessage(error))
+            next: (loginData) => this._loginData = loginData,
+            error: (error) => {
+                this.errorSignal.set(this.getErrorMessage(error))
+            }
         });
     }
 
@@ -142,17 +153,36 @@ export class Authentication implements OnInit
      */
     private verifyPassword(password: string)
     {
-        this.userService.verifyPassword(password).pipe(this.finalizeLoading()).subscribe({
-            next: () =>
-            {
-                this.submit.emit();
-            }, error: error => this.errorSignal.set(this.getErrorMessage(error))
+        if (!this.loginData)
+        {
+            return;
+        }
+
+        this.userService.verifyPassword(this.loginData, password).pipe(this.finalizeLoading()).subscribe({
+            next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
         });
     }
 
     private finalizeLoading(): MonoTypeOperatorFunction<any>
     {
-        return finalize((): void => {this.loadingAnimation = false;});
+        return finalize((): void => {this._loadingAnimation = false;});
+    }
+
+
+    protected get mobile(): boolean
+    {
+        return this._mobile;
+    }
+
+    protected get loadingAnimation(): boolean
+    {
+        return this._loadingAnimation;
+    }
+
+
+    protected get loginData(): LoginData | undefined
+    {
+        return this._loginData;
     }
 
     /**
@@ -169,4 +199,6 @@ export class Authentication implements OnInit
     {
         return "An error occurred"
     }
+
+    protected readonly credentialDisplayName = credentialDisplayName;
 }

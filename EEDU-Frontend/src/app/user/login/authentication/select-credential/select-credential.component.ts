@@ -1,10 +1,13 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {MatList, MatListItem, MatListOption, MatSelectionList} from "@angular/material/list";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {CdkMenu, CdkMenuItem} from "@angular/cdk/menu";
 import {MatDivider} from "@angular/material/divider";
-import {CredentialMethod} from "../login-data/credential-method";
+import {credentialDisplayName, CredentialMethod} from "../login-data/credential-method";
+import {FormsModule} from "@angular/forms";
+import {LoginData} from "../login-data/login-data";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-select-credential',
@@ -18,12 +21,37 @@ import {CredentialMethod} from "../login-data/credential-method";
         MatDialogClose,
         CdkMenu,
         CdkMenuItem,
-        MatDivider
+        MatDivider,
+        FormsModule,
+        MatIcon
     ],
   templateUrl: './select-credential.component.html',
   styleUrl: './select-credential.component.scss'
 })
 export class SelectCredentialComponent {
-    @Input() loginName?: string;
-    @Input() credentials?: CredentialMethod[];
+    @Output() readonly submit = new EventEmitter<any>();
+    @Input() _loginData?: LoginData;
+    @ViewChild('selectionList') selectionList!: MatSelectionList;
+
+    protected readonly credentialDisplayName = credentialDisplayName;
+
+
+    onSubmit()
+    {
+        const value: MatListOption = this.selectionList.selectedOptions.selected[0];
+        if (!value)
+        {
+            return;
+        }
+        this.submit.emit({ method: value.value });
+    }
+
+    protected get loginData(): LoginData
+    {
+        if(!this._loginData)
+        {
+            throw new Error("Login data was not set."); // TODO enhance error handling
+        }
+        return this._loginData;
+    }
 }

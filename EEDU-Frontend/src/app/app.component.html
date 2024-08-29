@@ -1,5 +1,5 @@
 <div class="content">
-    <app-load *ngIf="!isLoaded() && !userService.isLoggedIn()" [errorSignal]="errorSignal"></app-load>
-    <app-authentication *ngIf="isLoaded() && !userService.isLoggedIn()"></app-authentication>
-    <app-sidebar *ngIf="isLoaded() && userService.isLoggedIn()"></app-sidebar>
+    <app-load *ngIf="!isLoaded() && !userService.isLoggedIn" [errorSignal]="errorSignal"></app-load>
+    <app-authentication *ngIf="isLoaded() && !userService.isLoggedIn"></app-authentication>
+    <app-sidebar *ngIf="isLoaded() && userService.isLoggedIn"></app-sidebar>
 </div>

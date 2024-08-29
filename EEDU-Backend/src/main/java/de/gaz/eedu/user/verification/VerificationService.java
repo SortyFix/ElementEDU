@@ -156,12 +156,12 @@ import java.util.function.Function;
     {
         boolean single = credentialMethod.length == 1;
 
-        ClaimHolder<?> method = new ClaimHolder<>("methods", credentialMethod);
+        ClaimHolder<?> method = new ClaimHolder<>("available", credentialMethod);
         JwtTokenType type = JwtTokenType.CREDENTIAL_SELECTION;
 
         if (single)
         {
-            method = new ClaimHolder<>("method", credentialMethod[0]);
+            method = new ClaimHolder<>("available", credentialMethod); // keep array format (singleton)
             type = JwtTokenType.CREDENTIAL_PENDING;
         }
         return new KeyType(method, type);

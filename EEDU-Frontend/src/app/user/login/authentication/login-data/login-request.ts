@@ -1,6 +1,7 @@
 export class LoginRequest {
-    loginName: string;
-    keepLoggedIn: boolean = false;
+
+    public readonly loginName: string;
+    public readonly keepLoggedIn: boolean = false;
 
     constructor(loginName: string, keepLoggedIn: boolean) {
         this.loginName = loginName;
