@@ -2,8 +2,10 @@ plugins {
     id "com.github.node-gradle.node" version "7.0.1"
 }
 
-def nodejs = "20.5.0"
-def npm = "10.2.1"
+
+def nodejs = "22.2.0"
+def npm = "10.8.1"
+def angularVersion = "18.2.2"
 
 node {
     version = nodejs
@@ -12,11 +14,23 @@ node {
 }
 
 tasks.register("ngServe", NodeTask).configure {
-    dependsOn("installAngularCLI")
+    dependsOn("installAngularCli")
+    dependsOn("npmUpdate")
     script = file("node_modules/@angular/cli/bin/ng.js")
     args = ["serve"]
 }
 
-tasks.register("installAngularCLI", NpmTask).configure {
-    args = ["install", "@angular/cli"]
+tasks.register("printVersion", NodeTask).configure {
+    dependsOn("installAngularCli")
+    dependsOn("npmUpdate")
+    script = file("node_modules/@angular/cli/bin/ng.js")
+    args = ["version"]
+}
+
+tasks.register("installAngularCli", NpmTask).configure {
+    args = ["install", "@angular/cli@${angularVersion}"]
+}
+
+tasks.register("npmUpdate", NpmTask).configure {
+    args = ["update"]
 }

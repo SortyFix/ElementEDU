@@ -211,4 +211,35 @@ CREATE TABLE IF NOT EXISTS class_room_users
     PRIMARY KEY (class_room_id, user_id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
-)
+);
+
+CREATE TABLE IF NOT EXISTS post_entity
+(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    author VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    thumbnailurl VARCHAR(255) NOT NULL,
+    body VARCHAR(255) NOT NULL,
+    time_of_creation BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post_user_read_privileges
+(
+    post_id BIGINT NOT NULL,
+    read_privileges VARCHAR(255) NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS post_user_edit_privileges
+(
+    post_id BIGINT NOT NULL,
+    edit_privileges VARCHAR(255) NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS post_tags
+(
+    post_id BIGINT NOT NULL,
+    tags VARCHAR(255) NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
+);

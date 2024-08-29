@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.group.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
-import de.gaz.eedu.entity.model.Model;
 import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.validation.constraints.NotEmpty;

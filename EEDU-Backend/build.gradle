@@ -1,19 +1,18 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.6-SNAPSHOT'
-    id 'io.spring.dependency-management' version '1.1.3'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
-    id 'com.bmuschko.docker-spring-boot-application' version '6.1.4'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.asciidoctor.jvm.convert' version '4.0.3'
+    id 'com.bmuschko.docker-spring-boot-application' version '9.4.0'
 }
 
 import com.bmuschko.gradle.docker.tasks.image.*
-import com.bmuschko.gradle.docker.tasks.container.*
 
 group = 'de.gaz'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = "17"
+    sourceCompatibility = "21"
 }
 
 configurations {
@@ -43,7 +42,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.jetbrains:annotations:24.0.0'
-    implementation 'io.jsonwebtoken:jjwt:0.12.2'
+    implementation 'io.jsonwebtoken:jjwt:0.12.6'
 
     // Compiled code only
     compileOnly 'org.projectlombok:lombok'
@@ -56,8 +55,8 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     // Two factor
-    implementation 'com.google.zxing:core:3.5.1'
-    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'commons-codec:commons-codec:1.17.1'
 
     // Runtime drivers
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
@@ -78,8 +77,8 @@ dependencies {
 }
 
 compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.named('test') {

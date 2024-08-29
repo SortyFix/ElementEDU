@@ -14,12 +14,12 @@ public class IllnessNotificationManagementController
     private final IllnessNotificationManagementService illnessNotificationManagementService;
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/open")
-    public ResponseEntity<IllnessNotificationModel[]> getNotificationsWithStatusOfUser(@NotNull Long userId, @NotNull IllnessNotificationStatus status){
+    public ResponseEntity<IllnessNotificationModel[]> getNotificationsWithStatusOfUser(@NotNull @RequestBody Long userId, @NotNull @RequestBody IllnessNotificationStatus status){
         return illnessNotificationManagementService.getNotificationsOfUserByStatus(userId, status);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/all")
-    public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfUser(@NotNull Long userId){
+    public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfUser(@NotNull @RequestBody Long userId){
         return illnessNotificationManagementService.getNotificationsOfUser(userId);
     }
 

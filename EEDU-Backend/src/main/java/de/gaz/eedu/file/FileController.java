@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
     private final @NotNull FileService fileService;
 
     @PreAuthorize("isAuthenticated()") @PostMapping("/{id}/modify/tags") public HttpStatus modifyTags(
-            @AuthenticationPrincipal Long userId, @PathVariable Long id, @NotNull Set<String> newTags)
+            @AuthenticationPrincipal Long userId, @PathVariable Long id, @NotNull @RequestBody Set<String> newTags)
     {
         FileEntity fileEntity = fileService.getRepository().getReferenceById(id);
         if (fileEntity.getId().equals(userService.loadEntityByIDSafe(userId).getId()))

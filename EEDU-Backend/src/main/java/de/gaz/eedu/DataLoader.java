@@ -31,6 +31,7 @@ import java.security.SecureRandom;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
+
     @Value("${development:false}") private boolean development;
 
     @Override @Transactional public void run(@NotNull String... args)
