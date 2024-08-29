@@ -20,7 +20,9 @@
                         "outputPath": "dist/eedu-frontend",
                         "index": "src/index.html",
                         "main": "src/main.ts",
-                        "polyfills": [],
+                        "polyfills": [
+                            "zone.js"
+                        ],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
                         "assets": [
