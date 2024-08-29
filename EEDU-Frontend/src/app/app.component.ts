@@ -1,6 +1,7 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
+import {ThemeService} from "./theming/theme.service";
 
 @Component({
     selector: 'app-root',
@@ -13,13 +14,14 @@ export class AppComponent implements OnInit
 
     errorSignal: WritableSignal<string> = signal('')
 
-    constructor(public userService: UserService, public router: Router)
+    constructor(public userService: UserService, public themeService: ThemeService, public router: Router)
     {
     }
 
     ngOnInit(): void
     {
         this.loadUserData();
+        this.storeUserTheme();
     }
 
     protected isLoaded(): boolean
@@ -33,6 +35,7 @@ export class AppComponent implements OnInit
         this.userService.loadData().subscribe({
             error: error =>
             {
+                console.log("Error while fetching theme data.", error);
                 if (error.status == 403) // not logged in
                 {
                     return;
@@ -40,6 +43,12 @@ export class AppComponent implements OnInit
                 this.errorSignal.set(this.getErrorMessage(error))
             }
         });
+    }
+
+    // Stores the newly fetched theme inside local storage.
+    protected storeUserTheme() {
+        this.themeService.fetchTheme().subscribe((theme: any) =>
+        localStorage.setItem('userTheme', JSON.stringify(theme)));
     }
 
     private getErrorMessage(error: any): string

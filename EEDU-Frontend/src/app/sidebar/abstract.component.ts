@@ -1,5 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
+import {UserService} from "../user/user.service";
+import {ThemeService} from "../theming/theme.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +12,7 @@ import {Router} from "@angular/router";
 export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
 
-    constructor(public router: Router) { }
+    constructor(public router: Router, public userService: UserService, public themeService: ThemeService) { }
 
     sidebar_buttons = [
         {title:'Dashboard', icon_name: 'dashboard', route:'dashboard'},
@@ -20,6 +22,10 @@ export class AbstractComponent implements OnInit {
         {title:'Chat', icon_name: 'forum', route: 'chat'},
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
+
+    public logout() {
+        this.userService.logout().subscribe(value => console.log(value));
+    }
 
     private isMobile()
     {
