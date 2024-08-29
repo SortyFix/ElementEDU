@@ -21,7 +21,7 @@ export class AppComponent implements OnInit
     ngOnInit(): void
     {
         this.loadUserData();
-        this.storeUserTheme();
+        //this.storeUserTheme();
     }
 
     protected isLoaded(): boolean
@@ -35,7 +35,6 @@ export class AppComponent implements OnInit
         this.userService.loadData().subscribe({
             error: error =>
             {
-                console.log("Error while fetching theme data.", error);
                 if (error.status == 403) // not logged in
                 {
                     return;

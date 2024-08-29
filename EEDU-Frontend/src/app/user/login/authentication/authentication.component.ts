@@ -6,7 +6,6 @@ import {
     OnInit,
     Output,
     signal,
-    ViewChild,
     WritableSignal
 } from '@angular/core';
 import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardTitle} from "@angular/material/card";
