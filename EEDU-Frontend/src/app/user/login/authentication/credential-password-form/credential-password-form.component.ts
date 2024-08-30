@@ -6,9 +6,10 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatIcon} from "@angular/material/icon";
+import {LoginData} from "../login-data/login-data";
 
 @Component({
-    selector: 'app-password-form', standalone: true, imports: [
+    selector: 'app-credential-password-form', standalone: true, imports: [
         FormsModule,
         MatButton,
         MatCheckbox,
@@ -21,13 +22,13 @@ import {MatIcon} from "@angular/material/icon";
         MatSuffix,
         MatAnchor,
         MatFormField
-    ], templateUrl: './password-form.component.html', styleUrl: './password-form.component.scss'
+    ], templateUrl: './credential-password-form.component.html', styleUrl: './credential-password-form.component.scss'
 })
-export class PasswordFormComponent
+export class CredentialPasswordFormComponent
 {
     @Output() readonly submit = new EventEmitter<any>();
     @Input() errorSignal: WritableSignal<any> = signal('');
-    @Input() loginName?: string;
+    @Input() _loginData?: LoginData;
     protected password?: string;
     protected showPassword: boolean = false;
 
@@ -49,5 +50,10 @@ export class PasswordFormComponent
             return;
         }
         this.submit.emit(this.password);
+    }
+
+    get loginData(): LoginData | undefined
+    {
+        return this._loginData;
     }
 }

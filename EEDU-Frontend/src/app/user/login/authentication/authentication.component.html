@@ -1,8 +1,8 @@
 <div class="backdrop-blur">
     <mat-card>
         <mat-progress-bar [mode]="loadingAnimation ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
-
         <mat-card-header>
+
             <mat-card-title>
                 <mat-icon class="centered-icon">person</mat-icon>
                 Login to ElementEDU
@@ -15,16 +15,57 @@
                 </mat-grid-tile>
                 <mat-grid-tile>
                     <div class="form-container">
-                        <app-login-name-form *ngIf="!loginData" (submit)="onSubmit($event)" [errorSignal]="errorSignal"
-                                             class="current-form"></app-login-name-form>
-                        <app-select-credential *ngIf="loginData && !loginData.credential" (submit)="onSubmit($event)" [_loginData]="loginData"
-                                               class="current-form"></app-select-credential>
-                        <p *ngIf="loginData && loginData.credential">{{credentialDisplayName(loginData.credential).displayName}}</p>
+                        <app-login-name-form
+                            *ngIf="!loginData"
+                            (submit)="onSubmit($event)"
+                            [errorSignal]="errorSignal"
+                            class="current-form">
+                        </app-login-name-form>
+
+                        <app-select-credential
+                            *ngIf="loginData && !loginData.credential"
+                            (submit)="onSubmit($event)"
+                            [_loginData]="loginData"
+                            class="current-form">
+                        </app-select-credential>
+
+                        <ng-container *ngIf="loginData && loginData.credential">
+                            <app-credential-password-form
+                                *ngIf="loginData.credential === CredentialMethod.PASSWORD"
+                                [_loginData]="loginData"
+                                (submit)="onSubmit($event)"
+                                class="current-form">
+                            </app-credential-password-form>
+
+                            <app-credential-email-form
+                                *ngIf="loginData.credential === CredentialMethod.EMAIL"
+                                [_loginData]="loginData"
+                                (submit)="onSubmit($event)"
+                                class="current-form">
+                            </app-credential-email-form>
+                        </ng-container>
                     </div>
                 </mat-grid-tile>
             </mat-grid-list>
-            <mat-card-footer style="display: flex; justify-content: center">
-                <a href="styles.scss">Datenschutz</a>
+            <mat-card-footer class="footer">
+                <nav>
+                    <a href="#" mat-button>
+                        <mat-icon>privacy_tip</mat-icon>
+                        Datenschutz
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>gavel</mat-icon>
+                        Impressum
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>contact_mail</mat-icon>
+                        Contact
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>description</mat-icon>
+                        Terms of Service
+                    </a>
+                </nav>
             </mat-card-footer>
         </mat-card-content>
     </mat-card>

@@ -1,5 +1,4 @@
 import {
-    ChangeDetectorRef,
     Component,
     EventEmitter,
     HostListener,
@@ -13,15 +12,18 @@ import {MatIcon} from "@angular/material/icon";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {NgIf, NgOptimizedImage} from "@angular/common";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
-import {PasswordFormComponent} from "./password-form/password-form.component";
+import {CredentialPasswordFormComponent} from "./credential-password-form/credential-password-form.component";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {UserService} from "../../user.service";
 import {finalize, MonoTypeOperatorFunction} from "rxjs";
-import {SelectCredentialComponent} from "./select-credential/select-credential.component";
+import {SelectCredentialComponent} from "./select-credential-form/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {LoginData} from "./login-data/login-data";
 import {LoginRequest} from "./login-data/login-request";
-import {credentialDisplayName} from "./login-data/credential-method";
+import {credentialDisplayName, CredentialMethod} from "./login-data/credential-method";
+import {MatAnchor} from "@angular/material/button";
+import {MatDivider} from "@angular/material/divider";
+import {CredentialEmailFormComponent} from "./credential-email-form/credential-email-form.component";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -34,11 +36,14 @@ import {credentialDisplayName} from "./login-data/credential-method";
         MatGridList,
         MatGridTile,
         LoginNameFormComponent,
-        PasswordFormComponent,
+        CredentialPasswordFormComponent,
         MatCardFooter,
         NgOptimizedImage,
         NgIf,
         SelectCredentialComponent,
+        MatAnchor,
+        MatDivider,
+        CredentialEmailFormComponent,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [
@@ -200,4 +205,5 @@ export class Authentication implements OnInit
     }
 
     protected readonly credentialDisplayName = credentialDisplayName;
+    protected readonly CredentialMethod = CredentialMethod;
 }
