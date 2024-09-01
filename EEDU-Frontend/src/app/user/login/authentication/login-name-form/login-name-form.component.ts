@@ -30,17 +30,17 @@ export class LoginNameFormComponent
 {
     @Output() readonly submit: EventEmitter<LoginRequest> = new EventEmitter<LoginRequest>();
     @Input() errorSignal: WritableSignal<any> = signal('');
-    protected loginForm: FormGroup;
+    private readonly _loginForm: FormGroup;
 
     constructor(formBuilder: FormBuilder)
     {
-        this.loginForm = formBuilder.group({
+        this._loginForm = formBuilder.group({
             loginName: ['', Validators.required],
             rememberMe: [false]
         });
     }
 
-    onSubmit()
+    protected onSubmit(): void
     {
         const loginName = this.loginForm.get('loginName')?.value;
         const rememberMe = this.loginForm.get('rememberMe')?.value;
@@ -50,5 +50,10 @@ export class LoginNameFormComponent
         }
         const request = new LoginRequest(loginName, rememberMe);
         this.submit.emit(request);
+    }
+
+    protected get loginForm(): FormGroup
+    {
+        return this._loginForm;
     }
 }

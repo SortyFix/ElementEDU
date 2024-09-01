@@ -1,36 +1,32 @@
-import {Component, EventEmitter, Input, Output, signal, WritableSignal} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatAnchor, MatButton, MatIconButton} from "@angular/material/button";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {MatDialogClose} from "@angular/material/dialog";
-import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
-import {MatInput} from "@angular/material/input";
+import {Component} from '@angular/core';
+import {AbstractCredential} from "../abstract-credential";
+import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
-import {LoginData} from "../login-data/login-data";
+import {MatInput} from "@angular/material/input";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatDialogClose} from "@angular/material/dialog";
+
 
 @Component({
     selector: 'app-credential-password-form', standalone: true, imports: [
-        FormsModule,
-        MatButton,
-        MatCheckbox,
-        MatDialogClose,
-        MatInput,
-        MatLabel,
-        ReactiveFormsModule,
+        MatFormField,
         MatIcon,
+        MatInput,
         MatIconButton,
-        MatSuffix,
-        MatAnchor,
-        MatFormField
+        MatButton,
+        MatDialogClose,
+        ReactiveFormsModule,
+        MatLabel
     ], templateUrl: './credential-password-form.component.html', styleUrl: './credential-password-form.component.scss'
 })
-export class CredentialPasswordFormComponent
+export class CredentialPasswordFormComponent extends AbstractCredential<{ password: string }>
 {
-    @Output() private readonly _submit = new EventEmitter<{ password: string } | boolean>();
-    @Input() errorSignal: WritableSignal<any> = signal('');
-    @Input() _loginData?: LoginData;
     private _showPassword: boolean = false;
-    protected password?: string;
+    constructor(formBuilder: FormBuilder)
+    {
+        super(formBuilder.group({password: ['', Validators.required]}));
+    }
 
     protected onShowPassword(event: MouseEvent)
     {
@@ -43,22 +39,14 @@ export class CredentialPasswordFormComponent
         return this._showPassword;
     }
 
-    protected onSubmit()
+    protected override onSubmit(): void
     {
-        if(!this.password)
+        const password: string | undefined = this.form.get('password')?.value;
+        if (!password)
         {
+            this.errorSignal.set("Password cannot be empty.");
             return;
         }
-        this._submit.emit({password: this.password});
-    }
-
-    protected onCancel()
-    {
-        this._submit.emit(false)
-    }
-
-    protected get loginData(): LoginData | undefined
-    {
-        return this._loginData;
+        this.emit({password: password})
     }
 }

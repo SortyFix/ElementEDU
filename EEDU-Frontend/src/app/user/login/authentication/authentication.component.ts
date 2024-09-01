@@ -12,7 +12,7 @@ import {SelectCredentialComponent} from "./select-credential-form/select-credent
 import {animate, style, transition, trigger} from "@angular/animations";
 import {LoginData} from "./login-data/login-data";
 import {LoginRequest} from "./login-data/login-request";
-import {credentialDisplayName, CredentialMethod} from "./login-data/credential-method";
+import {CredentialMethod} from "./login-data/credential-method";
 import {MatAnchor} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
 import {CredentialEmailFormComponent} from "./credential-email-form/credential-email-form.component";
@@ -37,9 +37,9 @@ import {MatError} from "@angular/material/form-field";
         SelectCredentialComponent,
         MatAnchor,
         MatDivider,
-        CredentialEmailFormComponent,
-        CredentialTotpFormComponent,
         MatError,
+        CredentialTotpFormComponent,
+        CredentialEmailFormComponent,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [

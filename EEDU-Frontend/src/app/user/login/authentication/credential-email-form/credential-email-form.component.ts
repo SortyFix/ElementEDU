@@ -21,14 +21,16 @@ import {AbstractCodeCredential} from "../abstract-code-credential";
         ReactiveFormsModule
     ], templateUrl: './credential-email-form.component.html', styleUrl: './credential-email-form.component.scss'
 })
-export class CredentialEmailFormComponent extends AbstractCodeCredential
+export class CredentialEmailFormComponent extends AbstractCodeCredential<{emailCode: string}>
 {
     protected override onSubmit(): void
     {
-        if (!this._code)
+        const code: string | undefined = this.code;
+        if (!code)
         {
+            this.errorSignal().set("Please enter the code you've received in the E-Mail.")
             return;
         }
-        this.emit({emailCode: this._code});
+        this.emit({emailCode: code});
     }
 }

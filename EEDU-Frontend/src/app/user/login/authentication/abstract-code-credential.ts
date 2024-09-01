@@ -1,30 +1,19 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {LoginData} from "./login-data/login-data";
+import {AbstractCredential} from "./abstract-credential";
+import {Component} from "@angular/core";
+import {FormBuilder, Validators} from "@angular/forms";
 
 @Component({standalone: true, template: ''})
-export abstract class AbstractCodeCredential
+export abstract class AbstractCodeCredential<T> extends AbstractCredential<T>
 {
-
-    @Output() private readonly _submit = new EventEmitter<any>();
-    @Input() public _loginData?: LoginData;
-    protected _code: string | undefined = undefined;
-
-    protected abstract onSubmit(): void;
-
-    protected get loginData(): LoginData | undefined
+    public constructor(formBuilder: FormBuilder)
     {
-        return this._loginData;
+        super(formBuilder.group({
+            code: ['', Validators.required]
+        }));
     }
 
-    protected emit(data: any): void
+    protected get code(): string | undefined
     {
-        this._submit.emit(data);
+        return this.form.get('code')?.value;
     }
-
-    protected onCancel(): void
-    {
-        this._loginData = undefined;
-        this._submit.emit(false);
-    };
-
 }
