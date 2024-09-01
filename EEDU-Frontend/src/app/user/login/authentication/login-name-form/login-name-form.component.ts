@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal,
 import {MatButton} from "@angular/material/button";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatDialogClose} from "@angular/material/dialog";
-import {MatError, MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
+import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {LoginRequest} from "../login-data/login-request";
@@ -22,7 +22,8 @@ import {MatIcon} from "@angular/material/icon";
         ReactiveFormsModule,
         FormsModule,
         NgIf,
-        MatIcon
+        MatIcon,
+        MatSuffix
     ], templateUrl: './login-name-form.component.html', styleUrl: './login-name-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
