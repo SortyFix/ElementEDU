@@ -80,10 +80,10 @@ export class UserService
         }).pipe(tap(value => data.token = value), map((): void => {}));
     }
 
-    public verifyPassword(password: string, loginData: LoginData): Observable<string>
+    public verifyCredential(secret: string, loginData: LoginData): Observable<string>
     {
         const url = "http://localhost:8080/user/login/credentials/verify";
-        return this.http.post<string>(url, password, {
+        return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + loginData.token},
             withCredentials: true

@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
-import {AbstractCredential} from "../abstract-credential";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {ReactiveFormsModule} from "@angular/forms";
+import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
+import {AbstractSecretCredential} from "../abstract-secret-credential";
 
 
 @Component({
@@ -17,16 +17,14 @@ import {MatDialogClose} from "@angular/material/dialog";
         MatButton,
         MatDialogClose,
         ReactiveFormsModule,
-        MatLabel
+        MatLabel,
+        MatSuffix,
+        MatIconButton
     ], templateUrl: './credential-password-form.component.html', styleUrl: './credential-password-form.component.scss'
 })
-export class CredentialPasswordFormComponent extends AbstractCredential<{ password: string }>
+export class CredentialPasswordFormComponent extends AbstractSecretCredential
 {
     private _showPassword: boolean = false;
-    constructor(formBuilder: FormBuilder)
-    {
-        super(formBuilder.group({password: ['', Validators.required]}));
-    }
 
     protected onShowPassword(event: MouseEvent)
     {
@@ -39,14 +37,8 @@ export class CredentialPasswordFormComponent extends AbstractCredential<{ passwo
         return this._showPassword;
     }
 
-    protected override onSubmit(): void
+    protected emptyMessage(): string
     {
-        const password: string | undefined = this.form.get('password')?.value;
-        if (!password)
-        {
-            this.errorSignal.set("Password cannot be empty.");
-            return;
-        }
-        this.emit({password: password})
+        return "Please enter your password.";
     }
 }

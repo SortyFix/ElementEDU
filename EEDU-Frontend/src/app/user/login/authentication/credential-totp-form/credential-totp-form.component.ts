@@ -5,7 +5,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {AbstractCredential} from "../abstract-credential";
-import {AbstractCodeCredential} from "../abstract-code-credential";
+import {AbstractSecretCredential} from "../abstract-secret-credential";
 
 @Component({
     selector: 'app-credential-totp-form',
@@ -22,15 +22,10 @@ import {AbstractCodeCredential} from "../abstract-code-credential";
     templateUrl: './credential-totp-form.component.html',
     styleUrl: './credential-totp-form.component.scss'
 })
-export class CredentialTotpFormComponent extends AbstractCodeCredential<{totpCode: string}>
+export class CredentialTotpFormComponent extends AbstractSecretCredential
 {
-    protected override onSubmit(): void
-    {
-        const code: string | undefined = this.code;
-        if (!code)
-        {
-            return;
-        }
-        this.emit({totpCode: code});
+    protected override emptyMessage(): string {
+        return "Please enter the code your Authenticator App shows.";
     }
+
 }

@@ -4,7 +4,7 @@ import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {AbstractCodeCredential} from "../abstract-code-credential";
+import {AbstractSecretCredential} from "../abstract-secret-credential";
 
 @Component({
     selector: 'app-credential-sms-form',
@@ -21,16 +21,10 @@ import {AbstractCodeCredential} from "../abstract-code-credential";
     templateUrl: './credential-sms-form.component.html',
     styleUrl: './credential-sms-form.component.scss'
 })
-export class CredentialSmsFormComponent extends AbstractCodeCredential<{smsCode: string}>
+export class CredentialSmsFormComponent extends AbstractSecretCredential
 {
-    protected override onSubmit(): void
+    protected override emptyMessage(): string
     {
-        const code: string | undefined = this.code;
-        if (!code)
-        {
-
-            return;
-        }
-        this.emit({smsCode: code});
+        return "Please enter the code you've received via SMS.";
     }
 }

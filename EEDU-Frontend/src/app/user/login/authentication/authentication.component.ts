@@ -102,29 +102,34 @@ export class Authentication implements OnInit
      *
      * @param data The data submitted for login, either a password string or a LoginRequest object.
      */
-    onSubmit(data: any): void
+    protected onSubmit(data: any): void
     {
-
-        if (typeof data == 'boolean' && !data)
+        if (typeof data == 'boolean')
         {
             this._loginData = undefined;
             return;
         }
 
-        if (data && typeof data == "object" && this.loginData)
-        {
-            if ('method' in data && typeof data.method === 'string')
-            {
-                this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
-            }
-            else if ('password' in data && typeof data.password === 'string')
-            {
-                this.verifyPassword(data.password);
-            }
-        }
-        else if (data instanceof LoginRequest)
+        if (data instanceof LoginRequest)
         {
             this.requestCredentials(data);
+            return;
+        }
+
+        if (!data || typeof data != "object" || !this.loginData)
+        {
+            return;
+        }
+
+        if ('method' in data && typeof data.method === 'string')
+        {
+            this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
+        }
+        else if (this.loginData.credential && 'secret' in data && typeof data.secret === 'string')
+        {
+            this.userService.verifyCredential(data.secret, this.loginData).pipe(this.finalizeLoading()).subscribe({
+                next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
+            });
         }
     }
 
@@ -144,27 +149,6 @@ export class Authentication implements OnInit
             error: (error) => {
                 this.errorSignal.set(this.getErrorMessage(error))
             }
-        });
-    }
-
-    /**
-     * Verifies the provided password with the server.
-     *
-     * This method sends an HTTP POST request to the backend server to verify the provided password.
-     * If the password is correct, it emits the submit event. If an error occurs, it sets the error signal with an appropriate error message.
-     *
-     * @param password The password to be verified.
-     * @private
-     */
-    private verifyPassword(password: string): void
-    {
-        if (!this.loginData)
-        {
-            return;
-        }
-
-        this.userService.verifyPassword(password, this.loginData).pipe(this.finalizeLoading()).subscribe({
-            next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
         });
     }
 
