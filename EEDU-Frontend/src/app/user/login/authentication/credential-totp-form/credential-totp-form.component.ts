@@ -1,27 +1,27 @@
 import {Component} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
-import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
-import {MatIcon} from "@angular/material/icon";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {AbstractCodeCredential} from "../abstract-code-credential";
 
 @Component({
-    selector: 'app-credential-email-form', standalone: true, imports: [
+    selector: 'app-credential-totp-form',
+    standalone: true,
+    imports: [
         FormsModule,
         MatButton,
         MatDialogClose,
         MatFormField,
-        MatIcon,
-        MatIconButton,
         MatInput,
         MatLabel,
-        MatSuffix,
         ReactiveFormsModule
-    ], templateUrl: './credential-email-form.component.html', styleUrl: './credential-email-form.component.scss'
+    ],
+    templateUrl: './credential-totp-form.component.html',
+    styleUrl: './credential-totp-form.component.scss'
 })
-export class CredentialEmailFormComponent extends AbstractCodeCredential
+export class CredentialTotpFormComponent extends AbstractCodeCredential
 {
     protected override onSubmit(): void
     {
@@ -29,6 +29,6 @@ export class CredentialEmailFormComponent extends AbstractCodeCredential
         {
             return;
         }
-        this.emit({emailCode: this._code});
+        this.emit({totpCode: this._code});
     }
 }

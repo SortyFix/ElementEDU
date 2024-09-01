@@ -3,12 +3,12 @@ package de.gaz.eedu.user.verification;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
-import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
-import de.gaz.eedu.user.verification.model.UserLoginModel;
 import de.gaz.eedu.user.verification.credentials.CredentialController;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
+import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -27,7 +27,6 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -286,14 +285,12 @@ import java.util.function.Function;
         long userID = tokenContent.get("userID", Long.class);
         JwtTokenType jwtTokenType = JwtTokenType.valueOf(tokenContent.getSubject());
 
-        Function<UsernamePasswordAuthenticationToken, UsernamePasswordAuthenticationToken> mapper = (auth) ->
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(jwtTokenType, authorityFactory, userID);
+        return Optional.of(new UsernamePasswordAuthenticationToken(userID, null, authorities)).map((auth) ->
         {
             auth.setDetails(tokenContent);
             return auth;
-        };
-
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(jwtTokenType, authorityFactory, userID);
-        return Optional.of(new UsernamePasswordAuthenticationToken(userID, null, authorities)).map(mapper);
+        });
     }
 
     /**

@@ -44,7 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
             IOException
     {
 
-        checkHeader(request).or(() -> checkCookies(request)).ifPresentOrElse(token ->
+        checkHeader(request).or(() -> checkCookies(request)).filter(token -> !token.isBlank()).ifPresentOrElse(token ->
         {
             Consumer<UsernamePasswordAuthenticationToken> tokenConsumer = (usernamePasswordToken) ->
             {

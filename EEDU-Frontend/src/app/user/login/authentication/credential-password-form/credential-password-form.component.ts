@@ -26,21 +26,21 @@ import {LoginData} from "../login-data/login-data";
 })
 export class CredentialPasswordFormComponent
 {
-    @Output() readonly submit = new EventEmitter<any>();
+    @Output() private readonly _submit = new EventEmitter<{ password: string } | boolean>();
     @Input() errorSignal: WritableSignal<any> = signal('');
     @Input() _loginData?: LoginData;
+    private _showPassword: boolean = false;
     protected password?: string;
-    protected showPassword: boolean = false;
 
     protected onShowPassword(event: MouseEvent)
     {
         event.stopPropagation()
-        this.showPassword = !this.showPassword;
+        this._showPassword = !this._showPassword;
     }
 
-    protected onCancel()
+    protected get showPassword(): boolean
     {
-        this.submit.emit(false)
+        return this._showPassword;
     }
 
     protected onSubmit()
@@ -49,10 +49,15 @@ export class CredentialPasswordFormComponent
         {
             return;
         }
-        this.submit.emit(this.password);
+        this._submit.emit({password: this.password});
     }
 
-    get loginData(): LoginData | undefined
+    protected onCancel()
+    {
+        this._submit.emit(false)
+    }
+
+    protected get loginData(): LoginData | undefined
     {
         return this._loginData;
     }

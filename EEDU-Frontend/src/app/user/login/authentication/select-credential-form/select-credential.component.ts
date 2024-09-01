@@ -29,14 +29,14 @@ import {MatIcon} from "@angular/material/icon";
   styleUrl: './select-credential.component.scss'
 })
 export class SelectCredentialComponent {
-    @Output() readonly submit = new EventEmitter<any>();
+    @Output() readonly submit = new EventEmitter<{ method: CredentialMethod } | boolean>();
     @Input() _loginData?: LoginData;
     @ViewChild('selectionList') selectionList!: MatSelectionList;
 
     protected readonly credentialDisplayName = credentialDisplayName;
 
 
-    onSubmit()
+    protected onSubmit()
     {
         const value: MatListOption = this.selectionList.selectedOptions.selected[0];
         if (!value)
@@ -44,6 +44,11 @@ export class SelectCredentialComponent {
             return;
         }
         this.submit.emit({ method: value.value });
+    }
+
+    protected onCancel()
+    {
+        this.submit.emit(false);
     }
 
     protected get loginData(): LoginData

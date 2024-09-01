@@ -4,9 +4,10 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatError, MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {LoginRequest} from "../login-data/login-request";
 import {NgIf} from "@angular/common";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
     selector: 'app-login-name-form', standalone: true, imports: [
@@ -20,7 +21,8 @@ import {NgIf} from "@angular/common";
         MatLabel,
         ReactiveFormsModule,
         FormsModule,
-        NgIf
+        NgIf,
+        MatIcon
     ], templateUrl: './login-name-form.component.html', styleUrl: './login-name-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,16 +30,25 @@ export class LoginNameFormComponent
 {
     @Output() readonly submit: EventEmitter<LoginRequest> = new EventEmitter<LoginRequest>();
     @Input() errorSignal: WritableSignal<any> = signal('');
-    loginName?: string;
-    rememberMe: boolean = false;
+    protected loginForm: FormGroup;
+
+    constructor(formBuilder: FormBuilder)
+    {
+        this.loginForm = formBuilder.group({
+            loginName: ['', Validators.required],
+            rememberMe: [false]
+        });
+    }
 
     onSubmit()
     {
-        if (!this.loginName)
-        {
+        const loginName = this.loginForm.get('loginName')?.value;
+        const rememberMe = this.loginForm.get('rememberMe')?.value;
+        if (!loginName) {
+            this.errorSignal.set('Login name is required');
             return;
         }
-        const request = new LoginRequest(this.loginName, this.rememberMe);
+        const request = new LoginRequest(loginName, rememberMe);
         this.submit.emit(request);
     }
 }

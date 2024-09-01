@@ -1,12 +1,4 @@
-import {
-    Component,
-    EventEmitter,
-    HostListener,
-    OnInit,
-    Output,
-    signal,
-    WritableSignal
-} from '@angular/core';
+import {Component, EventEmitter, HostListener, OnInit, Output, signal, WritableSignal} from '@angular/core';
 import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
@@ -24,6 +16,8 @@ import {credentialDisplayName, CredentialMethod} from "./login-data/credential-m
 import {MatAnchor} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
 import {CredentialEmailFormComponent} from "./credential-email-form/credential-email-form.component";
+import {CredentialTotpFormComponent} from "./credential-totp-form/credential-totp-form.component";
+import {MatError} from "@angular/material/form-field";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -44,6 +38,8 @@ import {CredentialEmailFormComponent} from "./credential-email-form/credential-e
         MatAnchor,
         MatDivider,
         CredentialEmailFormComponent,
+        CredentialTotpFormComponent,
+        MatError,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [
@@ -61,7 +57,8 @@ import {CredentialEmailFormComponent} from "./credential-email-form/credential-e
 export class Authentication implements OnInit
 {
     @Output() submit: EventEmitter<void> = new EventEmitter<void>();
-    errorSignal: WritableSignal<any> = signal('');
+    protected errorSignal: WritableSignal<any> = signal('');
+    protected readonly CredentialMethod: typeof CredentialMethod = CredentialMethod;
     private _loginData?: LoginData;
     private _mobile: boolean = false;
     private _loadingAnimation: boolean = false;
@@ -79,7 +76,7 @@ export class Authentication implements OnInit
      * Lifecycle hook that is called after data-bound properties of a directive are initialized.
      * Initializes the screen size check.
      */
-    ngOnInit(): void
+    public ngOnInit(): void
     {
         this.checkScreenSize()
     }
@@ -87,7 +84,7 @@ export class Authentication implements OnInit
     /**
      * Listens for window resize events to check and update the screen size.
      */
-    @HostListener("window:resize") onResize()
+    @HostListener("window:resize") public onResize(): void
     {
         this.checkScreenSize()
     }
@@ -95,7 +92,7 @@ export class Authentication implements OnInit
     /**
      * Checks the screen size and sets the mobile property based on the width.
      */
-    checkScreenSize()
+    private checkScreenSize(): void
     {
         this._mobile = window.innerWidth <= 600;
     }
@@ -105,25 +102,29 @@ export class Authentication implements OnInit
      *
      * @param data The data submitted for login, either a password string or a LoginRequest object.
      */
-    onSubmit(data: any)
+    onSubmit(data: any): void
     {
 
-        if (data == false)
+        if (typeof data == 'boolean' && !data)
         {
             this._loginData = undefined;
             return;
         }
 
-        if(data && typeof data === 'object' && 'method' in data && typeof data.method === 'string' && this.loginData)
+        if (data && typeof data == "object" && this.loginData)
         {
-            this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
-            return;
+            if ('method' in data && typeof data.method === 'string')
+            {
+                this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
+            }
+            else if ('password' in data && typeof data.password === 'string')
+            {
+                this.verifyPassword(data.password);
+            }
         }
-
-        if (data instanceof LoginRequest)
+        else if (data instanceof LoginRequest)
         {
-            this.requestCredentials(data)
-            return;
+            this.requestCredentials(data);
         }
     }
 
@@ -136,7 +137,7 @@ export class Authentication implements OnInit
      * @param data The login request data containing user credentials.
      * @private
      */
-    private requestCredentials(data: LoginRequest)
+    private requestCredentials(data: LoginRequest): void
     {
         this.userService.request(data).pipe(this.finalizeLoading()).subscribe({
             next: (loginData) => this._loginData = loginData,
@@ -155,14 +156,14 @@ export class Authentication implements OnInit
      * @param password The password to be verified.
      * @private
      */
-    private verifyPassword(password: string)
+    private verifyPassword(password: string): void
     {
         if (!this.loginData)
         {
             return;
         }
 
-        this.userService.verifyPassword(this.loginData, password).pipe(this.finalizeLoading()).subscribe({
+        this.userService.verifyPassword(password, this.loginData).pipe(this.finalizeLoading()).subscribe({
             next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
         });
     }
@@ -201,9 +202,14 @@ export class Authentication implements OnInit
      */
     private getErrorMessage(error: any): string
     {
+        if(typeof error == 'object' && 'status' in error && typeof error.status == 'number')
+        {
+            switch (error.status)
+            {
+                case 401:
+                    return "The user has not been found."
+            }
+        }
         return "An error occurred"
     }
-
-    protected readonly credentialDisplayName = credentialDisplayName;
-    protected readonly CredentialMethod = CredentialMethod;
 }

@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -114,7 +116,8 @@ public class CredentialController extends EntityController<CredentialService, Cr
     {
         validate(isAuthorized(JwtTokenType.CREDENTIAL_PENDING), unauthorizedThrowable());
 
-        CredentialMethod method = CredentialMethod.valueOf(claims.get("method", String.class));
+        List<String> credentials = claims.get("available", List.class);
+        CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
         Optional<String> verifyToken = getEntityService().verify(method, code, claims);
 
         return verifyToken.map(token ->

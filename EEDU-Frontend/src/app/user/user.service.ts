@@ -80,7 +80,7 @@ export class UserService
         }).pipe(tap(value => data.token = value), map((): void => {}));
     }
 
-    public verifyPassword(loginData: LoginData, password: string): Observable<string>
+    public verifyPassword(password: string, loginData: LoginData): Observable<string>
     {
         const url = "http://localhost:8080/user/login/credentials/verify";
         return this.http.post<string>(url, password, {

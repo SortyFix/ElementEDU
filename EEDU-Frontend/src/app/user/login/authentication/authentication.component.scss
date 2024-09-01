@@ -50,10 +50,13 @@ mat-card {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
     nav {
         display: flex;
+        flex-wrap: wrap;
         justify-content: center;
+        margin: 0;
 
         a {
             display: flex;
@@ -61,7 +64,8 @@ mat-card {
             text-transform: none;
             font-weight: 500;
             text-decoration: none;
-            margin: 0 5px 0 5px;
+            margin: 5px;
+            font-size: 14px;
 
             mat-icon {
                 margin-right: 5px;
@@ -71,5 +75,31 @@ mat-card {
                 color: #0056b3;
             }
         }
+    }
+}
+
+@media (min-width: 600px) {
+    .footer {
+        flex-direction: row;
+    }
+
+    .footer nav {
+        flex-wrap: nowrap;
+    }
+
+    .footer a {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 960px) {
+    .footer {
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    .footer a {
+        margin: 0 10px;
+        font-size: 14px;
     }
 }

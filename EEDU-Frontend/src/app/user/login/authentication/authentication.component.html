@@ -23,27 +23,35 @@
                         </app-login-name-form>
 
                         <app-select-credential
-                            *ngIf="loginData && !loginData.credential"
+                            *ngIf="loginData && !loginData?.credential"
                             (submit)="onSubmit($event)"
                             [_loginData]="loginData"
                             class="current-form">
                         </app-select-credential>
 
-                        <ng-container *ngIf="loginData && loginData.credential">
+                        <ng-container *ngIf="loginData && loginData?.credential">
                             <app-credential-password-form
-                                *ngIf="loginData.credential === CredentialMethod.PASSWORD"
+                                *ngIf="loginData?.credential === CredentialMethod.PASSWORD"
                                 [_loginData]="loginData"
                                 (submit)="onSubmit($event)"
                                 class="current-form">
                             </app-credential-password-form>
 
                             <app-credential-email-form
-                                *ngIf="loginData.credential === CredentialMethod.EMAIL"
+                                *ngIf="loginData?.credential === CredentialMethod.EMAIL"
                                 [_loginData]="loginData"
                                 (submit)="onSubmit($event)"
                                 class="current-form">
                             </app-credential-email-form>
+
+                            <app-credential-totp-form
+                                (submit)="onSubmit($event)"
+                                *ngIf="loginData?.credential === CredentialMethod.TOTP"
+                                [_loginData]="loginData"
+                                class="current-form">
+                            </app-credential-totp-form>
                         </ng-container>
+
                     </div>
                 </mat-grid-tile>
             </mat-grid-list>
@@ -51,7 +59,7 @@
                 <nav>
                     <a href="#" mat-button>
                         <mat-icon>privacy_tip</mat-icon>
-                        Datenschutz
+                        Privacy
                     </a>
                     <a href="#" mat-button>
                         <mat-icon>gavel</mat-icon>
@@ -64,6 +72,10 @@
                     <a href="#" mat-button>
                         <mat-icon>description</mat-icon>
                         Terms of Service
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>help</mat-icon>
+                        Help
                     </a>
                 </nav>
             </mat-card-footer>
