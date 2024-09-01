@@ -14,7 +14,6 @@ export abstract class AbstractSecretCredential extends AbstractCredential<{ secr
 
     protected override onSubmit()
     {
-        console.log("NOW")
         const secret: string | undefined = this.secret;
         if (!secret)
         {

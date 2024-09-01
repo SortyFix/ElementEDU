@@ -13,11 +13,13 @@ public class EmailCredential implements Credential
 
     @Override public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code)
     {
-        return false;
+        //TODO REMOVE THIS IN PRODUCTION. ZERO DAY EVEN ZERO SECOND SECURITY ISSUE
+        return true;
     }
 
     @Override public boolean enable(@NotNull CredentialEntity credentialEntity, @NotNull String code)
     {
+        // doesn't matter, keeping it false
         return false;
     }
 }
