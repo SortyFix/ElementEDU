@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 
-\title{ElementEDU - Verlauf}
+\title{Protokoll zum Projekt "ElementEDU"}
 \author{Yonas Nieder Fernández}
 \date{Oktober 2023}
 
@@ -15,14 +15,26 @@ Wir, Falk Odin Ivo Quiring und Yonas Nieder Fernández, haben es uns mit der Bes
 
 Das Programm wird in Java und TypeScript geschrieben, wobei wir mehrere Pakete von Drittanbietern, insbesondere Spring Boot und Angular, zur Erweiterung der Entwicklungsmöglichkeiten in unser Projekt integrieren (siehe Abschnitt "Pakete"). 
 
-Unser Projekt, welches wir "ElementEDU" nennen, soll DSGVO-konform sein und mithilfe von Antiviren-Unterstützung das System und andere Nutzer vor Schadsoftware bewahren. Das Design wird klar separiert, um nicht nur benutzerfreundlich zu sein, sondern vor allem die Barrierefreiheit in unserer Software zu fördern. 
+Unser Projekt, welches wir "ElementEDU" nennen, soll DSGVO-konform sein und mithilfe von Antiviren-Unterstützung das System und andere Nutzer vor Schadsoftware bewahren. Das Design wird klar separiert, um nicht nur benutzerfreundlich zu sein, sondern vor allem die Barrierefreiheit innerhalb unserer Software zu fördern. 
 
 \section{Pakete}
-\textbf{Java:}
+\textbf{
+\subsection{Java}
+}
 \begin{itemize}
 \item Spring Boot
+\begin{itemize}
+    Als Webframework verwenden wir Spring Boot, da es momentan die gängigste Methode ist, ein Server-Backend zu entwickeln. Da Spring Boot dadurch besonders gut dokumentiert ist, ist es für uns möglich, bei Problemen fast immer eine Lösung zu finden. Dazu verwendet es als Programmiersprache Java, eine Sprache, die wir im Informatikunterricht bereits erlernt haben. 
+\end{itemize}
+
 \item Hibernate
+\begin{itemize}
+Hibernate ist ein Framework zur Persistierung und objektrelationalen Abbildung (ORM) von relationalen Datenbanken. Mithilfe von Hibernate ist es bspw. möglich, Plain Old Java Objects (POJOs) in einer Datenbank darzustellen und aus Datenbankeinträgen ein POJO zusammenzustellen.
+\end{itemize}
 \item JPA
+\begin{itemize}
+JPA (Jakarta Perisitence API) ist eine standartisierte API für ORM. Sie bietet eine Schnittstelle zur Kommunikation mit Hibernate, welches die ORM-Implementierung enthält.
+\end{itemize}
 \item Docker
 \item JJWT
 \item Jetbrains Annotations
@@ -33,12 +45,14 @@ Unser Projekt, welches wir "ElementEDU" nennen, soll DSGVO-konform sein und mith
 \item MariaDB
 \item H2
 \end{itemize}
-\textbf{TypeScript:}
+\subsection{\textbf{TypeScript:}}
 \begin{itemize}
     \item Angular
     \item JWT Decode
     \item rxjs
     \item tslib
+
+
 
 
 \end{itemize}
