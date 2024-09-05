@@ -18,6 +18,7 @@ import {MatDivider} from "@angular/material/divider";
 import {CredentialEmailFormComponent} from "./credential-email-form/credential-email-form.component";
 import {CredentialTotpFormComponent} from "./credential-totp-form/credential-totp-form.component";
 import {MatError} from "@angular/material/form-field";
+import {LoginService} from "../login.service";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -66,9 +67,9 @@ export class Authentication implements OnInit
     /**
      * Constructor to initialize the LoginComponent.
      *
-     * @param userService The service used for user-related operations such as login and password verification.
+     * @param loginService The service used for login-related operations such as login and password verification.
      */
-    constructor(private userService: UserService)
+    constructor(private loginService: LoginService)
     {
     }
 
@@ -123,11 +124,11 @@ export class Authentication implements OnInit
 
         if ('method' in data && typeof data.method === 'string')
         {
-            this.userService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
+            this.loginService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
         }
         else if (this.loginData.credential && 'secret' in data && typeof data.secret === 'string')
         {
-            this.userService.verifyCredential(data.secret, this.loginData).pipe(this.finalizeLoading()).subscribe({
+            this.loginService.verifyCredential(data.secret, this.loginData).pipe(this.finalizeLoading()).subscribe({
                 next: () => this.submit.emit(), error: error => this.errorSignal.set(this.getErrorMessage(error))
             });
         }
@@ -144,7 +145,7 @@ export class Authentication implements OnInit
      */
     private requestCredentials(data: LoginRequest): void
     {
-        this.userService.request(data).pipe(this.finalizeLoading()).subscribe({
+        this.loginService.request(data).pipe(this.finalizeLoading()).subscribe({
             next: (loginData) => this._loginData = loginData,
             error: (error) => {
                 this.errorSignal.set(this.getErrorMessage(error))
@@ -167,7 +168,6 @@ export class Authentication implements OnInit
     {
         return this._loadingAnimation;
     }
-
 
     protected get loginData(): LoginData | undefined
     {

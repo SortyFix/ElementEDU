@@ -2,9 +2,6 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
-import {LoginData} from "./login/authentication/login-data/login-data";
-import {LoginRequest} from "./login/authentication/login-data/login-request";
-import {CredentialMethod} from "./login/authentication/login-data/credential-method";
 
 @Injectable({
     providedIn: 'root'
@@ -44,7 +41,7 @@ export class UserService
         return this._loaded;
     }
 
-    public logout(): Observable<any>
+    public logout(): Observable<any> // TODO maybe move to login service??
     {
         if (!this.isLoggedIn)
         {
@@ -60,34 +57,6 @@ export class UserService
     public get isLoggedIn(): boolean
     {
         return !!localStorage.getItem("userData");
-    }
-
-    public request(data: LoginRequest): Observable<LoginData>
-    {
-        const url = "http://localhost:8080/user/login";
-        return this.http.post<string>(url, data,
-            {responseType: "text" as "json"}
-        ).pipe(tap<string>({}), map((token) => new LoginData(data.loginName, token)));
-    }
-
-    public selectCredential(credential: CredentialMethod, data: LoginData): Observable<void>
-    {
-        const url: string = "http://localhost:8080/user/login/credentials/select/" + credential;
-        return this.http.get<string>(url, {
-            responseType: "text" as "json",
-            headers: {"Authorization": "Bearer " + data.token},
-            withCredentials: true
-        }).pipe(tap(value => data.token = value), map((): void => {}));
-    }
-
-    public verifyCredential(secret: string, loginData: LoginData): Observable<string>
-    {
-        const url = "http://localhost:8080/user/login/credentials/verify";
-        return this.http.post<string>(url, secret, {
-            responseType: "text" as "json",
-            headers: {"Authorization": "Bearer " + loginData.token},
-            withCredentials: true
-        }).pipe(tap<string>({next: () => this.loadData().subscribe()}));
     }
 
     private get fetchUserData(): Observable<UserEntity>
