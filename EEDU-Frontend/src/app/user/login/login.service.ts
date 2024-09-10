@@ -46,6 +46,11 @@ export class LoginService
         }).pipe(tap<string>({}), map((token) => new LoginData(data.loginName, token)));
     }
 
+    public setupCredential(credential: CredentialMethod, data: LoginData)
+    {
+        const url: string = "http://localhost:8080/user/login/credentials/select/" + credential;
+    }
+
     /**
      * Sends a request to select a specific credential method after login.
      *

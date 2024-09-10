@@ -15,7 +15,16 @@
                 </mat-grid-tile>
                 <mat-grid-tile>
                     <div class="form-container">
-                        <app-login-name-form
+<!--                        <app-setup-password
+                            class="current-form">
+
+                        </app-setup-password>-->
+                        <app-setup-totp
+                            class="current-form">
+
+                        </app-setup-totp>
+
+<!--                        <app-login-name-form
                             *ngIf="!loginData"
                             (submit)="onSubmit($event)"
                             [errorSignal]="errorSignal"
@@ -50,7 +59,7 @@
                                 [_loginData]="loginData"
                                 class="current-form">
                             </app-credential-totp-form>
-                        </ng-container>
+                        </ng-container>-->
 
                     </div>
                 </mat-grid-tile>

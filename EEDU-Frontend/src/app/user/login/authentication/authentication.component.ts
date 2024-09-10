@@ -19,6 +19,10 @@ import {CredentialEmailFormComponent} from "./credential-email-form/credential-e
 import {CredentialTotpFormComponent} from "./credential-totp-form/credential-totp-form.component";
 import {MatError} from "@angular/material/form-field";
 import {LoginService} from "../login.service";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {SetupPasswordComponent} from "../credentials/setup-password/setup-password.component";
+import {SetupEmailComponent} from "../credentials/setup-email/setup-email/setup-email.component";
+import {SetupTOTPComponent} from "../credentials/setup-totp/setup-totp.component";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -41,6 +45,9 @@ import {LoginService} from "../login.service";
         MatError,
         CredentialTotpFormComponent,
         CredentialEmailFormComponent,
+        SetupPasswordComponent,
+        SetupEmailComponent,
+        SetupTOTPComponent,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [
@@ -68,8 +75,9 @@ export class Authentication implements OnInit
      * Constructor to initialize the LoginComponent.
      *
      * @param loginService The service used for login-related operations such as login and password verification.
+     * @param dialogRef
      */
-    constructor(private loginService: LoginService)
+    constructor(private loginService: LoginService, private dialogRef: MatDialog)
     {
     }
 
