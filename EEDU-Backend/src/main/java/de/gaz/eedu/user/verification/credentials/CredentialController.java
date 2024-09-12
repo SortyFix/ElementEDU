@@ -10,8 +10,11 @@ import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreate
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,25 +46,18 @@ import java.util.Optional;
 @RestController @RequestMapping("/user/login/credentials") @RequiredArgsConstructor public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {
     @Value("${development}") private final boolean development = false;
-    private final CredentialService credentialService;
+    @Getter(AccessLevel.PROTECTED) private final CredentialService entityService;
 
-    @Override protected @NotNull CredentialService getEntityService()
-    {
-        return credentialService;
-    }
-
-    @PreAuthorize("(#id == authentication.principal)") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long id)
-    {
-        validate(isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION), unauthorizedThrowable());
-        return super.delete(id);
-    }
+    @PreAuthorize("(#id == authentication.principal) && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)")
+    @DeleteMapping("/delete/{id}") @Override
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id) {return super.delete(id);}
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public @NotNull ResponseEntity<CredentialModel> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public @NotNull ResponseEntity<@Nullable String> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
     {
-        return super.create(new CredentialCreateModel(userID, model));
+        CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
+        return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
     /**
@@ -77,16 +73,13 @@ import java.util.Optional;
      * @param claims These are the claims associated with the JWT token.
      * @return A {@link HttpStatus} representing the state of the request.
      */
-    @PreAuthorize("isAuthenticated()") @PostMapping("/enable/{method}")
+    @PostMapping("/enable/{method}")
+    @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
     public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims)
     {
-        boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
-        boolean hasRequired = isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED);
-
-        validate((hasAdvanced || hasRequired), unauthorizedThrowable());
         validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
 
-        if (hasRequired) // return login token after user has setup two factor
+        if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED)) // return login token after user has setup two factor
         {
             Optional<String> token = getEntityService().verify(method, code, claims);
             return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);

@@ -17,7 +17,7 @@ import {MatAnchor} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
 import {CredentialEmailFormComponent} from "./credential-email-form/credential-email-form.component";
 import {CredentialTotpFormComponent} from "./credential-totp-form/credential-totp-form.component";
-import {MatError} from "@angular/material/form-field";
+import {MatError, MatLabel} from "@angular/material/form-field";
 import {LoginService} from "../login.service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {SetupPasswordComponent} from "../credentials/setup-password/setup-password.component";
@@ -48,6 +48,7 @@ import {SetupTOTPComponent} from "../credentials/setup-totp/setup-totp.component
         SetupPasswordComponent,
         SetupEmailComponent,
         SetupTOTPComponent,
+        MatLabel,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [

@@ -2,11 +2,12 @@ package de.gaz.eedu.user.verification.credentials.implementations;
 
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface Credential
 {
 
-    @NotNull <T> T creation(@NotNull CredentialEntity credentialEntity);
+    void creation(@NotNull CredentialEntity credentialEntity);
 
     boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code);
 
@@ -15,4 +16,8 @@ public interface Credential
         return true;
     }
 
+    default @Nullable String getSetupData(@NotNull CredentialEntity credentialEntity)
+    {
+        return null;
+    }
 }

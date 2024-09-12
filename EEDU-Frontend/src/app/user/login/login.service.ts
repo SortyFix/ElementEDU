@@ -26,7 +26,8 @@ export class LoginService
      * @param http         The {@link HttpClient} service used to send HTTP requests to the backend API.
      * @param userService  The {@link UserService} used to manage and load user-specific data.
      */
-    constructor(private http: HttpClient, private userService: UserService) { }
+    constructor(private http: HttpClient, private userService: UserService)
+    { }
 
     /**
      * Sends a login request to the server, optionally performing an advanced login.
@@ -46,9 +47,16 @@ export class LoginService
         }).pipe(tap<string>({}), map((token) => new LoginData(data.loginName, token)));
     }
 
-    public setupCredential(credential: CredentialMethod, data: LoginData)
+    public setupCredential(credential: CredentialMethod,
+                           additionalData: string | undefined): Observable<string | undefined>
     {
-        const url: string = "http://localhost:8080/user/login/credentials/select/" + credential;
+        const createModel: { method: CredentialMethod, data: string | undefined } = {
+            method: credential, data: additionalData
+        }
+        const url: string = "http://localhost:8080/user/login/credentials/create";
+        return this.http.post<string | undefined>(url, createModel, {
+            withCredentials: true, responseType: "text" as "json"
+        });
     }
 
     /**

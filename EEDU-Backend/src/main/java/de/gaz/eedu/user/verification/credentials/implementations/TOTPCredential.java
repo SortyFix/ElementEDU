@@ -12,6 +12,7 @@ import lombok.Getter;
 import org.apache.commons.codec.binary.Base32;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -26,14 +27,17 @@ import java.util.Base64;
     private static final Base32 BASE_32 = new Base32();
     @NotNull private final TOPTHandler toptHandler;
 
-    @Override public @NotNull String creation(@NotNull CredentialEntity credentialEntity)
+    @Override public void creation(@NotNull CredentialEntity credentialEntity)
+    {
+        credentialEntity.setSecret(generateBase32());
+    }
+
+    @Override public @Nullable String getSetupData(@NotNull CredentialEntity credentialEntity)
     {
         try
         {
             UserEntity userEntity = credentialEntity.getUser();
-            String secret = generateBase32();
-            credentialEntity.setSecret(secret);
-
+            String secret = credentialEntity.getSecret();
             QRData qrData = new QRData(userEntity.getLoginName(), secret, "ElementEDU", HashingAlgorithm.SHA1, 6, 30);
             return Base64.getEncoder().encodeToString(qrData.generateImage(350));
         }

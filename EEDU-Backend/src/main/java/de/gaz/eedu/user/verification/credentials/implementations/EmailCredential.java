@@ -5,10 +5,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class EmailCredential implements Credential
 {
-    @Override public @NotNull String creation(@NotNull CredentialEntity credentialEntity)
+    @Override public void creation(@NotNull CredentialEntity credentialEntity)
     {
         credentialEntity.setEnabled(true);
-        return "yes"; //TODO implement lol
     }
 
     @Override public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code)

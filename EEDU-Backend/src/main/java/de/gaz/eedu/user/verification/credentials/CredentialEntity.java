@@ -10,9 +10,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class CredentialEntity implements EntityObject,
         EntityModelRelation<CredentialModel>
 {
@@ -30,11 +27,6 @@ import java.util.Map;
 
     @Override public CredentialModel toModel()
     {
-        Map<String, String> claims = new HashMap<>();
-        if (!isEnabled())
-        {
-            claims.put("setup", getMethod().getCredential().creation(this));
-        }
-        return new CredentialModel(getId(), getMethod(), isEnabled(), claims);
+        return new CredentialModel(getId(), getMethod(), isEnabled());
     }
 }
