@@ -5,18 +5,13 @@ import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import org.jetbrains.annotations.NotNull;
 
-public record CredentialCreateModel(@NotNull Long userID, @NotNull CredentialMethod method,
-                                    @NotNull String data) implements CreationModel<CredentialEntity>
+public record UndefinedCredentialCreateModel(@NotNull CredentialMethod method,
+                                             @NotNull String data) implements CreationModel<CredentialEntity>
 {
 
     @Override public @NotNull String name()
     {
         return null; // going to be removed
-    }
-
-    public CredentialCreateModel(@NotNull Long userID, @NotNull UndefinedCredentialCreateModel model)
-    {
-        this(userID, model.method(), model.data());
     }
 
     @Override public @NotNull CredentialEntity toEntity(@NotNull CredentialEntity entity)

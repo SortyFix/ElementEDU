@@ -53,7 +53,7 @@ ij_java_align_multiline_method_parentheses = false
 ij_java_align_multiline_parameters = false
 ij_java_align_multiline_parameters_in_calls = false
 ij_java_align_multiline_parenthesized_expression = false
-ij_java_align_multiline_records = true
+ij_java_align_multiline_records = false
 ij_java_align_multiline_resources = true
 ij_java_align_multiline_ternary_operation = false
 ij_java_align_multiline_text_blocks = false
@@ -189,7 +189,7 @@ ij_java_message_dd_prefix =
 ij_java_message_dd_suffix = EJB
 ij_java_message_eb_prefix = 
 ij_java_message_eb_suffix = Bean
-ij_java_method_annotation_wrap = off
+ij_java_method_annotation_wrap = on_every_item
 ij_java_method_brace_style = next_line
 ij_java_method_call_chain_wrap = on_every_item
 ij_java_method_parameters_new_line_after_left_paren = false
@@ -342,7 +342,7 @@ ij_java_while_brace_force = always
 ij_java_while_on_new_line = true
 ij_java_wrap_comments = false
 ij_java_wrap_first_method_in_call_chain = false
-ij_java_wrap_long_lines = true
+ij_java_wrap_long_lines = false
 ij_java_wrap_semicolon_after_call_chain = false
 
 [*.less]

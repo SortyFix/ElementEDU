@@ -108,6 +108,8 @@ import java.util.function.Function;
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
+
+
     private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
