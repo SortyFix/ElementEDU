@@ -50,7 +50,7 @@ import java.util.Optional;
 
     @PreAuthorize("(#id == authentication.principal) && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)")
     @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long id) {return super.delete(id);}
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id) { return super.delete(id); }
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
