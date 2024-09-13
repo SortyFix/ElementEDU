@@ -9,12 +9,6 @@ import org.jetbrains.annotations.Nullable;
 public record UndefinedCredentialCreateModel(@NotNull CredentialMethod method,
                                              @Nullable String data) implements CreationModel<CredentialEntity>
 {
-
-    @Override public @NotNull String name()
-    {
-        return null; // going to be removed
-    }
-
     @Override public @NotNull CredentialEntity toEntity(@NotNull CredentialEntity entity)
     {
         entity.setEnabled(false);
