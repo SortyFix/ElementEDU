@@ -8,11 +8,6 @@ import java.util.Arrays;
 
 public record ChatCreateModel(@NotNull Long[] users, @NotNull Long timeOfCreation) implements CreationModel<ChatEntity>
 {
-    @Override
-    public @NotNull String name()
-    {
-        return System.currentTimeMillis() + " " + users[0];
-    }
 
     @Override
     public @NotNull ChatEntity toEntity(@NotNull ChatEntity chatEntity)
