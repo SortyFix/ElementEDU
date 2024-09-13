@@ -279,7 +279,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      */
     @Transactional public <T extends E> @NotNull T saveEntity(@NotNull T entity)
     {
-        return saveEntity(Collections.singleton(entity)).get(0);
+        return saveEntity(Collections.singleton(entity)).getFirst();
     }
 
     /**

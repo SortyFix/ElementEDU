@@ -3,9 +3,6 @@ package de.gaz.eedu.user.model;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserStatus;
-import de.gaz.eedu.user.theming.ThemeCreateModel;
-import de.gaz.eedu.user.theming.ThemeEntity;
-import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
 
 public record UserCreateModel(@NotNull String firstName, @NotNull String lastName, @NotNull String loginName, @NotNull String password,
