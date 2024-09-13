@@ -26,12 +26,6 @@ public record FileCreateModel(@NotNull Long authorId,
     }
 
     @Override
-    public @NotNull String name()
-    {
-        return authorId() + " " + System.currentTimeMillis();
-    }
-
-    @Override
     public @NotNull FileEntity toEntity(@NotNull FileEntity fileEntity) {
         fileEntity.setAuthorId(authorId());
         fileEntity.setFileName(fileName());

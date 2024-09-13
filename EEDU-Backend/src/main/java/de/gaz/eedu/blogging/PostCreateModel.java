@@ -14,12 +14,6 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
 {
 
     @Override
-    public @NotNull String name()
-    {
-        return title() + System.currentTimeMillis();
-    }
-
-    @Override
     public @NotNull PostEntity toEntity(@NotNull PostEntity entity)
     {
         entity.setTitle(title());
