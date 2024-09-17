@@ -1,0 +1,16 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h6 class="mat-subtitle-1">
+        Enter your Credentials
+    </h6>
+    <mat-form-field appearance="outline">
+        <mat-label>Login Name</mat-label>
+        <input formControlName="loginName" name="loginName" placeholder="Enter your login name..." maxlength="20" required autofocus matInput/>
+        <mat-error>{{ errorMessageSignal() }}</mat-error>
+    </mat-form-field>
+    <div class="action-row">
+        <mat-checkbox formControlName="rememberMe" name="rememberMe">Remember me</mat-checkbox>
+        <div class="buttons">
+            <button mat-stroked-button type="submit">Login</button>
+        </div>
+    </div>
+</form>

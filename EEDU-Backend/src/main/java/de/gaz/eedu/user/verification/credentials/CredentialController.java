@@ -50,12 +50,18 @@ import java.util.Optional;
 
     @PreAuthorize("(#id == authentication.principal) && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)")
     @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long id) { return super.delete(id); }
+    public @NotNull Boolean delete(@NotNull @PathVariable Long id) {return super.delete(id);}
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public @NotNull ResponseEntity<@Nullable String> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public @NotNull ResponseEntity<@Nullable String> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
     {
+        // validate that this method is allowed to be created by the token
+        if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED))
+        {
+            validate(!claims.get("available", List.class).contains(model.method().name()), unauthorizedThrowable());
+        }
+
         CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }

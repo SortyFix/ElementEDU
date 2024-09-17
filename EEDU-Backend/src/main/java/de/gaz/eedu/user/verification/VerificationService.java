@@ -71,10 +71,17 @@ import java.util.stream.Stream;
         boolean advanced = loginModel instanceof AdvancedUserLoginModel;
         Instant expiry = getExpiry(loginModel);
 
+
         if (user.getCredentials().isEmpty())
         {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+        if(user.getCredentials(CredentialMethod.PASSWORD).isPresent() && user.getCredentials().size() == 1)
+        {
+            return credentialRequired(user.getId(), expiry, advanced, CredentialMethod.TOTP);
+        }
+
         return credentialToken(user.getId(), expiry, advanced, getMethods(user));
     }
 
@@ -159,16 +166,18 @@ import java.util.stream.Stream;
      * @param userID   id of the user.
      * @param expiry   when the login token should expire after the two-factor has been set up.
      * @param advanced whether this token should have advanced user rights.
+     * @param credentialMethod TODO
      * @return the token which the user then can use to create and enable a {@link CredentialMethod}.
      */
-    public @NotNull String credentialRequired(long userID, @NotNull Instant expiry, boolean advanced)
+    public @NotNull String credentialRequired(long userID, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod)
     {
         Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
 
         ClaimHolder<?>[] holders = {
                 new ClaimHolder<>("userID", userID),
                 new ClaimHolder<>("expiry", expiry.toEpochMilli()),
-                new ClaimHolder<>("advanced", advanced)
+                new ClaimHolder<>("advanced", advanced),
+                new ClaimHolder<>("available", credentialMethod) //TODO everyone which wasn't setup
         };
 
         return generateKey(JwtTokenType.CREDENTIAL_REQUIRED, time, holders);

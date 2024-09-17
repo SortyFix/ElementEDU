@@ -1,0 +1,85 @@
+<div class="backdrop-blur">
+    <mat-card>
+        <mat-progress-bar [mode]="loadingAnimation ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
+        <mat-card-header>
+            <mat-card-title>
+                <mat-icon class="icon">person</mat-icon>
+                Login to ElementEDU
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-grid-list [cols]="mobile ? 1 : 2">
+                <mat-grid-tile *ngIf="!mobile">
+                    <img alt="element_edu_logo" height="200" ngSrc="/assets/favicon.svg" priority width="200">
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <div class="form-container">
+
+                        <app-login-name-form
+                            (_submit)="onSubmit($event)"
+                            *ngIf="!loginData"
+                            [responseStatusCode]="statusCode"
+                            class="current-form">
+                        </app-login-name-form>
+
+                        <app-select-credential
+                            (submit)="onSubmit($event)"
+                            *ngIf="loginData && !loginData?.credential"
+                            [_loginData]="loginData"
+                            class="current-form">
+                        </app-select-credential>
+
+                        <ng-container *ngIf="loginData && loginData?.credential">
+                            <app-credential-password-form
+                                (_submit)="onSubmit($event)"
+                                *ngIf="loginData?.credential === CredentialMethod.PASSWORD"
+                                [_loginData]="loginData"
+                                [responseStatusCode]="statusCode"
+                                class="current-form">
+                            </app-credential-password-form>
+
+                            <app-credential-email-form
+                                (submit)="onSubmit($event)"
+                                *ngIf="loginData?.credential === CredentialMethod.EMAIL"
+                                [_loginData]="loginData"
+                                class="current-form">
+                            </app-credential-email-form>
+
+                            <app-credential-totp-form
+                                (submit)="onSubmit($event)"
+                                *ngIf="loginData?.credential === CredentialMethod.TOTP"
+                                [_loginData]="loginData"
+                                class="current-form">
+                            </app-credential-totp-form>
+                        </ng-container>
+
+                    </div>
+                </mat-grid-tile>
+            </mat-grid-list>
+            <mat-card-footer class="footer">
+                <nav>
+                    <a href="#" mat-button>
+                        <mat-icon>privacy_tip</mat-icon>
+                        Privacy
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>gavel</mat-icon>
+                        Impressum
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>contact_mail</mat-icon>
+                        Contact
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>description</mat-icon>
+                        Terms of Service
+                    </a>
+                    <a href="#" mat-button>
+                        <mat-icon>help</mat-icon>
+                        Help
+                    </a>
+                </nav>
+            </mat-card-footer>
+        </mat-card-content>
+    </mat-card>
+</div>

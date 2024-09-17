@@ -1,7 +1,9 @@
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
 // Align material vertically with the text
-.icon {
-    display: inline-flex;
+.icon
+{
+    vertical-align: middle;
     align-items: center;
+    margin-bottom: 4px
 }
