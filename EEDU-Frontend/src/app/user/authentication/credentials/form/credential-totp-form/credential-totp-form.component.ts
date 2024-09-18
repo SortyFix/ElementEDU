@@ -21,10 +21,4 @@ import {AbstractCredentialCodeForm} from "../abstract-credential-code-form";
     templateUrl: './credential-totp-form.component.html',
     styleUrl: './credential-totp-form.component.scss'
 })
-export class CredentialTotpFormComponent extends AbstractCredentialCodeForm
-{
-    protected override get emptyMessage(): string {
-        return "Please enter the code your Authenticator App shows.";
-    }
-
-}
+export class CredentialTotpFormComponent extends AbstractCredentialCodeForm {}

@@ -49,9 +49,4 @@ export class CredentialPasswordFormComponent extends AbstractCredentialCodeForm
         }
         return super.errorMessage;
     }
-
-    protected override get emptyMessage(): string
-    {
-        return "Please enter your password.";
-    }
 }

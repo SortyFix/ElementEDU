@@ -53,15 +53,16 @@
                                 <app-setup-totp-credential
                                     (submit)="onSubmit($event)"
                                     *ngIf="loginData?.credential === CredentialMethod.TOTP"
-                                    [_loginData]="loginData"
+                                    [loginData]="loginData"
                                     class="current-form">
                                 </app-setup-totp-credential>
 
                             } @else {
+
                                 <app-credential-password-form
                                     (_submit)="onSubmit($event)"
                                     *ngIf="loginData?.credential === CredentialMethod.PASSWORD"
-                                    [_loginData]="loginData"
+                                    [loginData]="loginData"
                                     [responseStatusCode]="statusCode"
                                     class="current-form">
                                 </app-credential-password-form>
@@ -69,14 +70,14 @@
                                 <app-credential-email-form
                                     (submit)="onSubmit($event)"
                                     *ngIf="loginData?.credential === CredentialMethod.EMAIL"
-                                    [_loginData]="loginData"
+                                    [loginData]="loginData"
                                     class="current-form">
                                 </app-credential-email-form>
 
                                 <app-credential-totp-form
                                     (submit)="onSubmit($event)"
                                     *ngIf="loginData?.credential === CredentialMethod.TOTP"
-                                    [_loginData]="loginData"
+                                    [loginData]="loginData"
                                     class="current-form">
                                 </app-credential-totp-form>
                             }

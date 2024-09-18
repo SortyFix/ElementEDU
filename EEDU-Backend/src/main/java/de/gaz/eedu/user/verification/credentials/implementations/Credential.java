@@ -16,7 +16,7 @@ public interface Credential
         return true;
     }
 
-    default @Nullable String getSetupData(@NotNull CredentialEntity credentialEntity)
+    default <T> @Nullable T getSetupData(@NotNull CredentialEntity credentialEntity)
     {
         return null;
     }

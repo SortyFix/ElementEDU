@@ -226,4 +226,6 @@ export class Authentication implements OnInit
         }
         return "An error occurred"
     }
+
+    protected readonly LoginData = LoginData;
 }

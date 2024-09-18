@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {UserService} from "../user.service";
 import {LoginRequest} from "./login-data/login-request";
@@ -7,9 +7,10 @@ import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class AuthenticationService {
+export class AuthenticationService
+{
 
     /**
      * Constructs a new instance of this class and injects the required services.
@@ -38,14 +39,15 @@ export class AuthenticationService {
         }).pipe(tap<string>({}), map((token) => new LoginData(data.loginName, token)));
     }
 
-    public setupCredential(credential: CredentialMethod, loginData: LoginData, additionalData: string | undefined = undefined): Observable<string | undefined>
+    public setupCredential(credential: CredentialMethod, loginData: LoginData,
+                              additionalData: any = undefined): Observable<string>
     {
         const createModel: { method: CredentialMethod, data: string | undefined } = {
             method: credential, data: additionalData
         }
         const url: string = "http://localhost:8080/user/login/credentials/create";
-        return this.http.post<string | undefined>(url, createModel, {
-            responseType: 'text' as 'json',
+        return this.http.post<string>(url, createModel, {
+            responseType: "text" as "json",
             withCredentials: true,
             headers: {"Authorization": "Bearer " + loginData.token}
         });

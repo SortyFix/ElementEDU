@@ -17,13 +17,10 @@ export abstract class AbstractCredentialCodeForm extends AbstractCredentialForm<
         const secret: string | undefined = this.secret;
         if (!secret)
         {
-            this.errorSignal.set(this.emptyMessage);
             return;
         }
         this.emit({secret: secret});
     }
-
-    protected abstract get emptyMessage(): string;
 
     protected get secret(): string | undefined
     {

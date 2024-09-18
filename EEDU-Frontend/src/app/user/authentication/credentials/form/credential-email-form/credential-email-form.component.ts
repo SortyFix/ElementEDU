@@ -21,9 +21,4 @@ import {AbstractCredentialCodeForm} from "../abstract-credential-code-form";
         ReactiveFormsModule
     ], templateUrl: './credential-email-form.component.html', styleUrl: './credential-email-form.component.scss'
 })
-export class CredentialEmailFormComponent extends AbstractCredentialCodeForm
-{
-    protected override get emptyMessage(): string {
-        return "Please enter the code we've sent to your E-Mail."
-    }
-}
+export class CredentialEmailFormComponent extends AbstractCredentialCodeForm {}

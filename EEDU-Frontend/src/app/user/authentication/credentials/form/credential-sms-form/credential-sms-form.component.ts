@@ -21,10 +21,4 @@ import {AbstractCredentialCodeForm} from "../abstract-credential-code-form";
     templateUrl: './credential-sms-form.component.html',
     styleUrl: './credential-sms-form.component.scss'
 })
-export class CredentialSmsFormComponent extends AbstractCredentialCodeForm
-{
-    protected override get emptyMessage(): string
-    {
-        return "Please enter the code you've received via SMS.";
-    }
-}
+export class CredentialSmsFormComponent extends AbstractCredentialCodeForm {}

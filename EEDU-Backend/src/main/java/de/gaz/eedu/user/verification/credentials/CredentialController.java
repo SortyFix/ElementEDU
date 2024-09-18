@@ -54,7 +54,7 @@ import java.util.Optional;
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public @NotNull ResponseEntity<@Nullable String> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
     {
         // validate that this method is allowed to be created by the token
         if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED))
