@@ -6,6 +6,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {ReactiveFormsModule} from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
+import {NgIf, NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-setup-totp-credential',
@@ -14,14 +15,16 @@ import {AuthenticationService} from "../../../authentication.service";
         MatButton,
         MatDialogClose,
         MatProgressBar,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        NgOptimizedImage,
+        NgIf
     ],
   templateUrl: './setup-totp-credential.component.html',
   styleUrl: './setup-totp-credential.component.scss'
 })
 export class SetupTotpCredentialComponent implements OnInit {
 
-    @Input() private _loginData?: LoginData;
+    @Input() _loginData?: LoginData;
     private _base64?: string;
 
     constructor(private authService: AuthenticationService) {}
@@ -34,7 +37,7 @@ export class SetupTotpCredentialComponent implements OnInit {
         }
 
         this.authService.setupCredential(CredentialMethod.TOTP, this.loginData, undefined).subscribe({
-            next: ((value: string | undefined) => this._base64 = value)
+            next: ((value: string | undefined) => this._base64 = `data:image/png;base64, ${value}`)
         });
     }
 

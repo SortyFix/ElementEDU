@@ -16,7 +16,6 @@ export class LoginData {
         this._availableCredentials = this._decodedToken.available;
     }
 
-
     public get loginName(): string
     {
         return this._loginName;
@@ -45,10 +44,15 @@ export class LoginData {
 
     public get credential(): CredentialMethod | undefined
     {
-        if (this.decodedToken.sub !== "CREDENTIAL_PENDING")
+        if (this.decodedToken.sub !== 'CREDENTIAL_PENDING' && this.decodedToken.sub !== 'CREDENTIAL_REQUIRED')
         {
             return undefined;
         }
         return this.decodedToken.available[0];
+    }
+
+    public get isCredentialRequired(): boolean
+    {
+        return this.decodedToken.sub == 'CREDENTIAL_REQUIRED';
     }
 }

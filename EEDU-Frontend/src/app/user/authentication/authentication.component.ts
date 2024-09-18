@@ -20,6 +20,16 @@ import {CredentialEmailFormComponent} from "./credentials/form/credential-email-
 import {
     CredentialPasswordFormComponent
 } from "./credentials/form/credential-password-form/credential-password-form.component";
+import {
+    SetupEmailCredentialComponent
+} from "./credentials/setup/setup-email-credential/setup-email-credential/setup-email-credential.component";
+import {
+    SetupPasswordCredentialComponent
+} from "./credentials/setup/setup-password-credential/setup-password-credential.component";
+import {
+    SetupSmsCredentialComponent
+} from "./credentials/setup/setup-sms-credential/setup-sms-credential/setup-sms-credential.component";
+import {SetupTotpCredentialComponent} from "./credentials/setup/setup-totp-credential/setup-totp-credential.component";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -43,6 +53,10 @@ import {
         CredentialTotpFormComponent,
         CredentialEmailFormComponent,
         CredentialPasswordFormComponent,
+        SetupEmailCredentialComponent,
+        SetupPasswordCredentialComponent,
+        SetupSmsCredentialComponent,
+        SetupTotpCredentialComponent,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [

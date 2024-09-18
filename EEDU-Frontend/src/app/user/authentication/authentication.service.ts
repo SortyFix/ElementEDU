@@ -45,7 +45,8 @@ export class AuthenticationService {
         }
         const url: string = "http://localhost:8080/user/login/credentials/create";
         return this.http.post<string | undefined>(url, createModel, {
-            withCredentials: true, responseType: "text" as "json",
+            responseType: 'text' as 'json',
+            withCredentials: true,
             headers: {"Authorization": "Bearer " + loginData.token}
         });
     }

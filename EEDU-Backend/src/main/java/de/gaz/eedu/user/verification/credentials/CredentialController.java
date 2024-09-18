@@ -59,7 +59,7 @@ import java.util.Optional;
         // validate that this method is allowed to be created by the token
         if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED))
         {
-            validate(!claims.get("available", List.class).contains(model.method().name()), unauthorizedThrowable());
+            validate(claims.get("available", List.class).contains(model.method().name()), unauthorizedThrowable());
         }
 
         CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));

@@ -18,9 +18,7 @@ export abstract class AbstractLoginForm<T>  {
         this._form = form;
         this._fieldName = fieldName;
 
-        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges)
-            .pipe(takeUntilDestroyed())
-            .subscribe(() => this.updateErrorMessage());
+        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessage());
 
         effect(() =>
         {
