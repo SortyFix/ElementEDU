@@ -3,7 +3,6 @@ package de.gaz.eedu.user.verification.credentials.implementations;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.HashingAlgorithm;
-import de.gaz.eedu.user.verification.credentials.implementations.totp.QRData;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.TOPTHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

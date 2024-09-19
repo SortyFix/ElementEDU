@@ -55,7 +55,6 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     // Two factor
-    implementation 'com.google.zxing:core:3.5.3'
     implementation 'commons-codec:commons-codec:1.17.1'
 
     // Runtime drivers
