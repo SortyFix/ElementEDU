@@ -53,6 +53,17 @@ export class AuthenticationService
         });
     }
 
+    public enableCredential(credential: CredentialMethod, loginData: LoginData,
+                           secret: any = undefined): Observable<string>
+    {
+        const url: string = `http://localhost:8080/user/login/credentials/enable/${credential.toString()}`;
+        return this.http.post<string>(url, secret, {
+            responseType: "text" as "json",
+            withCredentials: true,
+            headers: {"Authorization": "Bearer " + loginData.token}
+        });
+    }
+
     /**
      * Sends a request to select a specific credential method after login.
      *

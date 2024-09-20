@@ -4,7 +4,7 @@ import {CredentialMethod} from "../../../login-data/credential-method";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
 import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatCardAvatar} from "@angular/material/card";
@@ -12,6 +12,8 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {QRCodeModule} from "angularx-qrcode";
 import {TotpData} from "./totp-data";
+import {AbstractLoginForm} from "../../../abstract-login-form";
+import {AbstractCredentialCodeForm} from "../../form/abstract-credential-code-form";
 
 @Component({
     selector: 'app-setup-totp-credential', standalone: true, imports: [
@@ -28,13 +30,14 @@ import {TotpData} from "./totp-data";
         QRCodeModule,
     ], templateUrl: './setup-totp-credential.component.html', styleUrl: './setup-totp-credential.component.scss'
 })
-export class SetupTotpCredentialComponent implements OnInit
+export class SetupTotpCredentialComponent extends AbstractCredentialCodeForm implements OnInit
 {
-
-    public readonly loginData: InputSignal<LoginData | undefined> = input<LoginData>();
     private _credentialData?: TotpData;
 
-    constructor(private authService: AuthenticationService) {}
+    constructor(formBuilder: FormBuilder, private readonly authService: AuthenticationService)
+    {
+        super(formBuilder);
+    }
 
     public ngOnInit(): void
     {

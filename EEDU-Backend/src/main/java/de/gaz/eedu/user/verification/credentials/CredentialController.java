@@ -81,14 +81,13 @@ import java.util.Optional;
      */
     @PostMapping("/enable/{method}")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims)
+    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims, @NotNull HttpServletResponse response)
     {
         validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
 
         if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED)) // return login token after user has setup two factor
         {
-            Optional<String> token = getEntityService().verify(method, code, claims);
-            return token.map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+            return authorizeToken(getEntityService().verify(method, code, claims), claims, response);
         }
         return ResponseEntity.ok(null);
     }
@@ -109,22 +108,8 @@ import java.util.Optional;
     {
         List<String> credentials = claims.get("available", List.class);
         CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
-        Optional<String> verifyToken = getEntityService().verify(method, code, claims);
 
-        return verifyToken.map(token ->
-        {
-            if (!claims.get("advanced", Boolean.class))
-            {
-                Cookie cookie = new Cookie("token", token);
-                cookie.setPath("/");
-                cookie.setDomain("localhost");
-                cookie.setMaxAge(3600);
-                cookie.setHttpOnly(true);
-                cookie.setSecure(!development);
-                response.addCookie(cookie);
-            }
-            return ResponseEntity.ok(token);
-        }).orElseThrow(this::unauthorizedThrowable);
+        return authorizeToken(getEntityService().verify(method, code, claims), claims, response);
     }
 
     /**
@@ -144,5 +129,23 @@ import java.util.Optional;
     {
         AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
         return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
+    }
+
+    private @NotNull ResponseEntity<String> authorizeToken(@NotNull Optional<String> token, @NotNull Claims claims, @NotNull HttpServletResponse response)
+    {
+        return token.map(jwtToken ->
+        {
+            if (!claims.get("advanced", Boolean.class))
+            {
+                Cookie cookie = new Cookie("token", jwtToken);
+                cookie.setPath("/");
+                cookie.setDomain("localhost");
+                cookie.setMaxAge(3600);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(!development);
+                response.addCookie(cookie);
+            }
+            return ResponseEntity.ok(jwtToken);
+        }).orElseThrow(this::unauthorizedThrowable);
     }
 }
