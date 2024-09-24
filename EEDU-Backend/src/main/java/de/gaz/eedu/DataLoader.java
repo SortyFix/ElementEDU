@@ -66,6 +66,7 @@ public class DataLoader implements CommandLineRunner
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
         setPassword(userEntity, randomPassword);
+        /*setEmail(userEntity);*/
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -83,6 +84,13 @@ public class DataLoader implements CommandLineRunner
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
         CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, randomPassword);
+        getCredentialService().create(credential);
+    }
+
+    private void setEmail(@NotNull UserEntity userEntity)
+    {
+        CredentialMethod password = CredentialMethod.EMAIL;
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, "");
         getCredentialService().create(credential);
     }
 

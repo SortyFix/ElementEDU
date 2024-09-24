@@ -15,11 +15,11 @@ import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/mat
 import {MatInput} from "@angular/material/input";
 import {CdkCopyToClipboard} from "@angular/cdk/clipboard";
 import {MatTooltip} from "@angular/material/tooltip";
-import {Authentication} from "./user/login/authentication/authentication.component";
 import {LoadComponent} from "./load/load.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AbstractComponent } from './sidebar/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
+import {Authentication} from "./user/authentication/authentication.component";
 
 @NgModule({
     declarations: [
@@ -48,10 +48,10 @@ import {MatSidenavModule} from "@angular/material/sidenav";
         MatSuffix,
         CdkCopyToClipboard,
         MatTooltip,
-        Authentication,
         LoadComponent,
         NgOptimizedImage,
-        MatSidenavModule
+        MatSidenavModule,
+        Authentication
     ],
     providers: [
         provideHttpClient(withFetch())

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Objects;
 
-public record CredentialModel(@NotNull Long id, @NotNull CredentialMethod method, boolean enabled, @Nullable Map<String, String> claims) implements EntityModel
+public record CredentialModel(@NotNull Long id, @NotNull CredentialMethod method, boolean enabled) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()

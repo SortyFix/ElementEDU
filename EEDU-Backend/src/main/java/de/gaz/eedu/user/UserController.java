@@ -83,10 +83,11 @@ import java.util.function.Function;
     public void logout(@AuthenticationPrincipal long userId, @NotNull HttpServletResponse response)
     {
         Cookie cookie = new Cookie("token", null);
-        cookie.setMaxAge(0);
-        cookie.setSecure(!development);
+        cookie.setPath("/");
         cookie.setDomain("localhost");
-        cookie.setPath("http://localhost/");
+        cookie.setMaxAge(3600);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!development);
         response.addCookie(cookie);
         
         log.info("User {} has been logged out.", userId);
@@ -106,6 +107,8 @@ import java.util.function.Function;
 
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
+
+
 
     private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {

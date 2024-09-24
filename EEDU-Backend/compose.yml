@@ -15,4 +15,3 @@ networks:
         labels:
             - development
             - eedu
-        external: true

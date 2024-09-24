@@ -14,7 +14,7 @@ public class PasswordCredential implements Credential
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public @NotNull Boolean creation(@NotNull CredentialEntity credentialEntity)
+    public void creation(@NotNull CredentialEntity credentialEntity)
     {
         String password = credentialEntity.getData();
         if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
@@ -24,7 +24,6 @@ public class PasswordCredential implements Credential
 
         credentialEntity.setEnabled(true); // no enabling required.
         credentialEntity.setData(getPasswordEncoder().encode(password));
-        return true;
     }
 
     @Override

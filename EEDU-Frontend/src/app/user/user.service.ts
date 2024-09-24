@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
-import {LoginRequest} from "./login/authentication/login-name-form/login-request";
 import {UserEntity} from "./user-entity";
 
 @Injectable({
@@ -9,8 +8,7 @@ import {UserEntity} from "./user-entity";
 })
 export class UserService
 {
-    private loaded: boolean = false;
-    private token?: string;
+    private _loaded: boolean = false;
 
     constructor(private http: HttpClient)
     {
@@ -18,24 +16,34 @@ export class UserService
 
     public loadData(): Observable<void>
     {
-        this.loaded = this.isLoggedIn();
-        if (this.loaded)
+        this._loaded = this.isLoggedIn;
+        if (this._loaded)
         {
             return of();
         }
-        return this.getUserdata().pipe(tap<UserEntity>({
-            next: (value: UserEntity) => this.storeUserData(value)
-        }), finalize((): void => { this.loaded = true; }), map((): void => {}));
+        return this.fetchUserData.pipe(tap<UserEntity>({
+            next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
+        }), finalize((): void => { this._loaded = true; }), map((): void => {}));
     }
 
-    public hasLoaded(): boolean
+    public get getUserData(): UserEntity
     {
-        return this.loaded;
+        const userData: string | null = localStorage.getItem('userData')
+        if (!this.isLoggedIn || !userData)
+        {
+            throw new Error("User is not logged in, or user data is corrupt.");
+        }
+        return JSON.parse(userData);
     }
 
-    public logout(): Observable<any>
+    public get hasLoaded(): boolean
     {
-        if (!this.isLoggedIn())
+        return this._loaded;
+    }
+
+    public logout(): Observable<any> // TODO maybe move to login service??
+    {
+        if (!this.isLoggedIn)
         {
             return of();
         }
@@ -46,40 +54,18 @@ export class UserService
         }));
     }
 
-    public isLoggedIn(): boolean
+    public get isLoggedIn(): boolean
     {
         return !!localStorage.getItem("userData");
     }
 
-    public request(data: LoginRequest): Observable<void>
-    {
-        const url = "http://localhost:8080/user/login";
-        return this.http.post<string>(url, data, {responseType: "text" as "json"}).pipe(tap<string>({
-            next: value => this.token = value
-        }), map(() => {}));
-    }
-
-    public verifyPassword(password: string): Observable<string>
-    {
-        const url = "http://localhost:8080/user/login/credentials/verify";
-        return this.http.post<string>(url, password, {
-            responseType: "text" as "json", headers: {"Authorization": "Bearer " + this.token}, withCredentials: true
-        }).pipe(tap<string>({
-            next: () =>
-            {
-                this.token = undefined;
-                this.loadData().subscribe();
-            }
-        }));
-    }
-
-    private getUserdata(): Observable<UserEntity>
+    private get fetchUserData(): Observable<UserEntity>
     {
         const url: string = "http://localhost:8080/user/get";
         return this.http.get<UserEntity>(url, {withCredentials: true});
     }
 
-    private storeUserData(userData: any)
+    private storeUserData(userData: string)
     {
         localStorage.setItem("userData", userData)
     }

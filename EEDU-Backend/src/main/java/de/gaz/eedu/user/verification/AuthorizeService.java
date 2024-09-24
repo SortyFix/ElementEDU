@@ -11,13 +11,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor  @Service public class AuthorizeService
@@ -31,6 +30,11 @@ import java.util.Optional;
 
     public @NotNull String selectTwoFactor(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
     {
+        if(!((List<String>) claims.get("available")).contains(credentialMethod.name()))
+        {
+            throw new InvalidTokenException();
+        }
+
         ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
         return getVerificationService().credentialToken(claimDecoder.userID(),
                 claimDecoder.expiry(),
