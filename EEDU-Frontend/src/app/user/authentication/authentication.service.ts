@@ -9,8 +9,9 @@ import {CredentialMethod} from "./login-data/credential-method";
 @Injectable({
     providedIn: 'root'
 })
-export class AuthenticationService
-{
+export class AuthenticationService {
+
+    private _loginData: LoginData | undefined;
 
     /**
      * Constructs a new instance of this class and injects the required services.
@@ -18,8 +19,8 @@ export class AuthenticationService
      * @param http         The {@link HttpClient} service used to send HTTP requests to the backend API.
      * @param userService  The {@link UserService} used to manage and load user-specific data.
      */
-    constructor(private http: HttpClient, private userService: UserService)
-    { }
+    constructor(private http: HttpClient, private userService: UserService) {
+    }
 
     /**
      * Sends a login request to the server, optionally performing an advanced login.
@@ -30,38 +31,48 @@ export class AuthenticationService
      * @return          An {@link Observable} which emits the login data containing
      *                  the login name and authentication token upon successful login.
      */
-    public request(data: LoginRequest, advanced: boolean = false): Observable<LoginData>
-    {
+    public requestAuthorization(data: LoginRequest, advanced: boolean = false): Observable<void> {
         const url = "http://localhost:8080/user/login" + (advanced ? "/advanced" : "");
         // send credential in case of advanced login
         return this.http.post<string>(url, data, {
             responseType: "text" as "json", withCredentials: true
-        }).pipe(tap<string>({}), map((token) => new LoginData(data.loginName, token)));
+        }).pipe(map((token) => {
+            this._loginData = new LoginData(data.loginName, token)
+            console.log("set login data to " + this.loginData)
+        }));
     }
 
-    public setupCredential(credential: CredentialMethod, loginData: LoginData,
-                              additionalData: any = undefined): Observable<string>
-    {
+    public setupCredential(credential: CredentialMethod, additionalData: any = undefined): Observable<string> {
+
+        if(!this.loginData)
+        {
+            throw new Error();
+        }
+
         const createModel: { method: CredentialMethod, data: string | undefined } = {
             method: credential, data: additionalData
         }
+
         const url: string = "http://localhost:8080/user/login/credentials/create";
         return this.http.post<string>(url, createModel, {
             responseType: "text" as "json",
             withCredentials: true,
-            headers: {"Authorization": "Bearer " + loginData.token}
+            headers: {"Authorization": "Bearer " + this.loginData.token}
         });
     }
 
-    public enableCredential(credential: CredentialMethod, loginData: LoginData,
-                           secret: any = undefined): Observable<string>
-    {
+    public enableCredential(credential: CredentialMethod, secret: any = undefined): Observable<void> {
+        if(!this.loginData)
+        {
+            throw new Error();
+        }
+
         const url: string = `http://localhost:8080/user/login/credentials/enable/${credential.toString()}`;
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             withCredentials: true,
-            headers: {"Authorization": "Bearer " + loginData.token}
-        });
+            headers: {"Authorization": "Bearer " + this.loginData.token}
+        }).pipe(map((token: string): void => {this.loginData!.token = token}));
     }
 
     /**
@@ -72,12 +83,17 @@ export class AuthenticationService
      * @return            An {@link Observable} which emits when the credential is successfully
      *                    selected and updates the token in the `LoginData`.
      */
-    public selectCredential(credential: CredentialMethod, data: LoginData): Observable<void>
-    {
+    public selectCredential(credential: CredentialMethod): Observable<void> {
+
+        if(!this.loginData)
+        {
+            throw new Error();
+        }
+
         const url: string = "http://localhost:8080/user/login/credentials/select/" + credential;
         return this.http.get<string>(url, {
-            responseType: "text" as "json", headers: {"Authorization": "Bearer " + data.token}, withCredentials: true
-        }).pipe(tap(value => data.token = value), map((): void => {}));
+            responseType: "text" as "json", headers: {"Authorization": "Bearer " + this.loginData.token}, withCredentials: true
+        }).pipe(map((value: string): void => { this.loginData!.token = value}));
     }
 
     /**
@@ -88,13 +104,21 @@ export class AuthenticationService
      * @return            An {@link Observable} that emits the verification response.
      *                    The user's data is reloaded upon successful verification.
      */
-    public verifyCredential(secret: string, loginData: LoginData): Observable<string>
-    {
+    public verifyCredential(secret: string, loginData: LoginData): Observable<string> {
         const url = "http://localhost:8080/user/login/credentials/verify";
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + loginData.token},
             withCredentials: true
         }).pipe(tap<string>({next: () => this.userService.loadData().subscribe()}));
+    }
+
+    public get loginData(): LoginData | undefined {
+        return this._loginData;
+    }
+
+    public reset(): void
+    {
+        this._loginData = undefined;
     }
 }

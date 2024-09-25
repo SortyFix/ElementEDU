@@ -71,16 +71,15 @@ import java.util.stream.Stream;
         boolean advanced = loginModel instanceof AdvancedUserLoginModel;
         Instant expiry = getExpiry(loginModel);
 
-
         if (user.getCredentials().isEmpty())
         {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        if(user.getCredentials(CredentialMethod.PASSWORD).isPresent() && user.getCredentials().size() == 1)
+/*        if(user.getCredentials(CredentialMethod.PASSWORD).isPresent() && user.getCredentials().size() == 1)
         {
             return credentialRequired(user.getId(), expiry, advanced, CredentialMethod.TOTP);
-        }
+        }*/
 
         return credentialToken(user.getId(), expiry, advanced, getMethods(user));
     }

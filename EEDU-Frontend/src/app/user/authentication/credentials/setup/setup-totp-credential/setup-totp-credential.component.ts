@@ -36,18 +36,18 @@ export class SetupTotpCredentialComponent extends AbstractCredentialCodeForm imp
 
     constructor(formBuilder: FormBuilder, private readonly authService: AuthenticationService)
     {
-        super(formBuilder);
+        super(formBuilder, authService);
     }
 
     public ngOnInit(): void
     {
-        const loginData: LoginData | undefined = this.loginData();
+        const loginData: LoginData | undefined = this.loginData;
         if (!loginData)
         {
             throw new Error("Cannot show form without login data.")
         }
 
-        this.authService.setupCredential(CredentialMethod.TOTP, loginData, undefined).subscribe({
+        this.authService.setupCredential(CredentialMethod.TOTP, loginData).subscribe({
             next: ((value: string) =>
             {
                 this._credentialData = new TotpData(

@@ -8,6 +8,7 @@ import {credentialDisplayName, CredentialMethod} from "../login-data/credential-
 import {FormsModule} from "@angular/forms";
 import {LoginData} from "../login-data/login-data";
 import {MatIcon} from "@angular/material/icon";
+import {AuthenticationService} from "../authentication.service";
 
 @Component({
   selector: 'app-select-credential',
@@ -29,12 +30,14 @@ import {MatIcon} from "@angular/material/icon";
   styleUrl: './select-credential.component.scss'
 })
 export class SelectCredentialComponent {
-    @Output() readonly submit = new EventEmitter<{ method: CredentialMethod } | boolean>();
-    @Input() _loginData?: LoginData;
+
     @ViewChild('selectionList') selectionList!: MatSelectionList;
 
     protected readonly credentialDisplayName = credentialDisplayName;
 
+
+    constructor(protected authenticationService: AuthenticationService) {
+    }
 
     protected onSubmit()
     {
@@ -43,20 +46,11 @@ export class SelectCredentialComponent {
         {
             return;
         }
-        this.submit.emit({ method: value.value });
+        this.authenticationService.selectCredential(value.value);
     }
 
     protected onCancel()
     {
-        this.submit.emit(false);
-    }
 
-    protected get loginData(): LoginData
-    {
-        if(!this._loginData)
-        {
-            throw new Error("Login data was not set."); // TODO enhance error handling
-        }
-        return this._loginData;
     }
 }

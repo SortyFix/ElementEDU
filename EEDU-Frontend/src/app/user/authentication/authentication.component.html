@@ -16,68 +16,53 @@
                     <div class="form-container">
 
                         <app-login-name-form
-                            (_submit)="onSubmit($event)"
-                            *ngIf="!loginData"
-                            [responseStatusCode]="statusCode"
+                            *ngIf="!authService.loginData"
                             class="current-form">
                         </app-login-name-form>
 
                         <app-select-credential
-                            (submit)="onSubmit($event)"
-                            *ngIf="loginData && !loginData?.credential"
-                            [_loginData]="loginData"
+                            *ngIf="authService.loginData && !authService.loginData?.credential"
                             class="current-form">
                         </app-select-credential>
 
-                        <ng-container *ngIf="loginData && loginData?.credential">
-                            @if(loginData.isCredentialRequired)
+                        <ng-container *ngIf="authService.loginData && authService.loginData?.credential">
+                            @if(authService.loginData.isCredentialRequired)
                             {
 
                                 <app-setup-password-credential
-                                    (submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.EMAIL"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.EMAIL"
                                     class="current-form">
                                 </app-setup-password-credential>
 
                                 <app-setup-email-credential
-                                    *ngIf="loginData?.credential === CredentialMethod.PASSWORD"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.PASSWORD"
                                     class="current-form">
                                 </app-setup-email-credential>
 
                                 <app-setup-sms-credential
-                                    (submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.SMS"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.SMS"
                                     class="current-form">
                                 </app-setup-sms-credential>
 
                                 <app-setup-totp-credential
-                                    (submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.TOTP"
-                                    [loginData]="loginData"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.TOTP"
                                     class="current-form">
                                 </app-setup-totp-credential>
 
                             } @else {
 
                                 <app-credential-password-form
-                                    (_submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.PASSWORD"
-                                    [loginData]="loginData"
-                                    [responseStatusCode]="statusCode"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.PASSWORD"
                                     class="current-form">
                                 </app-credential-password-form>
 
                                 <app-credential-email-form
-                                    (submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.EMAIL"
-                                    [loginData]="loginData"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.EMAIL"
                                     class="current-form">
                                 </app-credential-email-form>
 
                                 <app-credential-totp-form
-                                    (submit)="onSubmit($event)"
-                                    *ngIf="loginData?.credential === CredentialMethod.TOTP"
-                                    [loginData]="loginData"
+                                    *ngIf="authService.loginData?.credential === CredentialMethod.TOTP"
                                     class="current-form">
                                 </app-credential-totp-form>
                             }

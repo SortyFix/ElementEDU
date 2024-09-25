@@ -9,7 +9,6 @@ import {finalize, MonoTypeOperatorFunction} from "rxjs";
 import {SelectCredentialComponent} from "./select-credential-form/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {LoginData} from "./login-data/login-data";
-import {LoginRequest} from "./login-data/login-request";
 import {CredentialMethod} from "./login-data/credential-method";
 import {MatAnchor} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
@@ -75,7 +74,6 @@ export class Authentication implements OnInit
 {
     @Output() submit: EventEmitter<void> = new EventEmitter<void>();
     protected readonly CredentialMethod: typeof CredentialMethod = CredentialMethod;
-    private _loginData?: LoginData;
     private _mobile: boolean = false;
     private _loadingAnimation: boolean = false;
     private _statusCode?: number;
@@ -83,9 +81,9 @@ export class Authentication implements OnInit
     /**
      * Constructor to initialize the LoginComponent.
      *
-     * @param loginService The service used for login-related operations such as login and password verification.
+     * @param authService The service used for login-related operations such as login and password verification.
      */
-    constructor(private loginService: AuthenticationService)
+    constructor(protected authService: AuthenticationService)
     {
     }
 
@@ -115,74 +113,10 @@ export class Authentication implements OnInit
         this._mobile = window.innerWidth <= 600;
     }
 
-    /**
-     * Handles the submission of login data. Determines if the provided data is a password or login request and processes it accordingly.
-     *
-     * @param data The data submitted for login, either a password string or a LoginRequest object.
-     */
-    protected onSubmit(data: any): void
-    {
-        this._statusCode = undefined;
-        if (typeof data == 'boolean')
-        {
-            this._loginData = undefined;
-            return;
-        }
-
-        if (data instanceof LoginRequest)
-        {
-            this.requestCredentials(data);
-            return;
-        }
-
-        if (!data || typeof data != "object" || !this.loginData)
-        {
-            return;
-        }
-
-        if ('method' in data && typeof data.method === 'string')
-        {
-            this.loginService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
-        }
-        else if (this.loginData.credential && 'secret' in data && typeof data.secret === 'string')
-        {
-            this.loginService.verifyCredential(data.secret, this.loginData).pipe(this.finalizeLoading()).subscribe({
-                next: () => this.submit.emit(), error: error => this.statusCode = error
-            });
-        }
-    }
-
-    /**
-     * Sends a login request to the server.
-     *
-     * This method sends an HTTP POST request to the backend server to verify the existence of the given user.
-     * If the user exists, it sets the login data to the given credentials and proceeds accordingly.
-     *
-     * @param data The login request data containing user credentials.
-     * @private
-     */
-    private requestCredentials(data: LoginRequest): void
-    {
-        this.loginService.request(data).pipe(this.finalizeLoading()).subscribe({
-            next: (loginData) => this._loginData = loginData,
-            error: (error) => this.statusCode = error
-
-        });
-    }
-
-    private set statusCode(error: any)
-    {
-        if(typeof error == 'object' && 'status' in error && typeof error.status == 'number')
-        {
-            this._statusCode = error.status;
-        }
-    }
-
     private finalizeLoading(): MonoTypeOperatorFunction<any>
     {
         return finalize((): void => {this._loadingAnimation = false;});
     }
-
 
     protected get mobile(): boolean
     {
@@ -194,37 +128,9 @@ export class Authentication implements OnInit
         return this._loadingAnimation;
     }
 
-    protected get loginData(): LoginData | undefined
-    {
-        return this._loginData;
-    }
-
     protected get statusCode(): number | undefined
     {
         return this._statusCode;
-    }
-
-    /**
-     * Retrieves an appropriate error message based on the provided error.
-     *
-     * This method takes an error object as input and returns a user-friendly error message. The method
-     * analyzes the error type and details to provide a specific and helpful error message to the user.
-     *
-     * @param error The error object containing information about the error that occurred.
-     * @return A string representing the specific error message.
-     * @private
-     */
-    private getErrorMessage(error: any): string
-    {
-        if (typeof error == 'object' && 'status' in error && typeof error.status == 'number')
-        {
-            switch (error.status)
-            {
-                case 401:
-                    return "The user has not been found."
-            }
-        }
-        return "An error occurred"
     }
 
     protected readonly LoginData = LoginData;

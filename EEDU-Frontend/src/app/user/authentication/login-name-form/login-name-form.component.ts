@@ -8,9 +8,8 @@ import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angula
 import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {AbstractLoginForm} from "../abstract-login-form";
-import {merge} from "rxjs";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {LoginRequest} from "../login-data/login-request";
+import {AuthenticationService} from "../authentication.service";
 
 @Component({
     selector: 'app-login-name-form',
@@ -34,29 +33,23 @@ import {LoginRequest} from "../login-data/login-request";
     styleUrl: './login-name-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginNameFormComponent extends AbstractLoginForm<LoginRequest>
-{
-    constructor(formBuilder: FormBuilder)
-    {
+export class LoginNameFormComponent extends AbstractLoginForm<LoginRequest> {
+    constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
             loginName: ['', Validators.required], rememberMe: [false]
-        }), 'loginName');
-
-    }
-    protected override get errorMessage(): string | undefined
-    {
-        const currentStatus: number | undefined = this.responseStatusCode();
-        switch (currentStatus)
-        {
-            case 401:
-                return "The user " + this.form.get('loginName')!.value + " is not registered."
-        }
-        return undefined;
+        }), 'loginName', authenticationService);
     }
 
     protected override onSubmit(): void {
         const loginName = this.form.get('loginName')?.value;
         const rememberMe = this.form.get('rememberMe')?.value;
-        this.emit(new LoginRequest(loginName, rememberMe))
+
+        console.log("test")
+
+        this.authenticationService.requestAuthorization(new LoginRequest(loginName, rememberMe)).subscribe({
+            error: (error: any) => {
+                //TODO
+            }
+        });
     }
 }

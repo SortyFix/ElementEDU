@@ -2,17 +2,16 @@ import {Component, effect, Inject, input, output, signal, WritableSignal} from "
 import {FormGroup} from "@angular/forms";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {AuthenticationService} from "./authentication.service";
 
 @Component({standalone: true, template: ''})
 export abstract class AbstractLoginForm<T>  {
 
-    public readonly responseStatusCode = input<number | undefined>();
     private readonly _fieldName: string;
-    protected readonly _submit = output<T | boolean>();
     private readonly _errorMessageSignal: WritableSignal<string | undefined>;
     private readonly _form: FormGroup;
 
-    protected constructor(form: FormGroup, @Inject(String) fieldName: string)
+    protected constructor(form: FormGroup, @Inject(String) fieldName: string, protected authenticationService: AuthenticationService)
     {
         this._errorMessageSignal = signal(undefined);
         this._form = form;
@@ -28,19 +27,6 @@ export abstract class AbstractLoginForm<T>  {
                 this.error = serverError;
             }
         });
-    }
-
-    protected emit(data: T): void
-    {
-        if(this.form.valid)
-        {
-            this.submit.emit(data);
-        }
-    }
-
-    protected get submit()
-    {
-        return this._submit;
     }
 
     protected get errorMessageSignal(): WritableSignal<string | undefined>
