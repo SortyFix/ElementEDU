@@ -2,7 +2,8 @@
     <app-load *ngIf="!isLoaded() && !userService.isLoggedIn" [errorSignal]="errorSignal"></app-load>
     @if(isLoaded()) {
         <app-authentication *ngIf="!userService.isLoggedIn"></app-authentication>
-        <app-sidebar *ngIf="userService.isLoggedIn"></app-sidebar>
+        <app-abstract *ngIf="userService.isLoggedIn"></app-abstract>
     }
-
 </div>
+
+

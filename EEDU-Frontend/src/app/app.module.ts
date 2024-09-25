@@ -17,7 +17,7 @@ import {CdkCopyToClipboard} from "@angular/cdk/clipboard";
 import {MatTooltip} from "@angular/material/tooltip";
 import {LoadComponent} from "./load/load.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { AbstractComponent } from './sidebar/abstract.component';
+import { AbstractComponent } from './abstract/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {Authentication} from "./user/authentication/authentication.component";
 
