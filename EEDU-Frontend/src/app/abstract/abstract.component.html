@@ -1,12 +1,12 @@
 <mat-drawer-container class="example-container">
     <!-- SIDEBAR/DRAWER -->
     <mat-drawer #drawer mode="side" opened class="drawer" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
-        <div style="display: flex; justify-content: flex-end; margin-right: 5px">
+        <div class="toggle-button">
             <button mat-icon-button (click)="drawer.toggle()">
                 <mat-icon>close</mat-icon>
             </button>
         </div>
-        <h1 style="text-align: center; margin-top:40px; color: darkblue; font-weight: bold; user-select: none">ElementEDU</h1>
+        <h1 class="eedu-title">ElementEDU</h1>
         <div style="{{ mobile ? 'margin-top: 60px' : 'margin-top: 40px'}}">
             <div *ngFor="let item of sidebar_buttons">
                 <button mat-button class="sidebar-button" style="{{ mobile ? 'padding-left: 30%' : 'padding-left: 30px'}}" [routerLink]="[item.route]" (click)="drawer.toggle()">
