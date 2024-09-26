@@ -5,8 +5,8 @@ import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
+import {AbstractCredentialCode} from "../../abstract-credential-code";
 import {AbstractCredentialCodeForm} from "../abstract-credential-code-form";
-
 
 @Component({
     selector: 'app-credential-password-form', standalone: true, imports: [
@@ -36,5 +36,17 @@ export class CredentialPasswordFormComponent extends AbstractCredentialCodeForm
     protected get showPassword(): boolean
     {
         return this._showPassword;
+    }
+
+    protected override errorMessage(error: any): string {
+
+        if(typeof error == 'object' && 'status' in error && typeof error.status == 'number')
+        {
+            if(error.status == 401)
+            {
+                return 'Either the username or the password is incorrect.'
+            }
+        }
+        return super.errorMessage(error);
     }
 }

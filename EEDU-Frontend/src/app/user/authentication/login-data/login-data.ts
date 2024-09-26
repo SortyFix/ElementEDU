@@ -44,7 +44,7 @@ export class LoginData {
 
     public get credential(): CredentialMethod | undefined
     {
-        if (this.decodedToken.sub !== 'CREDENTIAL_PENDING' && this.decodedToken.sub !== 'CREDENTIAL_REQUIRED')
+        if (this.decodedToken.sub !== 'CREDENTIAL_PENDING')
         {
             return undefined;
         }

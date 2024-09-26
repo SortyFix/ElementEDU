@@ -12,8 +12,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {QRCodeModule} from "angularx-qrcode";
 import {TotpData} from "./totp-data";
-import {AbstractLoginForm} from "../../../abstract-login-form";
-import {AbstractCredentialCodeForm} from "../../form/abstract-credential-code-form";
+import {AbstractCredentialCodeSetup} from "../abstract-credential-code-setup";
 
 @Component({
     selector: 'app-setup-totp-credential', standalone: true, imports: [
@@ -30,7 +29,7 @@ import {AbstractCredentialCodeForm} from "../../form/abstract-credential-code-fo
         QRCodeModule,
     ], templateUrl: './setup-totp-credential.component.html', styleUrl: './setup-totp-credential.component.scss'
 })
-export class SetupTotpCredentialComponent extends AbstractCredentialCodeForm implements OnInit
+export class SetupTotpCredentialComponent extends AbstractCredentialCodeSetup implements OnInit
 {
     private _credentialData?: TotpData;
 

@@ -5,6 +5,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
+import {AbstractCredentialCode} from "../../abstract-credential-code";
 import {AbstractCredentialCodeForm} from "../abstract-credential-code-form";
 
 @Component({
