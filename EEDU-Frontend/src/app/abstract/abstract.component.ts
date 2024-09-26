@@ -4,7 +4,7 @@ import {UserService} from "../user/user.service";
 import {ThemeService} from "../theming/theme.service";
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-abstract',
   templateUrl: './abstract.component.html',
   styleUrls: ['./abstract.component.scss']
 })

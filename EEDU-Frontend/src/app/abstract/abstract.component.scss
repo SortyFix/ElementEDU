@@ -2,7 +2,20 @@
     width: auto;
     box-sizing: border-box;
     height: 100%;
-    border: 1px solid #555;
+}
+
+.eedu-title {
+    text-align: center;
+    margin-top:40px;
+    color: darkblue;
+    font-weight: bold;
+    user-select: none
+}
+
+.toggle-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 5px
 }
 
 .drawer {
@@ -35,8 +48,4 @@
     left: 0;
     border-bottom-right-radius: 10px;
     color: black;
-}
-
-body {
-    padding: 20px;
 }

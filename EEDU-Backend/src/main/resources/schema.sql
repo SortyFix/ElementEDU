@@ -1,9 +1,12 @@
 -- The 'file_entity' table is responsible for storing all information related to files. This includes the author's id, the file's unique id, the file's name and its physical path in storage.
 CREATE TABLE IF NOT EXISTS theme_entity
 (
-    background_color INT          NOT NULL,
-    text_color       INT          NOT NULL,
-    widget_color     INT          NOT NULL,
+    background_color_r   SMALLINT      NOT NULL,
+    background_color_g   SMALLINT      NOT NULL,
+    background_color_b   SMALLINT      NOT NULL,
+    widget_color_r       SMALLINT    NOT NULL,
+    widget_color_g       SMALLINT    NOT NULL,
+    widget_color_b       SMALLINT    NOT NULL,
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(255) NULL
 );

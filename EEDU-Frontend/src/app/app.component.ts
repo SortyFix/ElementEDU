@@ -21,7 +21,7 @@ export class AppComponent implements OnInit
     ngOnInit(): void
     {
         this.loadUserData();
-        //this.storeUserTheme();
+        this.storeUserTheme();
     }
 
     protected isLoaded(): boolean
