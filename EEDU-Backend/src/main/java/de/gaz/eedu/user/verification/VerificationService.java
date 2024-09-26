@@ -30,7 +30,6 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -76,10 +75,10 @@ import java.util.stream.Stream;
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-/*        if(user.getCredentials(CredentialMethod.PASSWORD).isPresent() && user.getCredentials().size() == 1)
+        if(user.getCredentials(CredentialMethod.PASSWORD).isPresent() && user.getCredentials().size() == 1)
         {
-            return credentialRequired(user.getId(), expiry, advanced, CredentialMethod.TOTP);
-        }*/
+            return credentialRequired(user.getId(), expiry, advanced, CredentialMethod.TOTP, CredentialMethod.EMAIL);
+        }
 
         return credentialToken(user.getId(), expiry, advanced, getMethods(user));
     }
@@ -157,7 +156,6 @@ import java.util.stream.Stream;
      * This token enables them to use:
      * <ul>
      *     <li>{@link CredentialController#create(CredentialCreateModel)}</li>
-     *     <li>{@link CredentialController#enable(CredentialMethod, String, Claims)}</li>
      * </ul>
      * <p>
      * Note that the user can still decide themselves what {@link CredentialMethod} they set up.
@@ -176,10 +174,17 @@ import java.util.stream.Stream;
                 new ClaimHolder<>("userID", userID),
                 new ClaimHolder<>("expiry", expiry.toEpochMilli()),
                 new ClaimHolder<>("advanced", advanced),
-                new ClaimHolder<>("available", credentialMethod) //TODO everyone which wasn't setup
+                new ClaimHolder<>("available", credentialMethod) //TODO every which weren't setup yet
         };
 
-        return generateKey(JwtTokenType.CREDENTIAL_REQUIRED, time, holders);
+        // force creation when only one is available
+        JwtTokenType jwtTokenType = JwtTokenType.CREDENTIAL_REQUIRED;
+        if(credentialMethod.length == 1)
+        {
+            jwtTokenType = JwtTokenType.CREDENTIAL_CREATION_PENDING;
+        }
+
+        return generateKey(jwtTokenType, time, holders);
     }
 
     /**
@@ -384,7 +389,7 @@ import java.util.stream.Stream;
                 }
                 yield authorities;
             }
-            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED ->
+            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
     }

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component} from '@angular/core';
 import {LoginData} from "../../../login-data/login-data";
 import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -6,6 +6,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
+import {AuthenticationService} from "../../../authentication.service";
 
 @Component({
   selector: 'app-setup-password-credential',
@@ -26,13 +27,12 @@ import {MatInput} from "@angular/material/input";
 })
 export class SetupPasswordCredentialComponent {
 
-    @Input() private _loginData?: LoginData;
     private readonly _formGroup: FormGroup;
     private _showPassword: boolean = false;
     private _showRepeatPassword: boolean = false;
 
 
-    constructor(formBuilder: FormBuilder) {
+    constructor(formBuilder: FormBuilder, private _authService: AuthenticationService) {
         this._formGroup = formBuilder.group({
             password: ['', [Validators.required, this.passwordsMustMatch]],
             repeatPassword: ['', [Validators.required, this.passwordsMustMatch]]
@@ -78,8 +78,7 @@ export class SetupPasswordCredentialComponent {
         return this._formGroup;
     }
 
-    get loginData(): LoginData | undefined
-    {
-        return this._loginData;
+    protected get loginData(): LoginData | undefined {
+        return this._authService.loginData;
     }
 }

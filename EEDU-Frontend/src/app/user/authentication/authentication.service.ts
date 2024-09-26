@@ -78,14 +78,17 @@ export class AuthenticationService {
             throw new Error();
         }
 
-        const url: string = "http://localhost:8080/user/login/credentials/select/" + credential;
+        let url: string = `http://localhost:8080/user/login/credentials/select/${credential}`;
+        if(this.loginData.decodedToken.sub == 'CREDENTIAL_REQUIRED')
+        {
+            url = `http://localhost:8080/user/login/credentials/create/select/${credential}`;
+        }
+
         return this.http.get<string>(url, {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData.token},
             withCredentials: true
-        }).pipe(map((value: string): void => {
-            this.loginData!.token = value
-        }));
+        }).pipe(map((value: string): void => {this.loginData!.token = value}));
     }
 
     /**

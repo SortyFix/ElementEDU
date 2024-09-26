@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-@Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor  @Service public class AuthorizeService
+@Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor @Service public class AuthorizeService
 {
     private final VerificationService verificationService;
 
@@ -28,18 +28,32 @@ import java.util.Optional;
         return getVerificationService().requestLogin(user, loginModel);
     }
 
-    public @NotNull String selectTwoFactor(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    public @NotNull String selectCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
     {
-        if(!((List<String>) claims.get("available")).contains(credentialMethod.name()))
-        {
-            throw new InvalidTokenException();
-        }
-
-        ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
+        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
         return getVerificationService().credentialToken(claimDecoder.userID(),
                 claimDecoder.expiry(),
                 claimDecoder.advanced(),
                 credentialMethod);
+    }
+
+    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    {
+        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
+        return getVerificationService().credentialRequired(claimDecoder.userID(),
+                claimDecoder.expiry(),
+                claimDecoder.advanced(),
+                credentialMethod);
+    }
+
+    private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims)
+    {
+        if (!((List<String>) claims.get("available")).contains(credentialMethod))
+        {
+            throw new InvalidTokenException();
+        }
+
+        return ClaimDecoder.decode(claims);
     }
 
     @Transactional public @Nullable String authorize(long userID, @NotNull Claims claims)

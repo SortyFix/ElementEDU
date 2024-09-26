@@ -46,7 +46,7 @@ export class SetupTotpCredentialComponent extends AbstractCredentialCodeSetup im
             throw new Error("Cannot show form without login data.")
         }
 
-        this.authService.setupCredential(CredentialMethod.TOTP, loginData).subscribe({
+        this.authService.setupCredential(CredentialMethod.TOTP).subscribe({
             next: ((value: string) =>
             {
                 this._credentialData = new TotpData(

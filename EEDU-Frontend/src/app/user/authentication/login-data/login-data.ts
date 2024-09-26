@@ -37,22 +37,22 @@ export class LoginData {
         this._decodedToken = jwtDecode(value);
     }
 
-    private get decodedToken(): JwtPayload & { available: CredentialMethod[] }
+    public get decodedToken(): JwtPayload & { available: CredentialMethod[] }
     {
         return this._decodedToken;
     }
 
     public get credential(): CredentialMethod | undefined
     {
-        if (this.decodedToken.sub !== 'CREDENTIAL_PENDING')
+        if (this.decodedToken.sub !== 'CREDENTIAL_PENDING' && this.decodedToken.sub !== 'CREDENTIAL_CREATION_PENDING')
         {
             return undefined;
         }
         return this.decodedToken.available[0];
     }
 
-    public get isCredentialRequired(): boolean
+    public get setupCredential(): boolean
     {
-        return this.decodedToken.sub == 'CREDENTIAL_REQUIRED';
+        return this.decodedToken.sub == 'CREDENTIAL_CREATION_PENDING';
     }
 }
