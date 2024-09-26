@@ -108,7 +108,7 @@ public class DataLoader implements CommandLineRunner
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel theme = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000); //TODO use real values
+        ThemeCreateModel theme = new ThemeCreateModel("Dark", new short[]{5, 5, 5}, new short[]{30, 30, 30});
         return getThemeService().createEntity(theme);
     }
 

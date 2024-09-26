@@ -5,16 +5,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record SimpleThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor, int widgetColor, int textColor)
+public record SimpleThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor_r, int backgroundColor_g, int backgroundColor_b,
+                               int widgetColor_r, int widgetColor_g, int widgetColor_b)
 {
-    @Contract(pure = true) @Override public @NotNull String toString()
+    @Contract(pure = true) @Override public String toString()
     {
         return "SimpleThemeModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", backgroundColor=" + backgroundColor +
-                ", widgetColor=" + widgetColor +
-                ", textColor=" + textColor +
+                ", backgroundColor_r=" + backgroundColor_r +
+                ", backgroundColor_g=" + backgroundColor_g +
+                ", backgroundColor_b=" + backgroundColor_b +
+                ", widgetColor_r=" + widgetColor_r +
+                ", widgetColor_g=" + widgetColor_g +
+                ", widgetColor_b=" + widgetColor_b +
                 '}';
     }
 

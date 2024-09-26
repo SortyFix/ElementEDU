@@ -42,11 +42,11 @@ assignment and hierarchy of users, groups, and privileges.
 
 =============================================================================
 */
-INSERT INTO theme_entity (name, background_color, widget_color, text_color)
-VALUES ('Light', 0x000000, 0x000000, 0x000000),
-       ('Medium', 0x000000, 0x000000, 0x000000),
-       ('Dark', 0x000000, 0x000000, 0x000000),
-       ('dummy', 0x000000, 0x000000, 0x000000);
+INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
+VALUES ('Light', 0, 0, 0, 0, 0, 0),
+       ('Medium', 0, 0, 0, 0, 0, 0),
+       ('Dark', 0, 0, 0, 0, 0,0),
+       ('dummy', 0, 0,0, 0, 0, 0);
 
 INSERT INTO class_room_entity(name)
 VALUES ('Q1'),

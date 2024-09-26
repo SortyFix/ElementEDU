@@ -6,16 +6,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
-public record ThemeCreateModel(String name, int backgroundColor, int widgetColor, int textColor) implements CreationModel<ThemeEntity>
+public record ThemeCreateModel(String name, short[] backgroundColor, short[] widgetColor) implements CreationModel<ThemeEntity>
 {
 
     @Override
     public @NotNull ThemeEntity toEntity(@NotNull ThemeEntity themeEntity)
     {
         themeEntity.setName(name());
-        themeEntity.setBackgroundColor(backgroundColor());
-        themeEntity.setWidgetColor(widgetColor());
-        themeEntity.setTextColor(textColor());
+
+        themeEntity.setBackgroundColor_r(backgroundColor[0]);
+        themeEntity.setBackgroundColor_r(backgroundColor[1]);
+        themeEntity.setBackgroundColor_r(backgroundColor[2]);
+
+        themeEntity.setWidgetColor_r(widgetColor[0]);
+        themeEntity.setWidgetColor_g(widgetColor[1]);
+        themeEntity.setWidgetColor_b(widgetColor[2]);
+
         themeEntity.setUsers(new HashSet<>());
         return themeEntity;
     }
@@ -27,8 +33,7 @@ public record ThemeCreateModel(String name, int backgroundColor, int widgetColor
         return "ThemeCreateModel[" +
                 "name=" + name + ", " +
                 "backgroundColor=" + backgroundColor + ", " +
-                "widgetColor=" + widgetColor + ", " +
-                "textColor=" + textColor + ']';
+                "widgetColor=" + widgetColor + ']';
     }
 
 
