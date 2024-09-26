@@ -37,7 +37,7 @@ export class LoginData {
         this._decodedToken = jwtDecode(value);
     }
 
-    public get decodedToken(): JwtPayload & { available: CredentialMethod[] }
+    private get decodedToken(): JwtPayload & { available: CredentialMethod[] }
     {
         return this._decodedToken;
     }
@@ -53,6 +53,6 @@ export class LoginData {
 
     public get setupCredential(): boolean
     {
-        return this.decodedToken.sub == 'CREDENTIAL_CREATION_PENDING';
+        return this.decodedToken.sub == 'CREDENTIAL_REQUIRED' || this.decodedToken.sub == 'CREDENTIAL_CREATION_PENDING';
     }
 }

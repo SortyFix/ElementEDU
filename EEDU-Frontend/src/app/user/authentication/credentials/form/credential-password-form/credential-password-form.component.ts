@@ -38,14 +38,11 @@ export class CredentialPasswordFormComponent extends AbstractCredentialCodeForm
         return this._showPassword;
     }
 
-    protected override errorMessage(error: any): string {
+    protected override errorMessage(error: number): string {
 
-        if(typeof error == 'object' && 'status' in error && typeof error.status == 'number')
+        if(error == 401)
         {
-            if(error.status == 401)
-            {
-                return 'Either the username or the password is incorrect.'
-            }
+            return 'Either the username or the password is incorrect.'
         }
         return super.errorMessage(error);
     }

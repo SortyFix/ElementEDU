@@ -28,10 +28,17 @@ export abstract class AbstractLoginForm {
     }
 
     protected exceptionHandler(fieldName: string) {
-        return {error: (error: any): void => {this.error = {field: fieldName, serverError: this.errorMessage(error)}}}
+        return {error: (error: any): void => {
+            let status: number = 0;
+            if(typeof error === 'object' && 'status' in error && typeof error.status === 'number')
+            {
+                status = error.status;
+            }
+            this.error = {field: fieldName, serverError: this.errorMessage(status)}
+        }}
     }
 
-    protected errorMessage(error: any): string
+    protected errorMessage(status: number): string
     {
         return "An unknown error occurred."
     }

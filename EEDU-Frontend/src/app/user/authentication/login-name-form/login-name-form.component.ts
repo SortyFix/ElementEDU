@@ -50,11 +50,9 @@ export class LoginNameFormComponent extends AbstractLoginForm {
         this.authenticationService.requestAuthorization(loginRequest).subscribe(this.exceptionHandler('loginName'));
     }
 
-    protected override errorMessage(error: any): string {
-        if (typeof error == 'object' && 'status' in error && typeof error.status == 'number') {
-            if (error.status == 401) {
-                return `The user ${this.form.get('loginName')?.value} was not found.`
-            }
+    protected override errorMessage(error: number): string {
+        if (error == 401) {
+            return `The user ${this.form.get('loginName')?.value} was not found.`
         }
         return super.errorMessage(error);
     }

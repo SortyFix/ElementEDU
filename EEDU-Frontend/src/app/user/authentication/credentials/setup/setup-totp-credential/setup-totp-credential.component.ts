@@ -8,7 +8,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
 import {NgIf, NgOptimizedImage} from "@angular/common";
 import {MatCardAvatar} from "@angular/material/card";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {QRCodeModule} from "angularx-qrcode";
 import {TotpData} from "./totp-data";
@@ -27,6 +27,7 @@ import {AbstractCredentialCodeSetup} from "../abstract-credential-code-setup";
         MatInput,
         MatLabel,
         QRCodeModule,
+        MatError,
     ], templateUrl: './setup-totp-credential.component.html', styleUrl: './setup-totp-credential.component.scss'
 })
 export class SetupTotpCredentialComponent extends AbstractCredentialCodeSetup implements OnInit
@@ -72,5 +73,13 @@ export class SetupTotpCredentialComponent extends AbstractCredentialCodeSetup im
     protected get doneLoading(): boolean
     {
         return !!this._credentialData;
+    }
+
+    protected override errorMessage(status: number): string {
+        if(status == 401)
+        {
+            return "This code is incorrect."
+        }
+        return super.errorMessage(status);
     }
 }

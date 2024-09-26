@@ -36,7 +36,9 @@ export class AuthenticationService {
         // send credential in case of advanced login
         return this.http.post<string>(url, data, {
             responseType: "text" as "json", withCredentials: true
-        }).pipe(map((token: string): void => {this._loginData = new LoginData(data.loginName, token)}));
+        }).pipe(map((token: string): void => {
+            this._loginData = new LoginData(data.loginName, token)
+        }));
     }
 
     public setupCredential(credential: CredentialMethod, additionalData: any = undefined): Observable<string> {
@@ -67,8 +69,8 @@ export class AuthenticationService {
             responseType: "text" as "json",
             withCredentials: true,
             headers: {"Authorization": "Bearer " + this.loginData.token}
-        }).pipe(map((token: string): void => {
-            this.loginData!.token = token
+        }).pipe(map((): void => {
+            this.finishLogin()
         }));
     }
 
@@ -79,8 +81,7 @@ export class AuthenticationService {
         }
 
         let url: string = `http://localhost:8080/user/login/credentials/select/${credential}`;
-        if(this.loginData.decodedToken.sub == 'CREDENTIAL_REQUIRED')
-        {
+        if (this.loginData.setupCredential) {
             url = `http://localhost:8080/user/login/credentials/create/select/${credential}`;
         }
 
@@ -88,7 +89,9 @@ export class AuthenticationService {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData.token},
             withCredentials: true
-        }).pipe(map((value: string): void => {this.loginData!.token = value}));
+        }).pipe(map((value: string): void => {
+            this.loginData!.token = value
+        }));
     }
 
     /**
@@ -105,7 +108,11 @@ export class AuthenticationService {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + loginData.token},
             withCredentials: true
-        }).pipe(tap<string>({next: () => this.userService.loadData().subscribe()}));
+        }).pipe(tap<string>({next: (): void => this.finishLogin()}));
+    }
+
+    private finishLogin() {
+        this.userService.loadData().subscribe({next: (): void => this._loginData = undefined});
     }
 
     public get loginData(): LoginData | undefined {

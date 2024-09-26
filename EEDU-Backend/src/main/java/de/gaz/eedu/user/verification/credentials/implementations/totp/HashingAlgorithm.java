@@ -9,6 +9,5 @@ import lombok.Getter;
     SHA256("HmacSHA256", "SHA256"),
     SHA512("HmacSHA512", "SHA512");
 
-    private final String hmacAlgorithm;
-    private final String friendlyName;
+    private final String hmacAlgorithm, friendlyName;
 }

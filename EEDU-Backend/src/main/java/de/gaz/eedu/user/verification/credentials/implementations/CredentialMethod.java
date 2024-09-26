@@ -21,9 +21,4 @@ import java.util.Objects;
     {
         this.credential = credential;
     }
-
-    public long toId(@NotNull UserEntity user)
-    {
-        return Objects.hash(user.getId(), ordinal());
-    }
 }

@@ -28,7 +28,6 @@
                         <ng-container *ngIf="authService.loginData && authService.loginData?.credential">
                             @if(authService.loginData.setupCredential)
                             {
-
                                 <app-setup-password-credential
                                     *ngIf="authService.loginData?.credential === CredentialMethod.EMAIL"
                                     class="current-form">

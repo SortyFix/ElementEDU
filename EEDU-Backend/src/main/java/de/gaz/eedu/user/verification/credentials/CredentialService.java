@@ -2,7 +2,6 @@ package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verification.credentials.implementations.Credential;
@@ -13,7 +12,6 @@ import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,10 +32,10 @@ import java.util.function.Function;
         return credentialRepository;
     }
 
-    @Override public @NotNull CredentialEntity createEntity(@NotNull CredentialCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull CredentialEntity createEntity(@NotNull CredentialCreateModel model) throws CreationException
     {
         UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
-        CredentialEntity credentialEntity = populateEntity(model, userEntity);
+        CredentialEntity credentialEntity = model.toEntity(new CredentialEntity(userEntity));
         credentialEntity.getMethod().getCredential().creation(credentialEntity);
 
         validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
@@ -84,26 +82,5 @@ import java.util.function.Function;
             return false;
         };
         return getUserService().loadEntityByIDSafe(userID).getCredentials(method).map(mapper).orElse(false);
-    }
-
-    /**
-     * This method populates an {@link CredentialEntity}.
-     * <p>
-     * This method creates a new {@link CredentialEntity} by a {@link CredentialCreateModel}.
-     *
-     * @param model      the two-factor model to create the {@link CredentialEntity}.
-     * @param userEntity the entity associated with.
-     * @return the created {@link CredentialEntity}.
-     */
-    @Contract(value = "_, _ -> new", pure = true) private @NotNull CredentialEntity populateEntity(@NotNull CredentialCreateModel model, @NotNull UserEntity userEntity)
-    {
-        long id = model.method().toId(userEntity);
-
-        if(getRepository().existsById(id))
-        {
-            throw new OccupiedException();
-        }
-
-        return model.toEntity(new CredentialEntity(id, userEntity));
     }
 }

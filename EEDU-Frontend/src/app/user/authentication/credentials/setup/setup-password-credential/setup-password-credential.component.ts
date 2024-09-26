@@ -7,6 +7,7 @@ import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {AuthenticationService} from "../../../authentication.service";
+import {AbstractCredentialForm} from "../../abstract-credential-form";
 
 @Component({
   selector: 'app-setup-password-credential',
@@ -25,29 +26,16 @@ import {AuthenticationService} from "../../../authentication.service";
   templateUrl: './setup-password-credential.component.html',
   styleUrl: './setup-password-credential.component.scss'
 })
-export class SetupPasswordCredentialComponent {
+export class SetupPasswordCredentialComponent extends AbstractCredentialForm {
 
-    private readonly _formGroup: FormGroup;
     private _showPassword: boolean = false;
     private _showRepeatPassword: boolean = false;
 
-
-    constructor(formBuilder: FormBuilder, private _authService: AuthenticationService) {
-        this._formGroup = formBuilder.group({
-            password: ['', [Validators.required, this.passwordsMustMatch]],
-            repeatPassword: ['', [Validators.required, this.passwordsMustMatch]]
-        });
-    }
-
-    private passwordsMustMatch(control: AbstractControl): { [key: string]: boolean } | undefined {
-        const password = control.get('password')?.value;
-        const repeatPassword = control.get('repeatPassword')?.value;
-
-        if (password !== repeatPassword) {
-            return { passwordsMismatch: true };
-        }
-
-        return undefined;
+    constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
+        super(formBuilder.group({
+            password: ['', [Validators.required]],
+            repeatPassword: ['', [Validators.required]]
+        }), authenticationService);
     }
 
     protected onShowPassword(event: MouseEvent)
@@ -72,13 +60,7 @@ export class SetupPasswordCredentialComponent {
         return this._showRepeatPassword;
     }
 
-
-    get formGroup(): FormGroup
-    {
-        return this._formGroup;
-    }
-
-    protected get loginData(): LoginData | undefined {
-        return this._authService.loginData;
+    protected onSubmit(): void {
+        console.log("test")
     }
 }

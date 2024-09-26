@@ -13,15 +13,14 @@ import lombok.*;
 @Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class CredentialEntity implements EntityObject,
         EntityModelRelation<CredentialModel>
 {
-    @Id @Setter(AccessLevel.NONE) private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     @Enumerated private CredentialMethod method;
     private String data, secret;
     private boolean enabled;
     @ManyToOne(fetch = FetchType.LAZY) @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
 
-    public CredentialEntity(long id, @NotNull UserEntity user)
+    public CredentialEntity(@NotNull UserEntity user)
     {
-        this.id = id;
         this.user = user;
     }
 

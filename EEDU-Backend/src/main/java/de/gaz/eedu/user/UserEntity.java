@@ -287,10 +287,10 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     public boolean initCredential(@NotNull CredentialEntity credentialEntity)
     {
-        if (this.getCredentials().stream().anyMatch(entity -> entity.getMethod().equals(credentialEntity.getMethod())))
+        /*if (this.getCredentials().stream().anyMatch(entity -> entity.getMethod().equals(credentialEntity.getMethod())))
         {
             return false; // should not be possible anyway. TODO discuss if remove (performance wisely)
-        }
+        }*/
 
         return this.credentials.add(credentialEntity);
     }
