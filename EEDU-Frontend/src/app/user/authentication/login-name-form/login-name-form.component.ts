@@ -33,23 +33,29 @@ import {AuthenticationService} from "../authentication.service";
     styleUrl: './login-name-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginNameFormComponent extends AbstractLoginForm<LoginRequest> {
+export class LoginNameFormComponent extends AbstractLoginForm {
     constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
             loginName: ['', Validators.required], rememberMe: [false]
-        }), 'loginName', authenticationService);
+        }), authenticationService);
+
+        this.registerField('loginName')
     }
 
     protected override onSubmit(): void {
         const loginName = this.form.get('loginName')?.value;
         const rememberMe = this.form.get('rememberMe')?.value;
 
-        console.log("test")
+        const loginRequest: LoginRequest = new LoginRequest(loginName, rememberMe);
+        this.authenticationService.requestAuthorization(loginRequest).subscribe(this.exceptionHandler('loginName'));
+    }
 
-        this.authenticationService.requestAuthorization(new LoginRequest(loginName, rememberMe)).subscribe({
-            error: (error: any) => {
-                //TODO
+    protected override errorMessage(error: any): string {
+        if (typeof error == 'object' && 'status' in error && typeof error.status == 'number') {
+            if (error.status == 401) {
+                return `The user ${this.form.get('loginName')?.value} was not found.`
             }
-        });
+        }
+        return super.errorMessage(error);
     }
 }

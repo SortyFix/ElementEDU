@@ -35,7 +35,6 @@ export class SelectCredentialComponent {
 
     protected readonly credentialDisplayName = credentialDisplayName;
 
-
     constructor(protected authenticationService: AuthenticationService) {
     }
 
@@ -51,6 +50,6 @@ export class SelectCredentialComponent {
 
     protected onCancel()
     {
-
+        this.authenticationService.reset();
     }
 }

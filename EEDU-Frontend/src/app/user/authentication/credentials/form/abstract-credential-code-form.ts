@@ -1,33 +1,26 @@
-import {Component, Inject} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Component} from "@angular/core";
+import {FormBuilder, Validators} from "@angular/forms";
 import {AbstractCredentialForm} from "./abstract-credential-form";
 import {AuthenticationService} from "../../authentication.service";
 
 @Component({standalone: true, template: ''})
-export abstract class AbstractCredentialCodeForm extends AbstractCredentialForm<{ secret: string }>
-{
-    public constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService)
-    {
-        super(formBuilder.group({
-            secret: ['', Validators.required]
-        }), 'secret', authenticationService);
+export abstract class AbstractCredentialCodeForm extends AbstractCredentialForm {
+
+    public constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
+        super(formBuilder.group({secret: ['', Validators.required]}), authenticationService);
+        this.registerField('secret');
     }
 
-    protected override onSubmit()
-    {
+    protected override onSubmit() {
         const secret: string | undefined = this.secret;
-        if (!secret || !this.loginData)
-        {
+        if (!secret || !this.loginData) {
             return;
         }
 
-        this.authenticationService.verifyCredential(secret, this.loginData).subscribe({error: ((error: any) => {
-            // TODO add error codes
-        })});
+        this.authenticationService.verifyCredential(secret, this.loginData).subscribe(this.exceptionHandler('secret'));
     }
 
-    protected get secret(): string | undefined
-    {
+    protected get secret(): string | undefined {
         return this.form.get('secret')?.value;
     }
 }
