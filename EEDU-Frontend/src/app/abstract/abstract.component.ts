@@ -1,7 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {UserService} from "../user/user.service";
-import {ThemeService} from "../theming/theme.service";
 
 @Component({
   selector: 'app-abstract',
@@ -12,7 +11,7 @@ import {ThemeService} from "../theming/theme.service";
 export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
 
-    constructor(public router: Router, public userService: UserService, public themeService: ThemeService) { }
+    constructor(public router: Router, public userService: UserService) { }
 
     sidebar_buttons = [
         {title:'Dashboard', icon_name: 'dashboard', route:'dashboard'},

@@ -1,7 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Injectable, numberAttribute} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
+import {ThemeEntity} from "../theming/theme-entity";
+import * as colorette from "colorette";
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +35,19 @@ export class UserService
         {
             throw new Error("User is not logged in, or user data is corrupt.");
         }
-        return JSON.parse(userData);
+        const parsedJson: any = JSON.parse(userData);
+        const theme: any = parsedJson.theme;
+        const themeEntity: ThemeEntity = new ThemeEntity(
+            theme.id,
+            theme.name,
+            theme.backgroundColor_r,
+            theme.backgroundColor_g,
+            theme.backgroundColor_b,
+            theme.widgetColor_r,
+            theme.widgetColor_g,
+            theme.widgetColor_b);
+
+        return new UserEntity(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
     }
 
     public get hasLoaded(): boolean
@@ -68,5 +82,46 @@ export class UserService
     private storeUserData(userData: string)
     {
         localStorage.setItem("userData", userData)
+    }
+
+    public get getBackgroundColor(): string
+    {
+        const theme: any = this.getUserData.theme;
+        return `rgb(${theme.backgroundColor_r}, ${theme.backgroundColor_g}, ${theme.backgroundColor_b})`
+    }
+
+    public get getWidgetColor(): string
+    {
+        const theme: any = this.getUserData.theme;
+        return `rgb(${theme.widgetColor_r}, ${theme.widgetColor_g}, ${theme.widgetColor_b})`
+    }
+
+    public getTextColorByLuminance(r: number, g: number, b: number, title: boolean)
+    {
+        // Formula for relative luminance
+        // See https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I!!PDF-E.pdf, section 3.2
+        const luminance: number = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b));
+        if(title)
+        {
+            return luminance > 220 ? 'darkblue' : 'rgb(220,220,220)';
+        }
+        return luminance > 220 ? 'rgb(0,0,0)' : 'rgb(220,220,220)';
+    }
+
+    public get getBackgroundTextColor(): string
+    {
+        const theme: any = this.getUserData.theme;
+        return this.getTextColorByLuminance(theme.backgroundColor_r, theme.backgroundColor_g, theme.backgroundColor_b, false);
+    }
+
+    public get getWidgetTextColor(): string
+    {
+        const theme: any = this.getUserData.theme;
+        return this.getTextColorByLuminance(theme.widgetColor_r, theme.widgetColor_g, theme.widgetColor_b, false);
+    }
+
+    public get getTitleTextColor(): string {
+        const theme: any = this.getUserData.theme;
+        return this.getTextColorByLuminance(theme.widgetColor_r, theme.widgetColor_g, theme.widgetColor_b, true);
     }
 }

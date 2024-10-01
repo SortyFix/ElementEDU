@@ -79,7 +79,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public UserModel toModel()
     {
-        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), getStatus());
+        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), getStatus(), getThemeEntity().toModel());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
