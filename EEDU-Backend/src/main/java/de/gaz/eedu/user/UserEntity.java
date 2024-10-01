@@ -8,7 +8,6 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
 import de.gaz.eedu.user.model.UserModel;
-import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;

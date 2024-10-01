@@ -1,9 +1,8 @@
-import {Injectable, numberAttribute} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
 import {ThemeEntity} from "../theming/theme-entity";
-import * as colorette from "colorette";
 
 @Injectable({
     providedIn: 'root'

@@ -9,7 +9,6 @@ import de.gaz.eedu.user.theming.ThemeModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**

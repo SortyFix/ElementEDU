@@ -4,6 +4,7 @@ import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 public record ThemeCreateModel(String name, short[] backgroundColor, short[] widgetColor) implements CreationModel<ThemeEntity>
@@ -32,8 +33,8 @@ public record ThemeCreateModel(String name, short[] backgroundColor, short[] wid
     {
         return "ThemeCreateModel[" +
                 "name=" + name + ", " +
-                "backgroundColor=" + backgroundColor + ", " +
-                "widgetColor=" + widgetColor + ']';
+                "backgroundColor=" + Arrays.toString(backgroundColor) + ", " +
+                "widgetColor=" + Arrays.toString(widgetColor) + ']';
     }
 
 
