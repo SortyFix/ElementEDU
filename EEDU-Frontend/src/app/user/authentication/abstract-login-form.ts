@@ -59,7 +59,7 @@ export abstract class AbstractLoginForm {
         this.errorMessageSignal.set(undefined);
     }
 
-    private set error(data: { field: string, serverError: string }) {
+    protected set error(data: { field: string, serverError: string }) {
         const field: string = data.field;
         const serverError: string = data.serverError;
         this.form.get(field)!.setErrors({serverError});

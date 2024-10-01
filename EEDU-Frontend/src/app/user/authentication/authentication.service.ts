@@ -2,9 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {UserService} from "../user.service";
 import {LoginRequest} from "./login-data/login-request";
-import {map, Observable, tap} from "rxjs";
+import {map, MonoTypeOperatorFunction, Observable, tap} from "rxjs";
 import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
+import {jwtDecode} from "jwt-decode";
 
 /**
  * Service responsible for handling user authentication and credential management.
@@ -78,21 +79,13 @@ export class AuthenticationService {
         });
     }
 
-    /**
-     * Enables a previously created credential (e.g., after entering an OTP or secret).
-     *
-     * @param secret    The secret or OTP required to enable the credential.
-     * @param loginData The current login data containing the user's login name and token.
-     * @returns         An {@link Observable} that emits a `void` response upon successful credential enablement.
-     * @throws          Will throw an error if login data is not present.
-     */
-    public enableCredential(secret: string, loginData: LoginData): Observable<void> {
+    public enableCredential(secret: string): Observable<void> {
 
         if (!this.loginData) {
             throw new Error();
         }
 
-        const url: string = `http://localhost:8080/user/login/credentials/enable/${loginData.credential?.toString()}`;
+        const url: string = `http://localhost:8080/user/login/credentials/enable/${this.loginData.credential?.toString()}`;
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             withCredentials: true,
@@ -126,19 +119,12 @@ export class AuthenticationService {
         }).pipe(map((value: string): void => { this.loginData!.token = value; }));
     }
 
-    /**
-     * Verifies a given credential (e.g., OTP, secret key) for the current login session.
-     *
-     * @param secret      The credential or secret to verify (e.g., an OTP code or password).
-     * @param loginData   The current login data containing the user's login name and token.
-     * @return            An {@link Observable} that emits the verification response.
-     *                    The user's data is reloaded upon successful verification.
-     */
-    public verifyCredential(secret: string, loginData: LoginData): Observable<string> {
+
+    public verifyCredential(secret: string): Observable<string> {
         const url = "http://localhost:8080/user/login/credentials/verify";
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
-            headers: {"Authorization": "Bearer " + loginData.token},
+            headers: {"Authorization": "Bearer " + this.loginData?.token},
             withCredentials: true
         }).pipe(tap<string>({next: (): void => this.finishLogin()}));
     }
@@ -152,8 +138,7 @@ export class AuthenticationService {
      * This method is called internally upon successful verification or credential actions.
      */
     private finishLogin() {
-        if(!this.userService.isLoggedIn)
-        {
+        if (!this.userService.isLoggedIn) {
             this.userService.loadData().subscribe({next: (): void => this._loginData = undefined});
         }
     }

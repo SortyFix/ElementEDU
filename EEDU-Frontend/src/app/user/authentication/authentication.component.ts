@@ -37,6 +37,7 @@ import {
     CredentialSmsVerifyFormComponent
 } from "./credentials/credential-sms/credential-sms-verify-form/credential-sms-verify-form.component";
 import {MatListOption} from "@angular/material/list";
+import {AccessibilityService} from "../../accessibility.service";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
@@ -80,9 +81,7 @@ import {MatListOption} from "@angular/material/list";
         ])
     ]
 })
-export class Authentication implements OnInit {
-
-    private _mobile: boolean = false;
+export class Authentication {
 
     private readonly _footerLinks: {name: string, link: string, icon: string}[] = [
         {name: "Privacy", link: "#", icon: "privacy_tip"},
@@ -92,17 +91,15 @@ export class Authentication implements OnInit {
         {name: "Help", link: "#", icon: "help"},
     ];
 
-
     protected get footerLinks(): { name: string; link: string; icon: string }[] {
         return this._footerLinks;
     }
 
-    /**
-     * Constructor to initialize the LoginComponent.
-     *
-     * @param authService The service used for login-related operations such as login and password verification.
-     */
-    constructor(protected authService: AuthenticationService) {}
+    constructor(private accessibilityService: AccessibilityService, protected authService: AuthenticationService) {}
+
+    protected get mobile(): boolean {
+        return this.accessibilityService.mobile;
+    }
 
     /**
      * Determines and returns the current component based on the login state and credential method.
@@ -128,37 +125,6 @@ export class Authentication implements OnInit {
         }
 
         return this.verifyComponent(credential);
-    }
-
-    /**
-     * Lifecycle hook that is called after data-bound properties of a directive are initialized.
-     * Initializes the screen size check.
-     */
-    public ngOnInit(): void {
-        this.checkScreenSize()
-    }
-
-    /**
-     * Listens for window resize events to check and update the screen size.
-     */
-    @HostListener("window:resize")
-    public onResize(): void {
-        this.checkScreenSize()
-    }
-
-    /**
-     * Checks the screen size and sets the mobile property based on the width.
-     */
-    private checkScreenSize(): void {
-        this._mobile = window.innerWidth <= 600;
-    }
-
-    /**
-     * Returns whether this is currently in mobile mode or not
-     * @protected
-     */
-    protected get mobile(): boolean {
-        return this._mobile;
     }
 
     /**

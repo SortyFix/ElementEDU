@@ -65,8 +65,8 @@ public class DataLoader implements CommandLineRunner
         PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
-        setPassword(userEntity, randomPassword);
-        /*setEmail(userEntity);*/
+/*        setPassword(userEntity, randomPassword);
+        *//*setEmail(userEntity);*/
 
         log.info("A default user has been created");
         log.info("-".repeat(20));

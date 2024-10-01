@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {AbstractCredentialForm} from "../../abstract-credential-form";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatError, MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
+import {CredentialMethod} from "../../../login-data/credential-method";
 
 @Component({
   selector: 'app-credential-password-setup-form',
@@ -19,7 +20,9 @@ import {MatDialogClose} from "@angular/material/dialog";
         ReactiveFormsModule,
         MatIconButton,
         MatDialogClose,
-        MatButton
+        MatButton,
+        MatError,
+        MatSuffix
     ],
   templateUrl: './credential-password-setup-form.component.html',
   styleUrl: './credential-password-setup-form.component.scss'
@@ -34,6 +37,8 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
             password: ['', [Validators.required]],
             repeatPassword: ['', [Validators.required]]
         }), authenticationService);
+        this.registerField('password');
+        this.registerField('repeatPassword');
     }
 
     protected onShowPassword(event: MouseEvent)
@@ -59,5 +64,15 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
     }
 
     protected onSubmit(): void {
+        const password: string = this.form.get('password')?.value;
+        const repeatPassword: string = this.form.get('repeatPassword')?.value;
+
+        if(password !== repeatPassword)
+        {
+            this.error = {field: 'repeatPassword', serverError: 'The passwords do not match.'}
+            return;
+        }
+
+        this.authenticationService.setupCredential(CredentialMethod.PASSWORD, password).subscribe(this.exceptionHandler('password'));
     }
 }

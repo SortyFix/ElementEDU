@@ -62,7 +62,7 @@ import java.util.Optional;
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @NotNull@RequestAttribute("claims") Claims claims, @NotNull HttpServletResponse response)
     {
         CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
