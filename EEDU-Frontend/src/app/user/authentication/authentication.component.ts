@@ -7,7 +7,7 @@ import {LoginNameFormComponent} from "./login-name-form/login-name-form.componen
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {SelectCredentialComponent} from "./select-credential-form/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
-import {credentialDisplayName, CredentialMethod} from "./login-data/credential-method";
+import {CredentialMethod} from "./login-data/credential-method";
 import {MatAnchor} from "@angular/material/button";
 import {MatDivider} from "@angular/material/divider";
 import {MatError, MatLabel} from "@angular/material/form-field";
