@@ -1,6 +1,5 @@
 <div class="backdrop-blur">
     <mat-card>
-        <mat-progress-bar [mode]="loadingAnimation ? 'indeterminate' : 'determinate'" [value]="100"></mat-progress-bar>
         <mat-card-header>
             <mat-card-title>
                 <mat-icon class="icon">person</mat-icon>
@@ -14,85 +13,20 @@
                 </mat-grid-tile>
                 <mat-grid-tile>
                     <div class="form-container">
-
-                        <app-login-name-form
-                            *ngIf="!authService.loginData"
-                            class="current-form">
-                        </app-login-name-form>
-
-                        <app-select-credential
-                            *ngIf="authService.loginData && !authService.loginData?.credential"
-                            class="current-form">
-                        </app-select-credential>
-
-                        <ng-container *ngIf="authService.loginData && authService.loginData?.credential">
-                            @if(authService.loginData.setupCredential)
-                            {
-                                <app-setup-password-credential
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.EMAIL"
-                                    class="current-form">
-                                </app-setup-password-credential>
-
-                                <app-setup-email-credential
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.PASSWORD"
-                                    class="current-form">
-                                </app-setup-email-credential>
-
-                                <app-setup-sms-credential
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.SMS"
-                                    class="current-form">
-                                </app-setup-sms-credential>
-
-                                <app-setup-totp-credential
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.TOTP"
-                                    class="current-form">
-                                </app-setup-totp-credential>
-
-                            } @else {
-
-                                <app-credential-password-form
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.PASSWORD"
-                                    class="current-form">
-                                </app-credential-password-form>
-
-                                <app-credential-email-form
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.EMAIL"
-                                    class="current-form">
-                                </app-credential-email-form>
-
-                                <app-credential-totp-form
-                                    *ngIf="authService.loginData?.credential === CredentialMethod.TOTP"
-                                    class="current-form">
-                                </app-credential-totp-form>
-                            }
-
-                        </ng-container>
-
+                        <div class="current-form">
+                            <ng-container *ngComponentOutlet="currentComponent"></ng-container>
+                        </div>
                     </div>
                 </mat-grid-tile>
             </mat-grid-list>
             <mat-card-footer class="footer">
                 <nav>
-                    <a href="#" mat-button>
-                        <mat-icon>privacy_tip</mat-icon>
-                        Privacy
-                    </a>
-                    <a href="#" mat-button>
-                        <mat-icon>gavel</mat-icon>
-                        Impressum
-                    </a>
-                    <a href="#" mat-button>
-                        <mat-icon>contact_mail</mat-icon>
-                        Contact
-                    </a>
-                    <a href="#" mat-button>
-                        <mat-icon>description</mat-icon>
-                        Terms of Service
-                    </a>
-                    <a href="#" mat-button>
-                        <mat-icon>help</mat-icon>
-                        Help
-                    </a>
+                    @for (footerEntry of this.footerLinks; track footerEntry) {
+                        <a href="{{ footerEntry.link }}" mat-button>
+                            <mat-icon>{{ footerEntry.icon }}</mat-icon>
+                            {{ footerEntry.name }}
+                        </a>
+                    }
                 </nav>
             </mat-card-footer>
         </mat-card-content>

@@ -6,6 +6,17 @@ import {map, Observable, tap} from "rxjs";
 import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
 
+/**
+ * Service responsible for handling user authentication and credential management.
+ *
+ * This service provides methods to set up, enable, select, and verify credentials
+ * for a user login session. It also manages the login session and the user's login data.
+ *
+ * The service is injectable and provided as a singleton across the application,
+ * ensuring that only one instance exists.
+ *
+ * @Injectable providedIn: "root" allows this service to be available globally in the application.
+ */
 @Injectable({
     providedIn: 'root'
 })
@@ -41,6 +52,14 @@ export class AuthenticationService {
         }));
     }
 
+    /**
+     * Initiates the creation of a credential for login.
+     *
+     * @param credential    The method of credential to be set up (e.g., password, OTP).
+     * @param additionalData Optional additional data required for credential setup (default is {@code undefined}).
+     * @returns             An {@link Observable} that emits a string response containing the status or result of the request.
+     * @throws              Will throw an error if login data is not present.
+     */
     public setupCredential(credential: CredentialMethod, additionalData: any = undefined): Observable<string> {
 
         if (!this.loginData) {
@@ -59,7 +78,16 @@ export class AuthenticationService {
         });
     }
 
+    /**
+     * Enables a previously created credential (e.g., after entering an OTP or secret).
+     *
+     * @param secret    The secret or OTP required to enable the credential.
+     * @param loginData The current login data containing the user's login name and token.
+     * @returns         An {@link Observable} that emits a `void` response upon successful credential enablement.
+     * @throws          Will throw an error if login data is not present.
+     */
     public enableCredential(secret: string, loginData: LoginData): Observable<void> {
+
         if (!this.loginData) {
             throw new Error();
         }
@@ -69,11 +97,17 @@ export class AuthenticationService {
             responseType: "text" as "json",
             withCredentials: true,
             headers: {"Authorization": "Bearer " + this.loginData.token}
-        }).pipe(map((): void => {
-            this.finishLogin()
-        }));
+        }).pipe(map((): void => { this.finishLogin() }));
     }
 
+    /**
+     * Selects a credential method for the current login session.
+     *
+     * @param credential The method of credential to be selected (e.g., password, OTP).
+     * @returns          An {@link Observable} that emits a {@code void} response upon successful credential selection.
+     *                   This updates the current token in the user's login data.
+     * @throws           Will throw an error if login data is not present.
+     */
     public selectCredential(credential: CredentialMethod): Observable<void> {
 
         if (!this.loginData) {
@@ -89,9 +123,7 @@ export class AuthenticationService {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData.token},
             withCredentials: true
-        }).pipe(map((value: string): void => {
-            this.loginData!.token = value
-        }));
+        }).pipe(map((value: string): void => { this.loginData!.token = value; }));
     }
 
     /**
@@ -111,14 +143,34 @@ export class AuthenticationService {
         }).pipe(tap<string>({next: (): void => this.finishLogin()}));
     }
 
+    /**
+     * Completes the login process by loading the user's data and setting the login state.
+     * <p>
+     * This will only be executed when the user is not logged in yet,
+     * otherwise this method will do nothing.
+     *
+     * This method is called internally upon successful verification or credential actions.
+     */
     private finishLogin() {
-        this.userService.loadData().subscribe({next: (): void => this._loginData = undefined});
+        if(!this.userService.isLoggedIn)
+        {
+            this.userService.loadData().subscribe({next: (): void => this._loginData = undefined});
+        }
     }
 
+    /**
+     * Retrieves the current login data.
+     * This might be null. It must be populated by {@link requestAuthorization}.
+     *
+     * @returns The current {@link LoginData}, or {@code undefined} if no login data is present.
+     */
     public get loginData(): LoginData | undefined {
         return this._loginData;
     }
 
+    /**
+     * Resets the current login data, clearing any authorization flow
+     */
     public reset(): void {
         this._loginData = undefined;
     }
