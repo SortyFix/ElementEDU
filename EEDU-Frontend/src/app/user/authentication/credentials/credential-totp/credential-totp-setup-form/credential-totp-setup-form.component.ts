@@ -52,12 +52,13 @@ export class CredentialTotpSetupFormComponent extends AbstractCredentialSetupCod
         this.authService.setupCredential(CredentialMethod.TOTP).subscribe({
             next: ((value: string) =>
             {
+                const jsonData: any = JSON.parse(value);
                 this._credentialData = new TotpData(
-                    JSON.parse(value).loginName,
-                    JSON.parse(value).secret,
-                    JSON.parse(value).algorithm,
-                    JSON.parse(value).digits,
-                    JSON.parse(value).period
+                    jsonData.loginName,
+                    jsonData.secret,
+                    jsonData.algorithm,
+                    jsonData.digits,
+                    jsonData.period,
                 );
             })
         });
