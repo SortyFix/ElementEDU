@@ -1,30 +1,52 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs";
-import {ThemeEntity} from "./theme-entity";
-import {HttpClient} from "@angular/common/http";
+import {UserService} from "../user/user.service";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ThemeService {
-  constructor(private http: HttpClient)
-  {
-  }
+    constructor(public userService: UserService) { }
 
-  // Receives user theme via GET request with credentials (token).
-  public fetchTheme() : Observable<ThemeEntity> {
-      console.log("Fetching theme...");
-      const url: string = "http://localhost:8080/user/me/theme/get";
-      return this.http.get<ThemeEntity>(url, { withCredentials: true });
-  }
+    public get getBackgroundColor(): string
+    {
+        const theme: any = this.userService.getUserData.theme;
+        return `rgb(${theme.backgroundColor_r}, ${theme.backgroundColor_g}, ${theme.backgroundColor_b})`
+    }
 
-    /**
-     * Parses the current theme in storage to a JS object
-     */
-  public parseStorageTheme() {
-      const theme = localStorage.getItem("userTheme");
-      return theme ? JSON.parse(theme) : null;
-  }
+    public get getWidgetColor(): string
+    {
+        const theme: any = this.userService.getUserData.theme;
+        return `rgb(${theme.widgetColor_r}, ${theme.widgetColor_g}, ${theme.widgetColor_b})`
+    }
 
+    public getTextColorByLuminance(r: number, g: number, b: number, title: boolean)
+    {
+        // Formula for relative luminance
+        // See https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I!!PDF-E.pdf, section 3.2
+        const luminance: number = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b));
+        if(title)
+        {
+            return luminance > 220 ? 'darkblue' : 'rgb(220,220,220)';
+        }
+        return luminance > 220 ? 'rgb(0,0,0)' : 'rgb(220,220,220)';
+    }
+
+    public getTextColor(type: 'background' | 'widget', isTitle: boolean): string
+    {
+        const theme: any = this.userService.getUserData.theme;
+        let r, g, b: number;
+        switch (type) {
+            case "background":
+                r = theme.backgroundColor_r;
+                g = theme.backgroundColor_g;
+                b = theme.backgroundColor_b;
+                break;
+            case "widget":
+                r = theme.widgetColor_r;
+                g = theme.widgetColor_g;
+                b = theme.widgetColor_b;
+                break;
+        }
+        return this.getTextColorByLuminance(r, g, b, isTitle);
+    }
 }
-

@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
+import {ThemeEntity} from "../theming/theme-entity";
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +34,19 @@ export class UserService
         {
             throw new Error("User is not logged in, or user data is corrupt.");
         }
-        return JSON.parse(userData);
+        const parsedJson: any = JSON.parse(userData);
+        const theme: any = parsedJson.theme;
+        const themeEntity: ThemeEntity = new ThemeEntity(
+            theme.id,
+            theme.name,
+            theme.backgroundColor_r,
+            theme.backgroundColor_g,
+            theme.backgroundColor_b,
+            theme.widgetColor_r,
+            theme.widgetColor_g,
+            theme.widgetColor_b);
+
+        return new UserEntity(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
     }
 
     public get hasLoaded(): boolean

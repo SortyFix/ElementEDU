@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {ThemeService} from "../theming/theme.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-
+    constructor(public themeService: ThemeService) {
+    }
 }

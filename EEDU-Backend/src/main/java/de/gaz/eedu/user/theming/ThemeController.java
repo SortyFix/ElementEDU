@@ -58,7 +58,9 @@ public class ThemeController
             return ResponseEntity.ok(userService.loadEntityById(id).get().getThemeEntity().toModel());
         }
 
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        ThemeCreateModel fallbackTheme = new ThemeCreateModel("fallback", new short[]{255, 255, 255}, new short[]{200, 200, 200});
+        // Return fallback theme if theme cannot be loaded
+        return ResponseEntity.ok(fallbackTheme.toEntity(new ThemeEntity()).toModel());
     }
 
     /**
