@@ -82,45 +82,4 @@ export class UserService
     {
         localStorage.setItem("userData", userData)
     }
-
-    public get getBackgroundColor(): string
-    {
-        const theme: any = this.getUserData.theme;
-        return `rgb(${theme.backgroundColor_r}, ${theme.backgroundColor_g}, ${theme.backgroundColor_b})`
-    }
-
-    public get getWidgetColor(): string
-    {
-        const theme: any = this.getUserData.theme;
-        return `rgb(${theme.widgetColor_r}, ${theme.widgetColor_g}, ${theme.widgetColor_b})`
-    }
-
-    public getTextColorByLuminance(r: number, g: number, b: number, title: boolean)
-    {
-        // Formula for relative luminance
-        // See https://www.itu.int/dms_pubrec/itu-r/rec/bt/R-REC-BT.709-6-201506-I!!PDF-E.pdf, section 3.2
-        const luminance: number = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b));
-        if(title)
-        {
-            return luminance > 220 ? 'darkblue' : 'rgb(220,220,220)';
-        }
-        return luminance > 220 ? 'rgb(0,0,0)' : 'rgb(220,220,220)';
-    }
-
-    public get getBackgroundTextColor(): string
-    {
-        const theme: any = this.getUserData.theme;
-        return this.getTextColorByLuminance(theme.backgroundColor_r, theme.backgroundColor_g, theme.backgroundColor_b, false);
-    }
-
-    public get getWidgetTextColor(): string
-    {
-        const theme: any = this.getUserData.theme;
-        return this.getTextColorByLuminance(theme.widgetColor_r, theme.widgetColor_g, theme.widgetColor_b, false);
-    }
-
-    public get getTitleTextColor(): string {
-        const theme: any = this.getUserData.theme;
-        return this.getTextColorByLuminance(theme.widgetColor_r, theme.widgetColor_g, theme.widgetColor_b, true);
-    }
 }
