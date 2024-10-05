@@ -10,8 +10,8 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {CredentialMethod} from "../../../login-data/credential-method";
 
 @Component({
-  selector: 'app-credential-password-setup-form',
-  standalone: true,
+    selector: 'app-credential-password-setup-form',
+    standalone: true,
     imports: [
         MatFormField,
         MatIcon,
@@ -24,8 +24,8 @@ import {CredentialMethod} from "../../../login-data/credential-method";
         MatError,
         MatSuffix
     ],
-  templateUrl: './credential-password-setup-form.component.html',
-  styleUrl: './credential-password-setup-form.component.scss'
+    templateUrl: './credential-password-setup-form.component.html',
+    styleUrl: './credential-password-setup-form.component.scss'
 })
 export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm {
 
@@ -41,25 +41,21 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
         this.registerField('repeatPassword');
     }
 
-    protected onShowPassword(event: MouseEvent)
-    {
+    protected onShowPassword(event: MouseEvent) {
         event.stopPropagation()
         this._showPassword = !this._showPassword;
     }
 
-    protected get showPassword(): boolean
-    {
+    protected get showPassword(): boolean {
         return this._showPassword;
     }
 
-    protected onShowRepeatPassword(event: MouseEvent)
-    {
+    protected onShowRepeatPassword(event: MouseEvent) {
         event.stopPropagation()
         this._showRepeatPassword = !this._showRepeatPassword;
     }
 
-    protected get showRepeatPassword(): boolean
-    {
+    protected get showRepeatPassword(): boolean {
         return this._showRepeatPassword;
     }
 
@@ -67,12 +63,14 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
         const password: string = this.form.get('password')?.value;
         const repeatPassword: string = this.form.get('repeatPassword')?.value;
 
-        if(password !== repeatPassword)
-        {
+        if (password !== repeatPassword) {
             this.error = {field: 'repeatPassword', serverError: 'The passwords do not match.'}
             return;
         }
 
-        this.authenticationService.setupCredential(CredentialMethod.PASSWORD, password).subscribe(this.exceptionHandler('password'));
+        this.authenticationService.setupCredential(CredentialMethod.PASSWORD, password).subscribe({
+            next: (): void => { this.authenticationService.verifyCredential(password).subscribe(); },
+            error: (error: any): void => this.exceptionHandler('password').error(error)
+        });
     }
 }
