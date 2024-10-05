@@ -2,10 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {UserService} from "../user.service";
 import {LoginRequest} from "./login-data/login-request";
-import {map, MonoTypeOperatorFunction, Observable, tap} from "rxjs";
+import {map, Observable, OperatorFunction, tap} from "rxjs";
 import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
-import {jwtDecode} from "jwt-decode";
+import {jwtDecode, JwtPayload} from "jwt-decode";
 
 /**
  * Service responsible for handling user authentication and credential management.
@@ -48,9 +48,7 @@ export class AuthenticationService {
         // send credential in case of advanced login
         return this.http.post<string>(url, data, {
             responseType: "text" as "json", withCredentials: true
-        }).pipe(map((token: string): void => {
-            this._loginData = new LoginData(data.loginName, token)
-        }));
+        }).pipe(map((token: string): void => {this._loginData = new LoginData(data.loginName, token)}));
     }
 
     /**
@@ -76,7 +74,7 @@ export class AuthenticationService {
             responseType: "text" as "json",
             withCredentials: true,
             headers: {"Authorization": "Bearer " + this.loginData.token}
-        });
+        }).pipe(this.tokenValidator);
     }
 
     public enableCredential(secret: string): Observable<void> {
@@ -90,7 +88,7 @@ export class AuthenticationService {
             responseType: "text" as "json",
             withCredentials: true,
             headers: {"Authorization": "Bearer " + this.loginData.token}
-        }).pipe(map((): void => { this.finishLogin() }));
+        }).pipe(this.tokenValidator, map((): void => {}));
     }
 
     /**
@@ -116,9 +114,8 @@ export class AuthenticationService {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData.token},
             withCredentials: true
-        }).pipe(map((value: string): void => { this.loginData!.token = value; }));
+        }).pipe(this.tokenValidator, map((): void => {}));
     }
-
 
     public verifyCredential(secret: string): Observable<string> {
         const url = "http://localhost:8080/user/login/credentials/verify";
@@ -126,8 +123,9 @@ export class AuthenticationService {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData?.token},
             withCredentials: true
-        }).pipe(tap<string>({next: (): void => this.finishLogin()}));
+        }).pipe(this.tokenValidator);
     }
+
 
     /**
      * Completes the login process by loading the user's data and setting the login state.
@@ -158,5 +156,23 @@ export class AuthenticationService {
      */
     public reset(): void {
         this._loginData = undefined;
+    }
+
+    private get tokenValidator(): OperatorFunction<any, any> {
+        return tap({next: this.validateToken.bind(this)});
+    }
+
+    private validateToken(value: any): void {
+        if (typeof value !== 'string' || value.length > 0) {
+            return;
+        }
+
+        const decoded: JwtPayload = jwtDecode(value);
+        if (decoded?.sub && this.loginData) {
+            this.loginData.token = value;
+            if (decoded.sub === 'AUTHORIZED') {
+                this.finishLogin();
+            }
+        }
     }
 }
