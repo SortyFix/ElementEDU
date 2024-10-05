@@ -56,7 +56,7 @@ import java.util.function.Function;
             Credential credential = credentialEntity.getMethod().getCredential();
             if (credentialEntity.isEnabled() && credential.verify(credentialEntity, code))
             {
-                return getUserService().getAuthorizeService().authorize(userEntity.getId(), claims);
+                return getUserService().getVerificationService().authorize(userEntity.getId(), claims);
             }
             return null;
         });

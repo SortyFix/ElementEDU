@@ -1,8 +1,8 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.verification.AuthorizeService;
 import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
@@ -56,8 +56,8 @@ import java.util.Optional;
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
     public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute Claims claims)
     {
-        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
-        return ResponseEntity.ok(authorizeService.requestSetupCredential(method, claims));
+        VerificationService verificationService = getEntityService().getUserService().getVerificationService();
+        return ResponseEntity.ok(verificationService.requestSetupCredential(method, claims));
     }
 
     @PostMapping("/create")
@@ -129,8 +129,8 @@ import java.util.Optional;
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_SELECTION)")
     public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute("claims") Claims claims)
     {
-        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
-        return ResponseEntity.ok(authorizeService.selectCredential(method, claims));
+        VerificationService verificationService = getEntityService().getUserService().getVerificationService();
+        return ResponseEntity.ok(verificationService.selectCredential(method, claims));
     }
 
     private @NotNull ResponseEntity<String> authorizeToken(@NotNull Optional<String> token, @NotNull Claims claims, @NotNull HttpServletResponse response)

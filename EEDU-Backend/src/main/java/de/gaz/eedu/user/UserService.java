@@ -11,7 +11,7 @@ import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
-import de.gaz.eedu.user.verification.AuthorizeService;
+import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
@@ -53,7 +53,7 @@ import java.util.function.Function;
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) @Slf4j
 public class UserService extends EntityService<UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
 {
-    @Getter private final AuthorizeService authorizeService;
+    @Getter private final VerificationService verificationService;
     @Getter private final ClassRoomService classRoomService;
     @Getter(AccessLevel.NONE) private final UserRepository userRepository;
     private final GroupRepository groupRepository;
@@ -98,7 +98,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     @Transactional public @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        Function<UserEntity, String> auth = user -> getAuthorizeService().requestLogin(user, loginModel);
+        Function<UserEntity, String> auth = user -> getVerificationService().requestLogin(user, loginModel);
         return userOptional.filter(UserEntity::isAccountNonLocked).map(auth);
     }
 
@@ -108,7 +108,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         {
             Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
             AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
-            return getAuthorizeService().validate(token, authorityFactory);
+            return getVerificationService().validate(token, authorityFactory);
         }
         catch (ExpiredJwtException ignored)
         {
