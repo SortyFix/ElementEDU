@@ -11,6 +11,7 @@ import {ThemeService} from "../theming/theme.service";
 
 export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
+    private _portrait: boolean = false;
 
     constructor(public router: Router, public userService: UserService, public themeService: ThemeService) { }
 
@@ -23,6 +24,13 @@ export class AbstractComponent implements OnInit {
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
 
+    responsiveContent() {
+        return {
+            'padding-left': this.mobile ? '20px' : '40px',
+            'width': this.portrait ? '' : '100vh'
+        };
+    }
+
     public logout() {
         this.userService.logout().subscribe(value => console.log(value));
     }
@@ -32,16 +40,27 @@ export class AbstractComponent implements OnInit {
         this._mobile = window.innerWidth <= 600;
     }
 
+    private isPortrait()
+    {
+        this._portrait = window.innerHeight > window.innerWidth;
+    }
+
     get mobile(): boolean {
         return this._mobile;
     }
 
+    get portrait(): boolean {
+        return this._portrait;
+    }
+
     @HostListener("window:resize") public onResize()
     {
-        this.isMobile()
+        this.isMobile();
+        this.isPortrait();
     }
 
     ngOnInit(): void {
         this.isMobile();
+        this.isPortrait();
     }
 }

@@ -1,7 +1,7 @@
 <!-- TODO: Shorten style attributes by outsourcing them into the ts file -->
 <mat-drawer-container class="example-container">
     <!-- SIDEBAR/DRAWER -->
-    <mat-drawer #drawer mode="side" opened class="drawer" [style.background-color]="this.themeService.getWidgetColor" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
+    <mat-drawer #drawer mode="over" opened class="drawer" [style.background-color]="this.themeService.getWidgetColor" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
         <div class="toggle-button">
             <button mat-icon-button [style.color]="this.themeService.getTextColor('background', false)" (click)="drawer.toggle()">
                 <mat-icon>close</mat-icon>
@@ -24,11 +24,11 @@
     <!-- MAIN CONTENT -->
     <mat-drawer-content [style.background-color]="this.themeService.getBackgroundColor">
         <button *ngIf="!drawer.opened" mat-icon-button (click)="drawer.toggle()">
-            <mat-icon>menu</mat-icon>
+            <mat-icon [style.color]="this.themeService.getTextColor('background', false)">menu</mat-icon>
         </button>
-        <!-- ROUTER OUTPUT -->
-        <div class="page-content" style="{{ drawer.opened ? 'margin-top: 48px' : ''}}">
+        <div class="page-content" style="{{ drawer.opened ? 'margin-top: 48px' : ''}}" [ngStyle]="responsiveContent()" >
             <router-outlet></router-outlet>
         </div>
+        <!-- ROUTER OUTPUT -->
     </mat-drawer-content>
 </mat-drawer-container>
