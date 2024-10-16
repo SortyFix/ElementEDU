@@ -29,7 +29,6 @@ public class PasswordCredential implements Credential
     @Override
     public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String password)
     {
-        System.out.println("test password " + password + " with " + credentialEntity.getData());
         return getPasswordEncoder().matches(password, credentialEntity.getData());
     }
 }

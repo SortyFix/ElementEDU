@@ -163,16 +163,16 @@ export class AuthenticationService {
     }
 
     private validateToken(value: any): void {
-        if (typeof value !== 'string' || value.length > 0) {
+        if (typeof value !== 'string' || value.length < 1 || !this.loginData) {
             return;
         }
 
-        const decoded: JwtPayload = jwtDecode(value);
-        if (decoded?.sub && this.loginData) {
+        try {
+            const decoded: JwtPayload = jwtDecode(value);
             this.loginData.token = value;
             if (decoded.sub === 'AUTHORIZED') {
                 this.finishLogin();
             }
-        }
+        } catch (ignored: any) {}
     }
 }

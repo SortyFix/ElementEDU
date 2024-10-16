@@ -69,8 +69,18 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
         }
 
         this.authenticationService.setupCredential(CredentialMethod.PASSWORD, password).subscribe({
-            next: (): void => { this.authenticationService.verifyCredential(password).subscribe(); },
+            next: (): void => { this.authenticationService.enableCredential(password).subscribe(); },
             error: (error: any): void => this.exceptionHandler('password').error(error)
         });
+    }
+
+
+    protected override errorMessage(status: number): string {
+        if(status === 406)
+        {
+            return "This password does not match the requirements."
+        }
+
+        return super.errorMessage(status);
     }
 }

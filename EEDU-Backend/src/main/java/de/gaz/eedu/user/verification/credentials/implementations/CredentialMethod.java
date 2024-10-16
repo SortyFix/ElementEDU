@@ -1,24 +1,18 @@
 package de.gaz.eedu.user.verification.credentials.implementations;
 
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.HashingAlgorithm;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.TOPTHandler;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Objects;
-
+@AllArgsConstructor
 @Getter public enum CredentialMethod {
-    PASSWORD(new PasswordCredential(new BCryptPasswordEncoder())),
-    EMAIL(new EmailCredential()),
-    SMS(new SMSCredential()),
-    TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA1)));
+    PASSWORD(new PasswordCredential(new BCryptPasswordEncoder()), false),
+    EMAIL(new EmailCredential(), true),
+    SMS(new SMSCredential(), true),
+    TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA1)), true);
 
     private final Credential credential;
-
-    CredentialMethod(@NotNull Credential credential)
-    {
-        this.credential = credential;
-    }
+    private final boolean enablingRequired;
 }

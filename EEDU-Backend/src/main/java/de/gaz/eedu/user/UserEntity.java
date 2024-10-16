@@ -67,8 +67,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public String getPassword()
     {
-        Optional<CredentialEntity> password = getCredentials(CredentialMethod.PASSWORD);
-        return password.map(CredentialEntity::getSecret).orElseThrow(UnsupportedOperationException::new);
+        throw new UnsupportedOperationException("Users can have multiple passwords");
     }
 
     @Override public boolean isDeletable()
@@ -273,10 +272,10 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return authorities.stream().anyMatch(loadedAuthorities::contains);
     }
 
-    public @NotNull Optional<CredentialEntity> getCredentials(@NotNull CredentialMethod credentialMethod)
+    public @NotNull Set<CredentialEntity> getCredentials(@NotNull CredentialMethod credentialMethod)
     {
         // Also include not enabled ones, therefore not getter
-        return credentials.stream().filter(entity -> entity.getMethod().equals(credentialMethod)).findFirst();
+        return credentials.stream().filter(entity -> entity.getMethod().equals(credentialMethod)).collect(Collectors.toUnmodifiableSet());
     }
 
     @Transactional public boolean initCredential(@NotNull UserService userService, @NotNull CredentialEntity credentialEntity)

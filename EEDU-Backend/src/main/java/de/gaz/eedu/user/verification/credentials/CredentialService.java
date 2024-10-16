@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class CredentialService extends EntityService<CredentialRepository, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
@@ -51,24 +51,27 @@ import java.util.function.Function;
         long userID = claims.get("userID", Long.class);
         UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
 
-        return userEntity.getCredentials(method).map(credentialEntity ->
+        boolean valid = userEntity.getCredentials(method).stream().anyMatch(credentialEntity ->
         {
             Credential credential = credentialEntity.getMethod().getCredential();
-            if (credentialEntity.isEnabled() && credential.verify(credentialEntity, code))
-            {
-                return getUserService().getVerificationService().authorize(userEntity.getId(), claims);
-            }
-            return null;
+            return credentialEntity.isEnabled() && credential.verify(credentialEntity, code);
         });
+
+        if(!valid)
+        {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(getUserService().getVerificationService().authorize(userID, claims));
     }
 
     @Transactional
     public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
     {
         long userID = claims.get("userID", Long.class);
-        Function<CredentialEntity, Boolean> mapper = credentialEntity ->
+        Predicate<CredentialEntity> mapper = credentialEntity ->
         {
-            if (credentialEntity.isEnabled())
+            if (credentialEntity.isEnabled() && method.isEnablingRequired())
             {
                 return false;
             }
@@ -81,6 +84,6 @@ import java.util.function.Function;
             }
             return false;
         };
-        return getUserService().loadEntityByIDSafe(userID).getCredentials(method).map(mapper).orElse(false);
+        return getUserService().loadEntityByIDSafe(userID).getCredentials(method).stream().anyMatch(mapper);
     }
 }
