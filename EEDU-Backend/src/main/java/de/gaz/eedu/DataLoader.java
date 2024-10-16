@@ -13,6 +13,7 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
+import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
@@ -65,8 +66,7 @@ public class DataLoader implements CommandLineRunner
         PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
-/*        setPassword(userEntity, randomPassword);
-        *//*setEmail(userEntity);*/
+        setPassword(userEntity, randomPassword);
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -84,14 +84,10 @@ public class DataLoader implements CommandLineRunner
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
         CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, randomPassword);
-        getCredentialService().create(credential);
-    }
 
-    private void setEmail(@NotNull UserEntity userEntity)
-    {
-        CredentialMethod password = CredentialMethod.EMAIL;
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, "");
-        getCredentialService().create(credential);
+        CredentialEntity credentialEntity = getCredentialService().createEntity(credential);
+        credentialEntity.setTemporary(true); // make the password subject to change
+        getCredentialService().save(credentialEntity);
     }
 
     private @NotNull PrivilegeEntity createDefaultPrivilege()

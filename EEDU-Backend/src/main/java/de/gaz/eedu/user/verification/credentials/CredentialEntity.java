@@ -16,7 +16,7 @@ import lombok.*;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     @Enumerated private CredentialMethod method;
     private String data, secret;
-    private boolean enabled;
+    private boolean enabled, temporary;
     @ManyToOne(fetch = FetchType.LAZY) @Setter(AccessLevel.NONE) @JsonBackReference @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
 
     public CredentialEntity(@NotNull UserEntity user)

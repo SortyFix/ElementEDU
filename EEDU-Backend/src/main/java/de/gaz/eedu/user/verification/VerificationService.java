@@ -31,6 +31,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -47,9 +48,9 @@ import java.util.*;
  * @author ivo
  */
 @Service
-public class VerificationService {
-    @Value("${jwt.secret}")
-    private String secret;
+public class VerificationService
+{
+    @Value("${jwt.secret}") private String secret;
 
     /**
      * Generates a login JWT token for a user based on their user model and login model.
@@ -67,7 +68,8 @@ public class VerificationService {
      * @throws IllegalStateException    when there is an issue in JWT generation related to key generation or
      *                                  compacting the token
      */
-    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel loginModel) {
+    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel loginModel)
+    {
         boolean advanced = loginModel instanceof AdvancedUserLoginModel;
         Instant expiry = getExpiry(loginModel);
 
@@ -76,8 +78,17 @@ public class VerificationService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }*/
 
-        if (user.getCredentials().isEmpty()) {
-            return credentialRequired(user.getId(), expiry, advanced, CredentialMethod.TOTP, CredentialMethod.PASSWORD, CredentialMethod.EMAIL);
+
+        if (user.getCredentials().isEmpty())
+        {
+            return credentialRequired(
+                    user.getId(),
+                    null,
+                    expiry,
+                    advanced,
+                    CredentialMethod.TOTP,
+                    CredentialMethod.PASSWORD,
+                    CredentialMethod.EMAIL);
         }
 
         return credentialToken(user.getId(), expiry, advanced, getMethods(user));
@@ -93,19 +104,25 @@ public class VerificationService {
      * @return an array of distinct enabled two-factor methods
      * @throws NullPointerException if `user` is null or if `user.twoFactor()` returns null
      */
-    private @NotNull CredentialMethod @NotNull [] getMethods(@NotNull UserEntity user) {
-        return user.getCredentials()
-                .stream()
-                .filter(CredentialEntity::isEnabled)
-                .map(CredentialEntity::getMethod)
-                .toArray(CredentialMethod[]::new);
+    private @NotNull CredentialMethod @NotNull [] getMethods(@NotNull UserEntity user)
+    {
+        Collection<CredentialEntity> credentialEntities = user.getCredentials().stream().filter(CredentialEntity::isEnabled).toList();
+        if (credentialEntities.stream().allMatch(CredentialEntity::isTemporary))
+        {
+            return credentialEntities.stream().map(CredentialEntity::getMethod).toArray(CredentialMethod[]::new);
+        }
+        return credentialEntities.stream().filter(credentialEntity -> !credentialEntity.isTemporary()).map(
+                CredentialEntity::getMethod).toArray(CredentialMethod[]::new);
     }
 
-    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType) {
+    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
+    {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Set<JwtTokenType> tokenTypes = Set.of(jwtTokenType);
-        return authentication.getAuthorities().stream().anyMatch(verification -> {
-            if (verification instanceof VerificationAuthority verificationAuthority) {
+        return authentication.getAuthorities().stream().anyMatch(verification ->
+        {
+            if (verification instanceof VerificationAuthority verificationAuthority)
+            {
                 return tokenTypes.contains(verificationAuthority.jwtTokenType());
             }
             return false;
@@ -130,15 +147,13 @@ public class VerificationService {
      * @throws IllegalStateException    if there is an issue with JWT generation related to key generation or
      *                                  compacting the token
      */
-    public @NotNull String credentialToken(long userID, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod) {
+    public @NotNull String credentialToken(long userID, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod)
+    {
         KeyType keyType = getKeyType(credentialMethod);
 
-        ClaimHolder<?>[] holders = {
-                new ClaimHolder<>("userID", userID),
-                new ClaimHolder<>("expiry", expiry.toEpochMilli()),
-                new ClaimHolder<>("advanced", advanced),
-                keyType.method()
-        };
+        ClaimHolder<?>[] holders = {new ClaimHolder<>("userID", userID), new ClaimHolder<>(
+                "expiry",
+                expiry.toEpochMilli()), new ClaimHolder<>("advanced", advanced), keyType.method()};
 
         return generateKey(keyType.type(), getExpiry(Duration.ofMinutes(5)), holders);
     }
@@ -157,28 +172,35 @@ public class VerificationService {
      * Note that the user can still decide themselves what {@link CredentialMethod} they set up.
      *
      * @param userID           id of the user.
+     * @param temporary        TODO
      * @param expiry           when the login token should expire after the two-factor has been set up.
      * @param advanced         whether this token should have advanced user rights.
      * @param credentialMethod TODO
      * @return the token which the user then can use to create and enable a {@link CredentialMethod}.
      */
-    public @NotNull String credentialRequired(long userID, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod) {
+    public @NotNull String credentialRequired(long userID, @Nullable Long temporary, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod)
+    {
         Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
 
-        ClaimHolder<?>[] holders = {
-                new ClaimHolder<>("userID", userID),
+        ClaimHolder<?> temporaryIdClaim = null;
+        if (temporary != null)
+        {
+            temporaryIdClaim = new ClaimHolder<>("temporaryId", temporary);
+        }
+
+        ClaimHolder<?>[] claimHolders = Stream.of(new ClaimHolder<>("userID", userID),
                 new ClaimHolder<>("expiry", expiry.toEpochMilli()),
                 new ClaimHolder<>("advanced", advanced),
-                new ClaimHolder<>("available", credentialMethod) //TODO every which weren't setup yet
-        };
+                new ClaimHolder<>("available", credentialMethod),
+                temporaryIdClaim).filter(Objects::nonNull).toArray(ClaimHolder<?>[]::new);
 
-        // force creation when only one is available
         JwtTokenType jwtTokenType = JwtTokenType.CREDENTIAL_REQUIRED;
-        if (credentialMethod.length == 1) {
+        if(credentialMethod.length == 1)
+        {
             jwtTokenType = JwtTokenType.CREDENTIAL_CREATION_PENDING;
         }
 
-        return generateKey(jwtTokenType, time, holders);
+        return generateKey(jwtTokenType, time, claimHolders);
     }
 
     /**
@@ -193,13 +215,15 @@ public class VerificationService {
      * @throws NullPointerException     if `twoFactorMethod` is null or if `twoFactorMethod` has null elements
      * @throws IllegalArgumentException if `twoFactorMethod` is empty
      */
-    private @NotNull VerificationService.KeyType getKeyType(@NotNull CredentialMethod @NotNull [] credentialMethod) {
+    private @NotNull VerificationService.KeyType getKeyType(@NotNull CredentialMethod @NotNull [] credentialMethod)
+    {
         boolean single = credentialMethod.length == 1;
 
         ClaimHolder<?> method = new ClaimHolder<>("available", credentialMethod);
         JwtTokenType type = JwtTokenType.CREDENTIAL_SELECTION;
 
-        if (single) {
+        if (single)
+        {
             method = new ClaimHolder<>("available", credentialMethod); // keep array format (singleton)
             type = JwtTokenType.CREDENTIAL_PENDING;
         }
@@ -219,9 +243,11 @@ public class VerificationService {
      * @throws NullPointerException     if user is null, or expiry is null
      * @throws IllegalArgumentException if user's ID is invalid
      */
-    public @NotNull String authorizeToken(long userID, @NotNull Instant expiry, boolean advanced) {
+    public @NotNull String authorizeToken(long userID, @NotNull Instant expiry, boolean advanced)
+    {
         JwtTokenType jwtTokenType = JwtTokenType.AUTHORIZED;
-        if (advanced) {
+        if (advanced)
+        {
             jwtTokenType = JwtTokenType.ADVANCED_AUTHORIZATION;
         }
         return generateKey(jwtTokenType, expiry, new ClaimHolder<>("userID", userID));
@@ -238,9 +264,11 @@ public class VerificationService {
      * @return the instant indicating when the login session expires
      * @throws NullPointerException if loginModel is null
      */
-    private @NotNull Instant getExpiry(@NotNull LoginModel loginModel) {
+    private @NotNull Instant getExpiry(@NotNull LoginModel loginModel)
+    {
         TemporalAmount temporalAmount = Duration.ofDays(1);
-        if (loginModel instanceof UserLoginModel userLoginModel && userLoginModel.keepLoggedIn()) {
+        if (loginModel instanceof UserLoginModel userLoginModel && userLoginModel.keepLoggedIn())
+        {
             temporalAmount = Period.ofDays(14);
         }
 
@@ -259,7 +287,8 @@ public class VerificationService {
      * @throws DateTimeException    if temporalAmount exceeds the capacity of Instant (something like 292 million
      *                              years lol)
      */
-    private @NotNull Instant getExpiry(@NotNull TemporalAmount temporalAmount) {
+    private @NotNull Instant getExpiry(@NotNull TemporalAmount temporalAmount)
+    {
         return Instant.now().atZone(ZoneId.systemDefault()).plus(temporalAmount).toInstant();
     }
 
@@ -277,7 +306,8 @@ public class VerificationService {
      * @throws IllegalArgumentException if JwtTokenType name does not comply with JWT subject rules
      * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
      */
-    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull ClaimHolder<?>... claims) {
+    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull ClaimHolder<?>... claims)
+    {
         return generateKey(jwtTokenType.name(), expiry, claims);
     }
 
@@ -296,17 +326,13 @@ public class VerificationService {
      * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
      * @throws IllegalArgumentException if provided subject does not comply with JWT subject rules
      */
-    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires, @NotNull ClaimHolder<?>... claims) {
+    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires, @NotNull ClaimHolder<?>... claims)
+    {
         Map<String, Object> jwtClaims = new HashMap<>();
         Arrays.stream(claims).forEach(claim -> jwtClaims.put(claim.key(), claim.content()));
 
-        return Jwts.builder()
-                .subject(subject)
-                .claims(jwtClaims)
-                .expiration(Date.from(expires))
-                .issuedAt(new Date())
-                .signWith(getKey())
-                .compact();
+        return Jwts.builder().subject(subject).claims(jwtClaims).expiration(Date.from(expires)).issuedAt(new Date()).signWith(
+                getKey()).compact();
     }
 
     /**
@@ -328,7 +354,8 @@ public class VerificationService {
      * @throws IllegalArgumentException if JWT token's compact value is null or empty, JWT claims string is null or
      *                                  empty, JWT claims map is empty, or any required claim is missing
      */
-    public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException {
+    public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
+    {
         Claims tokenContent = Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
         long userID = tokenContent.get("userID", Long.class);
         JwtTokenType jwtTokenType = JwtTokenType.valueOf(tokenContent.getSubject());
@@ -358,14 +385,17 @@ public class VerificationService {
      * @return an unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
      * @throws IllegalStateException if the jwtTokenType does not match any case in the switch statement
      */
-    @Unmodifiable
-    @NotNull
-    private Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID) {
-        return switch (jwtTokenType) {
-            case ADVANCED_AUTHORIZATION, AUTHORIZED -> {
+    @Unmodifiable @NotNull
+    private Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
+    {
+        return switch (jwtTokenType)
+        {
+            case ADVANCED_AUTHORIZATION, AUTHORIZED ->
+            {
                 Collection<GrantedAuthority> authorities = new HashSet<>(authorityFactory.get(userID));
                 authorities.add(JwtTokenType.AUTHORIZED.getAuthority());
-                if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION)) {
+                if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION))
+                {
                     authorities.add(JwtTokenType.ADVANCED_AUTHORIZATION.getAuthority());
                 }
                 yield authorities;
@@ -389,8 +419,39 @@ public class VerificationService {
      *                                  converted to bytes.
      * @throws IllegalArgumentException if 'secret' string value is null or empty.
      */
-    private @NotNull SecretKey getKey() {
+    private @NotNull SecretKey getKey()
+    {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public @NotNull String selectCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    {
+        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
+        return credentialToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
+    }
+
+    public @NotNull String requestSetupCredential(@Nullable Long temporary, @NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    {
+        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
+        long userID = claimDecoder.userID;
+        return credentialRequired(userID, temporary, claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
+    }
+
+    private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims)
+    {
+        if (!((List<String>) claims.get("available")).contains(credentialMethod))
+        {
+            throw new InvalidTokenException();
+        }
+
+        return ClaimDecoder.decode(claims);
+    }
+
+    @Transactional public @Nullable String authorize(@NotNull Claims claims)
+    {
+        ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
+
+        return authorizeToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced());
     }
 
     /**
@@ -405,8 +466,8 @@ public class VerificationService {
      * @param content the content of the claim.
      * @param <T>     the type of the content.
      */
-    private record ClaimHolder<T>(@NotNull String key, @NotNull T content) {
-    }
+    private record ClaimHolder<T>(@NotNull String key, @NotNull T content)
+    {}
 
     /**
      * A private record class that represents a particular JWT token type and its associated claim holder method.
@@ -419,38 +480,8 @@ public class VerificationService {
      * @param method A particular method for holding a claim holder. It is wrapped in a ClaimHolder generic class.
      * @param type   An enumerated type representing the type of JWT token.
      */
-    private record KeyType(ClaimHolder<?> method, JwtTokenType type) {
-    }
-
-    public @NotNull String selectCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims) {
-        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
-        return credentialToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
-    }
-
-    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims) {
-        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
-        long userID = claimDecoder.userID;
-        return credentialRequired(userID, claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
-    }
-
-    private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims) {
-        if (!((List<String>) claims.get("available")).contains(credentialMethod)) {
-            throw new InvalidTokenException();
-        }
-
-        return ClaimDecoder.decode(claims);
-    }
-
-    @Transactional
-    public @Nullable String authorize(long userID, @NotNull Claims claims) {
-        ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
-
-        if (claimDecoder.userID() != userID) {
-            return null;
-        }
-
-        return authorizeToken(userID, claimDecoder.expiry(), claimDecoder.advanced());
-    }
+    private record KeyType(ClaimHolder<?> method, JwtTokenType type)
+    {}
 
     /**
      * A decoder for JWT tokens.
@@ -467,16 +498,20 @@ public class VerificationService {
      * @param expiry   the expiry of the token, or the token created with the current token.
      * @param advanced if the token has advanced access to user management areas.
      */
-    private record ClaimDecoder(long userID, @NotNull Instant expiry, boolean advanced) {
-        private static @NotNull ClaimDecoder decode(@NotNull Claims claims) throws InvalidTokenException {
+    private record ClaimDecoder(long userID, @NotNull Instant expiry, boolean advanced)
+    {
+        private static @NotNull ClaimDecoder decode(@NotNull Claims claims) throws InvalidTokenException
+        {
             long userID = verify(claims.get("userID", Long.class));
             Instant expiry = Instant.ofEpochMilli(verify(claims.get("expiry", Long.class)));
             boolean advanced = verify(claims.get("advanced", Boolean.class));
             return new ClaimDecoder(userID, expiry, advanced);
         }
 
-        private static <T> @NotNull T verify(@Nullable T value) throws InvalidTokenException {
-            if (value == null) {
+        private static <T> @NotNull T verify(@Nullable T value) throws InvalidTokenException
+        {
+            if (value == null)
+            {
                 throw new InvalidTokenException();
             }
             return value;

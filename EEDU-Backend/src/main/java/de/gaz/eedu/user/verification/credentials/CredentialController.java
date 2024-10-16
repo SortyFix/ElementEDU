@@ -57,7 +57,7 @@ import java.util.Optional;
     public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute Claims claims)
     {
         VerificationService verificationService = getEntityService().getUserService().getVerificationService();
-        return ResponseEntity.ok(verificationService.requestSetupCredential(method, claims));
+        return ResponseEntity.ok(verificationService.requestSetupCredential(null, method, claims));
     }
 
     @PostMapping("/create")
