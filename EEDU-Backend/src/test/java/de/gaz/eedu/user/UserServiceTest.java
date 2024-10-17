@@ -71,7 +71,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT);
+        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, null); // can be null
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
             Assertions.assertEquals(expect.firstName(), result.firstName());
