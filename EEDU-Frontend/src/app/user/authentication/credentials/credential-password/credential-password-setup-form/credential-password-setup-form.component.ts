@@ -8,6 +8,7 @@ import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {CredentialMethod} from "../../../login-data/credential-method";
+import {NgIf} from "@angular/common";
 
 @Component({
     selector: 'app-credential-password-setup-form',
@@ -22,7 +23,8 @@ import {CredentialMethod} from "../../../login-data/credential-method";
         MatDialogClose,
         MatButton,
         MatError,
-        MatSuffix
+        MatSuffix,
+        NgIf
     ],
     templateUrl: './credential-password-setup-form.component.html',
     styleUrl: './credential-password-setup-form.component.scss'

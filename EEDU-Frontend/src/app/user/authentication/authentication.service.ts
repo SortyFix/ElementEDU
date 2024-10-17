@@ -106,7 +106,7 @@ export class AuthenticationService {
         }
 
         let url: string = `http://localhost:8080/user/login/credentials/select/${credential}`;
-        if (this.loginData.setupCredential) {
+        if (this.loginData.credentialRequired) {
             url = `http://localhost:8080/user/login/credentials/create/select/${credential}`;
         }
 

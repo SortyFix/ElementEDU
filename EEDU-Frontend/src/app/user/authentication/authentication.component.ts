@@ -120,7 +120,7 @@ export class Authentication {
 
         const credential: CredentialMethod = this.authService.loginData.credential;
 
-        if (this.authService.loginData.setupCredential) {
+        if (this.authService.loginData.credentialRequired) {
             return this.setupComponent(credential);
         }
 

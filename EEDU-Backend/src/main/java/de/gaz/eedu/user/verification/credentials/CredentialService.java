@@ -107,13 +107,20 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
         long userID = claims.get("userID", Long.class);
         return credentialEntity ->
         {
-            boolean valid = !credentialEntity.isEnabled() && method.isEnablingRequired();
-            if (valid && credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
+            if(method.isEnablingRequired() && credentialEntity.isEnabled())
+            {
+                return false;
+            }
+
+            if (credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
             {
                 deleteTemporary(method, claims, credentialEntity, userID);
 
-                credentialEntity.setEnabled(true);
-                save(credentialEntity);
+                if(!credentialEntity.isEnabled())
+                {
+                    credentialEntity.setEnabled(true);
+                    save(credentialEntity);
+                }
                 return true;
             }
 

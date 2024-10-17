@@ -51,8 +51,13 @@ export class LoginData {
         return this.decodedToken.available[0];
     }
 
-    public get setupCredential(): boolean
+    public get credentialRequired(): boolean
     {
         return this.decodedToken.sub == 'CREDENTIAL_REQUIRED' || this.decodedToken.sub == 'CREDENTIAL_CREATION_PENDING';
+    }
+
+    public get credentialTemporary(): boolean
+    {
+        return this.decodedToken && 'temporaryId' in this.decodedToken;
     }
 }
