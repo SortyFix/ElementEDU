@@ -10,6 +10,7 @@ import {MatIcon} from "@angular/material/icon";
 import {AbstractLoginForm} from "../abstract-login-form";
 import {LoginRequest} from "../login-data/login-request";
 import {AuthenticationService} from "../authentication.service";
+import {FormTitleComponent} from "../common/form-title/form-title.component";
 
 @Component({
     selector: 'app-login-name-form',
@@ -27,7 +28,8 @@ import {AuthenticationService} from "../authentication.service";
         FormsModule,
         NgIf,
         MatIcon,
-        MatSuffix
+        MatSuffix,
+        FormTitleComponent
     ],
     templateUrl: './login-name-form.component.html',
     styleUrl: './login-name-form.component.scss',

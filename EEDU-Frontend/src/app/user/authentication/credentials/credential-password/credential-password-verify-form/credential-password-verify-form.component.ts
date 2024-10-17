@@ -7,9 +7,12 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {AbstractCredentialCode} from "../../abstract-credential-code";
 import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-code";
+import {FormTitleComponent} from "../../../common/form-title/form-title.component";
+import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
 
 @Component({
-    selector: 'app-credential-password-verify-form', standalone: true, imports: [
+    selector: 'app-credential-password-verify-form', standalone: true,
+    imports: [
         MatFormField,
         MatIcon,
         MatInput,
@@ -20,7 +23,9 @@ import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-cod
         MatLabel,
         MatSuffix,
         MatIconButton,
-        MatError
+        MatError,
+        FormTitleComponent,
+        FooterButtonsComponent,
     ], templateUrl: './credential-password-verify-form.component.html', styleUrl: './credential-password-verify-form.component.scss'
 })
 export class CredentialPasswordVerifyFormComponent extends AbstractCredentialVerifyCode

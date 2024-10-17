@@ -5,6 +5,8 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-code";
+import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
+import {FormTitleComponent} from "../../../common/form-title/form-title.component";
 
 @Component({
     selector: 'app-credential-totp-verify-form',
@@ -17,7 +19,9 @@ import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-cod
         MatInput,
         MatLabel,
         ReactiveFormsModule,
-        MatError
+        MatError,
+        FooterButtonsComponent,
+        FormTitleComponent,
     ],
     templateUrl: './credential-totp-verify-form.component.html',
     styleUrl: './credential-totp-verify-form.component.scss'

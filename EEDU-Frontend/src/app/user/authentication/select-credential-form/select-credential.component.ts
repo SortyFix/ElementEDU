@@ -9,6 +9,7 @@ import {FormsModule} from "@angular/forms";
 import {MatIcon} from "@angular/material/icon";
 import {AuthenticationService} from "../authentication.service";
 import {LoginData} from "../login-data/login-data";
+import {FormTitleComponent} from "../common/form-title/form-title.component";
 
 @Component({
   selector: 'app-select-credential',
@@ -24,7 +25,8 @@ import {LoginData} from "../login-data/login-data";
         CdkMenuItem,
         MatDivider,
         FormsModule,
-        MatIcon
+        MatIcon,
+        FormTitleComponent
     ],
   templateUrl: './select-credential.component.html',
   styleUrl: './select-credential.component.scss'

@@ -12,6 +12,8 @@ import {MatInput} from "@angular/material/input";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
 import {QRCodeModule} from "angularx-qrcode";
+import {FormTitleComponent} from "../../../common/form-title/form-title.component";
+import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
 
 @Component({
   selector: 'app-credential-totp-setup-form',
@@ -27,7 +29,9 @@ import {QRCodeModule} from "angularx-qrcode";
         MatProgressBar,
         NgIf,
         QRCodeModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        FormTitleComponent,
+        FooterButtonsComponent,
     ],
   templateUrl: './credential-totp-setup-form.component.html',
   styleUrl: './credential-totp-setup-form.component.scss'
