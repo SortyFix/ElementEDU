@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -79,8 +80,8 @@ import java.util.function.Function;
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 
-    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @GetMapping("/logout")
-    public void logout(@AuthenticationPrincipal long userId, @NotNull HttpServletResponse response)
+    @PermitAll@GetMapping("/logout")
+    public void logout(@AuthenticationPrincipal @Nullable Long userId, @NotNull HttpServletResponse response)
     {
         Cookie cookie = new Cookie("token", null);
         cookie.setPath("/");
@@ -89,7 +90,12 @@ import java.util.function.Function;
         cookie.setHttpOnly(true);
         cookie.setSecure(!development);
         response.addCookie(cookie);
-        
+
+        if(Objects.isNull(userId))
+        {
+            log.info("An unidentified user has been logged out, likely due to token expiration.");
+            return;
+        }
         log.info("User {} has been logged out.", userId);
     }
 
@@ -107,8 +113,6 @@ import java.util.function.Function;
 
         return requestLogin(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
-
-
 
     private @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
