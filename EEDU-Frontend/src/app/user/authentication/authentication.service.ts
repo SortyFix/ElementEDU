@@ -65,8 +65,8 @@ export class AuthenticationService {
             throw new Error();
         }
 
-        const createModel: { method: CredentialMethod, data: string | undefined } = {
-            method: credential, data: additionalData
+        const createModel: { method: CredentialMethod, temporary: boolean, data: string | undefined } = {
+            method: credential, temporary: true, data: additionalData
         }
 
         const url: string = "http://localhost:8080/user/login/credentials/create";

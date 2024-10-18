@@ -11,30 +11,42 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-
 @Getter(AccessLevel.PROTECTED)
-public class CredentialServiceTest extends ServiceTest<CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel> {
+public class CredentialServiceTest extends ServiceTest<CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel>
+{
 
-    @Autowired
-    private CredentialService service;
+    @Autowired private CredentialService service;
 
-    @Override
-    protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval() {
-        CredentialCreateModel twoFactorCreateModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, "");
-        CredentialModel credentialModel = new CredentialModel(1L, CredentialMethod.TOTP, false);
+    @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
+    {
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, false, "");
+        CredentialModel credentialModel = new CredentialModel(1055L, CredentialMethod.TOTP, false);
 
-        return Eval.eval(twoFactorCreateModel, credentialModel, ((request, expect, result) -> {
+        return Eval.eval(createModel, credentialModel, ((request, expect, result) ->
+        {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.method(), result.method());
             Assertions.assertFalse(result.enabled());
         }));
     }
 
-    @Override
-    protected @NotNull CredentialCreateModel occupiedCreateModel() {
+    @Test public void successCreateTemporary()
+    {
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.PASSWORD, true, "Development123!");
+        CredentialModel credentialModel = new CredentialModel(962L, CredentialMethod.PASSWORD, true);
+        test(Eval.eval(createModel, credentialModel, ((request, expect, result) ->
+        {
+            Assertions.assertEquals(expect.id(), result.id());
+            Assertions.assertEquals(expect.method(), result.method());
+            Assertions.assertEquals(expect.enabled(), result.enabled());
+        })), getService()::create);
+    }
+
+    @Override protected @NotNull CredentialCreateModel occupiedCreateModel()
+    {
         // do nothing
         throw new OccupiedException();
     }

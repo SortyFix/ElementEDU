@@ -42,7 +42,13 @@ import java.util.stream.Stream;
  * @see GroupEntity
  * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") @Slf4j
+@Entity
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Table(name = "user_entity")
+@Slf4j
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
@@ -59,9 +65,10 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     private Set<CredentialEntity> credentials = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
     private ThemeEntity themeEntity;
-    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
-    @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
-    @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
+    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(
+            name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id")
+    ) @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
@@ -77,7 +84,13 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public UserModel toModel()
     {
-        return new UserModel(getId(), getFirstName(), getLastName(), getLoginName(), getStatus(), getThemeEntity().toModel());
+        return new UserModel(
+                getId(),
+                getFirstName(),
+                getLastName(),
+                getLoginName(),
+                getStatus(),
+                getThemeEntity().toModel());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
@@ -159,8 +172,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         // Filter already attached groups out
-        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream()
-                .noneMatch(presentGroup -> Objects.equals(presentGroup, requestedGroup));
+        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream().noneMatch(presentGroup -> Objects.equals(
+                presentGroup,
+                requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
 
@@ -267,8 +281,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     public boolean hasAnyAuthority(@NotNull Collection<String> authorities)
     {
-        Set<String> loadedAuthorities = getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+        Set<String> loadedAuthorities = getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return authorities.stream().anyMatch(loadedAuthorities::contains);
     }
 
@@ -278,17 +291,18 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return credentials.stream().filter(entity -> entity.getMethod().equals(credentialMethod)).collect(Collectors.toUnmodifiableSet());
     }
 
-    @Transactional public boolean initCredential(@NotNull UserService userService, @NotNull CredentialEntity credentialEntity)
+    @Transactional
+    public boolean initCredential(@NotNull UserService userService, @NotNull CredentialEntity credentialEntity)
     {
         return saveEntityIfPredicateTrue(userService, credentialEntity, this::initCredential);
     }
 
     public boolean initCredential(@NotNull CredentialEntity credentialEntity)
     {
-        /*if (this.getCredentials().stream().anyMatch(entity -> entity.getMethod().equals(credentialEntity.getMethod())))
+        if (getCredentials().stream().anyMatch(credential -> credential.getId().equals(credentialEntity.getId())))
         {
-            return false; // should not be possible anyway. TODO discuss if remove (performance wisely)
-        }*/
+            return false;
+        }
 
         return this.credentials.add(credentialEntity);
     }
@@ -362,7 +376,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public boolean deleteManagedRelations()
     {
-        if(this.groups.isEmpty())
+        if (this.groups.isEmpty())
         {
             return false;
         }
@@ -388,9 +402,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return Objects.hash(getId());
     }
 
-    private <T> boolean saveEntityIfPredicateTrue(
-            @NotNull UserService userService,
-            @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

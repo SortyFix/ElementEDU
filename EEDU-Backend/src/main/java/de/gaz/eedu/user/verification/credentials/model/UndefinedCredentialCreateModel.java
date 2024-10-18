@@ -6,14 +6,14 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record UndefinedCredentialCreateModel(@NotNull CredentialMethod method,
+public record UndefinedCredentialCreateModel(@NotNull CredentialMethod method, boolean temporary,
                                              @Nullable String data) implements CreationModel<CredentialEntity>
 {
     @Override public @NotNull CredentialEntity toEntity(@NotNull CredentialEntity entity)
     {
         entity.setEnabled(false);
-        entity.setData(data);
-        entity.setMethod(method);
+        entity.setData(data());
+        entity.setMethod(method());
         return entity;
     }
 }

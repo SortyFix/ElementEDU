@@ -83,11 +83,9 @@ public class DataLoader implements CommandLineRunner
     private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, randomPassword);
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, true, randomPassword);
 
-        CredentialEntity credentialEntity = getCredentialService().createEntity(credential);
-        credentialEntity.setTemporary(true); // make the password subject to change
-        getCredentialService().save(credentialEntity);
+        getCredentialService().createEntity(credential);
     }
 
     private @NotNull PrivilegeEntity createDefaultPrivilege()

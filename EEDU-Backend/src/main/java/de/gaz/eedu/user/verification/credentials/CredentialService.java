@@ -2,6 +2,7 @@ package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.verification.credentials.implementations.Credential;
@@ -56,12 +57,12 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     public @NotNull CredentialEntity createEntity(@NotNull CredentialCreateModel model) throws CreationException
     {
         UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
-        CredentialEntity credentialEntity = model.toEntity(new CredentialEntity(userEntity));
-        credentialEntity.getMethod().getCredential().creation(credentialEntity);
 
+        CredentialEntity credentialEntity = model.toEntity(new CredentialEntity(model.temporary(), userEntity));
+
+        credentialEntity.getMethod().getCredential().creation(credentialEntity);
         validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
 
-        getRepository().save(credentialEntity);
         getUserService().save(userEntity);
 
         return credentialEntity;
@@ -107,7 +108,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
         long userID = claims.get("userID", Long.class);
         return credentialEntity ->
         {
-            if(method.isEnablingRequired() && credentialEntity.isEnabled())
+            if (method.isEnablingRequired() && credentialEntity.isEnabled())
             {
                 return false;
             }
@@ -116,7 +117,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
             {
                 deleteTemporary(method, claims, credentialEntity, userID);
 
-                if(!credentialEntity.isEnabled())
+                if (!credentialEntity.isEnabled())
                 {
                     credentialEntity.setEnabled(true);
                     save(credentialEntity);
