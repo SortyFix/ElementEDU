@@ -1,21 +1,29 @@
 import {Component} from '@angular/core';
 import {AbstractCredentialForm} from "../../abstract-credential-form";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {
+    AbstractControl,
+    FormBuilder,
+    ReactiveFormsModule,
+    ValidationErrors,
+    ValidatorFn,
+    Validators
+} from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
-import {MatError, MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {CredentialMethod} from "../../../login-data/credential-method";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
 import {FormTitleComponent} from "../../../common/form-title/form-title.component";
+import {MatList, MatListItem} from "@angular/material/list";
 
 @Component({
     selector: 'app-credential-password-setup-form',
     standalone: true,
-    imports: [MatFormField, MatIcon, MatLabel, MatInput, ReactiveFormsModule, MatIconButton, MatDialogClose, MatButton, MatError, MatSuffix, NgIf, FooterButtonsComponent, FormTitleComponent,],
+    imports: [MatFormField, MatIcon, MatLabel, MatHint, MatInput, ReactiveFormsModule, MatIconButton, MatDialogClose, MatButton, MatError, MatSuffix, NgIf, FooterButtonsComponent, FormTitleComponent, MatList, MatListItem, NgForOf,],
     templateUrl: './credential-password-setup-form.component.html',
     styleUrl: './credential-password-setup-form.component.scss'
 })
@@ -27,11 +35,13 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
 
     constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
-            password: ['', [Validators.required]], repeatPassword: ['', [Validators.required]]
+            password: ['', [Validators.required, passwordValidator()]], repeatPassword: ['', [Validators.required]]
         }), authenticationService);
+
         this.registerField('password');
         this.registerField('repeatPassword');
     }
+
 
     protected toggleVisibility(field: 'password' | 'repeatPassword'): void {
         this._passwordVisibility[field] = !this._passwordVisibility[field];
@@ -72,4 +82,43 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
 
         return super.errorMessage(status);
     }
+}
+
+export function passwordValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const password: string = control.value;
+        if (!password) {
+            return null;
+        }
+
+        const passwordRequirements = {
+            length: password.length >= 6,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]/.test(password)
+        };
+
+        const errorMessages: Record<string, string> = {
+            length: 'Password must be at least 6 characters long',
+            lowercase: 'Password must contain at least one lowercase letter',
+            uppercase: 'Password must contain at least one uppercase letter',
+            number: 'Password must contain at least one number',
+            special: 'Password must contain at least one special character'
+        };
+
+        const errors: ValidationErrors = {};
+
+        Object.keys(passwordRequirements).forEach((key: string): void => {
+            if (!passwordRequirements[key as keyof typeof passwordRequirements]) {
+                errors[key] = errorMessages[key];
+            }
+        });
+
+        if (Object.keys(errors).length === 0) {
+            return null;
+        }
+
+        return errors;
+    };
 }
