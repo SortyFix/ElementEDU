@@ -35,8 +35,10 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
 
     @Test public void successCreateTemporary()
     {
-        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.PASSWORD, true, "Development123!");
-        CredentialModel credentialModel = new CredentialModel(962L, CredentialMethod.PASSWORD, true);
+        CredentialMethod passwordMethod = CredentialMethod.PASSWORD;
+
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, passwordMethod, true, "Development123!");
+        CredentialModel credentialModel = new CredentialModel(962L, passwordMethod, true);
         test(Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
