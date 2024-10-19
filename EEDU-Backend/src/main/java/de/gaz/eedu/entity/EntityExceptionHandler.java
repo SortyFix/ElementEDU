@@ -9,6 +9,31 @@ import java.util.function.Supplier;
 public class EntityExceptionHandler
 {
 
+    protected void catchException(@NotNull Runnable runnable, @NotNull RuntimeException runtimeException)
+    {
+        catchException(runnable, Throwable.class, runtimeException);
+    }
+
+    protected void catchException(@NotNull Runnable runnable, @NotNull Class<? extends Throwable> expected, @NotNull RuntimeException runtimeException)
+    {
+        catchException(runnable, expected, () -> runtimeException);
+    }
+
+    protected void catchException(@NotNull Runnable runnable, @NotNull Class<? extends Throwable> expected, @NotNull Supplier<RuntimeException> runtimeException)
+    {
+        try
+        {
+            runnable.run();
+        }
+        catch (Throwable exception)
+        {
+            if (expected.isAssignableFrom(exception.getClass()))
+            {
+                throw runtimeException.get();
+            }
+        }
+    }
+
     protected void validate(boolean condition)
     {
         validate(condition, new IllegalStateException());
@@ -21,7 +46,7 @@ public class EntityExceptionHandler
 
     protected void validate(boolean condition, @NotNull Supplier<? extends RuntimeException> exception)
     {
-        if(!condition)
+        if (!condition)
         {
             throw exception.get();
         }

@@ -19,7 +19,7 @@ import java.util.Objects;
 @Setter
 public class CredentialEntity implements EntityObject, EntityModelRelation<CredentialModel>
 {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
+    @Id @Setter(AccessLevel.NONE) private Long id;
     @Enumerated private CredentialMethod method;
     private String data, secret;
     private boolean enabled;

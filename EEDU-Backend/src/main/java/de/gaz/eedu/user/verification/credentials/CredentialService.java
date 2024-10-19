@@ -60,6 +60,11 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
 
         CredentialEntity credentialEntity = model.toEntity(new CredentialEntity(model.temporary(), userEntity));
 
+        if(getRepository().existsById(credentialEntity.getId()))
+        {
+            throw new OccupiedException();
+        }
+
         credentialEntity.getMethod().getCredential().creation(credentialEntity);
         validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
 

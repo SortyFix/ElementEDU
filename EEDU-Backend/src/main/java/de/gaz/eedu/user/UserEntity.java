@@ -299,11 +299,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     public boolean initCredential(@NotNull CredentialEntity credentialEntity)
     {
-        if (getCredentials().stream().anyMatch(credential -> credential.getId().equals(credentialEntity.getId())))
-        {
-            return false;
-        }
-
         return this.credentials.add(credentialEntity);
     }
 
