@@ -5,7 +5,6 @@ import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
-import {AbstractCredentialCode} from "../../abstract-credential-code";
 import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-code";
 import {FormTitleComponent} from "../../../common/form-title/form-title.component";
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
@@ -32,9 +31,8 @@ export class CredentialPasswordVerifyFormComponent extends AbstractCredentialVer
 {
     private _showPassword: boolean = false;
 
-    protected onShowPassword(event: MouseEvent)
+    protected onShowPassword(): void
     {
-        event.stopPropagation()
         this._showPassword = !this._showPassword;
     }
 
