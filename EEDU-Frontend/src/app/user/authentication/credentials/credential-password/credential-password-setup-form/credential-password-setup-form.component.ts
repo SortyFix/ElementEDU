@@ -15,54 +15,38 @@ import {FormTitleComponent} from "../../../common/form-title/form-title.componen
 @Component({
     selector: 'app-credential-password-setup-form',
     standalone: true,
-    imports: [
-        MatFormField,
-        MatIcon,
-        MatLabel,
-        MatInput,
-        ReactiveFormsModule,
-        MatIconButton,
-        MatDialogClose,
-        MatButton,
-        MatError,
-        MatSuffix,
-        NgIf,
-        FooterButtonsComponent,
-        FormTitleComponent,
-    ],
+    imports: [MatFormField, MatIcon, MatLabel, MatInput, ReactiveFormsModule, MatIconButton, MatDialogClose, MatButton, MatError, MatSuffix, NgIf, FooterButtonsComponent, FormTitleComponent,],
     templateUrl: './credential-password-setup-form.component.html',
     styleUrl: './credential-password-setup-form.component.scss'
 })
 export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm {
 
-    private _showPassword: boolean = false;
-    private _showRepeatPassword: boolean = false;
+    private _passwordVisibility: { password: boolean, repeatPassword: boolean } = {
+        password: false, repeatPassword: false
+    };
 
     constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
-            password: ['', [Validators.required]],
-            repeatPassword: ['', [Validators.required]]
+            password: ['', [Validators.required]], repeatPassword: ['', [Validators.required]]
         }), authenticationService);
         this.registerField('password');
         this.registerField('repeatPassword');
     }
 
-    protected onShowPassword(event: MouseEvent) {
-        event.stopPropagation()
-        this._showPassword = !this._showPassword;
+    protected toggleVisibility(field: 'password' | 'repeatPassword'): void {
+        this._passwordVisibility[field] = !this._passwordVisibility[field];
     }
 
-    protected get showPassword(): boolean {
-        return this._showPassword;
+    protected isVisible(field: 'password' | 'repeatPassword'): boolean {
+        return this._passwordVisibility[field];
     }
 
-    protected onShowRepeatPassword(event: MouseEvent) {
-        event.stopPropagation()
-        this._showRepeatPassword = !this._showRepeatPassword;
+    protected inputType(field: 'password' | 'repeatPassword'): 'text' | 'password' {
+        return this.isVisible(field) ? 'text' : 'password';
     }
 
-    protected get showRepeatPassword(): boolean {
-        return this._showRepeatPassword;
+    protected icon(field: 'password' | 'repeatPassword'): 'visibility' | 'visibility_off' {
+        return this.isVisible(field) ? 'visibility' : 'visibility_off';
     }
 
     protected onSubmit(): void {
@@ -82,8 +66,7 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
 
 
     protected override errorMessage(status: number): string {
-        if(status === 406)
-        {
+        if (status === 406) {
             return "This password does not match the requirements."
         }
 
