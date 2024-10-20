@@ -9,6 +9,7 @@ import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Objects;
 
@@ -23,24 +24,34 @@ public class CredentialEntity implements EntityObject, EntityModelRelation<Crede
     @Enumerated private CredentialMethod method;
     private String data, secret;
     private boolean enabled;
-    @Setter(AccessLevel.NONE) private boolean temporary; // once temporary, always temporary!
     @ManyToOne(fetch = FetchType.LAZY) @Setter(AccessLevel.NONE) @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false) private UserEntity user;
 
-    public CredentialEntity(boolean temporary, @NotNull UserEntity user)
+    public CredentialEntity(@NotNull CredentialMethod credentialMethod, boolean temporary, @NotNull UserEntity user)
     {
         this.user = user;
-        this.temporary = temporary;
-        if(temporary)
+        this.method = credentialMethod;
+        if (temporary)
         {
-            this.id = (long) Objects.hash(method, user.getId());
+            this.id = temporaryId(credentialMethod, getUser().getId());
             return;
         }
         this.id = (long) Objects.hash(user.getCredentials().size(), user);
     }
 
+    @Contract(pure = true)
+    private static long temporaryId(@NotNull CredentialMethod method, long userId)
+    {
+        return Objects.hash(method, userId);
+    }
+
     @Override public CredentialModel toModel()
     {
         return new CredentialModel(getId(), getMethod(), isEnabled());
+    }
+
+    public boolean isTemporary()
+    {
+        return Objects.equals(this.getId(), temporaryId(getMethod(), getUser().getId()));
     }
 }

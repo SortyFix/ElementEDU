@@ -81,20 +81,20 @@ VALUES ('READ'),
        ('DUMMY');
 
 /* 0 = PASSWORD, 1 = EMAIL, 2 = SMS, 3 = TOTP */
-INSERT INTO credential_entity(id, method, data, secret, enabled, temporary, user_id)
-VALUES (992, 0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', '', true, false, 1),
-       (993, 1, 'mustermann@example.com', '', true, false, 1),
+INSERT INTO credential_entity(id, method, data, secret, enabled, user_id)
+VALUES (992, 0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', '', true, 1),
+       (993, 1, 'mustermann@example.com', '', true, 1),
 
-       (1023, 0, '$2y$10$4urnpOegHUXoQaQakLcKP.iNZxrGeaKhS.55FlAI1eJqkLeGqF.iO', '', true, false, 2),
-       (1024, 1, 'mustermann@example.com', '', false, false, 2),
-       (1025, 2, '555 5555555', '', true, false, 2),
+       (1023, 0, '$2y$10$4urnpOegHUXoQaQakLcKP.iNZxrGeaKhS.55FlAI1eJqkLeGqF.iO', '', true, 2),
+       (1024, 1, 'mustermann@example.com', '', false, 2),
+       (1025, 2, '555 5555555', '', true, 2),
 
-       (1054, 0, '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', '', true, false, 3),
-       (1055, 1, 'mustermann@examle.com', '', true, false, 3),
-       (1056, 2, '555 5555555', '', true, false, 3),
-       (1057, 3, NULL, '', false, false, 3),
+       (1054, 0, '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', '', true, 3),
+       (1055, 1, 'mustermann@examle.com', '', true, 3),
+       (1056, 2, '555 5555555', '', true, 3),
+       (1057, 3, NULL, '', false, 3),
 
-       (1088, 3, NULL, '', true, false, 4);
+       (1088, 3, NULL, '', true, 4);
 
 --- Courses
 INSERT INTO subject_entity(name)

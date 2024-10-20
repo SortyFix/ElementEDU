@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS credential_entity
     id      BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT       NOT NULL,
     enabled BIT          NOT NULL,
-    temporary BIT        NOT NULL,
     data    VARCHAR(255) NULL,
     method  TINYINT      NULL,
     secret  VARCHAR(255) NULL,
