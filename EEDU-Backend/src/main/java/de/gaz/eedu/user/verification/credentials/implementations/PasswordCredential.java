@@ -26,11 +26,7 @@ public class PasswordCredential implements Credential
             throw new InsecurePasswordException();
         }
 
-        Set<CredentialEntity> passwords = credentialEntity.getUser().getCredentials(CredentialMethod.PASSWORD);
-        if(passwords.stream().anyMatch(credential -> verify(credential, password) && credential.isEnabled()))
-        {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        prohibitDuplication(credentialEntity);
 
         credentialEntity.setEnabled(true); // no enabling required.
         credentialEntity.setData(getPasswordEncoder().encode(password));
@@ -40,5 +36,24 @@ public class PasswordCredential implements Credential
     public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String password)
     {
         return getPasswordEncoder().matches(password, credentialEntity.getData());
+    }
+
+    /**
+     * This method prohibits duplicated passwords
+     * <p>
+     * This method iterates over the passwords from the specified user and validates each of them.
+     * If one of the password returns {@code true} when running {@link #verify(CredentialEntity, String)} a
+     * {@link ResponseStatusException} will get thrown.
+     *
+     * @param credential the credential which contains the data of the newly registered password.
+     * @throws ResponseStatusException when a similar password has been found within the users passwords.
+     */
+    private void prohibitDuplication(@NotNull CredentialEntity credential) throws ResponseStatusException
+    {
+        Set<CredentialEntity> passwords = credential.getUser().getCredentials(CredentialMethod.PASSWORD);
+        if(passwords.stream().anyMatch(current -> verify(current, credential.getData()) && current.isEnabled()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
