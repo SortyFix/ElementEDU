@@ -50,6 +50,11 @@ public class CredentialEntity implements EntityObject, EntityModelRelation<Crede
         return new CredentialModel(getId(), getMethod(), isEnabled());
     }
 
+    @Override public boolean deleteManagedRelations()
+    {
+        return getUser().disableCredential(getId());
+    }
+
     public boolean isTemporary()
     {
         return Objects.equals(this.getId(), temporaryId(getMethod(), getUser().getId()));

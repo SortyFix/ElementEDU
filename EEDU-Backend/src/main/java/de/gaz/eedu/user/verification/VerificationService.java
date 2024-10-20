@@ -81,11 +81,10 @@ public class VerificationService
 
         if (user.getCredentials().isEmpty())
         {
-            return credentialRequired(
-                    user.getId(),
-                    null,
+            return credentialRequired(user.getId(),
                     expiry,
                     advanced,
+                    new ClaimHolder<?>[0],
                     CredentialMethod.TOTP,
                     CredentialMethod.PASSWORD,
                     CredentialMethod.EMAIL);
@@ -151,8 +150,7 @@ public class VerificationService
     {
         KeyType keyType = getKeyType(credentialMethod);
 
-        ClaimHolder<?>[] holders = {new ClaimHolder<>("userID", userID), new ClaimHolder<>(
-                "expiry",
+        ClaimHolder<?>[] holders = {new ClaimHolder<>("userID", userID), new ClaimHolder<>("expiry",
                 expiry.toEpochMilli()), new ClaimHolder<>("advanced", advanced), keyType.method()};
 
         return generateKey(keyType.type(), getExpiry(Duration.ofMinutes(5)), holders);
@@ -172,30 +170,23 @@ public class VerificationService
      * Note that the user can still decide themselves what {@link CredentialMethod} they set up.
      *
      * @param userID           id of the user.
-     * @param temporary        TODO
      * @param expiry           when the login token should expire after the two-factor has been set up.
      * @param advanced         whether this token should have advanced user rights.
      * @param credentialMethod TODO
      * @return the token which the user then can use to create and enable a {@link CredentialMethod}.
      */
-    public @NotNull String credentialRequired(long userID, @Nullable Long temporary, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod)
+    public @NotNull String credentialRequired(long userID, @NotNull Instant expiry, boolean advanced, @NotNull ClaimHolder<?>[] additionalClaims, @NotNull CredentialMethod @NotNull ... credentialMethod)
     {
         Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
 
-        ClaimHolder<?> temporaryIdClaim = null;
-        if (temporary != null)
-        {
-            temporaryIdClaim = new ClaimHolder<>("temporaryId", temporary);
-        }
-
-        ClaimHolder<?>[] claimHolders = Stream.of(new ClaimHolder<>("userID", userID),
-                new ClaimHolder<>("expiry", expiry.toEpochMilli()),
-                new ClaimHolder<>("advanced", advanced),
-                new ClaimHolder<>("available", credentialMethod),
-                temporaryIdClaim).filter(Objects::nonNull).toArray(ClaimHolder<?>[]::new);
+        ClaimHolder<?>[] claimHolders = Stream.concat(Stream.of(new ClaimHolder<>("userID", userID),
+                        new ClaimHolder<>("expiry", expiry.toEpochMilli()),
+                        new ClaimHolder<>("advanced", advanced),
+                        new ClaimHolder<>("available", credentialMethod)),
+                Stream.of(additionalClaims)).toArray(ClaimHolder<?>[]::new);
 
         JwtTokenType jwtTokenType = JwtTokenType.CREDENTIAL_REQUIRED;
-        if(credentialMethod.length == 1)
+        if (credentialMethod.length == 1)
         {
             jwtTokenType = JwtTokenType.CREDENTIAL_CREATION_PENDING;
         }
@@ -430,11 +421,11 @@ public class VerificationService
         return credentialToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
     }
 
-    public @NotNull String requestSetupCredential(@Nullable Long temporary, @NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims, @NotNull ClaimHolder<?>... additionalClaims)
     {
         ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
         long userID = claimDecoder.userID;
-        return credentialRequired(userID, temporary, claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
+        return credentialRequired(userID, claimDecoder.expiry(), claimDecoder.advanced(), additionalClaims, credentialMethod);
     }
 
     private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims)
@@ -453,21 +444,6 @@ public class VerificationService
 
         return authorizeToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced());
     }
-
-    /**
-     * A private record class that helps with creating claims.
-     * <p>
-     * This private record is a helper class for creating Claims. These claims are saved in a
-     * {@link Map} wit the types String and Object.
-     * With this class multiple objects can be added to such a list as key and value are both included within this
-     * object.
-     *
-     * @param key     the key of the claim.
-     * @param content the content of the claim.
-     * @param <T>     the type of the content.
-     */
-    private record ClaimHolder<T>(@NotNull String key, @NotNull T content)
-    {}
 
     /**
      * A private record class that represents a particular JWT token type and its associated claim holder method.

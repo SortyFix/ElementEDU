@@ -6,7 +6,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Set;
 
 @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class PasswordCredential implements Credential
@@ -20,6 +24,12 @@ public class PasswordCredential implements Credential
         if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
         {
             throw new InsecurePasswordException();
+        }
+
+        Set<CredentialEntity> passwords = credentialEntity.getUser().getCredentials(CredentialMethod.PASSWORD);
+        if(passwords.stream().anyMatch(credential -> verify(credential, password) && credential.isEnabled()))
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         credentialEntity.setEnabled(true); // no enabling required.

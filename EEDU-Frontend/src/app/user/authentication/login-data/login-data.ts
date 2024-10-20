@@ -58,6 +58,6 @@ export class LoginData {
 
     public get credentialTemporary(): boolean
     {
-        return this.decodedToken && 'temporaryId' in this.decodedToken;
+        return this.decodedToken && 'temporary' in this.decodedToken;
     }
 }

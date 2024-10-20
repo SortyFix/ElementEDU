@@ -57,12 +57,12 @@ import java.util.Optional;
     public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute Claims claims)
     {
         VerificationService verificationService = getEntityService().getUserService().getVerificationService();
-        return ResponseEntity.ok(verificationService.requestSetupCredential(null, method, claims));
+        return ResponseEntity.ok(verificationService.requestSetupCredential(method, claims));
     }
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @NotNull@RequestAttribute("claims") Claims claims, @NotNull HttpServletResponse response)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
     {
         CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));

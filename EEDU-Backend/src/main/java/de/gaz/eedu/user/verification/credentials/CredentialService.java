@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.ClaimHolder;
 import de.gaz.eedu.user.verification.credentials.implementations.Credential;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -33,19 +35,27 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     @Getter(AccessLevel.NONE) private final CredentialRepository credentialRepository;
     private final UserService userService;
 
-    private static void deleteTemporary(@NotNull CredentialMethod method, @NotNull Claims claims, @NotNull CredentialEntity credentialEntity, long userID)
+    private static void deleteTemporary(@NotNull UserEntity user, long credentialId)
     {
-        if (!claims.containsKey("temporaryId"))
+        if (user.disableCredential(credentialId))
         {
+            String infoMessage = "User {} has enabled a new credential. The temporary credential {} has been pruned.";
+            log.info(infoMessage, user.getId(), credentialId);
             return;
         }
+        String warnMessage = "User {} has obtained a temporary authentication token, but lacks the associated temporary credentials.";
+        log.warn(warnMessage, user.getId());
+    }
 
-        long credentialId = claims.get("temporaryId", Long.class);
-        if (credentialEntity.getUser().disableCredential(credentialId))
+    private static @NotNull Optional<Long> getTemporary(@NotNull CredentialEntity credentialEntity, @NotNull Claims claims)
+    {
+        if (claims.containsKey("temporary"))
         {
-            String errorMessage = "User {} has enabled a new credential of the type {}. The temporary credential {} has been pruned.";
-            log.info(errorMessage, userID, method, credentialId);
+            long userId = credentialEntity.getUser().getId();
+            long id = Objects.hash(CredentialMethod.valueOf(claims.get("temporary", String.class)), userId);
+            return Optional.of(id);
         }
+        return Optional.empty();
     }
 
     @Override public @NotNull CredentialRepository getRepository()
@@ -61,7 +71,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
         CredentialEntity entity = new CredentialEntity(model.method(), model.temporary(), userEntity);
         CredentialEntity credentialEntity = model.toEntity(entity);
 
-        if(getRepository().existsById(credentialEntity.getId()))
+        if (getRepository().existsById(credentialEntity.getId()))
         {
             throw new OccupiedException();
         }
@@ -94,7 +104,8 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
         {
             if (entity.isTemporary())
             {
-                return getUserService().getVerificationService().requestSetupCredential(entity.getId(), method, claims);
+                ClaimHolder<?> temporary = new ClaimHolder<>("temporary", entity.getMethod());
+                return getUserService().getVerificationService().requestSetupCredential(method, claims, temporary);
             }
 
             return getUserService().getVerificationService().authorize(claims);
@@ -111,22 +122,21 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     @Transactional
     protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
     {
-        long userID = claims.get("userID", Long.class);
-        return credentialEntity ->
+        return credential ->
         {
-            if (method.isEnablingRequired() && credentialEntity.isEnabled())
+            if (method.isEnablingRequired() && credential.isEnabled())
             {
                 return false;
             }
 
-            if (credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
+            if (credential.getMethod().getCredential().verify(credential, code))
             {
-                deleteTemporary(method, claims, credentialEntity, userID);
+                getTemporary(credential, claims).ifPresent(id -> deleteTemporary(credential.getUser(), id));
 
-                if (!credentialEntity.isEnabled())
+                if (!credential.isEnabled())
                 {
-                    credentialEntity.setEnabled(true);
-                    save(credentialEntity);
+                    credential.setEnabled(true);
+                    save(credential);
                 }
                 return true;
             }
