@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS course_entity
     repository_id BIGINT       NOT NULL,
     class_room_id BIGINT       NULL,
     FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
+    FOREIGN KEY (repository_id) REFERENCES file_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
@@ -175,7 +176,7 @@ CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     course_id  BIGINT         NOT NULL,
     time_stamp BIGINT         NOT NULL,
-    duration   DECIMAL(21, 0) NOT NULL,
+    duration   BIGINT         NOT NULL,
     period     VARBINARY(255) NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id)
 );
@@ -184,7 +185,8 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
     id                       BIGINT PRIMARY KEY,
     time_stamp               BIGINT         NOT NULL,
-    duration                 DECIMAL(21, 0) NOT NULL,
+    publish                  BIGINT         NOT NULL,
+    duration                 BIGINT         NOT NULL,
     description              VARCHAR(255),
     homework                 VARCHAR(255),
     submit_homework          BOOLEAN        NOT NULL,

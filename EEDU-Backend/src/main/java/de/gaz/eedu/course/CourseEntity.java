@@ -53,6 +53,10 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @ManyToOne @JoinColumn(name = "repository_id", referencedColumnName = "id", unique = true)
     private FileEntity repository;
 
+    public CourseEntity(@NotNull FileEntity repository)
+    {
+        this.repository = repository;
+    }
 
     @Override public CourseModel toModel()
     {

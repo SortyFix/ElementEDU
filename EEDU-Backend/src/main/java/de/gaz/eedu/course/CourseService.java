@@ -14,6 +14,9 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.exception.OccupiedException;
+import de.gaz.eedu.file.FileCreateModel;
+import de.gaz.eedu.file.FileEntity;
+import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -40,6 +43,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final UserRepository userRepository;
     private final ClassRoomRepository classRoomRepository;
     private final AppointmentEntryRepository appointmentEntryRepository;
+    private final FileService fileService;
 
     @Contract(pure = true, value = "_, _ -> new")
     private static @NotNull CreationFactory<AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
@@ -81,7 +85,11 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             throw new NameOccupiedException(model.name());
         }
 
-        return saveEntity(model.toEntity(new CourseEntity(), (entity) ->
+        // WHY DO I HAVE TO ADD AN AUTHOR AND A FILE NAME????????? YONAAAAAASSSSSSSSSSSS
+        FileCreateModel file = new FileCreateModel(1L, model.name(), new String[0], "", new String[0]);
+        FileEntity fileEntity = getFileService().createEntity(file);
+
+        return saveEntity(model.toEntity(new CourseEntity(fileEntity), (entity) ->
         {
             // attach users
             if(model.users().length > 0)
