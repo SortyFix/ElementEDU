@@ -33,12 +33,12 @@ public class ThemeController
      * @param name the name of the theme to set for the user
      * @return ThemeModel
      */
-    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PostMapping("/me/theme/set")
-    public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @RequestBody String name){
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PutMapping("/me/theme/set/{theme_id}")
+    public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @PathVariable Long theme_id){
         try
         {
             UserEntity userEntity = userService.loadEntityById(id).orElseThrow(IllegalArgumentException::new);
-            ThemeEntity loadedEntity = themeService.getRepository().findByName(name).orElseThrow(IllegalArgumentException::new);
+            ThemeEntity loadedEntity = themeService.getRepository().findById(theme_id).orElseThrow(IllegalArgumentException::new);
             userEntity.setThemeEntity(userService, loadedEntity);
             return ResponseEntity.ok(loadedEntity.toModel());
         }
@@ -69,7 +69,7 @@ public class ThemeController
      * Returns all themes in the database as SimpleThemeModels.
      * @return SimpleThemeModel
      */
-    @GetMapping("/me/theme/all") public ResponseEntity<SimpleThemeModel[]> getAllThemes()
+    @GetMapping("/theme/all") public ResponseEntity<SimpleThemeModel[]> getAllThemes()
     {
         return ResponseEntity.ok(themeRepository.findAll().stream()
                                                 .map(ThemeEntity::toSimpleModel).toArray(SimpleThemeModel[]::new));
