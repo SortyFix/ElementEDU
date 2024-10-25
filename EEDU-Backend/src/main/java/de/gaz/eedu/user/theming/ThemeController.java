@@ -29,8 +29,7 @@ public class ThemeController
     /**
      * Loads User Entity by given ID and sets its Theme Entity to the one that is holding the given name.
      * Returns the Theme Entity as a model.
-     * @param id ID of the theme to set
-     * @param name the name of the theme to set for the user
+     * @param theme_id ID of the theme to set
      * @return ThemeModel
      */
     @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PutMapping("/me/theme/set/{theme_id}")

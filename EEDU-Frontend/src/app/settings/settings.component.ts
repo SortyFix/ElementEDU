@@ -11,8 +11,6 @@ import {ThemeEntity} from "../theming/theme-entity";
 import {UserService} from "../user/user.service";
 import {MatButton} from "@angular/material/button";
 import {ThemeService} from "../theming/theme.service";
-import {LoginData} from "../user/authentication/login-data/login-data";
-import {Authentication} from "../user/authentication/authentication.component";
 
 @Component({
   selector: 'app-settings',
