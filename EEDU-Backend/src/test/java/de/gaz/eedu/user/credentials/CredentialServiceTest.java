@@ -28,13 +28,11 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
     @Override
     protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval() {
         CredentialCreateModel twoFactorCreateModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, "");
-        CredentialModel credentialModel = new CredentialModel(995L, CredentialMethod.TOTP, false, new HashMap<>());
+        CredentialModel credentialModel = new CredentialModel(995L, CredentialMethod.TOTP, false);
 
         return Eval.eval(twoFactorCreateModel, credentialModel, ((request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.method(), result.method());
-            Assertions.assertNotNull(result.claims());
-            Assertions.assertTrue(result.claims().containsKey("setup"));
             Assertions.assertFalse(result.enabled());
         }));
     }

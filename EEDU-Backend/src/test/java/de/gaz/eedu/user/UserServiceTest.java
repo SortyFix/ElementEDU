@@ -7,6 +7,7 @@ import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.theming.ThemeModel;
 import de.gaz.eedu.user.theming.ThemeService;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
@@ -71,7 +72,8 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT);
+        final ThemeModel themeModel = themeService.loadByIdSafe(1L);
+        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, themeModel);
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
             Assertions.assertEquals(expect.firstName(), result.firstName());
