@@ -56,16 +56,15 @@ export class SettingsComponent {
             this.setTheme(this.selectedTheme).subscribe(themeEntity => {
                 parsedUserData.theme = themeEntity;
                 localStorage.setItem("userData", JSON.stringify(parsedUserData));
+                location.reload();
             });
         }
     }
 
     public setTheme(themeId: bigint) {
-        const url: string = `http://localhost:8080/user/me/theme/set/${themeId}`;
-        console.log(document.cookie);
-        return this.http.put<ThemeEntity>(url, {
-            responseType: "text" as "json",
-            withCredentials: true,
+        const url: string = `http://localhost:8080/user/me/theme/set`;
+        return this.http.put<ThemeEntity>(url, themeId, {
+            withCredentials: true
         });
     }
 
@@ -79,6 +78,4 @@ export class SettingsComponent {
             map(themes => themes.map(theme => theme.name))
         );
     }
-
-    protected readonly name = name;
 }

@@ -7,4 +7,4 @@
         </mat-option>
     </mat-select>
 </mat-form-field> <br>
-<button mat-button style="color: white" (click)="saveSettings()">Save changes</button>
+<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>

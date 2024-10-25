@@ -32,8 +32,8 @@ public class ThemeController
      * @param theme_id ID of the theme to set
      * @return ThemeModel
      */
-    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PutMapping("/me/theme/set/{theme_id}")
-    public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @PathVariable Long theme_id){
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PutMapping("/me/theme/set")
+    public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @RequestBody Long theme_id){
         try
         {
             UserEntity userEntity = userService.loadEntityById(id).orElseThrow(IllegalArgumentException::new);

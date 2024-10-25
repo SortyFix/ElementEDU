@@ -12,14 +12,20 @@ import {UserService} from "../user/user.service";
 export class ThemeService {
     constructor(public userService: UserService) { }
 
+    public theme: any = this.userService.getUserData.theme;
+
+    ngOnInit(): void {
+        this.theme = this.userService.getUserData.theme;
+
+    }
+
     /**
      * Returns the background color from local storage as a string matching CSS syntax.
      * @returns {string} The background color as a 'rgb(r, g, b)' CSS argument.
      */
     public get getBackgroundColor(): string
     {
-        const theme: any = this.userService.getUserData.theme;
-        return `rgb(${theme.backgroundColor_r}, ${theme.backgroundColor_g}, ${theme.backgroundColor_b})`
+        return `rgb(${this.theme.backgroundColor_r}, ${this.theme.backgroundColor_g}, ${this.theme.backgroundColor_b})`
     }
 
     /**
@@ -28,8 +34,7 @@ export class ThemeService {
      */
     public get getWidgetColor(): string
     {
-        const theme: any = this.userService.getUserData.theme;
-        return `rgb(${theme.widgetColor_r}, ${theme.widgetColor_g}, ${theme.widgetColor_b})`
+        return `rgb(${this.theme.widgetColor_r}, ${this.theme.widgetColor_g}, ${this.theme.widgetColor_b})`
     }
 
     /**
@@ -51,9 +56,9 @@ export class ThemeService {
         const luminance: number = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b));
         if(title)
         {
-            return luminance > 220 ? 'darkblue' : 'rgb(220,220,220)';
+            return luminance > 200 ? 'darkblue' : 'rgb(220,220,220)';
         }
-        return luminance > 220 ? 'rgb(0,0,0)' : 'rgb(220,220,220)';
+        return luminance > 200 ? 'rgb(0,0,0)' : 'rgb(220,220,220)';
     }
 
     /**
@@ -65,18 +70,17 @@ export class ThemeService {
      */
     public getTextColor(type: 'background' | 'widget', isTitle: boolean): string
     {
-        const theme: any = this.userService.getUserData.theme;
         let r, g, b: number;
         switch (type) {
             case "background":
-                r = theme.backgroundColor_r;
-                g = theme.backgroundColor_g;
-                b = theme.backgroundColor_b;
+                r = this.theme.backgroundColor_r;
+                g = this.theme.backgroundColor_g;
+                b = this.theme.backgroundColor_b;
                 break;
             case "widget":
-                r = theme.widgetColor_r;
-                g = theme.widgetColor_g;
-                b = theme.widgetColor_b;
+                r = this.theme.widgetColor_r;
+                g = this.theme.widgetColor_g;
+                b = this.theme.widgetColor_b;
                 break;
         }
         return this.getTextColorByLuminance(r, g, b, isTitle);
