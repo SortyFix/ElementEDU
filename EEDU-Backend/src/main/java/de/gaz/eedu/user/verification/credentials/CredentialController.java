@@ -9,6 +9,7 @@ import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreateModel;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -144,7 +145,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     {
         return token.map(jwtToken ->
         {
-            if (!tokenData.advanced())
+            if (!tokenData.advanced()) //TODO do not send when not being logged in
             {
                 Cookie cookie = new Cookie("token", jwtToken);
                 cookie.setPath("/");
