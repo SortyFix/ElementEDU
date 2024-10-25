@@ -421,11 +421,11 @@ public class VerificationService
         return credentialToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
     }
 
-    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims, @NotNull ClaimHolder<?>... additionalClaims)
+    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull CredentialMethod[] credentialMethods, @NotNull Claims claims, @NotNull ClaimHolder<?>[] additionalClaims)
     {
         ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
         long userID = claimDecoder.userID;
-        return credentialRequired(userID, claimDecoder.expiry(), claimDecoder.advanced(), additionalClaims, credentialMethod);
+        return credentialRequired(userID, claimDecoder.expiry(), claimDecoder.advanced(), additionalClaims, credentialMethods);
     }
 
     private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims)

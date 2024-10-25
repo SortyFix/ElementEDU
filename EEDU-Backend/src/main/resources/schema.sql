@@ -51,12 +51,13 @@ CREATE TABLE IF NOT EXISTS privilege_entity
 -- The 'group_entity' table contains information about user groups. Each group can have a unique name and optionally require two-factor authentication.
 CREATE TABLE IF NOT EXISTS credential_entity
 (
-    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT       NOT NULL,
-    enabled BIT          NOT NULL,
-    data    VARCHAR(255) NULL,
-    method  TINYINT      NULL,
-    secret  VARCHAR(255) NULL,
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id        BIGINT       NOT NULL,
+    enabled        BIT          NOT NULL,
+    allowed_methods INT          NULL,
+    data           VARCHAR(255) NULL,
+    method         TINYINT      NULL,
+    secret         VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 

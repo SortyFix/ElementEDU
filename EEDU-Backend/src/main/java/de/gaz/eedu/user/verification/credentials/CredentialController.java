@@ -1,11 +1,13 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.verification.ClaimHolder;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
+import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreateModel;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
@@ -56,13 +58,22 @@ import java.util.Optional;
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
     public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute Claims claims)
     {
-        VerificationService verificationService = getEntityService().getUserService().getVerificationService();
-        return ResponseEntity.ok(verificationService.requestSetupCredential(method, claims));
+        CredentialMethod[] methods = {method};
+        VerificationService service = getEntityService().getUserService().getVerificationService();
+        return ResponseEntity.ok(service.requestSetupCredential(method, methods, claims, new ClaimHolder[0]));
     }
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    {
+        CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
+        return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
+    }
+
+    @PostMapping("/create/temporary")
+    @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody TemporaryCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
     {
         CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));

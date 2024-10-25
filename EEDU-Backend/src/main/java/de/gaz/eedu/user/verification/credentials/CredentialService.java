@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -104,8 +105,9 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
         {
             if (entity.isTemporary())
             {
-                ClaimHolder<?> temporary = new ClaimHolder<>("temporary", entity.getMethod());
-                return getUserService().getVerificationService().requestSetupCredential(method, claims, temporary);
+                ClaimHolder<?>[] temporary = {new ClaimHolder<>("temporary", entity.getMethod())};
+                System.out.println(Arrays.toString(entity.allowedMethods()));
+                return getUserService().getVerificationService().requestSetupCredential(method, entity.allowedMethods(), claims, temporary);
             }
 
             return getUserService().getVerificationService().authorize(claims);

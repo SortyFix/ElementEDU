@@ -13,7 +13,6 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
-import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
@@ -83,7 +82,8 @@ public class DataLoader implements CommandLineRunner
     private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, true, randomPassword);
+        int bitMask = CredentialMethod.bitMask(CredentialMethod.PASSWORD, CredentialMethod.TOTP);
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
 
         getCredentialService().createEntity(credential);
     }

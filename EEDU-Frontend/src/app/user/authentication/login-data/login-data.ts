@@ -4,7 +4,6 @@ import {jwtDecode, JwtPayload} from "jwt-decode";
 export class LoginData {
 
     private readonly _loginName: string;
-    private readonly _availableCredentials: CredentialMethod[];
     private _token: string;
     private _decodedToken: JwtPayload & { available: CredentialMethod[] };
 
@@ -13,7 +12,6 @@ export class LoginData {
         this._loginName = loginName;
         this._token = token;
         this._decodedToken = jwtDecode(token);
-        this._availableCredentials = this._decodedToken.available;
     }
 
     public get loginName(): string
@@ -23,7 +21,7 @@ export class LoginData {
 
     public get availableCredentials(): CredentialMethod[]
     {
-        return this._availableCredentials;
+        return this.decodedToken?.available;
     }
 
     public get token(): string
