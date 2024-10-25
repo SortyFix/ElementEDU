@@ -32,3 +32,6 @@ build/
 
 # Gradle #
 .gradle/
+
+# operating system stuff
+.directory
