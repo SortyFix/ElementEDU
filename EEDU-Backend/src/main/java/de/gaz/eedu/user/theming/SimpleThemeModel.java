@@ -5,8 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record SimpleThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor_r, int backgroundColor_g, int backgroundColor_b,
-                               int widgetColor_r, int widgetColor_g, int widgetColor_b)
+public record SimpleThemeModel(@NotNull Long id, @NotNull String name)
 {
     @Contract(pure = true) @Override public String toString()
     {

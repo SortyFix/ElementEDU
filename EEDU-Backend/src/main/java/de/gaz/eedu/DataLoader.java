@@ -64,7 +64,7 @@ public class DataLoader implements CommandLineRunner
 
         PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
+        UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
         setPassword(userEntity, randomPassword);
         setEmail(userEntity);
 
@@ -106,10 +106,13 @@ public class DataLoader implements CommandLineRunner
         return getGroupService().createEntity(group);
     }
 
-    private @NotNull ThemeEntity createDefaultTheme()
+    private @NotNull ThemeEntity createDefaultThemes()
     {
-        ThemeCreateModel theme = new ThemeCreateModel("default", new short[]{5, 5, 5}, new short[]{10, 10, 10});
-        return getThemeService().createEntity(theme);
+        ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark", new short[]{5, 5, 5}, new short[]{10, 10, 10});
+        ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight", new short[]{255, 255, 255}, new short[]{220, 220, 220});
+        getThemeService().createEntity(defaultLight);
+        // Dark will be set as default
+        return getThemeService().createEntity(defaultDark);
     }
 
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)

@@ -30,4 +30,9 @@ import java.util.Set;
         return new ThemeModel(getId(), getName(), getBackgroundColor_r(), getBackgroundColor_g(), getBackgroundColor_b(),
                 getWidgetColor_r(), getWidgetColor_g(), getWidgetColor_b());
     }
+
+    @Contract(pure = true) public @NotNull SimpleThemeModel toSimpleModel()
+    {
+        return new SimpleThemeModel(getId(), getName());
+    }
 }

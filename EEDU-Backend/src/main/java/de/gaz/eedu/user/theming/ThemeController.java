@@ -25,6 +25,7 @@ public class ThemeController
     private final ThemeService themeService;
     @Getter(AccessLevel.PROTECTED)
     private final UserService userService;
+    private final ThemeRepository themeRepository;
 
     /**
      * Loads User Entity by given ID and sets its Theme Entity to the one that is holding the given name.
@@ -33,7 +34,8 @@ public class ThemeController
      * @param name the name of the theme to set for the user
      * @return ThemeModel
      */
-    @PermitAll @PostMapping("/me/theme/set") public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @RequestBody String name){
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PostMapping("/me/theme/set")
+    public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @RequestBody String name){
         try
         {
             UserEntity userEntity = userService.loadEntityById(id).orElseThrow(IllegalArgumentException::new);
@@ -52,7 +54,8 @@ public class ThemeController
      * @param id ID of the theme to output
      * @return ThemeModel
      */
-    @PermitAll @GetMapping("/me/theme/get") public ResponseEntity<ThemeModel> getTheme(@AuthenticationPrincipal Long id){
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')")
+    @GetMapping("/me/theme/get") public ResponseEntity<ThemeModel> getTheme(@AuthenticationPrincipal Long id){
         if(userService.loadEntityById(id).isPresent())
         {
             return ResponseEntity.ok(userService.loadEntityById(id).get().getThemeEntity().toModel());
@@ -64,12 +67,23 @@ public class ThemeController
     }
 
     /**
+     * Returns all themes in the database as SimpleThemeModels.
+     * @return SimpleThemeModel
+     */
+    @GetMapping("/me/theme/all") public ResponseEntity<SimpleThemeModel[]> getAllThemes()
+    {
+        return ResponseEntity.ok(themeRepository.findAll().stream()
+                                                .map(ThemeEntity::toSimpleModel).toArray(SimpleThemeModel[]::new));
+    }
+
+    /**
      * Create theme with given <code>ThemeEntity</code> data in request body.
      * Will throw a NameOccupiedException if name is already used by another Theme Entity.
      * @param themeCreateModel template of the theme to be created
      * @return ThemeEntity
      */
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create") public @NotNull ResponseEntity<ThemeEntity> createTheme(@NotNull @RequestBody ThemeCreateModel themeCreateModel)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create")
+    public @NotNull ResponseEntity<ThemeEntity> createTheme(@NotNull @RequestBody ThemeCreateModel themeCreateModel)
     {
         try
         {
@@ -82,7 +96,8 @@ public class ThemeController
     }
 
     // Possibly set for deletion.
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete")
+    public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
     {
         if(!themeService.delete(themeId))
         {
