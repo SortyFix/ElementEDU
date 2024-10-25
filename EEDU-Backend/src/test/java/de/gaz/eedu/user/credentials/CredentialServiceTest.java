@@ -24,7 +24,7 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
     @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
     {
         CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, null, "");
-        CredentialModel credentialModel = new CredentialModel(1055L, CredentialMethod.TOTP, false);
+        CredentialModel credentialModel = new CredentialModel(1086L, CredentialMethod.TOTP, false);
 
         return Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
@@ -42,7 +42,7 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
         TemporaryCredentialCreateModel temporaryCreateModel = new TemporaryCredentialCreateModel(passwordMethod,  "Development123!", allowed);
         CredentialCreateModel createModel = new CredentialCreateModel(1L, temporaryCreateModel);
 
-        CredentialModel credentialModel = new CredentialModel(962L, passwordMethod, true);
+        CredentialModel credentialModel = new CredentialModel(1858448519L, passwordMethod, true);
         test(Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
