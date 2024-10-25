@@ -3,7 +3,6 @@ package de.gaz.eedu.user.theming;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

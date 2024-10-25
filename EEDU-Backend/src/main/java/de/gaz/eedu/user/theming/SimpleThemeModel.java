@@ -11,14 +11,7 @@ public record SimpleThemeModel(@NotNull Long id, @NotNull String name)
     {
         return "SimpleThemeModel{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", backgroundColor_r=" + backgroundColor_r +
-                ", backgroundColor_g=" + backgroundColor_g +
-                ", backgroundColor_b=" + backgroundColor_b +
-                ", widgetColor_r=" + widgetColor_r +
-                ", widgetColor_g=" + widgetColor_g +
-                ", widgetColor_b=" + widgetColor_b +
-                '}';
+                ", name='" + name;
     }
 
     @Override public boolean equals(Object o)
