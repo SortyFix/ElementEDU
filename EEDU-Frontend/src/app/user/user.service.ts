@@ -3,12 +3,14 @@ import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
 import {ThemeEntity} from "../theming/theme-entity";
+import {environment} from "../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService
 {
+    private readonly BACKEND_URL: string = environment.backendUrl;
     private _loaded: boolean = false;
 
     constructor(private http: HttpClient)
@@ -61,7 +63,7 @@ export class UserService
             return of();
         }
 
-        const url = "http://localhost:8080/user/logout";
+        const url = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
             next: () => localStorage.removeItem("userData")
         }));
@@ -74,7 +76,7 @@ export class UserService
 
     private get fetchUserData(): Observable<UserEntity>
     {
-        const url: string = "http://localhost:8080/user/get";
+        const url: string = `${this.BACKEND_URL}/user/get`;
         return this.http.get<UserEntity>(url, {withCredentials: true});
     }
 

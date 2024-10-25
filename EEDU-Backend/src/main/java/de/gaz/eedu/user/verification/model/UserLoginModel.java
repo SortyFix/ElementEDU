@@ -10,7 +10,7 @@ public record UserLoginModel(@NotNull String loginName, @NotNull Boolean keepLog
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()
-    {  // Automatically generated using intellij
+    { // Automatically generated using intellij
         return "UserLoginModel{" +
                 "loginName='" + loginName + '\'' +
                 ", keepLoggedIn=" + keepLoggedIn +
@@ -18,7 +18,7 @@ public record UserLoginModel(@NotNull String loginName, @NotNull Boolean keepLog
     }
 
     @Override public boolean equals(Object o)
-    {  // Automatically generated using intellij
+    { // Automatically generated using intellij
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserLoginModel that = (UserLoginModel) o;
@@ -27,7 +27,7 @@ public record UserLoginModel(@NotNull String loginName, @NotNull Boolean keepLog
 
     @Override
     public int hashCode()
-    {  // Automatically generated using intellij
+    { // Automatically generated using intellij
         return Objects.hashCode(loginName);
     }
 }

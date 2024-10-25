@@ -7,6 +7,7 @@ import de.gaz.eedu.user.verification.credentials.CredentialService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
+import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
 
     @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
     {
-        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, false, "");
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, null, "");
         CredentialModel credentialModel = new CredentialModel(1055L, CredentialMethod.TOTP, false);
 
         return Eval.eval(createModel, credentialModel, ((request, expect, result) ->
@@ -36,8 +37,11 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
     @Test public void successCreateTemporary()
     {
         CredentialMethod passwordMethod = CredentialMethod.PASSWORD;
+        CredentialMethod[] allowed = {passwordMethod, CredentialMethod.EMAIL};
 
-        CredentialCreateModel createModel = new CredentialCreateModel(1L, passwordMethod, true, "Development123!");
+        TemporaryCredentialCreateModel temporaryCreateModel = new TemporaryCredentialCreateModel(passwordMethod,  "Development123!", allowed);
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, temporaryCreateModel);
+
         CredentialModel credentialModel = new CredentialModel(962L, passwordMethod, true);
         test(Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {

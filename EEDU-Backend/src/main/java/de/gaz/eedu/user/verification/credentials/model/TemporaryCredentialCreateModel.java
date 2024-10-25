@@ -4,7 +4,7 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record TemporaryCredentialCreateModel(long userId, @NotNull CredentialMethod method, @Nullable String data, @NotNull CredentialMethod... allowed)
+public record TemporaryCredentialCreateModel(@NotNull CredentialMethod method, @Nullable String data, @NotNull CredentialMethod... allowed)
 {
     public int bitMask()
     {

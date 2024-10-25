@@ -5,12 +5,13 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.verification.ClaimHolder;
+import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.TokenData;
+import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.credentials.implementations.Credential;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
-import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -35,29 +34,6 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
 {
     @Getter(AccessLevel.NONE) private final CredentialRepository credentialRepository;
     private final UserService userService;
-
-    private static void deleteTemporary(@NotNull UserEntity user, long credentialId)
-    {
-        if (user.disableCredential(credentialId))
-        {
-            String infoMessage = "User {} has enabled a new credential. The temporary credential {} has been pruned.";
-            log.info(infoMessage, user.getId(), credentialId);
-            return;
-        }
-        String warnMessage = "User {} has obtained a temporary authentication token, but lacks the associated temporary credentials.";
-        log.warn(warnMessage, user.getId());
-    }
-
-    private static @NotNull Optional<Long> getTemporary(@NotNull CredentialEntity credentialEntity, @NotNull Claims claims)
-    {
-        if (claims.containsKey("temporary"))
-        {
-            long userId = credentialEntity.getUser().getId();
-            long id = Objects.hash(CredentialMethod.valueOf(claims.get("temporary", String.class)), userId);
-            return Optional.of(id);
-        }
-        return Optional.empty();
-    }
 
     @Override public @NotNull CredentialRepository getRepository()
     {
@@ -86,43 +62,42 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     }
 
     @Transactional
-    public @NotNull Optional<String> verify(@NotNull CredentialMethod method, String code, @NotNull Claims claims)
+    public @NotNull Optional<String> verify(@NotNull CredentialMethod method, String code, @NotNull TokenData tokenData)
     {
-        long userID = claims.get("userID", Long.class);
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
-
+        UserEntity userEntity = getUserService().loadEntityByIDSafe(tokenData.userId());
         return userEntity.getCredentials(method).stream().filter(credentialEntity ->
         {
             Credential credential = credentialEntity.getMethod().getCredential();
             return credentialEntity.isEnabled() && credential.verify(credentialEntity, code);
-        }).findFirst().map(toToken(method, claims));
+        }).findFirst().map(toToken(tokenData));
     }
 
-    @Transactional @Contract(pure = true, value = "_, _ -> new")
-    protected @NotNull Function<CredentialEntity, String> toToken(@NotNull CredentialMethod method, @NotNull Claims claims)
+    @Transactional @Contract(pure = true, value = "_ -> new")
+    protected @NotNull Function<CredentialEntity, String> toToken(@NotNull TokenData tokenData)
     {
+        VerificationService verificationService = getUserService().getVerificationService();
         return (entity) ->
         {
+            tokenData.restrictClaim("expiry");
             if (entity.isTemporary())
             {
-                ClaimHolder<?>[] temporary = {new ClaimHolder<>("temporary", entity.getMethod())};
-                System.out.println(Arrays.toString(entity.allowedMethods()));
-                return getUserService().getVerificationService().requestSetupCredential(method, entity.allowedMethods(), claims, temporary);
+                JwtTokenType type = entity.allowedMethods().length == 1 ? JwtTokenType.CREDENTIAL_CREATION_PENDING : JwtTokenType.CREDENTIAL_REQUIRED;
+                return verificationService.credentialToken(type, tokenData, entity.allowedMethods());
             }
 
-            return getUserService().getVerificationService().authorize(claims);
+            return verificationService.authorizeToken(tokenData);
         };
     }
 
-    @Transactional public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
+    @Transactional
+    public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull TokenData tokenData)
     {
-        long userID = claims.get("userID", Long.class);
-        Predicate<CredentialEntity> beenEnabled = enabled(method, code, claims);
-        return getUserService().loadEntityByIDSafe(userID).getCredentials(method).stream().anyMatch(beenEnabled);
+        UserEntity user = getUserService().loadEntityByIDSafe(tokenData.userId());
+        return user.getCredentials(method).stream().anyMatch(enabled(method, code));
     }
 
     @Transactional
-    protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
+    protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code)
     {
         return credential ->
         {
@@ -133,8 +108,6 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
 
             if (credential.getMethod().getCredential().verify(credential, code))
             {
-                getTemporary(credential, claims).ifPresent(id -> deleteTemporary(credential.getUser(), id));
-
                 if (!credential.isEnabled())
                 {
                     credential.setEnabled(true);

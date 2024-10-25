@@ -2,7 +2,6 @@ package de.gaz.eedu.user.verification.credentials;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CredentialEntity implements EntityObject, EntityModelRelation<CredentialModel>
+public class CredentialEntity implements EntityModelRelation<CredentialModel>
 {
     @Id @Setter(AccessLevel.NONE) private Long id;
     @Enumerated private CredentialMethod method;

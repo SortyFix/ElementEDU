@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class GroupController extends EntityController<GroupService,
         return groupService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<GroupModel> create(@NotNull @RequestBody GroupCreateModel model)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<GroupModel> create(@NotNull @RequestBody GroupCreateModel model) throws CreationException
     {
         return super.create(model);
     }

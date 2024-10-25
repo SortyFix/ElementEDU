@@ -10,14 +10,14 @@ public record CredentialCreateModel(@NotNull Long userID, @NotNull CredentialMet
                                     @Nullable String data) implements CreationModel<CredentialEntity>
 {
 
-    public CredentialCreateModel(@NotNull Long userID, @NotNull UndefinedCredentialCreateModel model)
+    public CredentialCreateModel(long userId, @NotNull UndefinedCredentialCreateModel model)
     {
-        this(userID, model.method(), null, model.data());
+        this(userId, model.method(), null, model.data());
     }
 
-    public CredentialCreateModel(@NotNull Long userID, @NotNull TemporaryCredentialCreateModel model)
+    public CredentialCreateModel(long userId, @NotNull TemporaryCredentialCreateModel model)
     {
-        this(userID, model.method(), model.bitMask(), model.data());
+        this(userId, model.method(), model.bitMask(), model.data());
     }
 
     @Override public @NotNull CredentialEntity toEntity(@NotNull CredentialEntity entity)

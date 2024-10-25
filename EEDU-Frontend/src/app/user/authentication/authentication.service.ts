@@ -6,6 +6,7 @@ import {map, Observable, OperatorFunction, tap} from "rxjs";
 import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
 import {jwtDecode, JwtPayload} from "jwt-decode";
+import {environment} from "../../../environments/environment";
 
 /**
  * Service responsible for handling user authentication and credential management.
@@ -22,6 +23,8 @@ import {jwtDecode, JwtPayload} from "jwt-decode";
     providedIn: 'root'
 })
 export class AuthenticationService {
+
+    private readonly BACKEND_URL: string = environment.backendUrl;
 
     private _loginData: LoginData | undefined;
 
@@ -44,7 +47,7 @@ export class AuthenticationService {
      *                  the login name and authentication token upon successful login.
      */
     public requestAuthorization(data: LoginRequest, advanced: boolean = false): Observable<void> {
-        const url = "http://localhost:8080/user/login" + (advanced ? "/advanced" : "");
+        const url = `${this.BACKEND_URL}/user/login` + (advanced ? "/advanced" : "");
         // send credential in case of advanced login
         return this.http.post<string>(url, data, {
             responseType: "text" as "json", withCredentials: true
@@ -69,7 +72,7 @@ export class AuthenticationService {
             method: credential, temporary: false, data: additionalData
         }
 
-        const url: string = "http://localhost:8080/user/login/credentials/create";
+        const url: string = `${this.BACKEND_URL}/user/login/credentials/create`;
         return this.http.post<string>(url, createModel, {
             responseType: "text" as "json",
             withCredentials: true,
@@ -83,7 +86,7 @@ export class AuthenticationService {
             throw new Error();
         }
 
-        const url: string = `http://localhost:8080/user/login/credentials/enable/${this.loginData.credential?.toString()}`;
+        const url: string = `${this.BACKEND_URL}/user/login/credentials/enable/${this.loginData.credential?.toString()}`;
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             withCredentials: true,
@@ -105,9 +108,9 @@ export class AuthenticationService {
             throw new Error();
         }
 
-        let url: string = `http://localhost:8080/user/login/credentials/select/${credential}`;
+        let url: string = `${this.BACKEND_URL}/user/login/credentials/select/${credential}`;
         if (this.loginData.credentialRequired) {
-            url = `http://localhost:8080/user/login/credentials/create/select/${credential}`;
+            url = `${this.BACKEND_URL}/user/login/credentials/create/select/${credential}`;
         }
 
         return this.http.get<string>(url, {
@@ -118,7 +121,7 @@ export class AuthenticationService {
     }
 
     public verifyCredential(secret: string): Observable<string> {
-        const url = "http://localhost:8080/user/login/credentials/verify";
+        const url = `${this.BACKEND_URL}/user/login/credentials/verify`;
         return this.http.post<string>(url, secret, {
             responseType: "text" as "json",
             headers: {"Authorization": "Bearer " + this.loginData?.token},

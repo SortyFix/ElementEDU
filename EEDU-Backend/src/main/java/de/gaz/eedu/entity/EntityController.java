@@ -37,7 +37,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
      * @throws CreationException If there is a problem with creating the entity,
      *                           this exception will be thrown. It contains the HTTP status code for the error response.
      */
-    public @NotNull ResponseEntity<M> create(@NotNull C model)
+    public @NotNull ResponseEntity<M> create(@NotNull C model) throws CreationException
     {
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try

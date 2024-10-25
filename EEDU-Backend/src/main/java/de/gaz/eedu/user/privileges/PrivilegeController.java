@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
         return privilegeService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model) throws CreationException
     {
         return super.create(model);
     }

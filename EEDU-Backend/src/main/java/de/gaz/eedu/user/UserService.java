@@ -13,6 +13,8 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
 import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
+import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -50,7 +52,10 @@ import java.util.function.Function;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) @Slf4j
+@Service
+@AllArgsConstructor
+@Getter(AccessLevel.PROTECTED)
+@Slf4j
 public class UserService extends EntityService<UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
 {
     @Getter private final VerificationService verificationService;
@@ -64,7 +69,8 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override
+    public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
     {
         if (getRepository().existsByLoginName(model.loginName()))
         {
@@ -79,7 +85,8 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         }));
     }
 
-    @Transactional @Override public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override
+    public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -97,9 +104,18 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
 
     @Transactional public @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
     {
-        Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        Function<UserEntity, String> auth = user -> getVerificationService().requestLogin(user, loginModel);
-        return userOptional.filter(UserEntity::isAccountNonLocked).map(auth);
+        Optional<UserEntity> potentialUser = switch (loginModel)
+        {
+            case UserLoginModel userLoginModel -> getRepository().findByLoginName(userLoginModel.loginName());
+            case AdvancedUserLoginModel advancedUserLoginModel -> getRepository().findById(advancedUserLoginModel.id());
+            default -> Optional.empty();
+        };
+
+        return potentialUser.filter(UserEntity::isAccountNonLocked).map(user ->
+        {
+            VerificationService service = getVerificationService();
+            return service.requestLogin(user, loginModel);
+        });
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
@@ -109,8 +125,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
             Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
             AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
             return getVerificationService().validate(token, authorityFactory);
-        }
-        catch (ExpiredJwtException ignored)
+        } catch (ExpiredJwtException ignored)
         {
             log.warn("An incoming request has been received with an expired token.");
         }

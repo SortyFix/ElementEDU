@@ -3,6 +3,7 @@ package de.gaz.eedu.course;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class CourseController extends EntityController<CourseService, CourseMode
 
     @PostMapping("/create")
     @Override
-    public @NotNull ResponseEntity<CourseModel> create(@NotNull @RequestBody CourseCreateModel model)
+    public @NotNull ResponseEntity<CourseModel> create(@NotNull @RequestBody CourseCreateModel model) throws CreationException
     {
         return super.create(model);
     }

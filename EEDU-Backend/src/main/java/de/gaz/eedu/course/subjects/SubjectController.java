@@ -3,6 +3,7 @@ package de.gaz.eedu.course.subjects;
 import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")
     @Override
-    public @NotNull ResponseEntity<SubjectModel> create(@NotNull @RequestBody SubjectCreateModel model)
+    public @NotNull ResponseEntity<SubjectModel> create(@NotNull @RequestBody SubjectCreateModel model) throws CreationException
     {
         return super.create(model);
     }

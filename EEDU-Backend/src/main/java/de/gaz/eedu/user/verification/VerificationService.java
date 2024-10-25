@@ -3,19 +3,15 @@ package de.gaz.eedu.user.verification;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
-import de.gaz.eedu.user.verification.authority.InvalidTokenException;
 import de.gaz.eedu.user.verification.authority.VerificationAuthority;
-import de.gaz.eedu.user.verification.credentials.CredentialController;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
-import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,15 +19,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -60,37 +53,38 @@ public class VerificationService
      * In case where two-factor authentication is enabled, the `twoFactor` method is used to generate the token,
      * otherwise the `authorizeToken` method is used.
      *
-     * @param user       the user's account information
-     * @param loginModel the login credentials provided by the user
+     * @param user  the user's account information
+     * @param model the login credentials provided by the user
      * @return a JWT token in string format for the provided user
-     * @throws NullPointerException     if `user` or `loginModel` is null
+     * @throws NullPointerException     if `user` or `model` is null
      * @throws IllegalArgumentException if user's ID is not valid or `user.twoFactor()` returns invalid TwoFactorModels
      * @throws IllegalStateException    when there is an issue in JWT generation related to key generation or
      *                                  compacting the token
      */
-    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel loginModel)
+    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel model)
     {
-        boolean advanced = loginModel instanceof AdvancedUserLoginModel;
-        Instant expiry = getExpiry(loginModel);
-
 /*        if (user.getCredentials().isEmpty())
         {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }*/
 
+        Set<String> restricted = Collections.singleton("expiry");
+        ClaimHolder<Long> expiry = new ClaimHolder<>("expiry", getExpiry(model).toEpochMilli());
+        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry);
 
         if (user.getCredentials().isEmpty())
         {
-            return credentialRequired(user.getId(),
-                    expiry,
-                    advanced,
-                    new ClaimHolder<?>[0],
-                    CredentialMethod.TOTP,
-                    CredentialMethod.PASSWORD,
-                    CredentialMethod.EMAIL);
+            CredentialMethod[] methods = {CredentialMethod.PASSWORD};
+
+            //noinspection ConstantValue
+            JwtTokenType type = methods.length == 1 ? JwtTokenType.CREDENTIAL_CREATION_PENDING : JwtTokenType.CREDENTIAL_REQUIRED;
+            return credentialToken(type, tokenData, methods);
         }
 
-        return credentialToken(user.getId(), expiry, advanced, getMethods(user));
+        CredentialMethod[] methods = getMethods(user);
+
+        JwtTokenType type = methods.length == 1 ? JwtTokenType.CREDENTIAL_PENDING : JwtTokenType.CREDENTIAL_SELECTION;
+        return credentialToken(type, tokenData, methods);
     }
 
     /**
@@ -114,134 +108,25 @@ public class VerificationService
                 CredentialEntity::getMethod).toArray(CredentialMethod[]::new);
     }
 
-    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
+    public @NotNull String credentialToken(@NotNull JwtTokenType type, @NotNull TokenData tokenData, @NotNull CredentialMethod @NotNull ... credentialMethod)
     {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Set<JwtTokenType> tokenTypes = Set.of(jwtTokenType);
-        return authentication.getAuthorities().stream().anyMatch(verification ->
+        System.out.println(type);
+        switch (type)
         {
-            if (verification instanceof VerificationAuthority verificationAuthority)
+            case CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING, CREDENTIAL_SELECTION ->
             {
-                return tokenTypes.contains(verificationAuthority.jwtTokenType());
+                tokenData.addClaim(true, "available", credentialMethod);
+                return generateKey(type, getExpiry(Duration.ofMinutes(5)), tokenData);
             }
-            return false;
-        });
-    }
-
-    /**
-     * Generates a two-factor authentication JWT token for a user.
-     * <p>
-     * This method generates a JWT token for a user that is going through a two-factor authentication process. The
-     * token contains various claims such as user ID, expiry, whether it's an advanced token, and the two-factor
-     * method(s) that will be used. The type of JWT token varies based on the number of two-factor methods provided.
-     *
-     * @param userID           the user's ID
-     * @param expiry           the expiration time of the token
-     * @param advanced         a flag indicating whether it's an advanced token
-     * @param credentialMethod the method(s) used for two-factor authentication
-     * @return a JWT token in string format
-     * @throws NullPointerException     if `expiry` or `twoFactorMethod` is null or if `twoFactorMethod` has null
-     *                                  elements
-     * @throws IllegalArgumentException if `twoFactorMethod` is empty
-     * @throws IllegalStateException    if there is an issue with JWT generation related to key generation or
-     *                                  compacting the token
-     */
-    public @NotNull String credentialToken(long userID, @NotNull Instant expiry, boolean advanced, @NotNull CredentialMethod @NotNull ... credentialMethod)
-    {
-        KeyType keyType = getKeyType(credentialMethod);
-
-        ClaimHolder<?>[] holders = {new ClaimHolder<>("userID", userID), new ClaimHolder<>("expiry",
-                expiry.toEpochMilli()), new ClaimHolder<>("advanced", advanced), keyType.method()};
-
-        return generateKey(keyType.type(), getExpiry(Duration.ofMinutes(5)), holders);
-    }
-
-    /**
-     * Generates a token for the user to be able to set up two-factor.
-     * <p>
-     * This method generates a token for making a user able to set up two-factor. It is required when a group enforces
-     * two-factor on their members but this user does not have two-factor setup yet.
-     * <p>
-     * This token enables them to use:
-     * <ul>
-     *     <li>{@link CredentialController#create(CredentialCreateModel)}</li>
-     * </ul>
-     * <p>
-     * Note that the user can still decide themselves what {@link CredentialMethod} they set up.
-     *
-     * @param userID           id of the user.
-     * @param expiry           when the login token should expire after the two-factor has been set up.
-     * @param advanced         whether this token should have advanced user rights.
-     * @param credentialMethod TODO
-     * @return the token which the user then can use to create and enable a {@link CredentialMethod}.
-     */
-    public @NotNull String credentialRequired(long userID, @NotNull Instant expiry, boolean advanced, @NotNull ClaimHolder<?>[] additionalClaims, @NotNull CredentialMethod @NotNull ... credentialMethod)
-    {
-        Instant time = getExpiry(Duration.of(5, ChronoUnit.MINUTES));
-
-        ClaimHolder<?>[] claimHolders = Stream.concat(Stream.of(new ClaimHolder<>("userID", userID),
-                        new ClaimHolder<>("expiry", expiry.toEpochMilli()),
-                        new ClaimHolder<>("advanced", advanced),
-                        new ClaimHolder<>("available", credentialMethod)),
-                Stream.of(additionalClaims)).toArray(ClaimHolder<?>[]::new);
-
-        JwtTokenType jwtTokenType = JwtTokenType.CREDENTIAL_REQUIRED;
-        if (credentialMethod.length == 1)
-        {
-            jwtTokenType = JwtTokenType.CREDENTIAL_CREATION_PENDING;
+            default -> throw new IllegalArgumentException("Unsupported token type");
         }
-
-        return generateKey(jwtTokenType, time, claimHolders);
     }
 
-    /**
-     * Determines the key type used for two-factor authentication based on the given two-factor methods.
-     * <p>
-     * This method creates a KeyType instance that holds the respective JwtTokenType and the method(s) used for
-     * two-factor authentication. The JwtTokenType and method are determined based on the number of two-factor
-     * methods provided.
-     *
-     * @param credentialMethod the two-factor methods used for authentication
-     * @return a KeyType instance containing the JwtTokenType and the method(s) used for two-factor authentication
-     * @throws NullPointerException     if `twoFactorMethod` is null or if `twoFactorMethod` has null elements
-     * @throws IllegalArgumentException if `twoFactorMethod` is empty
-     */
-    private @NotNull VerificationService.KeyType getKeyType(@NotNull CredentialMethod @NotNull [] credentialMethod)
+    public @NotNull String authorizeToken(@NotNull TokenData tokenData)
     {
-        boolean single = credentialMethod.length == 1;
-
-        ClaimHolder<?> method = new ClaimHolder<>("available", credentialMethod);
-        JwtTokenType type = JwtTokenType.CREDENTIAL_SELECTION;
-
-        if (single)
-        {
-            method = new ClaimHolder<>("available", credentialMethod); // keep array format (singleton)
-            type = JwtTokenType.CREDENTIAL_PENDING;
-        }
-        return new KeyType(method, type);
-    }
-
-    /**
-     * Authorizes a user and provides an associated JWT token based on the user model and provided expiration instant.
-     * <p>
-     * The method authorizes the given UserModel and returns a JWT token string. The token type is set as AUTHORIZED
-     * or ADVANCED_AUTHORIZATION based on the 'advanced' parameter. User's ID is included as a claim in the token.
-     *
-     * @param userID   the user to be authorized
-     * @param expiry   the time at which the JWT token expires
-     * @param advanced a flag indicating whether an advanced authorization token is to be generated
-     * @return a JWT token in string format
-     * @throws NullPointerException     if user is null, or expiry is null
-     * @throws IllegalArgumentException if user's ID is invalid
-     */
-    public @NotNull String authorizeToken(long userID, @NotNull Instant expiry, boolean advanced)
-    {
-        JwtTokenType jwtTokenType = JwtTokenType.AUTHORIZED;
-        if (advanced)
-        {
-            jwtTokenType = JwtTokenType.ADVANCED_AUTHORIZATION;
-        }
-        return generateKey(jwtTokenType, expiry, new ClaimHolder<>("userID", userID));
+        JwtTokenType type = tokenData.advanced() ? JwtTokenType.ADVANCED_AUTHORIZATION : JwtTokenType.AUTHORIZED;
+        Instant expiry = Instant.ofEpochMilli(tokenData.get("expiry", Long.class));
+        return generateKey(type, expiry, tokenData);
     }
 
     /**
@@ -283,47 +168,14 @@ public class VerificationService
         return Instant.now().atZone(ZoneId.systemDefault()).plus(temporalAmount).toInstant();
     }
 
-    /**
-     * Generates a JWT token using the given token type, expiry date, and claim holders.
-     * <p>
-     * The method encapsulates the provided JwtTokenType, Instant expiry timestamp and ClaimHolder(s) into a JWT
-     * token. It internally calls the overloaded version of this method with the JwtTokenType's name as the subject.
-     *
-     * @param jwtTokenType name of the JwtTokenType, which will be the subject of the JWT token
-     * @param expiry       timestamp representing when the JWT token is set to expire
-     * @param claims       variable arguments representing the claims to be put in the JWT token
-     * @return a JWT token in string format
-     * @throws NullPointerException     if jwtTokenType is null, or expiry is null, or claims are null
-     * @throws IllegalArgumentException if JwtTokenType name does not comply with JWT subject rules
-     * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
-     */
-    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull ClaimHolder<?>... claims)
+    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull TokenData tokenData)
     {
-        return generateKey(jwtTokenType.name(), expiry, claims);
+        return generateKey(jwtTokenType.name(), expiry, tokenData);
     }
 
-    /**
-     * Generates a JWT token using the given subject, expiry date, and claim holders.
-     * <p>
-     * The method takes a subject, an expiry date and N number of claims to create a JWT token. It puts all
-     * ClaimHolders content into a Map, creates a new JWT with this map of claims, sets the provided subject and
-     * expiry date, uses HMAC SHA Secret Key for signing, and finally returning the token.
-     *
-     * @param subject subject field for the JWT token. Typically identifying the principal that the JWT claims about.
-     * @param expires timestamp representing when the JWT token is set to expire
-     * @param claims  variable arguments representing the claims to be put into the JWT token
-     * @return a JWT token in string format
-     * @throws NullPointerException     if subject is null, or expires is null, or claims are null
-     * @throws IllegalStateException    if HMAC-SHA secret key generation errors out during the JWT creation.
-     * @throws IllegalArgumentException if provided subject does not comply with JWT subject rules
-     */
-    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires, @NotNull ClaimHolder<?>... claims)
+    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires, @NotNull TokenData tokenData)
     {
-        Map<String, Object> jwtClaims = new HashMap<>();
-        Arrays.stream(claims).forEach(claim -> jwtClaims.put(claim.key(), claim.content()));
-
-        return Jwts.builder().subject(subject).claims(jwtClaims).expiration(Date.from(expires)).issuedAt(new Date()).signWith(
-                getKey()).compact();
+        return Jwts.builder().subject(subject).claims(tokenData.toMap()).expiration(Date.from(expires)).issuedAt(new Date()).signWith(getKey()).compact();
     }
 
     /**
@@ -348,13 +200,13 @@ public class VerificationService
     public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
         Claims tokenContent = Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
-        long userID = tokenContent.get("userID", Long.class);
-        JwtTokenType jwtTokenType = JwtTokenType.valueOf(tokenContent.getSubject());
+        JwtTokenType type = JwtTokenType.valueOf(tokenContent.getSubject());
+        TokenData data = TokenData.deserialize(tokenContent);
 
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(jwtTokenType, authorityFactory, userID);
-        return Optional.of(new UsernamePasswordAuthenticationToken(userID, null, authorities)).map((auth) ->
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, authorityFactory, data.userId());
+        return Optional.of(new UsernamePasswordAuthenticationToken(data.userId(), null, authorities)).map((auth) ->
         {
-            auth.setDetails(tokenContent);
+            auth.setDetails(data);
             return auth;
         });
     }
@@ -376,8 +228,8 @@ public class VerificationService
      * @return an unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
      * @throws IllegalStateException if the jwtTokenType does not match any case in the switch statement
      */
-    @Unmodifiable @NotNull
-    private Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
+
+    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
     {
         return switch (jwtTokenType)
         {
@@ -415,82 +267,21 @@ public class VerificationService
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public @NotNull String selectCredential(@NotNull CredentialMethod credentialMethod, @NotNull Claims claims)
+    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
     {
-        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
-        return credentialToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced(), credentialMethod);
+        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
     }
 
-    public @NotNull String requestSetupCredential(@NotNull CredentialMethod credentialMethod, @NotNull CredentialMethod[] credentialMethods, @NotNull Claims claims, @NotNull ClaimHolder<?>[] additionalClaims)
+    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
     {
-        ClaimDecoder claimDecoder = validate(credentialMethod.name(), claims);
-        long userID = claimDecoder.userID;
-        return credentialRequired(userID, claimDecoder.expiry(), claimDecoder.advanced(), additionalClaims, credentialMethods);
-    }
-
-    private @NotNull ClaimDecoder validate(@NotNull String credentialMethod, @NotNull Claims claims)
-    {
-        if (!((List<String>) claims.get("available")).contains(credentialMethod))
+        Set<JwtTokenType> tokenTypes = Set.of(jwtTokenType);
+        return authentication.getAuthorities().stream().anyMatch(verification ->
         {
-            throw new InvalidTokenException();
-        }
-
-        return ClaimDecoder.decode(claims);
-    }
-
-    @Transactional public @Nullable String authorize(@NotNull Claims claims)
-    {
-        ClaimDecoder claimDecoder = ClaimDecoder.decode(claims);
-
-        return authorizeToken(claimDecoder.userID(), claimDecoder.expiry(), claimDecoder.advanced());
-    }
-
-    /**
-     * A private record class that represents a particular JWT token type and its associated claim holder method.
-     * <p>
-     * This record class private inner class pairs a method for holding a ClaimHolder, and a JwtTokenType. The
-     * ClaimHolder is a generic type that can hold any type of claim, i.e., it might be a claim about the user
-     * identity, a claim about the user's authorization, etc. The JwtTokenType is an enumerated type that can hold
-     * the type of JWT token, i.e., it might be an access token, refresh token, etc.
-     *
-     * @param method A particular method for holding a claim holder. It is wrapped in a ClaimHolder generic class.
-     * @param type   An enumerated type representing the type of JWT token.
-     */
-    private record KeyType(ClaimHolder<?> method, JwtTokenType type)
-    {}
-
-    /**
-     * A decoder for JWT tokens.
-     * <p>
-     * This record serves as a helper class for decoding jwt tokens send to the backend.
-     * A jwt token must always contain the following attributes:
-     * <ul>
-     *     <li>userID</li>
-     *     <li>expiry</li>
-     *     <li>advanced</li>
-     * </ul>
-     *
-     * @param userID   the id of the user.
-     * @param expiry   the expiry of the token, or the token created with the current token.
-     * @param advanced if the token has advanced access to user management areas.
-     */
-    private record ClaimDecoder(long userID, @NotNull Instant expiry, boolean advanced)
-    {
-        private static @NotNull ClaimDecoder decode(@NotNull Claims claims) throws InvalidTokenException
-        {
-            long userID = verify(claims.get("userID", Long.class));
-            Instant expiry = Instant.ofEpochMilli(verify(claims.get("expiry", Long.class)));
-            boolean advanced = verify(claims.get("advanced", Boolean.class));
-            return new ClaimDecoder(userID, expiry, advanced);
-        }
-
-        private static <T> @NotNull T verify(@Nullable T value) throws InvalidTokenException
-        {
-            if (value == null)
+            if (verification instanceof VerificationAuthority verificationAuthority)
             {
-                throw new InvalidTokenException();
+                return tokenTypes.contains(verificationAuthority.jwtTokenType());
             }
-            return value;
-        }
+            return false;
+        });
     }
 }
