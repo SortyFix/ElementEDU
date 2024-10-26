@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -82,7 +83,12 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
             tokenData.restrictClaim("expiry");
             if (entity.isTemporary())
             {
-                JwtTokenType type = entity.allowedMethods().length == 1 ? JwtTokenType.CREDENTIAL_CREATION_PENDING : JwtTokenType.CREDENTIAL_REQUIRED;
+                tokenData.addRestrictedClaim("temporary", entity.getMethod());
+                JwtTokenType type = JwtTokenType.CREDENTIAL_REQUIRED;
+                if (entity.allowedMethods().length == 1)
+                {
+                    type = JwtTokenType.CREDENTIAL_CREATION_PENDING;
+                }
                 return verificationService.credentialToken(type, tokenData, entity.allowedMethods());
             }
 
@@ -94,11 +100,11 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull TokenData tokenData)
     {
         UserEntity user = getUserService().loadEntityByIDSafe(tokenData.userId());
-        return user.getCredentials(method).stream().anyMatch(enabled(method, code));
+        return user.getCredentials(method).stream().anyMatch(enabled(method, code, tokenData));
     }
 
     @Transactional
-    protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code)
+    protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code, @NotNull TokenData tokenData)
     {
         return credential ->
         {
@@ -109,6 +115,12 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
 
             if (credential.getMethod().getCredential().verify(credential, code))
             {
+                if (tokenData.additionalClaims().containsKey("temporary"))
+                {
+                    long userId = credential.getUser().getId();
+                    deleteTemporary(Objects.hash(tokenData.get("temporary", String.class), userId), credential);
+                }
+
                 if (!credential.isEnabled())
                 {
                     credential.setEnabled(true);
@@ -119,5 +131,17 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
 
             return false;
         };
+    }
+
+    @Transactional
+    protected void deleteTemporary(long id, @NotNull CredentialEntity credential)
+    {
+        if (delete(id))
+        {
+            return;
+        }
+
+        String warnMessage = "The user {} attempted to create a new credential using a temporary one; however, it appears that the temporary credential with the id {} does not exist.";
+        log.warn(warnMessage, credential.getUser().getId(), id);
     }
 }
