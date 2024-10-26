@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
 import de.gaz.eedu.user.verification.VerificationService;
@@ -62,7 +63,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     }
 
     @Transactional
-    public @NotNull Optional<String> verify(@NotNull CredentialMethod method, String code, @NotNull TokenData tokenData)
+    public @NotNull Optional<GeneratedToken> verify(@NotNull CredentialMethod method, String code, @NotNull TokenData tokenData)
     {
         UserEntity userEntity = getUserService().loadEntityByIDSafe(tokenData.userId());
         return userEntity.getCredentials(method).stream().filter(credentialEntity ->
@@ -73,7 +74,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     }
 
     @Transactional @Contract(pure = true, value = "_ -> new")
-    protected @NotNull Function<CredentialEntity, String> toToken(@NotNull TokenData tokenData)
+    protected @NotNull Function<CredentialEntity, GeneratedToken> toToken(@NotNull TokenData tokenData)
     {
         VerificationService verificationService = getUserService().getVerificationService();
         return (entity) ->

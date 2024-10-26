@@ -9,7 +9,6 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -20,8 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.*;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
@@ -61,7 +58,7 @@ public class VerificationService
      * @throws IllegalStateException    when there is an issue in JWT generation related to key generation or
      *                                  compacting the token
      */
-    public @NotNull String requestLogin(@NotNull UserEntity user, @NotNull LoginModel model)
+    public @NotNull GeneratedToken requestLogin(@NotNull UserEntity user, @NotNull LoginModel model)
     {
 /*        if (user.getCredentials().isEmpty())
         {
@@ -108,9 +105,8 @@ public class VerificationService
                 CredentialEntity::getMethod).toArray(CredentialMethod[]::new);
     }
 
-    public @NotNull String credentialToken(@NotNull JwtTokenType type, @NotNull TokenData tokenData, @NotNull CredentialMethod @NotNull ... credentialMethod)
+    public @NotNull GeneratedToken credentialToken(@NotNull JwtTokenType type, @NotNull TokenData tokenData, @NotNull CredentialMethod @NotNull ... credentialMethod)
     {
-        System.out.println(type);
         switch (type)
         {
             case CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING, CREDENTIAL_SELECTION ->
@@ -122,7 +118,7 @@ public class VerificationService
         }
     }
 
-    public @NotNull String authorizeToken(@NotNull TokenData tokenData)
+    public @NotNull GeneratedToken authorizeToken(@NotNull TokenData tokenData)
     {
         JwtTokenType type = tokenData.advanced() ? JwtTokenType.ADVANCED_AUTHORIZATION : JwtTokenType.AUTHORIZED;
         Instant expiry = Instant.ofEpochMilli(tokenData.get("expiry", Long.class));
@@ -168,14 +164,9 @@ public class VerificationService
         return Instant.now().atZone(ZoneId.systemDefault()).plus(temporalAmount).toInstant();
     }
 
-    private @NotNull String generateKey(@NotNull JwtTokenType jwtTokenType, @NotNull Instant expiry, @NotNull TokenData tokenData)
+    private @NotNull GeneratedToken generateKey(@NotNull JwtTokenType type, @NotNull Instant expiry, @NotNull TokenData tokenData)
     {
-        return generateKey(jwtTokenType.name(), expiry, tokenData);
-    }
-
-    private @NotNull String generateKey(@NotNull String subject, @NotNull Instant expires, @NotNull TokenData tokenData)
-    {
-        return Jwts.builder().subject(subject).claims(tokenData.toMap()).expiration(Date.from(expires)).issuedAt(new Date()).signWith(getKey()).compact();
+        return GeneratedToken.toToken(secret, type, expiry, tokenData);
     }
 
     /**
@@ -199,9 +190,8 @@ public class VerificationService
      */
     public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
-        Claims tokenContent = Jwts.parser().verifyWith(getKey()).build().parseSignedClaims(token).getPayload();
-        JwtTokenType type = JwtTokenType.valueOf(tokenContent.getSubject());
-        TokenData data = TokenData.deserialize(tokenContent);
+        TokenData data = TokenData.deserialize(secret, token);
+        JwtTokenType type = JwtTokenType.valueOf(data.getParent().map(Claims::getSubject).orElseThrow());
 
         Collection<? extends GrantedAuthority> authorities = getAuthorities(type, authorityFactory, data.userId());
         return Optional.of(new UsernamePasswordAuthenticationToken(data.userId(), null, authorities)).map((auth) ->
@@ -225,8 +215,8 @@ public class VerificationService
      * @param jwtTokenType     the JwtTokenType identifying the type of JWT token
      * @param authorityFactory factory used to generate user authorities according to user ID
      * @param userID           the ID of the user whose authorities are to be generated
-     * @return an unmodifiable collection of authorities, derived from jwtTokenType, authorityFactory and user ID
-     * @throws IllegalStateException if the jwtTokenType does not match any case in the switch statement
+     * @return an unmodifiable collection of authorities, derived from type, authorityFactory and user ID
+     * @throws IllegalStateException if the type does not match any case in the switch statement
      */
 
     private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
@@ -246,25 +236,6 @@ public class VerificationService
             case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
-    }
-
-    /**
-     * Retrieves a SecretKey instance using the HMAC SHAKey algorithm.
-     * <p>
-     * The HMAC SHAKey algorithm is a type of Mac (Message Authentication Code) algorithm that combines the power of
-     * Hash algorithms with the strength of AES (Advanced Encryption Standard). This method takes the predefined
-     * 'secret' string value, converts it to a byte array using UTF-8 encoding, and then generates a HMAC SHAKey from
-     * that byte array. The resulting SecretKey can be used for further cryptographic operations that require a
-     * secret key, like creating or verifying a JWT (JSON Web Token).
-     *
-     * @return a SecretKey derived from the 'secret' string value using HMAC SHAKey algorithm and UTF-8 encoded bytes.
-     * @throws IllegalStateException    if UTF-8 encoding is not supported or 'secret' string value cannot be
-     *                                  converted to bytes.
-     * @throws IllegalArgumentException if 'secret' string value is null or empty.
-     */
-    private @NotNull SecretKey getKey()
-    {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)

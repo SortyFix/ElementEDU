@@ -11,6 +11,7 @@ import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
+import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
@@ -102,7 +103,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         entry.getClassRoom().ifPresent(clazz -> clazz.detachStudents(getClassRoomService(), entry.getId()));
     }
 
-    @Transactional public @NotNull Optional<String> requestLogin(@NotNull LoginModel loginModel)
+    @Transactional public @NotNull Optional<GeneratedToken> requestLogin(@NotNull LoginModel loginModel)
     {
         Optional<UserEntity> potentialUser = switch (loginModel)
         {

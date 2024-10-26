@@ -2,11 +2,15 @@ package de.gaz.eedu.user.verification;
 
 import de.gaz.eedu.user.verification.authority.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +66,14 @@ public record TokenData(@Nullable Claims parent, long userId, boolean advanced, 
         long userId = claims.get("userId", Long.class);
         boolean advanced = claims.get("advanced", Boolean.class);
         return new TokenData(claims, userId, advanced, restricted, additionalClaims);
+    }
+
+    @Contract("_, _ -> new")
+    public static @NotNull TokenData deserialize(@NotNull String key, @NotNull String token) throws InvalidTokenException
+    {
+        SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+        Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+        return TokenData.deserialize(claims);
     }
 
     public @Unmodifiable @NotNull Map<String, Object> toMap()

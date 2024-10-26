@@ -136,7 +136,11 @@ public class UserController extends EntityController<UserService, UserModel, Use
     public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel model)
     {
         log.info("The server has recognized an incoming normal login request login name {}.", model.loginName());
-        return getEntityService().requestLogin(model).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        return getEntityService().requestLogin(model).map((token) ->
+        {
+            String jwt = token.jwt();
+            return ResponseEntity.ok(jwt);
+        }).orElseThrow(this::unauthorizedThrowable);
     }
 
     /**
@@ -155,10 +159,12 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PostMapping("/login/advanced")
     public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal long userID)
     {
-        AdvancedUserLoginModel model = new AdvancedUserLoginModel(userID);
-
         log.info("The server has recognized an incoming advanced login request for {}.", userID);
-        return getEntityService().requestLogin(model).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        return getEntityService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
+        {
+            String jwt = token.jwt();
+            return ResponseEntity.ok(jwt);
+        }).orElseThrow(this::unauthorizedThrowable);
     }
 
     /**
