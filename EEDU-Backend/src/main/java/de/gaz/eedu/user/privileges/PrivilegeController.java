@@ -24,25 +24,26 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
         return privilegeService;
     }
 
-    @PreAuthorize("hasAuthority(${privilege.privilege.create})") @PostMapping("/create") @Override
+    @PreAuthorize("hasAnyAuthority(${privilege.privilege.create}, ${privilege.privilege.all})") @PostMapping("/create")
+    @Override
     public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model) throws CreationException
     {
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.privilege.delete})") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAnyAuthority(${privilege.privilege.delete}, ${privilege.privilege.all})")
+    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.privilege.get})") @GetMapping("/get/{id}") @Override
-    public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAnyAuthority(${privilege.privilege.get}, ${privilege.privilege.all})") @GetMapping("/get/{id}")
+    @Override public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.group.privilege.grant})") @PostMapping("/{group}/grant")
+    @PreAuthorize("hasAnyAuthority(${privilege.group.privilege.grant}, ${privilege.group.all})") @PostMapping("/{group}/grant")
     public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         PrivilegeEntity[] entities = getEntityService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
@@ -50,7 +51,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
         groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.group.privilege.revoke})") @PostMapping("/{group}/revoke")
+    @PreAuthorize("hasAnyAuthority(${privilege.group.privilege.revoke}, ${privilege.group.all})") @PostMapping("/{group}/revoke")
     public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         GroupService groupService = getEntityService().getGroupService();

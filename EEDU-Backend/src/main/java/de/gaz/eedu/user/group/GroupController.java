@@ -23,7 +23,8 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
         return groupService;
     }
 
-    @PreAuthorize("hasAuthority(${privilege.user.group.attach})") @PostMapping("/{user}/attach")
+    @PreAuthorize("hasAnyAuthority(${privilege.user.group.attach}, ${privilege.user.all})")
+    @PostMapping("/{user}/attach")
     public void attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
         GroupEntity[] entities = getEntityService().loadEntityById(groups).toArray(GroupEntity[]::new);
@@ -31,26 +32,28 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
         userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.user.group.detach})") @PostMapping("/{user}/detach")
+    @PreAuthorize("hasAnyAuthority(${privilege.user.group.detach}, ${privilege.user.all})")
+    @PostMapping("/{user}/detach")
     public void detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
         UserService userService = getEntityService().getUserService();
         userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.group.create})") @PostMapping("/create") @Override
+    @PreAuthorize("hasAnyAuthority(${privilege.group.create}, ${privilege.group.all})") @PostMapping("/create")
+    @Override
     public @NotNull ResponseEntity<GroupModel> create(@NotNull @RequestBody GroupCreateModel model) throws CreationException
     {
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.group.delete})") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAnyAuthority(${privilege.group.delete}, ${privilege.group.all})") @DeleteMapping("/delete/{id}")
+    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @PreAuthorize("hasAuthority(${privilege.group.get})") @GetMapping("/get/{id}") @Override
+    @PreAuthorize("hasAnyAuthority(${privilege.group.get}, ${privilege.group.all})") @GetMapping("/get/{id}") @Override
     public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);

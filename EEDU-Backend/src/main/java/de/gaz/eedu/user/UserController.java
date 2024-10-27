@@ -60,7 +60,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing the newly created {@link UserModel}.
      * @throws CreationException if an error occurs during the user creation process.
      */
-    @PreAuthorize("hasAuthority(${privilege.user.create})") @PostMapping("/create") @Override
+    @PreAuthorize("hasAnyAuthority(${privilege.user.create}, ${privilege.user.all})") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model) throws CreationException
     {
         return super.create(model);
@@ -78,8 +78,8 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user to be deleted.
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("hasAuthority(${privilege.user.delete})") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAnyAuthority(${privilege.user.delete}, ${privilege.user.all})") @DeleteMapping("/delete/{id}")
+    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
@@ -96,10 +96,9 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("hasAuthority(${privilege.user.get} or #id == authentication.principal)") @GetMapping("/get/{id}")
-    @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAnyAuthority(${privilege.user.get}, ${privilege.user.all}) or #id == authentication.principal")
+    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        validate(isAuthorized(JwtTokenType.AUTHORIZED), unauthorizedThrowable());
         return super.getData(id);
     }
 
