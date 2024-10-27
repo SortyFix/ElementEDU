@@ -2,6 +2,7 @@ package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.RequiredArgsConstructor;
@@ -10,30 +11,49 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping("/privilege") @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/user/group/privilege")
+@RequiredArgsConstructor
 public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
 
     private final PrivilegeService privilegeService;
 
-    @Override
-    protected @NotNull PrivilegeService getEntityService()
+    @Override protected @NotNull PrivilegeService getEntityService()
     {
         return privilegeService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model) throws CreationException
+    @PreAuthorize("hasAuthority(${privilege.privilege.create})") @PostMapping("/create") @Override
+    public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model) throws CreationException
     {
         return super.create(model);
     }
 
-    @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAuthority(${privilege.privilege.delete})") @DeleteMapping("/delete/{id}") @Override
+    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAuthority(${privilege.privilege.get})") @GetMapping("/get/{id}") @Override
+    public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
+    }
+
+    @PreAuthorize("hasAuthority(${privilege.group.privilege.grant})") @PostMapping("/{group}/grant")
+    public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    {
+        PrivilegeEntity[] entities = getEntityService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
+        GroupService groupService = getEntityService().getGroupService();
+        groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
+    }
+
+    @PreAuthorize("hasAuthority(${privilege.group.privilege.revoke})") @PostMapping("/{group}/revoke")
+    public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    {
+        GroupService groupService = getEntityService().getGroupService();
+        groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
     }
 }

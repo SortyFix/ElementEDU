@@ -43,7 +43,7 @@ export class CredentialPasswordVerifyFormComponent extends AbstractCredentialVer
 
     protected override errorMessage(error: number): string {
 
-        if(error == 401)
+        if(error == 403)
         {
             return 'Either the username or the password is incorrect.'
         }
