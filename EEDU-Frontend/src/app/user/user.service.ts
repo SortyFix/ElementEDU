@@ -22,8 +22,12 @@ export class UserService
         this._loaded = this.isLoggedIn;
         if (this._loaded)
         {
-            return of();
+            // load user data in the background
+            return this.fetchUserData.pipe(map((user: UserEntity): void => {
+                this.storeUserData(JSON.stringify(user))
+            }));
         }
+
         return this.fetchUserData.pipe(tap<UserEntity>({
             next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
