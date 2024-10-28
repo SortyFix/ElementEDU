@@ -85,6 +85,17 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return repeatingAppointments.addAll(Arrays.stream(scheduledAppointmentEntity).filter(notPart).toList());
     }
 
+    public boolean unscheduleRepeating(@NotNull CourseService courseService, @NotNull Long... scheduledAppointmentEntity)
+    {
+        return saveEntityIfPredicateTrue(courseService, scheduledAppointmentEntity, this::unscheduleRepeating);
+    }
+
+    public boolean unscheduleRepeating(@NotNull Long... scheduledAppointmentEntity)
+    {
+        Set<Long> toRemove = Set.of(scheduledAppointmentEntity);
+        return repeatingAppointments.removeIf(appointment -> toRemove.contains(appointment.getId()));
+    }
+
     public boolean setEntry(@NotNull CourseService service, @NotNull AppointmentEntryEntity entry)
     {
         if (setEntry(entry))
