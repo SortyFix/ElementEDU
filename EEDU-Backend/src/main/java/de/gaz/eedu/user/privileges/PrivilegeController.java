@@ -6,6 +6,7 @@ import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/user/group/privilege")
 @RequiredArgsConstructor
+@Slf4j
 public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
     private final PrivilegeService privilegeService;
@@ -109,6 +111,8 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
     @PostMapping("/{group}/grant")
     public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
+        log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
+
         PrivilegeEntity[] entities = getEntityService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
         GroupService groupService = getEntityService().getGroupService();
         groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
@@ -132,6 +136,8 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
     @PostMapping("/{group}/revoke")
     public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
+        log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);
+
         GroupService groupService = getEntityService().getGroupService();
         groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
     }

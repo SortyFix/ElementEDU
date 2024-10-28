@@ -8,6 +8,7 @@ import de.gaz.eedu.user.group.model.GroupModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user/group")
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
+@Slf4j
 public class GroupController extends EntityController<GroupService, GroupModel, GroupCreateModel>
 {
     private final GroupService entityService;
@@ -49,6 +51,8 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
     @PostMapping("/{user}/attach")
     public void attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
+        log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
+
         GroupEntity[] entities = getEntityService().loadEntityById(groups).toArray(GroupEntity[]::new);
         UserService userService = getEntityService().getUserService();
         userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
@@ -72,6 +76,8 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
     @PostMapping("/{user}/detach")
     public void detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
+        log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
+
         UserService userService = getEntityService().getUserService();
         userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
     }
