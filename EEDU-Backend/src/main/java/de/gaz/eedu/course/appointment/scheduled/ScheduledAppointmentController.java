@@ -20,6 +20,7 @@ public class ScheduledAppointmentController extends EntityController<ScheduledAp
     // TODO ?? What is this class about?
     private final ScheduledAppointmentService service;
 
+
     @PostMapping("/{course}/schedule") public @NotNull HttpStatus scheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
     {
         log.info("Received incoming request for scheduling appointment(s) {} in course {}.", appointments, course);
@@ -53,5 +54,11 @@ public class ScheduledAppointmentController extends EntityController<ScheduledAp
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<ScheduledAppointmentModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/all")
+    @Override public @NotNull ResponseEntity<ScheduledAppointmentModel[]> fetchAll()
+    {
+        return super.fetchAll();
     }
 }

@@ -15,8 +15,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@Slf4j
-@AllArgsConstructor public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.function.Predicate;
+
+@Slf4j @AllArgsConstructor
+public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
 {
     protected abstract @NotNull S getService();
 
@@ -55,7 +59,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
      * It is executed when a DELETE request hits the API endpoint associated with this method.
      *
      * @param id The id of the entity to be deleted. Must be not null.
-     *
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
@@ -70,7 +73,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
      * It is executed when a GET request hits the API endpoint associated with this method.
      *
      * @param id The id of the entity to be fetched. Must be not null.
-     *
      * @return A ResponseEntity object that encapsulates the HTTP response.
      * If the entity is successfully fetched,
      * the method returns a ResponseEntity with HTTP status 200 (Ok),
@@ -82,7 +84,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return getService().loadById(id)
+                           .map(ResponseEntity::ok)
+                           .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    public @NotNull ResponseEntity<M[]> fetchAll()
+    {
+        return fetchAll((m) -> true);
+    }
+
+    public @NotNull ResponseEntity<M[]> fetchAll(@NotNull Predicate<M> predicate)
+    {
+        log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
+
+        Collection<M> collection = getService().findAll(predicate);
+        M[] array = (M[]) Array.newInstance(Object.class, collection.size());
+        return ResponseEntity.ok(collection.toArray(array));
     }
 
     protected boolean isAuthorized(@NotNull String authority)
