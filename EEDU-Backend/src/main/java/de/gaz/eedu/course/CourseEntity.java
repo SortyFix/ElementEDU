@@ -68,6 +68,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
                 ScheduledAppointmentModel[]::new));
     }
 
+    public void setSubject(@NotNull CourseService service, SubjectEntity subject)
+    {
+        this.setSubject(subject);
+        service.saveEntity(this);
+    }
+
     public boolean scheduleRepeating(@NotNull CourseService courseService, @NotNull ScheduledAppointmentEntity... scheduledAppointmentEntity)
     {
         return saveEntityIfPredicateTrue(courseService, scheduledAppointmentEntity, this::scheduleRepeating);
@@ -190,9 +196,9 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param classRoom     The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
      */
-    public boolean assignClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
+    public boolean linkClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
     {
-        return saveEntityIfPredicateTrue(courseService, classRoom, this::assignClassRoom);
+        return saveEntityIfPredicateTrue(courseService, classRoom, this::linkClassRoom);
     }
 
     /**
@@ -204,7 +210,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param classRoom The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
      */
-    public boolean assignClassRoom(@NotNull ClassRoomEntity classRoom)
+    public boolean linkClassRoom(@NotNull ClassRoomEntity classRoom)
     {
         if (!Objects.equals(this.classRoom, classRoom))
         {
@@ -217,16 +223,16 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     /**
      * Disassociates the currently assigned {@link ClassRoomEntity} from this course and saves the changes using the provided {@link CourseService}.
      * <p>
-     * This method calls {@link #revokeClassroom()} to remove the association between the course and its assigned classroom.
+     * This method calls {@link #unlinkClassRoom()} to remove the association between the course and its assigned classroom.
      * The disassociation is persisted using the provided {@link CourseService}.
      *
      * @param courseService The {@link CourseService} used to save the changes.
      * @return {@code true} if the disassociation was successful, and changes were saved; false otherwise.
      */
-    public boolean revokeClassroom(@NotNull CourseService courseService)
+    public boolean unlinkClassRoom(@NotNull CourseService courseService)
     {
         // That's what I call an API stretch
-        return saveEntityIfPredicateTrue(courseService, revokeClassroom(), (value) -> value);
+        return saveEntityIfPredicateTrue(courseService, unlinkClassRoom(), (value) -> value);
     }
 
     /**
@@ -237,7 +243,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      *
      * @return {@code true} if the disassociation was successful; false otherwise.
      */
-    public boolean revokeClassroom()
+    public boolean unlinkClassRoom()
     {
         if (!hasClassRoomAssigned())
         {

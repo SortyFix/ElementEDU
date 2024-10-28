@@ -31,8 +31,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
         return classRoomRepository;
     }
 
-    @Transactional @Override public @NotNull ClassRoomEntity createEntity(
-            @NotNull ClassRoomCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull ClassRoomEntity createEntity(@NotNull ClassRoomCreateModel model) throws CreationException
     {
         if (getRepository().existsByName(model.name()))
         {
@@ -54,7 +53,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
         // add classroom to courses after entity was saved.
         // assign courses
         Set<CourseEntity> courseEntities = getCourseService().loadEntityById(model.courses());
-        courseEntities.forEach(courseEntity -> courseEntity.assignClassRoom(classRoomEntity));
+        courseEntities.forEach(courseEntity -> courseEntity.linkClassRoom(classRoomEntity));
         getCourseService().saveEntity(courseEntities);
 
         return classRoomEntity;
@@ -64,7 +63,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
     {
         // remove this classroom from all courses
         Set<CourseEntity> courses = entry.getCourses();
-        courses.forEach(CourseEntity::revokeClassroom);
+        courses.forEach(CourseEntity::unlinkClassRoom);
         getCourseService().saveEntity(courses);
     }
 }

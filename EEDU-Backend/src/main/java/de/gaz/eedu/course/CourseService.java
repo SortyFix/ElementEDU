@@ -101,7 +101,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             // assign class
             if (model.classId() != null)
             {
-                getClassRoomRepository().findById(model.classId()).ifPresentOrElse(entity::assignClassRoom, () ->
+                getClassRoomRepository().findById(model.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
                 {
                     throw new EntityUnknownException(model.classId());
                 });
