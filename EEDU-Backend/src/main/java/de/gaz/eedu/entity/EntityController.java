@@ -94,7 +94,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
         return fetchAll((m) -> true);
     }
 
-    public @NotNull ResponseEntity<M[]> fetchAll(@NotNull Predicate<M> predicate)
+    public @NotNull final ResponseEntity<M[]> fetchAll(@NotNull Predicate<M> predicate)
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
 
