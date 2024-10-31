@@ -1,15 +1,18 @@
 package de.gaz.eedu.course;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
+import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
+import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subjects.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.persistence.*;
 import lombok.*;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -41,12 +44,76 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     @ManyToOne @JsonManagedReference @JoinColumn(name = "subject_id", referencedColumnName = "id")
     private SubjectEntity subject;
 
+    @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE)
+    private final Set<ScheduledAppointmentEntity> repeatingAppointments = new HashSet<>();
+
+    @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE)
+    private final Set<AppointmentEntryEntity> appointmentEntries = new HashSet<>();
+
+    @ManyToOne @JoinColumn(name = "repository_id", referencedColumnName = "id", unique = true)
+    private FileEntity repository;
+
+    public CourseEntity(@NotNull FileEntity repository)
+    {
+        this.repository = repository;
+    }
+
     @Override public CourseModel toModel()
     {
         return new CourseModel(getId(),
                 getName(),
                 getSubject().toModel(),
-                getUsers().stream().map(UserEntity::toModel).toArray(UserModel[]::new));
+                getUsers().stream().map(UserEntity::toModel).toArray(UserModel[]::new), getScheduledAppointments().stream().map(
+                ScheduledAppointmentEntity::toModel).toArray(
+                ScheduledAppointmentModel[]::new));
+    }
+
+    public void setSubject(@NotNull CourseService service, SubjectEntity subject)
+    {
+        this.setSubject(subject);
+        service.saveEntity(this);
+    }
+
+    public boolean scheduleRepeating(@NotNull CourseService courseService, @NotNull ScheduledAppointmentEntity... scheduledAppointmentEntity)
+    {
+        return saveEntityIfPredicateTrue(courseService, scheduledAppointmentEntity, this::scheduleRepeating);
+    }
+
+    public boolean scheduleRepeating(@NotNull ScheduledAppointmentEntity... scheduledAppointmentEntity)
+    {
+        Predicate<ScheduledAppointmentEntity> notPart = current -> !Objects.equals(this, current.getCourse());
+        return repeatingAppointments.addAll(Arrays.stream(scheduledAppointmentEntity).filter(notPart).toList());
+    }
+
+    public boolean unscheduleRepeating(@NotNull CourseService courseService, @NotNull Long... scheduledAppointmentEntity)
+    {
+        return saveEntityIfPredicateTrue(courseService, scheduledAppointmentEntity, this::unscheduleRepeating);
+    }
+
+    public boolean unscheduleRepeating(@NotNull Long... scheduledAppointmentEntity)
+    {
+        Set<Long> toRemove = Set.of(scheduledAppointmentEntity);
+        return repeatingAppointments.removeIf(appointment -> toRemove.contains(appointment.getId()));
+    }
+
+    public boolean setEntry(@NotNull CourseService service, @NotNull AppointmentEntryEntity entry)
+    {
+        if (setEntry(entry))
+        {
+            service.saveEntity(this);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setEntry(@NotNull AppointmentEntryEntity entry)
+    {
+        return appointmentEntries.add(entry);
+    }
+
+    public @NotNull AppointmentEntryEntity[] getEntries()
+    {
+        return appointmentEntries.toArray(AppointmentEntryEntity[]::new);
     }
 
     /**
@@ -75,12 +142,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * <p>
      * Note that this method does not persist the changes.
      * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachUsers(CourseService, UserEntity...)},
-     * or {@link CourseService#saveEntity(EntityModelRelation)}
+     * or {@link CourseService#saveEntity(Iterable)}
      *
      * @param user The array of UserEntity instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
      * @see #attachUsers(CourseService, UserEntity...)
-     * @see CourseService#saveEntity(EntityModelRelation)
+     * @see CourseService#saveEntity(Iterable)
      */
     public boolean attachUsers(@NonNull UserEntity... user)
     {
@@ -115,12 +182,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * Note that only users which are part of this course are removed.
      * <p>
      * To make the changes permanent, the object needs to be saved. This can be achieved by calling {@link #detachUsers(CourseService, Long...)}
-     * or {@link CourseService#saveEntity(EntityModelRelation)} after detaching the users.
+     * or {@link CourseService#saveEntity(Iterable)} after detaching the users.
      *
      * @param ids The array of IDs corresponding to {@link UserEntity} instances to be detached from the group.
      * @return true if the users were successfully detached, false otherwise.
      * @see #detachUsers(Long...)
-     * @see CourseService#saveEntity(EntityModelRelation)
+     * @see CourseService#saveEntity(Iterable)
      */
     public boolean detachUsers(@NonNull Long... ids)
     {
@@ -140,9 +207,9 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param classRoom     The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
      */
-    public boolean assignClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
+    public boolean linkClassRoom(@NotNull CourseService courseService, @NotNull ClassRoomEntity classRoom)
     {
-        return saveEntityIfPredicateTrue(courseService, classRoom, this::assignClassRoom);
+        return saveEntityIfPredicateTrue(courseService, classRoom, this::linkClassRoom);
     }
 
     /**
@@ -154,7 +221,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param classRoom The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
      */
-    public boolean assignClassRoom(@NotNull ClassRoomEntity classRoom)
+    public boolean linkClassRoom(@NotNull ClassRoomEntity classRoom)
     {
         if (!Objects.equals(this.classRoom, classRoom))
         {
@@ -167,16 +234,16 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     /**
      * Disassociates the currently assigned {@link ClassRoomEntity} from this course and saves the changes using the provided {@link CourseService}.
      * <p>
-     * This method calls {@link #revokeClassroom()} to remove the association between the course and its assigned classroom.
+     * This method calls {@link #unlinkClassRoom()} to remove the association between the course and its assigned classroom.
      * The disassociation is persisted using the provided {@link CourseService}.
      *
      * @param courseService The {@link CourseService} used to save the changes.
      * @return {@code true} if the disassociation was successful, and changes were saved; false otherwise.
      */
-    public boolean revokeClassroom(@NotNull CourseService courseService)
+    public boolean unlinkClassRoom(@NotNull CourseService courseService)
     {
         // That's what I call an API stretch
-        return saveEntityIfPredicateTrue(courseService, revokeClassroom(), (value) -> value);
+        return saveEntityIfPredicateTrue(courseService, unlinkClassRoom(), (value) -> value);
     }
 
     /**
@@ -187,7 +254,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      *
      * @return {@code true} if the disassociation was successful; false otherwise.
      */
-    public boolean revokeClassroom()
+    public boolean unlinkClassRoom()
     {
         if (!hasClassRoomAssigned())
         {
@@ -239,6 +306,11 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return Stream.concat(users.stream(), userStream).collect(Collectors.toUnmodifiableSet());
     }
 
+    public @NotNull @Unmodifiable Set<ScheduledAppointmentEntity> getScheduledAppointments()
+    {
+        return Collections.unmodifiableSet(repeatingAppointments);
+    }
+
     /**
      * Saves this entity if the predicate returns true.
      * <p>
@@ -274,9 +346,18 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         return true;
     }
 
-    @Contract(pure = true) @Override public @NotNull String toString()
+    @Override public String toString()
     { // Automatically generated by IntelliJ
-        return "CourseEntity{" + "id=" + id + ", name='" + name + '\'' + ", users=" + users + ", subject=" + subject + '}';
+        return "CourseEntity{" +
+                "users=" + users +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", classRoom=" + classRoom +
+                ", subject=" + subject +
+                ", repeatingAppointments=" + repeatingAppointments +
+                ", appointmentEntries=" + appointmentEntries +
+                ", repository=" + repository +
+                '}';
     }
 
     @Override public boolean equals(Object o)

@@ -45,9 +45,7 @@ public record QRData(@NotNull String type, @NotNull String label, @NotNull Strin
             }
         }
         ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
-
         ImageIO.write(image, "JPEG", jpegOutputStream);
-
         return jpegOutputStream.toByteArray();
     }
 
