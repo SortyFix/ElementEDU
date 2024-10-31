@@ -172,14 +172,13 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
     @Test
     public void testDeleteEntitySuccess()
     {
-        Stream<TestData<Boolean>> deleteData = deleteEntities();
-        List<TestData<Boolean>> data = deleteData.toList();
-        if(data.isEmpty())
+        TestData<Boolean>[] deleteData = deleteEntities();
+        if(deleteData.length == 0)
         {
             Assumptions.abort();
         }
 
-        for(TestData<Boolean> current : data)
+        for(TestData<Boolean> current : deleteData)
         {
             test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
         }
