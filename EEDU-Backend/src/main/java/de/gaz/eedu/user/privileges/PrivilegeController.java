@@ -5,6 +5,7 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -24,15 +25,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/user/group/privilege")
 @RequiredArgsConstructor
-@Slf4j
+@Slf4j @Getter(AccessLevel.PROTECTED)
 public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
-    private final PrivilegeService privilegeService;
-
-    @Override protected @NotNull PrivilegeService getEntityService()
-    {
-        return privilegeService;
-    }
+    private final PrivilegeService service;
 
     /**
      * Handles the creation of a new privilege.

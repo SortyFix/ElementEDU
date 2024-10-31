@@ -61,7 +61,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     private boolean systemAccount;
     private String firstName, lastName, loginName;
     private boolean enabled, locked;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     private Set<CredentialEntity> credentials = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
     private ThemeEntity themeEntity;
@@ -381,7 +381,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public String toString()
     { // Automatically generated using intellij
-        return "UserEntity{" + "courses=" + courses + ", status=" + status + ", illnessNotificationEntities=" + illnessNotificationEntities + ", id=" + id + ", systemAccount=" + systemAccount + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", loginName='" + loginName + '\'' + ", enabled=" + enabled + ", locked=" + locked + ", credentials=" + credentials + ", themeEntity=" + themeEntity + ", groups=" + groups + ", classRoom=" + classRoom + '}';
+        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
     }
 
     @Override public boolean equals(Object object)

@@ -8,22 +8,18 @@ import de.gaz.eedu.exception.OccupiedException;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -173,12 +169,20 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
         evaluator.evaluateResult(tester.execute(evaluator.request()));
     }
 
-
-    @ParameterizedTest(name = "{index} => request={0}") @MethodSource("deleteEntities") @NullSource public void testDeleteEntitySuccess(
-            @Nullable TestData<Boolean> data)
+    @Test
+    public void testDeleteEntitySuccess()
     {
-        Assumptions.assumeTrue(Objects.nonNull(data));
-        test(Eval.eval(data.entityID(), data.expected(), Validator.equals()), (id) -> getService().delete(id));
+        Stream<TestData<Boolean>> deleteData = deleteEntities();
+        List<TestData<Boolean>> data = deleteData.toList();
+        if(data.isEmpty())
+        {
+            Assumptions.abort();
+        }
+
+        for(TestData<Boolean> current : data)
+        {
+            test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
+        }
     }
 
     @Contract(pure = true, value = "-> new") protected @NotNull TestData<Boolean>[] deleteEntities()

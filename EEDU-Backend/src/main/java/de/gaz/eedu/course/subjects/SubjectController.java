@@ -7,7 +7,6 @@ import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 //TODO manage access
@@ -20,12 +19,12 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
     private final SubjectService subjectService;
 
     @Override
-    protected @NotNull SubjectService getEntityService()
+    protected @NotNull SubjectService getService()
     {
         return subjectService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")
     @Override
     public @NotNull ResponseEntity<SubjectModel> create(@NotNull @RequestBody SubjectCreateModel model) throws CreationException
@@ -33,7 +32,7 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
     @Override
     public @NotNull Boolean delete(@NotNull @PathVariable Long id)
@@ -41,7 +40,7 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
         return super.delete(id);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     @GetMapping("/get/{id}")
     @Override
     public @NotNull ResponseEntity<SubjectModel> getData(@NotNull @PathVariable Long id)

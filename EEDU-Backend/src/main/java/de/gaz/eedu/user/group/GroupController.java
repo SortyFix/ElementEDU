@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class GroupController extends EntityController<GroupService, GroupModel, GroupCreateModel>
 {
-    private final GroupService entityService;
+    private final GroupService service;
 
     /**
      * Handles the attachment of groups to a specified user.
