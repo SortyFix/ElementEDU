@@ -6,6 +6,7 @@ import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -109,8 +110,8 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
 
-        PrivilegeEntity[] entities = getEntityService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
-        GroupService groupService = getEntityService().getGroupService();
+        PrivilegeEntity[] entities = getService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
+        GroupService groupService = getService().getGroupService();
         groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
     }
 
@@ -134,7 +135,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
     {
         log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);
 
-        GroupService groupService = getEntityService().getGroupService();
+        GroupService groupService = getService().getGroupService();
         groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
     }
 }

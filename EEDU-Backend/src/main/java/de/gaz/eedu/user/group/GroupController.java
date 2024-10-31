@@ -53,8 +53,8 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
 
-        GroupEntity[] entities = getEntityService().loadEntityById(groups).toArray(GroupEntity[]::new);
-        UserService userService = getEntityService().getUserService();
+        GroupEntity[] entities = getService().loadEntityById(groups).toArray(GroupEntity[]::new);
+        UserService userService = getService().getUserService();
         userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
     }
 
@@ -78,7 +78,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
     {
         log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
 
-        UserService userService = getEntityService().getUserService();
+        UserService userService = getService().getUserService();
         userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
     }
 

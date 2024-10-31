@@ -14,6 +14,7 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -379,9 +380,25 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return true;
     }
 
+    @Contract(pure = true, value = "-> new")
     @Override public String toString()
     { // Automatically generated using intellij
-        return "UserEntity{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", password='" + password + '\'' + ", enabled=" + enabled + ", locked=" + locked;
+        return "UserEntity{" +
+                "courses=" + courses +
+                ", status=" + status +
+                ", illnessNotificationEntities=" + illnessNotificationEntities +
+                ", id=" + id +
+                ", systemAccount=" + systemAccount +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", enabled=" + enabled +
+                ", locked=" + locked +
+                ", credentials=" + credentials +
+                ", themeEntity=" + themeEntity +
+                ", groups=" + groups +
+                ", classRoom=" + classRoom +
+                '}';
     }
 
     @Override public boolean equals(Object object)

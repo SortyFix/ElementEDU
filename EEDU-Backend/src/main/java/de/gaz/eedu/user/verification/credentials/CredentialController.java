@@ -52,7 +52,7 @@ import java.util.Optional;
 public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {
     @Value("${development}") private final boolean development = false;
-    @Getter(AccessLevel.PROTECTED) private final CredentialService entityService;
+    @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
     @PreAuthorize(
             "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${user.credential.delete})"
@@ -66,7 +66,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute TokenData token)
     {
         token.restrictClaim("expiry");
-        VerificationService service = getEntityService().getUserService().getVerificationService();
+        VerificationService service = getService().getUserService().getVerificationService();
 
         GeneratedToken generated = service.credentialToken(JwtTokenType.CREDENTIAL_CREATION_PENDING, token, method);
         return ResponseEntity.ok(generated.jwt());
@@ -83,7 +83,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create}, ${privilege.user.all})") @PostMapping("/create/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
-        CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
@@ -91,7 +91,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PostMapping("/create/temporary/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
-        CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
@@ -113,11 +113,11 @@ public class CredentialController extends EntityController<CredentialService, Cr
     ) @PostMapping("/enable/{method}")
     public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute @NotNull TokenData token, @NotNull HttpServletResponse response)
     {
-        validate(getEntityService().enable(method, code, token), unauthorizedThrowable());
+        validate(getService().enable(method, code, token), unauthorizedThrowable());
 
         if (isAuthorized(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
         {
-            return authorizeToken(getEntityService().verify(method, code, token), response);
+            return authorizeToken(getService().verify(method, code, token), response);
         }
         return ResponseEntity.ok(null);
     }
@@ -140,7 +140,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
         List<String> credentials = token.get("available", List.class);
         CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
 
-        return authorizeToken(getEntityService().verify(method, code, token), response);
+        return authorizeToken(getService().verify(method, code, token), response);
     }
 
 
@@ -149,7 +149,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute @NotNull TokenData token)
     {
         token.restrictClaim("expiry");
-        VerificationService verificationService = getEntityService().getUserService().getVerificationService();
+        VerificationService verificationService = getService().getUserService().getVerificationService();
         GeneratedToken generated = verificationService.credentialToken(JwtTokenType.CREDENTIAL_REQUIRED, token, method);
         return ResponseEntity.ok(generated.jwt());
     }

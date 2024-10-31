@@ -44,7 +44,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
 {
-    @Getter(AccessLevel.PROTECTED) private final UserService entityService;
+    @Getter(AccessLevel.PROTECTED) private final UserService service;
     @Value("${development}") private final boolean development = false;
 
     /**
@@ -135,7 +135,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel model)
     {
         log.info("The server has recognized an incoming normal login request login name {}.", model.loginName());
-        return getEntityService().requestLogin(model).map((token) ->
+        return getService().requestLogin(model).map((token) ->
         {
             String jwt = token.jwt();
             return ResponseEntity.ok(jwt);
@@ -159,7 +159,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal long userID)
     {
         log.info("The server has recognized an incoming advanced login request for {}.", userID);
-        return getEntityService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
+        return getService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
         {
             String jwt = token.jwt();
             return ResponseEntity.ok(jwt);
