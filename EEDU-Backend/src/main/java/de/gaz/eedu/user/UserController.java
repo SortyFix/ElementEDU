@@ -12,13 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.function.Function;
@@ -43,7 +39,7 @@ import java.util.function.Function;
     private final UserService userService;
 
     @Override
-    protected @NotNull UserService getEntityService()
+    protected @NotNull UserService getService()
     {
         return userService;
     }
@@ -77,7 +73,7 @@ import java.util.function.Function;
     {
         Function<UserEntity, Boolean> isAllowed = user -> user.getLoginName().equals(loginModel.loginName());
 
-        validate(getEntityService().loadEntityById(userID).map(isAllowed).orElse(false), () ->
+        validate(getService().loadEntityById(userID).map(isAllowed).orElse(false), () ->
         {
             log.warn("A user tried to access the advanced token of another user. The request has been rejected.");
             return unauthorizedThrowable();
@@ -90,6 +86,6 @@ import java.util.function.Function;
     private @NotNull ResponseEntity<String> login(@NotNull LoginModel loginModel)
     {
         log.info("The server has recognized an incoming login request.");
-        return getEntityService().login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
+        return getService().login(loginModel).map(ResponseEntity::ok).orElseThrow(this::unauthorizedThrowable);
     }
 }
