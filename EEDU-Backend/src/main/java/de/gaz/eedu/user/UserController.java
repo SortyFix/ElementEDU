@@ -197,4 +197,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
         }
         log.info("User {} has been logged out.", userId);
     }
+
+    @PostMapping("/all")
+    @Override public @NotNull ResponseEntity<UserModel[]> fetchAll()
+    {
+        return super.fetchAll();
+    }
 }

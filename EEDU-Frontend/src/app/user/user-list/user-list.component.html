@@ -1,0 +1,11 @@
+<mat-nav-list>
+    @for(user of userList(); track user)
+    {
+        <mat-list-item >
+            <a matListItemTitle>User {{ user.lastName }}</a>
+            <button mat-icon-button matListItemMeta>
+                <mat-icon>info</mat-icon>
+            </button>
+        </mat-list-item>
+    }
+</mat-nav-list>

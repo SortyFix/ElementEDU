@@ -5,7 +5,7 @@ export enum UserStatus
     PRESENT = "PRESENT", EXCUSED = "EXCUSED", UNEXCUSED = "UNEXCUSED", PROSPECTIVE = "PROSPECTIVE"
 }
 
-export class UserEntity
+export class UserModel
 {
     constructor(public readonly id: bigint,
                 public readonly firstName: string,
