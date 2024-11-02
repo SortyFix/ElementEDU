@@ -99,6 +99,15 @@ public record TokenData(@Nullable Claims parent, long userId, boolean advanced, 
         return addClaim(override, key, value) && restrictClaim(key);
     }
 
+    public boolean deleteRestrictedClaim(@NotNull String key)
+    {
+        return restrictedClaims().remove(key) && removeClaim(key);
+    }
+
+    public boolean unrestrictedClaim(@NotNull String key)
+    {
+        return restrictedClaims().remove(key);
+    }
 
     public boolean addClaim(@NotNull String key, @NotNull Object value)
     {

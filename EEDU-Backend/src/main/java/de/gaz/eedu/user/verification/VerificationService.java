@@ -122,6 +122,11 @@ public class VerificationService
     {
         JwtTokenType type = tokenData.advanced() ? JwtTokenType.ADVANCED_AUTHORIZATION : JwtTokenType.AUTHORIZED;
         Instant expiry = Instant.ofEpochMilli(tokenData.get("expiry", Long.class));
+
+        tokenData.deleteRestrictedClaim("expiry");
+        tokenData.deleteRestrictedClaim("available");
+        tokenData.deleteRestrictedClaim("temporary");
+
         return generateKey(type, expiry, tokenData);
     }
 
