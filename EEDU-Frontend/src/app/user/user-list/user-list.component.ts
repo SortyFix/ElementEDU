@@ -1,7 +1,7 @@
 import {Component, input, InputSignal} from '@angular/core';
 import {UserModel} from "../user-model";
 import {MatListItem, MatListItemLine, MatListItemMeta, MatListItemTitle, MatNavList} from "@angular/material/list";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatChip, MatChipRow, MatChipSet} from "@angular/material/chips";
 import {
@@ -14,6 +14,9 @@ import {
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
+import {AccessibilityService} from "../../accessibility.service";
+import {NgForOf, NgIf} from "@angular/common";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-user-list',
@@ -37,26 +40,64 @@ import {MatInput} from "@angular/material/input";
         MatListItemLine,
         MatFormField,
         MatInput,
-        MatLabel
+        MatLabel,
+        MatButton,
+        NgIf,
+        FormsModule,
+        NgForOf
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })
 export class UserListComponent {
 
+    protected filteredString: string = '';
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
+    private _selected: Set<string> = new Set();
 
-    handleKeyDown(event: KeyboardEvent) {
+    constructor(protected accessibilityService: AccessibilityService) {}
 
+    handleKeyDown(event: KeyboardEvent, user: UserModel) {
+        // noinspection FallThroughInSwitchStatementJS
         switch (event.key) { // fall through
-            case 'Enter':
-
+            // @ts-ignore
+            case ' ':
+                this.toggle(user)
             case 'ArrowLeft':
             case 'ArrowRight':
             case "ArrowUp":
             case 'ArrowDown':
                 event.stopPropagation();
                 event.preventDefault();
+        }
+    }
+
+    protected get allSelected(): boolean {
+        return this._selected.size === this.userList().length;
+    }
+
+    protected toggleAllSelected(): void {
+        if (this.allSelected) {
+            this._selected.clear();
+            return;
+        }
+
+        this.userList().forEach((userModel: UserModel): Set<string> => this._selected.add(userModel.loginName));
+    }
+
+    protected get partiallySelected(): boolean {
+        return this._selected.size > 0 && !this.allSelected;
+    }
+
+    protected selected(user: UserModel): boolean {
+        return this._selected.has(user.loginName);
+    }
+
+    protected toggle(user: UserModel): void {
+        if (this.selected(user)) {
+            this._selected.delete(user.loginName);
+        } else {
+            this._selected.add(user.loginName);
         }
     }
 }
