@@ -1,17 +1,34 @@
-<mat-nav-list style="background-color: white">
-    @for(user of userList(); track user)
-    {
-        <mat-list-item >
-            <a matListItemTitle><mat-icon class="icon" style="margin-right: 10px">person</mat-icon>{{ user.lastName }}</a>
+<mat-form-field appearance="fill">
+    <mat-label>Search</mat-label>
+    <input name="search"
+           type="search"
+           placeholder="Search..."
+           autofocus matInput>
+</mat-form-field>
+<mat-accordion>
+    <section>
+        @for(user of userList(); track user)
+        {
+            <mat-expansion-panel>
+                <mat-expansion-panel-header tabindex="-1">
+                    <mat-panel-title>
+                        <a matListItemTitle><mat-checkbox (click)="$event.stopPropagation()" (keydown)="handleKeyDown($event)"></mat-checkbox>
+                            <mat-icon class="icon" style="margin-right: 10px">person</mat-icon>{{ user.lastName }}
+                        </a>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-chip-set>
+                            <mat-chip>Schüler</mat-chip>
+                            <mat-chip>5B</mat-chip>
+                            <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
+                        </mat-chip-set>
+                    </mat-panel-description>
 
-            <mat-chip-set matListItemMeta>
-                <mat-chip>Schüler</mat-chip>
-                <mat-chip>5B</mat-chip>
-                <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
-            </mat-chip-set>
-            <button mat-icon-button matListItemMeta>
-                <mat-icon>info</mat-icon>
-            </button>
-        </mat-list-item>
-    }
-</mat-nav-list>
+                </mat-expansion-panel-header>
+                <p>
+                    test
+                </p>
+            </mat-expansion-panel>
+        }
+    </section>
+</mat-accordion>

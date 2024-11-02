@@ -238,3 +238,14 @@ CREATE TABLE IF NOT EXISTS post_tags
     tags VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
+
+INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
+VALUES ('Light', 30, 30, 30, 50, 50, 50);
+
+
+INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
+VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, FALSE, FALSE, 1, 0),
+       ('John', 'Zimmermann', 'john.zimmermann', FALSE, TRUE, TRUE, 1, 0),
+       ('Martin', 'Hansen', 'martin.hansen', FALSE, TRUE, FALSE, 1, 0),
+       ('dummy', 'dummy', 'dummy.dummy', FALSE, TRUE, FALSE, 1, 3),
+       ('gaz', 'gaz', 'gaz', TRUE, TRUE, FALSE, 1, 3);
