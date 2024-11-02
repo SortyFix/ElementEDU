@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @Slf4j @RestController @RequestMapping("/api/v1/course/appointment") @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class ScheduledAppointmentController extends EntityController<ScheduledAppointmentService, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
@@ -57,7 +59,7 @@ public class ScheduledAppointmentController extends EntityController<ScheduledAp
     }
 
     @GetMapping("/get/all")
-    @Override public @NotNull ResponseEntity<ScheduledAppointmentModel[]> fetchAll()
+    @Override public @NotNull ResponseEntity<Set<ScheduledAppointmentModel>> fetchAll()
     {
         return super.fetchAll();
     }

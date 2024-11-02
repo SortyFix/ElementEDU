@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j @AllArgsConstructor
@@ -89,18 +90,15 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
                            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    public @NotNull ResponseEntity<M[]> fetchAll()
+    public @NotNull ResponseEntity<Set<M>> fetchAll()
     {
         return fetchAll((m) -> true);
     }
 
-    public @NotNull final ResponseEntity<M[]> fetchAll(@NotNull Predicate<M> predicate)
+    public @NotNull final ResponseEntity<Set<M>> fetchAll(@NotNull Predicate<M> predicate)
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
-
-        Collection<M> collection = getService().findAll(predicate);
-        M[] array = (M[]) Array.newInstance(Object.class, collection.size());
-        return ResponseEntity.ok(collection.toArray(array));
+        return ResponseEntity.ok(getService().findAll(predicate));
     }
 
     protected boolean isAuthorized(@NotNull String authority)
