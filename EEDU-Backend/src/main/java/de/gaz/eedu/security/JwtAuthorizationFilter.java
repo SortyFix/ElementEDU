@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -69,6 +70,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
 
     private @NotNull Optional<String> checkCookies(@NotNull HttpServletRequest request)
     {
+        System.out.println(Arrays.toString(request.getCookies()));
         Cookie[] cookies = request.getCookies();
         if (Objects.isNull(cookies))
         {
