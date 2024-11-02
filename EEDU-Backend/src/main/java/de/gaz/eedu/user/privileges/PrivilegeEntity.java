@@ -2,12 +2,8 @@ package de.gaz.eedu.user.privileges;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -22,34 +18,16 @@ import java.util.Set;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) // ID is final
     private Long id;
     private String name;
-    @JsonBackReference
-    @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    private Set<GroupEntity> groupEntities;
+    @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER) private Set<GroupEntity> groupEntities;
 
     public @NotNull SimpleGrantedAuthority toAuthority()
     {
         return new SimpleGrantedAuthority(getName());
     }
 
-    public @NotNull SimplePrivilegeModel toSimpleModel()
-    {
-        return new SimplePrivilegeModel(getId(), getName());
-    }
-
     @Override public PrivilegeModel toModel()
     {
-        return new PrivilegeModel(getId(),
-                getName(),
-                getGroupEntities().stream()
-                        .map(groupEntity -> new SimplePrivilegeGroupModel(groupEntity.getId(),
-                                groupEntity.getName(),
-                                groupEntity.isTwoFactorRequired(),
-                                groupEntity.getUsers()
-                                        .stream()
-                                        .map(UserEntity::toSimpleModel)
-                                        .toArray(SimpleUserModel[]::new)))
-                        .distinct()
-                        .toArray(SimplePrivilegeGroupModel[]::new));
+        return new PrivilegeModel(getId(), getName());
     }
 
     @Override public String toString()

@@ -6,6 +6,7 @@ import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
+import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,7 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<CourseModel> create(@NotNull @RequestBody CourseCreateModel model)
+    @PostMapping("/create") @Override public @NotNull ResponseEntity<CourseModel> create(@NotNull @RequestBody CourseCreateModel model) throws CreationException
     {
         return super.create(model);
     }

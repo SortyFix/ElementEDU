@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Getter(AccessLevel.PROTECTED)
+@Slf4j @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
 public class GroupService extends EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
@@ -54,7 +54,11 @@ public class GroupService extends EntityService<GroupRepository, GroupEntity, Gr
             return group;
         }));
 
-        users.forEach(user -> user.attachGroups(getUserService(), groupEntity)); // attach users to this group
+        users.stream().filter(user -> !user.attachGroups(getUserService(), groupEntity)).forEach(group ->
+        {
+            log.warn("Could not attach newly created group {} to at least one of the users {}.", group.getId(), users);
+        }); // attach users to this group
+        
         return groupEntity;
     }
 

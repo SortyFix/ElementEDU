@@ -1,25 +1,21 @@
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
-.backdrop-blur {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+html, body {
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    margin: 0;
 }
 
-.centered-icon
+// Align material vertically with the text
+.icon
 {
     vertical-align: middle;
+    align-items: center;
     margin-bottom: 4px
 }
 
-app-root {
-    display: block;
-    height: 100%;
+// This is a temporary solution
+mat-form-field
+{
+    width: 100%;
+    margin-top: 5px;
 }

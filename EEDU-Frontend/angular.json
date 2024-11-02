@@ -36,6 +36,12 @@
                     },
                     "configurations": {
                         "production": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.production.ts"
+                                }
+                            ],
                             "budgets": [
                                 {
                                     "type": "initial",
@@ -65,10 +71,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "browserTarget": "EEDU-Frontend:build:production"
+                            "buildTarget": "EEDU-Frontend:build:production"
                         },
                         "development": {
-                            "browserTarget": "EEDU-Frontend:build:development"
+                            "buildTarget": "EEDU-Frontend:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -76,7 +82,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "EEDU-Frontend:build"
+                        "buildTarget": "EEDU-Frontend:build"
                     }
                 },
                 "test": {

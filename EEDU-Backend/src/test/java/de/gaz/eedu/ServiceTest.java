@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * {@code ServiceTest} is an abstract class, providing a generic way to test services.
@@ -173,22 +172,21 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
     @Test
     public void testDeleteEntitySuccess()
     {
-        Stream<TestData<Boolean>> deleteData = deleteEntities();
-        List<TestData<Boolean>> data = deleteData.toList();
-        if(data.isEmpty())
+        TestData<Boolean>[] deleteData = deleteEntities();
+        if(deleteData.length == 0)
         {
             Assumptions.abort();
         }
 
-        for(TestData<Boolean> current : data)
+        for(TestData<Boolean> current : deleteData)
         {
             test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
         }
     }
 
-    @Contract(pure = true, value = "-> new") protected @NotNull Stream<TestData<Boolean>> deleteEntities()
+    @Contract(pure = true, value = "-> new") protected @NotNull TestData<Boolean>[] deleteEntities()
     {
-        return Stream.empty();
+        return new TestData[0];
     }
 
     /**

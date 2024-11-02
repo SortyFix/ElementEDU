@@ -1,0 +1,19 @@
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    mat-checkbox {
+        margin: 0;
+    }
+}
+
+.buttons {
+    display: flex;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}

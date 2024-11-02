@@ -1,46 +1,91 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import { Router } from "@angular/router";
-import {catchError, Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
+import {finalize, map, Observable, of, tap} from "rxjs";
+import {UserEntity} from "./user-entity";
+import {ThemeEntity} from "../theming/theme-entity";
+import {environment} from "../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
-export class UserService {
-    constructor(private http: HttpClient, private router: Router) { }
+export class UserService
+{
+    private readonly BACKEND_URL: string = environment.backendUrl;
+    private _loaded: boolean = false;
 
-    /**
-     * Passes a POST request with login name and password to the UserController's loginUser() method.
-     * <p>
-     * Returns the status code of the response as an <code>Observable<number></code>.
-     * Therefore, other components/classes need to subscribe to this function in order to
-     * access its return value.
-     * @param loginName
-     * @param password
-     */
-
-    requestLogin(loginName: string, password: string): Observable<number> {
-        const body: {loginName: string, password: string } = {loginName, password};
-        const httpOptions = {
-            headers: new HttpHeaders({'Content-Type':  'application/json'}),
-            observe: 'response' as const
-        };
-
-        return this.http.post("http://localhost:8080/user/login", body, httpOptions).pipe(
-            map(response => {
-                // Navigate to ./home if routing is successful. TODO: Tokens
-                this.router.navigate(["/home"]).then(r => console.log("Successful login; Switching to user dashboard."));
-                console.log(response);
-                console.log(response.status);
-                return response.status;
-            }),
-            catchError(error => {
-                console.error(error);
-                console.log(error.status);
-                throw error.status;
-            })
-        );
+    constructor(private http: HttpClient)
+    {
     }
 
+    public loadData(): Observable<void>
+    {
+        this._loaded = this.isLoggedIn;
+        if (this._loaded)
+        {
+            // load user data in the background
+            return this.fetchUserData.pipe(map((user: UserEntity): void => {
+                this.storeUserData(JSON.stringify(user))
+            }));
+        }
+
+        return this.fetchUserData.pipe(tap<UserEntity>({
+            next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
+        }), finalize((): void => { this._loaded = true; }), map((): void => {}));
+    }
+
+    public get getUserData(): UserEntity
+    {
+        const userData: string | null = localStorage.getItem('userData')
+        if (!this.isLoggedIn || !userData)
+        {
+            throw new Error("User is not logged in, or user data is corrupt.");
+        }
+        const parsedJson: any = JSON.parse(userData);
+        const theme: any = parsedJson.theme;
+        const themeEntity: ThemeEntity = new ThemeEntity(
+            theme.id,
+            theme.name,
+            theme.backgroundColor_r,
+            theme.backgroundColor_g,
+            theme.backgroundColor_b,
+            theme.widgetColor_r,
+            theme.widgetColor_g,
+            theme.widgetColor_b);
+
+        return new UserEntity(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
+    }
+
+    public get hasLoaded(): boolean
+    {
+        return this._loaded;
+    }
+
+    public logout(): Observable<any> // TODO maybe move to login service??
+    {
+        if (!this.isLoggedIn)
+        {
+            return of();
+        }
+
+        const url = `${this.BACKEND_URL}/user/logout`;
+        return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
+            next: () => localStorage.removeItem("userData")
+        }));
+    }
+
+    public get isLoggedIn(): boolean
+    {
+        return !!localStorage.getItem("userData");
+    }
+
+    private get fetchUserData(): Observable<UserEntity>
+    {
+        const url: string = `${this.BACKEND_URL}/user/get`;
+        return this.http.get<UserEntity>(url, {withCredentials: true});
+    }
+
+    private storeUserData(userData: string)
+    {
+        localStorage.setItem("userData", userData)
+    }
 }

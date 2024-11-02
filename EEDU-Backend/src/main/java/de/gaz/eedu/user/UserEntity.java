@@ -6,19 +6,15 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.SimpleUserGroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.model.UserModel;
-import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
-import de.gaz.eedu.user.verfication.twofa.TwoFactorEntity;
-import de.gaz.eedu.user.verfication.twofa.implementations.TwoFactorMethod;
-import de.gaz.eedu.user.verfication.twofa.model.TwoFactorModel;
+import de.gaz.eedu.user.verification.credentials.CredentialEntity;
+import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -47,7 +43,13 @@ import java.util.stream.Stream;
  * @see GroupEntity
  * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "user_entity") @Slf4j
+@Entity
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Table(name = "user_entity")
+@Slf4j
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
@@ -58,28 +60,22 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private boolean systemAccount;
-    private String firstName, lastName, loginName, password;
+    private String firstName, lastName, loginName;
     private boolean enabled, locked;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
-    private Set<TwoFactorEntity> twoFactors = new HashSet<>();
+    private Set<CredentialEntity> credentials = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
     private ThemeEntity themeEntity;
-    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE)
-    @JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"))
-    @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
+    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(
+            name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id")
+    ) @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
-    public @NotNull SimpleUserModel toSimpleModel()
+    @Override public String getPassword()
     {
-        return new SimpleUserModel(getId(),
-                getFirstName(),
-                getLastName(),
-                getLoginName(),
-                isEnabled(),
-                isLocked(),
-                getThemeEntity().toSimpleModel(),
-                getStatus());
+        throw new UnsupportedOperationException("Users can have multiple passwords");
     }
 
     @Override public boolean isDeletable()
@@ -89,26 +85,13 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public UserModel toModel()
     {
-        Function<GroupEntity, SimpleUserGroupModel> mapper = (entity) ->
-        {
-            SimplePrivilegeModel[] privilegeModels = entity.getPrivileges().stream().map(PrivilegeEntity::toSimpleModel)
-                    .toArray(SimplePrivilegeModel[]::new);
-            return new SimpleUserGroupModel(entity.getId(),
-                    entity.getName(),
-                    entity.isTwoFactorRequired(),
-                    privilegeModels);
-        };
-
-        return new UserModel(getId(),
+        return new UserModel(
+                getId(),
                 getFirstName(),
                 getLastName(),
                 getLoginName(),
-                isEnabled(),
-                isLocked(),
-                getTwoFactors().stream().map(TwoFactorEntity::toModel).distinct().toArray(TwoFactorModel[]::new),
-                getThemeEntity().toSimpleModel(),
-                getGroups().stream().map(mapper).toArray(SimpleUserGroupModel[]::new),
-                getStatus());
+                getStatus(),
+                getThemeEntity().toModel());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
@@ -190,8 +173,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         // Filter already attached groups out
-        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream()
-                .noneMatch(presentGroup -> Objects.equals(presentGroup, requestedGroup));
+        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream().noneMatch(presentGroup -> Objects.equals(
+                presentGroup,
+                requestedGroup));
         return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
     }
 
@@ -298,56 +282,41 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     public boolean hasAnyAuthority(@NotNull Collection<String> authorities)
     {
-        Set<String> loadedAuthorities = getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+        Set<String> loadedAuthorities = getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
         return authorities.stream().anyMatch(loadedAuthorities::contains);
     }
 
-    public @NotNull Optional<TwoFactorEntity> getTwoFactor(@NotNull TwoFactorMethod twoFactorMethod)
+    public @NotNull Set<CredentialEntity> getCredentials(@NotNull CredentialMethod credentialMethod)
     {
         // Also include not enabled ones, therefore not getter
-        return twoFactors.stream().filter(entity -> entity.getMethod().equals(twoFactorMethod)).findFirst();
+        return credentials.stream().filter(entity -> entity.getMethod().equals(credentialMethod)).collect(Collectors.toUnmodifiableSet());
     }
 
-    @Transactional public boolean initTwoFactor(
-            @NotNull UserService userService, @NotNull TwoFactorEntity twoFactorEntity)
+    @Transactional
+    public boolean initCredential(@NotNull UserService userService, @NotNull CredentialEntity credentialEntity)
     {
-        return saveEntityIfPredicateTrue(userService, twoFactorEntity, this::initTwoFactor);
+        return saveEntityIfPredicateTrue(userService, credentialEntity, this::initCredential);
     }
 
-    public boolean initTwoFactor(@NotNull TwoFactorEntity twoFactorEntity)
+    public boolean initCredential(@NotNull CredentialEntity credentialEntity)
     {
-        if (this.getTwoFactors().stream().anyMatch(entity -> entity.getMethod().equals(twoFactorEntity.getMethod())))
-        {
-            return false;
-        }
-
-        // remove not enabled instances of this two factor
-        if (twoFactors.removeIf(entity -> Objects.equals(entity.getMethod(), twoFactorEntity.getMethod())))
-        {
-            String removalMessage = "A disabled two-factor instance using method {} was overridden from user {}.";
-            log.warn(removalMessage, twoFactorEntity.getMethod(), getId());
-        }
-
-        return this.twoFactors.add(twoFactorEntity);
+        return this.credentials.add(credentialEntity);
     }
 
-    @Transactional public boolean disableTwoFactor(@NotNull UserService userService, @NotNull Long... ids)
+    @Transactional public boolean disableCredential(@NotNull UserService userService, @NotNull Long... ids)
     {
-        return saveEntityIfPredicateTrue(userService, ids, this::disableTwoFactor);
+        return saveEntityIfPredicateTrue(userService, ids, this::disableCredential);
     }
 
-    public boolean disableTwoFactor(@NotNull Long... ids)
+    public boolean disableCredential(@NotNull Long... ids)
     {
-        Set<Long> disableFactors = Stream.of(ids)
-                .filter(current -> getTwoFactors().stream().anyMatch(entity -> Objects.equals(entity.getId(), current)))
-                .collect(Collectors.toSet());
-        return twoFactors.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
+        Set<Long> disableFactors = Set.of(ids);
+        return credentials.removeIf(currentEntity -> disableFactors.contains(currentEntity.getId()));
     }
 
-    public @NotNull @Unmodifiable Set<TwoFactorEntity> getTwoFactors()
+    public @NotNull @Unmodifiable Set<CredentialEntity> getCredentials()
     {
-        return twoFactors.stream().filter(TwoFactorEntity::isEnabled).collect(Collectors.toUnmodifiableSet());
+        return credentials.stream().filter(CredentialEntity::isEnabled).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -403,7 +372,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public boolean deleteManagedRelations()
     {
-        if(this.groups.isEmpty())
+        if (this.groups.isEmpty())
         {
             return false;
         }
@@ -411,8 +380,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return true;
     }
 
+    @Contract(pure = true, value = "-> new")
     @Override public String toString()
-    {
+    { // Automatically generated using intellij
         return "UserEntity{" +
                 "courses=" + courses +
                 ", status=" + status +
@@ -422,10 +392,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", loginName='" + loginName + '\'' +
-                ", password='" + password + '\'' +
                 ", enabled=" + enabled +
                 ", locked=" + locked +
-                ", twoFactors=" + twoFactors +
+                ", credentials=" + credentials +
                 ", themeEntity=" + themeEntity +
                 ", groups=" + groups +
                 ", classRoom=" + classRoom +
@@ -445,9 +414,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return Objects.hash(getId());
     }
 
-    private <T> boolean saveEntityIfPredicateTrue(
-            @NotNull UserService userService,
-            @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

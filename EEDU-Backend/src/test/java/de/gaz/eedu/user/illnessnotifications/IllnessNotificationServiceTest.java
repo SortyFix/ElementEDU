@@ -16,7 +16,6 @@ import org.springframework.mock.web.MockMultipartFile;
 
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationService, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
@@ -70,7 +69,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     }
 
     @Override
-    protected @NotNull Stream<TestData<Boolean>> deleteEntities() {
-        return Stream.of(new TestData<>(3, true));
+    protected @NotNull TestData<Boolean>[] deleteEntities() {
+        return new TestData[] {new TestData<>(3, true) };
     }
 }

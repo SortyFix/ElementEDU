@@ -1,5 +1,11 @@
-.content {
-    width: 100%;
+.content, .background-image {
     height: 100%;
-    margin-bottom: 30px;
+}
+
+.background-image {
+    background-image: url('../assets/img/gaz-background.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
 }
