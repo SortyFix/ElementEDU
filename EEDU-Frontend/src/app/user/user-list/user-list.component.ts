@@ -1,8 +1,9 @@
 import {Component, input, InputSignal} from '@angular/core';
 import {UserModel} from "../user-model";
-import {MatListItem, MatListItemTitle, MatNavList} from "@angular/material/list";
+import {MatListItem, MatListItemMeta, MatListItemTitle, MatNavList} from "@angular/material/list";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {MatChip, MatChipRow, MatChipSet} from "@angular/material/chips";
 
 @Component({
   selector: 'app-user-list',
@@ -12,7 +13,11 @@ import {MatIcon} from "@angular/material/icon";
         MatListItem,
         MatListItemTitle,
         MatIconButton,
-        MatIcon
+        MatIcon,
+        MatChipRow,
+        MatChipSet,
+        MatChip,
+        MatListItemMeta
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'

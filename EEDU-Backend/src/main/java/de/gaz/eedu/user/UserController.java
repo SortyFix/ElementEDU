@@ -23,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Contains methods to interact with the {@link UserService} using a http request.
@@ -198,8 +199,8 @@ public class UserController extends EntityController<UserService, UserModel, Use
         log.info("User {} has been logged out.", userId);
     }
 
-    @PostMapping("/all")
-    @Override public @NotNull ResponseEntity<UserModel[]> fetchAll()
+    @GetMapping("/all")
+    @Override public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
         return super.fetchAll();
     }

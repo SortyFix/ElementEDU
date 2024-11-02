@@ -1,8 +1,14 @@
-<mat-nav-list>
+<mat-nav-list style="background-color: white">
     @for(user of userList(); track user)
     {
         <mat-list-item >
-            <a matListItemTitle>User {{ user.lastName }}</a>
+            <a matListItemTitle><mat-icon class="icon" style="margin-right: 10px">person</mat-icon>{{ user.lastName }}</a>
+
+            <mat-chip-set matListItemMeta>
+                <mat-chip>Schüler</mat-chip>
+                <mat-chip>5B</mat-chip>
+                <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
+            </mat-chip-set>
             <button mat-icon-button matListItemMeta>
                 <mat-icon>info</mat-icon>
             </button>

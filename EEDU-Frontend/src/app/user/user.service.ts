@@ -29,7 +29,7 @@ export class UserService
         }
 
         return this.fetchUserData.pipe(tap<UserModel>({
-            next: (value: UserModel) => this.storeUserData(JSON.stringify(value))
+            next: (value: UserModel): void => this.storeUserData(JSON.stringify(value))
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
     }
 
@@ -72,12 +72,10 @@ export class UserService
         return this.http.get<UserModel>(url, {withCredentials: true});
     }
 
-    public get fetchAll(): Observable<UserModel[]> {
+    public get fetchAll(): Observable<UserModel[]>
+    {
         const url: string = `${this.BACKEND_URL}/user/all`;
-        return this.http.post<UserModel[]>(url, {
-            withCredentials: true,
-            responseType: "text" as "json"
-        });
+        return this.http.get<UserModel[]>(url, {withCredentials: true});
     }
 
     private storeUserData(userData: string)
