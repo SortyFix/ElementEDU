@@ -12,10 +12,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -25,6 +22,17 @@ import java.util.stream.Collectors;
 public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
 {
     @NotNull protected abstract R getRepository();
+
+    protected final boolean duplicates(@NotNull C @NotNull [] data)
+    {
+        Set<C> set = new HashSet<>();
+        for (C element : data) {
+            if (!set.add(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Loads an entity {@link E} by its id.
@@ -117,7 +125,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @throws CreationException is thrown when anything went wrong while creating
      * @see Transactional
      */
-    @Transactional public abstract @NotNull E[] createEntity(@NotNull C... model) throws CreationException;
+    @Transactional public abstract @NotNull Set<E> createEntity(@NotNull Set<C> model) throws CreationException;
 
     /**
      * Deletes an {@link E} from the database.
@@ -332,7 +340,6 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
         return toModel().apply(loadEntityByIDSafe(id));
     }
 
-
     /**
      * Loads a {@link M} by its id.
      * <p>
@@ -375,9 +382,9 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
         return findAllEntities().stream().map(toModel()).filter(predicate).collect(Collectors.toSet());
     }
 
-    @Transactional public @NotNull M create(@NotNull C model)
+    @Transactional public @NotNull Set<M> create(@NotNull Set<C> model)
     {
-        return toModel().apply(createEntity(model));
+        return createEntity(model).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }
 
     @Transactional public @NotNull M save(@NotNull E entity)
