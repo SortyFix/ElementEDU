@@ -1,5 +1,6 @@
-<button (click)="fetch()"></button>
-
 @if (this.userList.length != 0) {
-    <app-user-list [userList]="userList"></app-user-list>
+    <div style="background-color: #eee; padding: 5px;">
+
+        <app-user-list [userList]="userList"></app-user-list>
+    </div>
 }

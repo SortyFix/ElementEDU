@@ -72,32 +72,40 @@ export class UserListComponent {
         }
     }
 
-    protected get allSelected(): boolean {
-        return this._selected.size === this.userList().length;
+    protected get partiallySelected(): boolean {
+        return this._selected.size > 0 && !this.isSelected('all');
     }
 
-    protected toggleAllSelected(): void {
-        if (this.allSelected) {
-            this._selected.clear();
+    protected isSelected(entry: UserModel | 'all'): boolean {
+        if (entry === 'all') {
+            return this._selected.size === this.users.length;
+        }
+
+        return this._selected.has(entry.loginName);
+    }
+
+    protected toggle(entry: UserModel | 'all'): void {
+
+        if (entry === 'all') {
+            if (this.isSelected('all')) {
+                this._selected.clear();
+                return;
+            }
+
+            this.users.forEach((userModel: UserModel): Set<string> => this._selected.add(userModel.loginName));
             return;
         }
 
-        this.userList().forEach((userModel: UserModel): Set<string> => this._selected.add(userModel.loginName));
-    }
-
-    protected get partiallySelected(): boolean {
-        return this._selected.size > 0 && !this.allSelected;
-    }
-
-    protected selected(user: UserModel): boolean {
-        return this._selected.has(user.loginName);
-    }
-
-    protected toggle(user: UserModel): void {
-        if (this.selected(user)) {
-            this._selected.delete(user.loginName);
-        } else {
-            this._selected.add(user.loginName);
+        // delete if selected
+        if (this.isSelected(entry)) {
+            this._selected.delete(entry.loginName);
+            return;
         }
+
+        this._selected.add(entry.loginName);
+    }
+
+    protected get users(): UserModel[] {
+        return this.userList();
     }
 }

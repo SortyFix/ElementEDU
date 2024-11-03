@@ -7,37 +7,36 @@
            autofocus matInput>
 </mat-form-field>
 <mat-accordion>
-    <section>
-        <mat-checkbox [checked]="allSelected"
-                      [indeterminate]="partiallySelected"
-                      (change)="toggleAllSelected()"
-        >Select All
-        </mat-checkbox>
+    <mat-checkbox [checked]="isSelected('all')"
+                  [indeterminate]="partiallySelected"
+                  (change)="toggle('all')"
+    >Select All
+    </mat-checkbox>
 
-        <mat-expansion-panel *ngFor="let user of userList()">
-            <mat-expansion-panel-header tabindex="-1">
-                <mat-panel-title>
-                    <a matListItemTitle>
-                        <mat-checkbox
-                            [checked]="selected(user)"
-                            (change)="toggle(user)"
-                            (click)="$event.stopPropagation()"
-                            (keydown)="handleKeyDown($event, user)"></mat-checkbox>
-                        <mat-icon class="icon" style="margin-right: 10px">person</mat-icon>{{ user.lastName }}
-                    </a>
-                </mat-panel-title>
-                <mat-panel-description *ngIf="!accessibilityService.mobile">
-                    <mat-chip-set>
-                        <mat-chip>Schüler</mat-chip>
-                        <mat-chip>5B</mat-chip>
-                        <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
-                    </mat-chip-set>
-                </mat-panel-description>
+    <mat-expansion-panel *ngFor="let user of userList()">
+        <mat-expansion-panel-header tabindex="-1">
+            <mat-panel-title>
+                <a matListItemTitle>
+                    <mat-checkbox
+                        [checked]="isSelected(user)"
+                        (change)="toggle(user)"
+                        (click)="$event.stopPropagation()"
+                        (keydown)="handleKeyDown($event, user)"></mat-checkbox>
+                    <mat-icon class="icon" style="margin-right: 10px">person</mat-icon>
+                    {{ user.lastName }}
+                </a>
+            </mat-panel-title>
+            <mat-panel-description *ngIf="!accessibilityService.mobile">
+                <mat-chip-set>
+                    <mat-chip>Schüler</mat-chip>
+                    <mat-chip>5B</mat-chip>
+                    <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
+                </mat-chip-set>
+            </mat-panel-description>
 
-            </mat-expansion-panel-header>
-            <p>
-                <button mat-button>Set Password</button>
-            </p>
-        </mat-expansion-panel>
-    </section>
+        </mat-expansion-panel-header>
+        <p>
+            <button mat-button>Set Password</button>
+        </p>
+    </mat-expansion-panel>
 </mat-accordion>
