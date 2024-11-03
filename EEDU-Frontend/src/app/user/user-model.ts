@@ -1,4 +1,5 @@
 import {ThemeEntity} from "../theming/theme-entity";
+import {GroupModel} from "./GroupModel";
 
 export enum UserStatus
 {
@@ -12,5 +13,6 @@ export class UserModel
                 public readonly lastName: string,
                 public readonly loginName: string,
                 public readonly status: UserStatus,
+                public readonly groups: GroupModel[],
                 public readonly theme: ThemeEntity) { }
 }

@@ -6,6 +6,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
@@ -85,12 +86,14 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public UserModel toModel()
     {
+        GroupModel[] groups = getGroups().stream().map(GroupEntity::toModel).toArray(GroupModel[]::new);
         return new UserModel(
                 getId(),
                 getFirstName(),
                 getLastName(),
                 getLoginName(),
                 getStatus(),
+                groups,
                 getThemeEntity().toModel());
     }
 

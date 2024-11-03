@@ -55,7 +55,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
     @PreAuthorize(
-            "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${user.credential.delete})"
+            "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${privilege.user.credential.delete})"
     ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
         return super.delete(id);
@@ -80,14 +80,14 @@ public class CredentialController extends EntityController<CredentialService, Cr
         return create(userID, model);
     }
 
-    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create}, ${privilege.user.all})") @PostMapping("/create/{userId}")
+    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create})") @PostMapping("/create/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
         CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
-    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create.temporary}, ${privilege.user.all})")
+    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create.temporary})")
     @PostMapping("/create/temporary/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {

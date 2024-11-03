@@ -4,6 +4,7 @@
            type="search"
            placeholder="Filter..."
            [(ngModel)]="filteredString"
+           (input)="unselectAll()"
            autofocus matInput>
 </mat-form-field>
 <mat-accordion >
@@ -25,6 +26,7 @@
                         (keydown)="handleKeyDown($event, user)"
                     ></mat-checkbox>
                     <mat-icon class="icon">person</mat-icon>
+
                     {{ user.loginName }}
                 </a>
             </mat-panel-title>
@@ -35,7 +37,7 @@
                     <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
                 </mat-chip-set>
 
-                <mat-icon class="icon" [style.color]="color(user)" [matTooltip]="user.status">{{ status(user) }}
+                <mat-icon class="icon" [matTooltip]="user.status">{{ status(user) }}
                 </mat-icon>
             </mat-panel-description>
 

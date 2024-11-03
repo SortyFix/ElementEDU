@@ -7,6 +7,7 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +78,8 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
 
     @Override public @NotNull GroupModel toModel()
     {
-        return new GroupModel(getId(), getName());
+        PrivilegeModel[] models = getPrivileges().stream().map(PrivilegeEntity::toModel).toArray(PrivilegeModel[]::new);
+        return new GroupModel(getId(), getName(), models);
     }
 
     /**

@@ -89,11 +89,16 @@ export class UserListComponent {
         return this._selected.has(entry.loginName);
     }
 
+    protected unselectAll()
+    {
+        this._selected.clear();
+    }
+
     protected toggle(entry: UserModel | 'all'): void {
 
         if (entry === 'all') {
             if (this.isSelected('all')) {
-                this._selected.clear();
+                this.unselectAll();
                 return;
             }
 
@@ -110,28 +115,16 @@ export class UserListComponent {
         this._selected.add(entry.loginName);
     }
 
-    protected status(user: UserModel): 'check_circle' | 'error' | 'folder' | 'pending' {
+    protected status(user: UserModel): 'check_circle' | 'error' | 'receipt_long' | 'pending' {
         switch (user.status) {
             case UserStatus.PRESENT:
                 return 'check_circle';
             case UserStatus.EXCUSED:
-                return 'folder';
+                return 'receipt_long';
             case UserStatus.UNEXCUSED:
                 return 'error';
             case UserStatus.PROSPECTIVE:
                 return 'pending';
-        }
-    }
-
-    protected color(user: UserModel): '#596' | '#956' | undefined {
-        switch (user.status) {
-            case UserStatus.PRESENT:
-                return '#596';
-            case UserStatus.UNEXCUSED:
-                return '#956'
-            case UserStatus.EXCUSED:
-            case UserStatus.PROSPECTIVE:
-                return undefined;
         }
     }
 

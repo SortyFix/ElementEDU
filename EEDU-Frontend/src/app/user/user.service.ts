@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {finalize, map, Observable, of, pipe, tap} from "rxjs";
+import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
 import {ThemeEntity} from "../theming/theme-entity";
 import {environment} from "../../environments/environment";
+import {GroupModel} from "./GroupModel";
+import {PrivilegeModel} from "./PrivilegeModel";
 
 @Injectable({
     providedIn: 'root'
@@ -108,6 +110,12 @@ export class UserService
             theme.widgetColor_b
         );
 
-        return new UserModel(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
+        const groups: GroupModel[] = parsedJson.groups.map((group: any): GroupModel => {
+            const privileges: any = group.privileges.map((privilege: any): PrivilegeModel => new PrivilegeModel(privilege.name, privilege.level));
+
+            return new GroupModel(BigInt(group.id), group.name, privileges);
+        })
+
+        return new UserModel(BigInt(parsedJson.id), parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, groups, themeEntity);
     }
 }

@@ -1,5 +1,6 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.security.PrivilegeProperties;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -37,6 +38,8 @@ public class DataLoader implements CommandLineRunner
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
 
+    private final PrivilegeProperties privilegeProperties;
+
     @Value("${development:false}") private boolean development;
 
     @Override @Transactional public void run(@NotNull String... args)
@@ -62,10 +65,11 @@ public class DataLoader implements CommandLineRunner
     {
         String randomPassword = randomPassword(15);
 
-        PrivilegeEntity privilegeEntity = createDefaultPrivilege();
+        PrivilegeEntity privilegeEntity = createDefaultPrivileges();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
         setPassword(userEntity, randomPassword);
+
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -88,8 +92,9 @@ public class DataLoader implements CommandLineRunner
         getCredentialService().createEntity(credential);
     }
 
-    private @NotNull PrivilegeEntity createDefaultPrivilege()
+    private @NotNull PrivilegeEntity createDefaultPrivileges()
     {
+        getPrivilegeProperties().getPrivileges();
         PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
         return getPrivilegeService().createEntity(privilege);
     }
