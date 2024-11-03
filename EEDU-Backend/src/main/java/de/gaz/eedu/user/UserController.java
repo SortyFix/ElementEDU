@@ -44,7 +44,7 @@ import java.util.function.Function;
         return userService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<UserModel[]> create(@NotNull @RequestBody UserCreateModel[] model)
     {
         return super.create(model);
     }

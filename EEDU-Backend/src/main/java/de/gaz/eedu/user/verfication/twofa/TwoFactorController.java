@@ -58,7 +58,7 @@ public class TwoFactorController extends EntityController<TwoFactorService, TwoF
         return super.delete(id);
     }
 
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel> create(@NotNull @RequestBody TwoFactorCreateModel model)
+    @PostMapping("/create") @Override public @NotNull ResponseEntity<TwoFactorModel[]> create(@NotNull @RequestBody TwoFactorCreateModel[] model)
     {
         boolean hasAdvanced = isAuthorized(JwtTokenType.ADVANCED_AUTHORIZATION);
         boolean hasRequired = isAuthorized(JwtTokenType.TWO_FACTOR_REQUIRED);

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,17 +30,14 @@ public class SubjectService extends EntityService<SubjectRepository, SubjectEnti
     }
 
     @Override @Transactional
-    public @NotNull SubjectEntity[] createEntity(@NotNull SubjectCreateModel... model) throws CreationException
+    public @NotNull List<SubjectEntity> createEntity(@NotNull Set<SubjectCreateModel> model) throws CreationException
     {
-        List<String> subjects = Arrays.stream(model).map(SubjectCreateModel::name).toList();
-        boolean duplicates = subjects.size() != subjects.stream().collect(Collectors.toUnmodifiableSet()).size();
-        if (getRepository().existsByNameIn(subjects) || duplicates)
+        if (getRepository().existsByNameIn(model.stream().map(SubjectCreateModel::name).toList()))
         {
             throw new OccupiedException();
         }
 
-        SubjectEntity[] entities = new SubjectEntity[subjects.size()];
         Function<SubjectCreateModel, SubjectEntity> toEntity = current -> current.toEntity(new SubjectEntity());
-        return saveEntity(Stream.of(model).map(toEntity).collect(Collectors.toList())).toArray(entities);
+        return saveEntity(model.stream().map(toEntity).toList());
     }
 }

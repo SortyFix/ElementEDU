@@ -12,7 +12,6 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
@@ -30,10 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
 public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
@@ -78,40 +74,44 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         return (entity.getId() + "-" + timeStamp).hashCode();
     }
 
-    @Transactional @Override public @NotNull CourseEntity[] createEntity(@NotNull CourseCreateModel... model) throws CreationException
+    @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException
     {
-        return new CourseEntity[0]; //TODO
-/*        if (getRepository().existsByName(model.name()))
+        Set<FileEntity> repositories = new HashSet<>(model.size());
+        List<CourseEntity> courseEntities = model.stream().map(clazzModel ->
         {
-            throw new NameOccupiedException(model.name());
-        }
 
-        // WHY DO I HAVE TO ADD AN AUTHOR AND A FILE NAME????????? YONAAAAAASSSSSSSSSSSS
-        FileCreateModel file = new FileCreateModel(1L, model.name(), new String[0], "", new String[0]);
-        FileEntity fileEntity = getFileService().createEntity(file);
+            //TODO Yonas: please add a way of creating entities without instantly saving them
+            FileCreateModel file = new FileCreateModel(1L, clazzModel.name(), new String[0], "", new String[0]);
+            FileEntity fileEntity = file.toEntity(new FileEntity());
+            repositories.add(fileEntity);
 
-        return saveEntity(model.toEntity(new CourseEntity(fileEntity), (entity) ->
-        {
-            // attach users
-            if(model.users().length > 0)
+            return clazzModel.toEntity(new CourseEntity(fileEntity), (entity) ->
             {
-                List<UserEntity> userEntities = getUserRepository().findAllById(List.of(model.users()));
-                entity.attachUsers(userEntities.toArray(UserEntity[]::new));
-            }
-
-            // assign class
-            if (model.classId() != null)
-            {
-                getClassRoomRepository().findById(model.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
+                // attach users
+                if (clazzModel.users().length > 0)
                 {
-                    throw new EntityUnknownException(model.classId());
-                });
-            }
+                    List<UserEntity> userEntities = getUserRepository().findAllById(List.of(clazzModel.users()));
+                    entity.attachUsers(userEntities.toArray(UserEntity[]::new));
+                }
 
-            // add to subject
-            entity.setSubject(getSubjectService().loadEntityByIDSafe(model.subjectId()));
-            return entity;
-        }));*/
+                // assign class
+                if (clazzModel.classId() != null)
+                {
+                    getClassRoomRepository().findById(clazzModel.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
+                    {
+                        throw new EntityUnknownException(clazzModel.classId());
+                    });
+                }
+
+                // add to subject
+                entity.setSubject(getSubjectService().loadEntityByIDSafe(clazzModel.subjectId()));
+                return entity;
+            });
+        }).toList();
+
+        // create repositories first
+        getFileService().getRepository().saveAll(repositories);
+        return saveEntity(courseEntities);
     }
 
     @Transactional public @NotNull AppointmentEntryEntity getAppointment(@NotNull Long timeStamp, @NotNull Long courseId)

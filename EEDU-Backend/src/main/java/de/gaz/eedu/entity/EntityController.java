@@ -16,7 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -42,12 +42,14 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @throws CreationException If there is a problem with creating the entity,
      *                           this exception will be thrown. It contains the HTTP status code for the error response.
      */
-    public @NotNull ResponseEntity<M> create(@NotNull C model)
+    public @NotNull ResponseEntity<M[]> create(@NotNull C[] model)
     {
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
-            return ResponseEntity.status(HttpStatus.CREATED).body(getService().create(model));
+            List<M> created = getService().create(Set.of(model));
+            M[] models = created.toArray((M[]) Array.newInstance(created.getFirst().getClass(), created.size()));
+            return ResponseEntity.status(HttpStatus.CREATED).body(models);
         }
         catch (CreationException creationException)
         {

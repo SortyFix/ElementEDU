@@ -63,21 +63,21 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull Set<UserEntity> createEntity(@NotNull Set<UserCreateModel> @NotNull ... model) throws CreationException
+    @Transactional @Override public @NotNull List<UserEntity> createEntity(@NotNull Set<UserCreateModel> model) throws CreationException
     {
-        if (getRepository().existsByLoginNameIn(loginNames))
+        if (getRepository().existsByLoginNameIn(model.stream().map(UserCreateModel::loginName).toList()))
         {
             throw new OccupiedException();
         }
 
-        return saveEntity(Stream.of(model).map(current -> current.toEntity(new UserEntity(), entity ->
+        return saveEntity(model.stream().map(current -> current.toEntity(new UserEntity(), entity ->
         {
             entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
 
             List<Long> ids = Arrays.asList(current.groups());
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        })).collect(Collectors.toList())).toArray(new UserEntity[model.length]);
+        })).toList());
     }
 
     @Transactional @Override public @NotNull UserDetails loadUserByUsername(

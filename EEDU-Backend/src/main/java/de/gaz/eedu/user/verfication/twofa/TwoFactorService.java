@@ -19,7 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TwoFactorService extends EntityService<TwoFactorRepository, TwoFactorEntity, TwoFactorModel, TwoFactorCreateModel>
@@ -36,9 +39,9 @@ import java.util.function.Function;
         return twoFactorRepository;
     }
 
-    @Override public @NotNull TwoFactorEntity[] createEntity(@NotNull TwoFactorCreateModel... model) throws CreationException
+    @Override public @NotNull List<TwoFactorEntity> createEntity(@NotNull Set<TwoFactorCreateModel> model) throws CreationException
     {
-        return new TwoFactorEntity[0];
+        return Collections.emptyList();
     }
 
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)
