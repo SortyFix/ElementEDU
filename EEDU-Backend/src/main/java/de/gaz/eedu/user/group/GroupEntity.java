@@ -42,38 +42,17 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.PRIVATE)
-    private Set<UserEntity> users = new HashSet<>();
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference
+    private final Set<UserEntity> users = new HashSet<>();
 
     @ManyToMany @JsonManagedReference
     @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private Set<PrivilegeEntity> privileges;
-
-    /**
-     * Creates an instance with a {@link Set} of users.
-     * <p>
-     * This constructor creates an instance of the group entity only requiring a users set. This is necessary
-     * as this reference is not managed in this class but outside of it.
-     * <p>
-     * As a result, this constructor prioritizes the users set, primarily because the necessary data might not
-     * be immediately available when first creating the group entity. Other properties of the group entity,
-     * like privileges or name, can be changed later as required using their respective setter methods.
-     * <p>
-     * Therefore, this constructor provides greater flexibility when initial data is minimal or when the
-     * group entity undergoes significant changes post-instantiation.
-     *
-     * @param users the set of {@link UserEntity} objects to be associated with this group.
-     */
-    public GroupEntity(@NotNull Set<UserEntity> users)
-    {
-        this.users = users;
-    }
+    private final Set<PrivilegeEntity> privileges = new HashSet<>();
 
     public @NotNull @Unmodifiable Set<GrantedAuthority> toSpringSecurity()
     {
         return Stream.concat(getAuthorities().stream(), Stream.of(toRole())).collect(Collectors.toSet());
     }
-
 
     @Override public @NotNull GroupModel toModel()
     {

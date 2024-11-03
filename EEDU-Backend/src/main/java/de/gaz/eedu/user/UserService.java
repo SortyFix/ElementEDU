@@ -4,7 +4,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
@@ -30,11 +30,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class manages user related tasks.
@@ -71,19 +70,21 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     }
 
     @Transactional @Override
-    public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    public @NotNull List<UserEntity> createEntity(@NotNull Set<UserCreateModel> model) throws CreationException
     {
-        if (getRepository().existsByLoginName(model.loginName()))
+        if (getRepository().existsByLoginNameIn(model.stream().map(UserCreateModel::loginName).toList()))
         {
-            throw new NameOccupiedException(model.loginName());
+            throw new OccupiedException();
         }
 
-        return saveEntity(model.toEntity(new UserEntity(), entity ->
+        return saveEntity(model.stream().map(current -> current.toEntity(new UserEntity(), entity ->
         {
-            entity.setThemeEntity(themeRepository.getReferenceById(model.theme()));
-            entity.attachGroups(getGroupRepository().findAllById(List.of(model.groups())).toArray(GroupEntity[]::new));
+            entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
+
+            List<Long> ids = Arrays.asList(current.groups());
+            entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        }));
+        })).toList());
     }
 
     @Transactional @Override

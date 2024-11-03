@@ -21,4 +21,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @NotNull Optional<UserEntity> findByLoginName(@NotNull String loginName);
 
     @NotNull boolean existsByLoginName(@NotNull String loginName);
+
+
+    @NotNull boolean existsByLoginNameIn(@NotNull Collection<String> loginNames);
 }
