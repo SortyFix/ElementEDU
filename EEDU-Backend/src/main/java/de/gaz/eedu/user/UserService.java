@@ -67,7 +67,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     {
         List<String> loginNames = Arrays.stream(model).map(UserCreateModel::loginName).toList();
         boolean duplicates = loginNames.size() != loginNames.stream().collect(Collectors.toUnmodifiableSet()).size();
-        if (duplicates || getRepository().existsByLoginName(loginNames))
+        if (duplicates || getRepository().existsByLoginNameIn(loginNames))
         {
             throw new OccupiedException();
         }
@@ -79,7 +79,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
             List<Long> ids = Arrays.asList(current.groups());
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        })).collect(Collectors.toList())).toArray(UserEntity[]::new);
+        })).collect(Collectors.toList())).toArray(new UserEntity[model.length]);
     }
 
     @Transactional @Override public @NotNull UserDetails loadUserByUsername(

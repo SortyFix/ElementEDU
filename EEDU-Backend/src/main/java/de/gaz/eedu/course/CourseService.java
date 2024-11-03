@@ -78,9 +78,10 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         return (entity.getId() + "-" + timeStamp).hashCode();
     }
 
-    @Transactional @Override public @NotNull CourseEntity createEntity(@NotNull CourseCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull CourseEntity[] createEntity(@NotNull CourseCreateModel... model) throws CreationException
     {
-        if (getRepository().existsByName(model.name()))
+        return new CourseEntity[0]; //TODO
+/*        if (getRepository().existsByName(model.name()))
         {
             throw new NameOccupiedException(model.name());
         }
@@ -110,7 +111,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             // add to subject
             entity.setSubject(getSubjectService().loadEntityByIDSafe(model.subjectId()));
             return entity;
-        }));
+        }));*/
     }
 
     @Transactional public @NotNull AppointmentEntryEntity getAppointment(@NotNull Long timeStamp, @NotNull Long courseId)

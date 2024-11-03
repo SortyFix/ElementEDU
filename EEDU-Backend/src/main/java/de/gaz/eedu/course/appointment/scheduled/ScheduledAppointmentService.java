@@ -12,16 +12,22 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class ScheduledAppointmentService extends EntityService<ScheduledAppointmentRepository, ScheduledAppointmentEntity, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
 {
     private final ScheduledAppointmentRepository repository;
     private final CourseService courseService;
 
-    @Transactional @Override public @NotNull ScheduledAppointmentEntity createEntity(@NotNull ScheduledAppointmentCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull ScheduledAppointmentEntity[] createEntity(@NotNull ScheduledAppointmentCreateModel... model) throws CreationException
     {
-        ScheduledAppointmentEntity appointment = model.toEntity(new ScheduledAppointmentEntity());
-        getCourseService().loadEntityByIDSafe(model.course()).scheduleRepeating(appointment);
-        return saveEntity(appointment);
+        return Stream.of(model).map(current ->
+        {
+            ScheduledAppointmentEntity entity = current.toEntity(new ScheduledAppointmentEntity());
+            getCourseService().loadEntityByIDSafe(current.course()).scheduleRepeating(entity);
+            return entity;
+        }).toList().toArray(new ScheduledAppointmentEntity[model.length]);
     }
 }

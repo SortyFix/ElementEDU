@@ -4,9 +4,11 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
+import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,8 +18,11 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor @Service @Getter
 public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
@@ -31,32 +36,35 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
         return classRoomRepository;
     }
 
-    @Transactional @Override public @NotNull ClassRoomEntity createEntity(@NotNull ClassRoomCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull ClassRoomEntity[] createEntity(@NotNull ClassRoomCreateModel... model) throws CreationException
     {
-        if (getRepository().existsByName(model.name()))
+        List<String> clazzes = Arrays.stream(model).map(ClassRoomCreateModel::name).toList();
+        boolean duplicates = clazzes.size() != clazzes.stream().collect(Collectors.toUnmodifiableSet()).size();
+        if(getRepository().existsByNameIn(clazzes) || duplicates)
         {
-            throw new NameOccupiedException(model.name());
+            throw new OccupiedException();
         }
 
-        ClassRoomEntity classRoomEntity = saveEntity(model.toEntity(new ClassRoomEntity(), (entity) ->
+        return Stream.of(model).map(current ->
         {
-            // attach users
-            if (model.users().length > 0)
+            ClassRoomEntity classRoom = saveEntity(current.toEntity(new ClassRoomEntity(), (entity ->
             {
-                List<UserEntity> userEntities = getUserRepository().findAllById(List.of(model.users()));
-                entity.attachStudents(userEntities.toArray(UserEntity[]::new));
-            }
+                // attach users
+                if (current.users().length > 0)
+                {
+                    List<UserEntity> userEntities = getUserRepository().findAllById(List.of(current.users()));
+                    entity.attachStudents(userEntities.toArray(UserEntity[]::new));
+                }
 
-            return entity;
-        }));
+                return entity;
+            })));
 
-        // add classroom to courses after entity was saved.
-        // assign courses
-        Set<CourseEntity> courseEntities = getCourseService().loadEntityById(model.courses());
-        courseEntities.forEach(courseEntity -> courseEntity.linkClassRoom(classRoomEntity));
-        getCourseService().saveEntity(courseEntities);
-
-        return classRoomEntity;
+            // add classroom to courses after entity was saved.
+            Set<CourseEntity> courseEntities = getCourseService().loadEntityById(current.courses());
+            courseEntities.forEach(courseEntity -> courseEntity.linkClassRoom(classRoom));
+            getCourseService().saveEntity(courseEntities);
+            return classRoom;
+        }).toArray(ClassRoomEntity[]::new);
     }
 
     @Override public void deleteRelations(@NotNull ClassRoomEntity entry)
