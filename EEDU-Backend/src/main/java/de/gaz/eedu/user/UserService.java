@@ -63,11 +63,9 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull UserEntity[] createEntity(@NotNull UserCreateModel @NotNull ... model) throws CreationException
+    @Transactional @Override public @NotNull Set<UserEntity> createEntity(@NotNull Set<UserCreateModel> @NotNull ... model) throws CreationException
     {
-        List<String> loginNames = Arrays.stream(model).map(UserCreateModel::loginName).toList();
-        boolean duplicates = loginNames.size() != loginNames.stream().collect(Collectors.toUnmodifiableSet()).size();
-        if (duplicates || getRepository().existsByLoginNameIn(loginNames))
+        if (getRepository().existsByLoginNameIn(loginNames))
         {
             throw new OccupiedException();
         }

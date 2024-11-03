@@ -125,7 +125,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @throws CreationException is thrown when anything went wrong while creating
      * @see Transactional
      */
-    @Transactional public abstract @NotNull Set<E> createEntity(@NotNull Set<C> model) throws CreationException;
+    @Transactional public abstract @NotNull List<E> createEntity(@NotNull Set<C> model) throws CreationException;
 
     /**
      * Deletes an {@link E} from the database.
@@ -382,9 +382,9 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
         return findAllEntities().stream().map(toModel()).filter(predicate).collect(Collectors.toSet());
     }
 
-    @Transactional public @NotNull Set<M> create(@NotNull Set<C> model)
+    @Transactional public @NotNull List<M> create(@NotNull Set<C> model)
     {
-        return createEntity(model).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
+        return createEntity(model).stream().map(toModel()).toList();
     }
 
     @Transactional public @NotNull M save(@NotNull E entity)
