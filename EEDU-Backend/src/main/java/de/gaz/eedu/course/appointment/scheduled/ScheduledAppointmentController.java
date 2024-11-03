@@ -43,7 +43,8 @@ public class ScheduledAppointmentController extends EntityController<ScheduledAp
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<ScheduledAppointmentModel> create(@RequestBody @NotNull ScheduledAppointmentCreateModel model)
+    @PostMapping("/create") @Override
+    public @NotNull ResponseEntity<ScheduledAppointmentModel[]> create(@RequestBody @NotNull ScheduledAppointmentCreateModel[] model)
     {
         return super.create(model);
     }

@@ -62,7 +62,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @throws CreationException if an error occurs during the user creation process.
      */
     @PreAuthorize("hasAnyAuthority(${privilege.user.create})") @PostMapping("/create") @Override
-    public @NotNull ResponseEntity<UserModel> create(@NotNull @RequestBody UserCreateModel model) throws CreationException
+    public @NotNull ResponseEntity<UserModel[]> create(@NotNull @RequestBody UserCreateModel[] model) throws CreationException
     {
         return super.create(model);
     }
