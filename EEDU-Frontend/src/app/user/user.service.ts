@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {finalize, map, Observable, of, tap} from "rxjs";
+import {finalize, map, Observable, of, pipe, tap} from "rxjs";
 import {UserModel} from "./user-model";
 import {ThemeEntity} from "../theming/theme-entity";
 import {environment} from "../../environments/environment";
@@ -22,10 +22,18 @@ export class UserService
         this._loaded = this.isLoggedIn;
         if (this._loaded)
         {
-            // load user data in the background
-            return this.fetchUserData.pipe(map((user: UserModel): void => {
-                this.storeUserData(JSON.stringify(user))
-            }));
+            return this.fetchUserData.pipe(tap({
+                next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
+                error: (error: any): void  => {
+                    if(error && 'status' in error && typeof error.status === 'number' && error.status === 403)
+                    {
+                        // logout when token expired
+                        this.logout().subscribe();
+                        return;
+                    }
+                    // idk??
+                }
+            }), map((): void => {}));
         }
 
         return this.fetchUserData.pipe(tap<UserModel>({
@@ -52,12 +60,13 @@ export class UserService
     {
         if (!this.isLoggedIn)
         {
+            console.log("wlll")
             return of();
         }
 
         const url = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
-            next: () => localStorage.removeItem("userData")
+            next: (): void => localStorage.removeItem("userData")
         }));
     }
 
