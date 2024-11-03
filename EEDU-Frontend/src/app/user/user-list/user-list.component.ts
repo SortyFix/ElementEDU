@@ -1,5 +1,5 @@
 import {Component, input, InputSignal} from '@angular/core';
-import {UserModel} from "../user-model";
+import {UserModel, UserStatus} from "../user-model";
 import {MatListItem, MatListItemLine, MatListItemMeta, MatListItemTitle, MatNavList} from "@angular/material/list";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -15,8 +15,10 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {AccessibilityService} from "../../accessibility.service";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf, NgIf, NgStyle} from "@angular/common";
 import {FormsModule} from "@angular/forms";
+import {MatTooltip} from "@angular/material/tooltip";
+import {ThemeService} from "../../theming/theme.service";
 
 @Component({
   selector: 'app-user-list',
@@ -44,7 +46,9 @@ import {FormsModule} from "@angular/forms";
         MatButton,
         NgIf,
         FormsModule,
-        NgForOf
+        NgForOf,
+        MatTooltip,
+        NgStyle
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -55,7 +59,7 @@ export class UserListComponent {
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
     private _selected: Set<string> = new Set();
 
-    constructor(protected accessibilityService: AccessibilityService) {}
+    constructor(protected accessibilityService: AccessibilityService, protected themeService: ThemeService) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -78,7 +82,8 @@ export class UserListComponent {
 
     protected isSelected(entry: UserModel | 'all'): boolean {
         if (entry === 'all') {
-            return this._selected.size === this.users.length;
+            const usersLength: number = this.users.length;
+            return usersLength != 0 && this._selected.size === usersLength;
         }
 
         return this._selected.has(entry.loginName);
@@ -105,7 +110,49 @@ export class UserListComponent {
         this._selected.add(entry.loginName);
     }
 
+    protected status(user: UserModel): 'check_circle' | 'error' | 'folder' | 'pending' {
+        switch (user.status) {
+            case UserStatus.PRESENT:
+                return 'check_circle';
+            case UserStatus.EXCUSED:
+                return 'folder';
+            case UserStatus.UNEXCUSED:
+                return 'error';
+            case UserStatus.PROSPECTIVE:
+                return 'pending';
+        }
+    }
+
+    protected color(user: UserModel): '#596' | '#956' | undefined {
+        switch (user.status) {
+            case UserStatus.PRESENT:
+                return '#596';
+            case UserStatus.UNEXCUSED:
+                return '#956'
+            case UserStatus.EXCUSED:
+            case UserStatus.PROSPECTIVE:
+                return undefined;
+        }
+    }
+
+    // todo implement lazy loading
     protected get users(): UserModel[] {
-        return this.userList();
+        const userList: UserModel[] = this.userList();
+
+        if (!this.filteredString) {
+            return this.sorted(userList);
+        }
+
+        const loweredFilter: string = this.filteredString.toLowerCase();
+
+        return this.sorted(userList.filter((user: UserModel): boolean =>
+            user.firstName.toLowerCase().includes(loweredFilter) ||
+            user.lastName.toLowerCase().includes(loweredFilter) ||
+            user.loginName.toLowerCase().includes(loweredFilter)
+        ));
+    }
+
+    private sorted(users: UserModel[]): UserModel[] {
+        return users.sort((a: UserModel, b: UserModel): number => a.lastName.localeCompare(b.lastName));
     }
 }

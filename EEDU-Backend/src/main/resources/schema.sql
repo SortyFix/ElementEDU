@@ -244,8 +244,20 @@ VALUES ('Light', 30, 30, 30, 50, 50, 50);
 
 
 INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
-VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, FALSE, FALSE, 1, 0),
-       ('John', 'Zimmermann', 'john.zimmermann', FALSE, TRUE, TRUE, 1, 0),
-       ('Martin', 'Hansen', 'martin.hansen', FALSE, TRUE, FALSE, 1, 0),
-       ('dummy', 'dummy', 'dummy.dummy', FALSE, TRUE, FALSE, 1, 3),
-       ('gaz', 'gaz', 'gaz', TRUE, TRUE, FALSE, 1, 3);
+VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- PRESENT
+       ('John', 'Zimmermann', 'john.zimmermann', FALSE, TRUE, FALSE, 1, 1),  -- EXCUSED
+       ('Martin', 'Hansen', 'martin.hansen', FALSE, TRUE, FALSE, 1, 2),      -- UNEXCUSED
+       ('Lora', 'Schmidt', 'lora.schmidt', FALSE, TRUE, FALSE, 1, 1),        -- EXCUSED
+       ('Sara', 'Müller', 'sara.mueller', TRUE, TRUE, FALSE, 1, 0),          -- PRESENT
+       ('Tom', 'Bauer', 'tom.bauer', TRUE, FALSE, FALSE, 1, 2),              -- UNEXCUSED
+       ('Lisa', 'Klein', 'lisa.klein', TRUE, TRUE, FALSE, 1, 3),             -- PROSPECTIVE
+       ('Oliver', 'Wagner', 'oliver.wagner', FALSE, TRUE, TRUE, 1, 0),       -- PRESENT
+       ('Sophia', 'Becker', 'sophia.becker', FALSE, FALSE, FALSE, 1, 1),     -- EXCUSED
+       ('Liam', 'Schneider', 'liam.schneider', FALSE, TRUE, TRUE, 1, 3),     -- PROSPECTIVE
+       ('Emma', 'Fischer', 'emma.fischer', TRUE, TRUE, FALSE, 1, 2),         -- UNEXCUSED
+       ('Noah', 'Weber', 'noah.weber', FALSE, TRUE, FALSE, 1, 1),            -- EXCUSED
+       ('Mia', 'Hoffmann', 'mia.hoffmann', TRUE, TRUE, FALSE, 1, 0),         -- PRESENT
+       ('Ethan', 'Schwarz', 'ethan.schwarz', TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE
+       ('Charlotte', 'Zimmer', 'charlotte.zimmer', FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED
+       ('James', 'Krause', 'james.krause', FALSE, TRUE, FALSE, 1, 1); -- EXCUSED
+
