@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record GroupCreateModel(@NotNull String name, @NotNull Boolean twoFactorRequired, @NotNull Long[] users,
-                               @NotNull Long[] privileges) implements CreationModel<GroupEntity>
+public record GroupCreateModel(@NotNull String name, @NotNull Boolean twoFactorRequired, @NotNull Long[] privileges) implements CreationModel<GroupEntity>
 {
     @Override public @NotNull GroupEntity toEntity(@NotNull GroupEntity groupEntity)
     {
@@ -20,8 +19,7 @@ public record GroupCreateModel(@NotNull String name, @NotNull Boolean twoFactorR
 
     @Override public @NotNull String toString()
     {
-        return "GroupCreateModel{" + "name='" + name + '\'' + ", twoFactorRequired=" + twoFactorRequired + ", users=" + Arrays.toString(
-                users) + ", privileges=" + Arrays.toString(privileges) + '}';
+        return "GroupCreateModel{" + "name='" + name + '\'' + ", twoFactorRequired=" + twoFactorRequired + ", privileges=" + Arrays.toString(privileges) + '}';
     }
 
     @Override public boolean equals(Object object)

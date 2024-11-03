@@ -2,7 +2,6 @@ package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
@@ -14,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService extends EntityService<PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
@@ -28,19 +29,10 @@ import java.util.Set;
         return privilegeRepository;
     }
 
-    @Override public @NotNull PrivilegeEntity createEntity(@NotNull PrivilegeCreateModel privilegeCreateModel) throws CreationException
+    @Override public @NotNull PrivilegeEntity[] createEntity(@NotNull PrivilegeCreateModel... createModel) throws CreationException
     {
-        if(getRepository().existsByName(privilegeCreateModel.name()))
-        {
-            throw new NameOccupiedException(privilegeCreateModel.name());
-        }
-
-        return getRepository().save(privilegeCreateModel.toEntity(new PrivilegeEntity(), (entity ->
-        {
-            Set<GroupEntity> groupEntities = getGroupService().loadEntityById(privilegeCreateModel.groupEntities());
-            entity.setGroupEntities(groupEntities);
-            return entity;
-        })));
+        Function<PrivilegeCreateModel, PrivilegeEntity> toEntity = current -> current.toEntity(new PrivilegeEntity());
+        return getRepository().saveAll(Stream.of(createModel).map(toEntity).toList()).toArray(PrivilegeEntity[]::new);
     }
 
     @Override public void deleteRelations(@NotNull PrivilegeEntity entry)

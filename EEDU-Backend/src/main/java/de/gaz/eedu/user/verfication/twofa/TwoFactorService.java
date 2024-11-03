@@ -36,17 +36,9 @@ import java.util.function.Function;
         return twoFactorRepository;
     }
 
-    @Override public @NotNull TwoFactorEntity createEntity(@NotNull TwoFactorCreateModel model) throws CreationException
+    @Override public @NotNull TwoFactorEntity[] createEntity(@NotNull TwoFactorCreateModel... model) throws CreationException
     {
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
-        TwoFactorEntity twoFactorEntity = populateEntity(model, userEntity);
-
-        validate(userEntity.initTwoFactor(twoFactorEntity), new CreationException(HttpStatus.CONFLICT));
-
-        getRepository().save(twoFactorEntity);
-        getUserService().save(userEntity);
-
-        return twoFactorEntity;
+        return new TwoFactorEntity[0];
     }
 
     public @NotNull Optional<String> verify(@NotNull TwoFactorMethod method, String code, @NotNull Claims claims)

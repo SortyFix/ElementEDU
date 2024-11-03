@@ -4,8 +4,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.NameOccupiedException;
-import de.gaz.eedu.user.exception.InsecurePasswordException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
@@ -28,11 +27,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class manages user related tasks.
@@ -65,29 +63,23 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull UserEntity createEntity(
-            @NotNull UserCreateModel model) throws CreationException
+    @Transactional @Override public @NotNull UserEntity[] createEntity(@NotNull UserCreateModel @NotNull ... model) throws CreationException
     {
-        if (getRepository().existsByLoginName(model.loginName()))
+        List<String> loginNames = Arrays.stream(model).map(UserCreateModel::loginName).toList();
+        boolean duplicates = loginNames.size() != loginNames.stream().collect(Collectors.toUnmodifiableSet()).size();
+        if (duplicates || getRepository().existsByLoginName(loginNames))
         {
-            throw new NameOccupiedException(model.loginName());
+            throw new OccupiedException();
         }
 
-        String password = model.password();
-        if (!password.matches(
-                "^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
+        return saveEntity(Stream.of(model).map(current -> current.toEntity(new UserEntity(), entity ->
         {
-            throw new InsecurePasswordException();
-        }
+            entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
 
-        String hashedPassword = getAuthorizeService().encode(model.password());
-        return saveEntity(model.toEntity(new UserEntity(), entity ->
-        {
-            entity.setPassword(hashedPassword); // outsource as it must be encrypted using the encryption service.
-            entity.setThemeEntity(themeRepository.getReferenceById(model.theme()));
-            entity.attachGroups(getGroupRepository().findAllById(List.of(model.groups())).toArray(GroupEntity[]::new));
+            List<Long> ids = Arrays.asList(current.groups());
+            entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        }));
+        })).collect(Collectors.toList())).toArray(UserEntity[]::new);
     }
 
     @Transactional @Override public @NotNull UserDetails loadUserByUsername(

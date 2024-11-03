@@ -2,7 +2,6 @@ package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
@@ -12,15 +11,12 @@ import de.gaz.eedu.user.privileges.PrivilegeRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
@@ -39,23 +35,14 @@ public class GroupService extends EntityService<GroupRepository, GroupEntity, Gr
         return groupRepository;
     }
 
-    @Override
-    public @NotNull GroupEntity createEntity(@NotNull GroupCreateModel createModel) throws CreationException {
-
-        if(getRepository().existsByName(createModel.name()))
+    @Override public @NotNull GroupEntity[] createEntity(@NotNull GroupCreateModel... createModel) throws CreationException
+    {
+        return getRepository().saveAll(Stream.of(createModel).map(current -> current.toEntity(new GroupEntity(), group ->
         {
-            throw new NameOccupiedException(createModel.name());
-        }
-
-        Set<UserEntity> users = Stream.of(createModel.users()).map(getUserService()::loadEntityById).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
-        GroupEntity groupEntity = getRepository().save(createModel.toEntity(new GroupEntity(users), group -> {
-            Stream<Optional<PrivilegeEntity>> privileges = Stream.of(createModel.privileges()).map(getPrivilegeRepository()::findById);
-            group.setPrivileges(privileges.map(privilegeEntity -> privilegeEntity.orElse(null)).collect(Collectors.toSet()));
+            List<Long> ids = Arrays.asList(current.privileges());
+            group.grantPrivilege(getPrivilegeRepository().findAllById(ids).toArray(PrivilegeEntity[]::new));
             return group;
-        }));
-
-        users.forEach(user -> user.attachGroups(getUserService(), groupEntity)); // attach users to this group
-        return groupEntity;
+        })).toList()).toArray(GroupEntity[]::new);
     }
 
     @Override public void deleteRelations(@NotNull GroupEntity entry)

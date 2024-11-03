@@ -117,7 +117,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @throws CreationException is thrown when anything went wrong while creating
      * @see Transactional
      */
-    @Transactional public abstract @NotNull E createEntity(@NotNull C model) throws CreationException;
+    @Transactional public abstract @NotNull E[] createEntity(@NotNull C... model) throws CreationException;
 
     /**
      * Deletes an {@link E} from the database.
