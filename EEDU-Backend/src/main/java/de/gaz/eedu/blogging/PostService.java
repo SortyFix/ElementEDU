@@ -119,8 +119,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         {
             FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), createModel.readPrivileges(), "blog", createModel.tags()).toEntity(new FileEntity());
             thumbnailFile.uploadBatch("", thumbnail);
-            return createEntity(new PostCreateModel(createModel.author(), createModel.title(),
-                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags())).toModel();
+            return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
+                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
