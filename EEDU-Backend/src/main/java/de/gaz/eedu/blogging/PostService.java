@@ -19,6 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +33,10 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     @Value("${blog.write}") private String writePrivilege;
 
-    public @NotNull PostEntity createEntity(@NotNull PostCreateModel model) throws CreationException
+    @Transactional
+    public @NotNull List<PostEntity> createEntity(@NotNull Set<PostCreateModel> model) throws CreationException
     {
-        return model.toEntity(new PostEntity());
+        return saveEntity(model.stream().map(postCreateModel -> postCreateModel.toEntity(new PostEntity())).toList());
     }
 
     /**
