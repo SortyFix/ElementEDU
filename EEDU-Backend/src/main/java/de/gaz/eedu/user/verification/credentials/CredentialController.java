@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
@@ -83,7 +84,8 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create}, ${privilege.user.all})") @PostMapping("/create/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
-        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
@@ -91,7 +93,8 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PostMapping("/create/temporary/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
-        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 

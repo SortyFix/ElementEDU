@@ -85,9 +85,9 @@ public class DataLoader implements CommandLineRunner
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
         int bitMask = CredentialMethod.bitMask(CredentialMethod.PASSWORD, CredentialMethod.TOTP);
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
 
-        getCredentialService().createEntity(credential);
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
+        getCredentialService().createEntity(Set.of(credential));
     }
 
     private @NotNull PrivilegeEntity createDefaultPrivilege()
