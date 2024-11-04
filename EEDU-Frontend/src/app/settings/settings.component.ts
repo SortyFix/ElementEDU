@@ -1,8 +1,7 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {UserService} from "../user/user.service";
 import {UserModel} from "../user/user-model";
 import {UserListComponent} from "../user/user-list/user-list.component";
-import { Component } from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -32,7 +31,7 @@ import {ThemeService} from "../theming/theme.service";
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
-export class SettingsComponent implements AfterViewInit{
+export class SettingsComponent implements AfterViewInit, OnInit {
 
     private _userList: UserModel[] = [];
 

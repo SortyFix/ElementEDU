@@ -5,6 +5,7 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
+import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeModel;
@@ -73,7 +74,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
         final ThemeModel themeModel = themeService.loadByIdSafe(1L);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, themeModel);
+        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, new GroupModel[0], themeModel);
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
             Assertions.assertEquals(expect.firstName(), result.firstName());

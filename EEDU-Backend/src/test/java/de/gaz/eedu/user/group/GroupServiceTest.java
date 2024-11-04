@@ -5,6 +5,7 @@ import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
         GroupCreateModel groupCreateModel = new GroupCreateModel("test", new Long[0]);
-        GroupModel groupModel = new GroupModel(5L, "test");
+        GroupModel groupModel = new GroupModel(5L, "test", new PrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
