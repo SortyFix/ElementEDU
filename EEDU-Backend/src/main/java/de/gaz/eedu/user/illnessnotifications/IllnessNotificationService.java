@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service public class IllnessNotificationService extends EntityService<IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
@@ -41,11 +42,11 @@ import java.util.List;
     public boolean excuse(@NotNull Long userId, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
     {
         // TODO: Add logic if current day is an exam day
-        FileEntity fileEntity = fileService.createEntity(new FileCreateModel(userId,
+        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
                 file.getName(),
                 new String[] { "Management" },
                 "illness_notifications",
-                new String[] { "illness_notification" }));
+                new String[] { "illness_notification" }))).getFirst();
 
         try
         {
@@ -56,11 +57,11 @@ import java.util.List;
             throw new RuntimeException(e);
         }
 
-        createEntity(new IllnessNotificationCreateModel(userId,
+        createEntity(Set.of(new IllnessNotificationCreateModel(userId,
                 reason,
                 LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(),
                 expirationTime,
-                fileEntity.getId()));
+                fileEntity.getId())));
 
         return true;
     }
@@ -75,14 +76,16 @@ import java.util.List;
     }
 
     @Override
-    public @NotNull IllnessNotificationEntity createEntity(@NotNull IllnessNotificationCreateModel model) throws CreationException
+    public @NotNull List<IllnessNotificationEntity> createEntity(@NotNull Set<IllnessNotificationCreateModel> model) throws CreationException
     {
-        return illnessNotificationRepository.save(model.toEntity(new IllnessNotificationEntity(), (entity ->
-        {
-            entity.setUser(userService.loadEntityByIDSafe(model.userId()));
-            entity.setFileEntity(fileService.getRepository().getReferenceById(model.fileId()));
-            return entity;
-        })));
+        List<IllnessNotificationEntity> entities = model.stream().map(createModel ->
+                createModel.toEntity(new IllnessNotificationEntity(), (entity ->
+                {
+                    entity.setUser(userService.loadEntityByIDSafe(createModel.userId()));
+                    entity.setFileEntity(fileService.getRepository().getReferenceById(createModel.fileId()));
+                    return entity;
+                }))).toList();
+        return illnessNotificationRepository.saveAll(entities);
         // same thing:
 //        return illnessNotificationRepository.save(model.toEntity(new IllnessNotificationEntity(),
 //                new CreationFactory<>() {

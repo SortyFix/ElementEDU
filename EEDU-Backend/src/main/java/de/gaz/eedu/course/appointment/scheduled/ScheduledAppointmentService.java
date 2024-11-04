@@ -1,5 +1,6 @@
 package de.gaz.eedu.course.appointment.scheduled;
 
+import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
@@ -12,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,13 +25,20 @@ public class ScheduledAppointmentService extends EntityService<ScheduledAppointm
     private final ScheduledAppointmentRepository repository;
     private final CourseService courseService;
 
-    @Transactional @Override public @NotNull ScheduledAppointmentEntity[] createEntity(@NotNull ScheduledAppointmentCreateModel... model) throws CreationException
+    @Transactional @Override public @NotNull List<ScheduledAppointmentEntity> createEntity(@NotNull Set<ScheduledAppointmentCreateModel> model) throws CreationException
     {
-        return Stream.of(model).map(current ->
+        Set<CourseEntity> editedCourses = new HashSet<>();
+        List<ScheduledAppointmentEntity> scheduledAppointmentEntities = model.stream().map(current ->
         {
             ScheduledAppointmentEntity entity = current.toEntity(new ScheduledAppointmentEntity());
-            getCourseService().loadEntityByIDSafe(current.course()).scheduleRepeating(entity);
+            CourseEntity courseEntity = getCourseService().loadEntityByIDSafe(current.course());
+            editedCourses.add(courseEntity);
+            courseEntity.scheduleRepeating(entity);
             return entity;
-        }).toList().toArray(new ScheduledAppointmentEntity[model.length]);
+        }).toList();
+
+        //save courses
+        getCourseService().saveEntity(editedCourses);
+        return scheduledAppointmentEntities;
     }
 }

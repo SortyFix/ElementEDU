@@ -27,6 +27,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Set;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED)
 public class DataLoader implements CommandLineRunner
@@ -90,20 +92,20 @@ public class DataLoader implements CommandLineRunner
 
     private @NotNull PrivilegeEntity createDefaultPrivilege()
     {
-        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
-        return getPrivilegeService().createEntity(privilege);
+        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN");
+        return getPrivilegeService().createEntity(Set.of(privilege)).getFirst();
     }
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", new Long[0], new Long[] { privilegeEntity.getId() });
-        return getGroupService().createEntity(group);
+        GroupCreateModel group = new GroupCreateModel("admin", new Long[] { privilegeEntity.getId() });
+        return getGroupService().createEntity(Set.of(group)).getFirst();
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
         ThemeCreateModel theme = new ThemeCreateModel("default", new short[]{5, 5, 5}, new short[]{10, 10, 10});
-        return getThemeService().createEntity(theme);
+        return getThemeService().createEntity(Set.of(theme)).getFirst();
     }
 
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
@@ -117,7 +119,7 @@ public class DataLoader implements CommandLineRunner
                 UserStatus.PROSPECTIVE,
                 themeEntity.getId(),
                 new Long[] { groupEntity.getId() });
-        UserEntity userEntity = getUserService().createEntity(user);
+        UserEntity userEntity = getUserService().createEntity(Set.of(user)).getFirst();
         userEntity.setSystemAccount(true);
 
         return getUserService().saveEntity(userEntity);

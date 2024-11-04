@@ -6,6 +6,11 @@ import de.gaz.eedu.exception.NameOccupiedException;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.context.Theme;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service @AllArgsConstructor
 public class ThemeService extends EntityService<ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
@@ -19,12 +24,15 @@ public class ThemeService extends EntityService<ThemeRepository, ThemeEntity, Th
     }
 
     @Override
-    public @NotNull ThemeEntity createEntity(@NotNull ThemeCreateModel model) throws CreationException
+    public @NotNull List<ThemeEntity> createEntity(@NotNull Set<ThemeCreateModel> model) throws CreationException
     {
-        getRepository().findByName(model.name()).ifPresent(occupied ->
-        {
-            throw new NameOccupiedException(occupied.getName());
-        });
-        return getRepository().save(model.toEntity(new ThemeEntity()));
+        List<ThemeEntity> entities = model.stream().map(createModel -> {
+            getRepository().findByName(createModel.name()).ifPresent(occupied ->
+            {
+                throw new NameOccupiedException(occupied.getName());
+            });
+            return createModel.toEntity(new ThemeEntity());
+        }).toList();
+        return getRepository().saveAll(entities);
     }
 }

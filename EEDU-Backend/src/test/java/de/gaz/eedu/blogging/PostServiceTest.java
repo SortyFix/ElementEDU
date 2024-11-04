@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter(AccessLevel.PROTECTED)
 public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostModel, PostCreateModel>
@@ -65,7 +66,7 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
     {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 
-        PostEntity entity = getPostService().createEntity(new PostCreateModel(
+        PostEntity entity = getPostService().createEntity(Set.of(new PostCreateModel(
                 "Ivo",
                 "10 Reasons for why",
                 Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
@@ -73,7 +74,7 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 new String[]{"Read1", "Read2", "Read3"},
                 new String[]{"Edit1", "Edit2", "Edit3"},
                 new String[]{"Tag1", "Tag2", "Tag3"}
-        ));
+        ))).getFirst();
 
         entity.attachTags(getService(),"Tag4", "Tag5");
 

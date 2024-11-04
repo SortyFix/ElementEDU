@@ -27,7 +27,7 @@ public class FileServiceTest
     public void testCreateEntity()
     {
         FileCreateModel fileCreateModel = new FileCreateModel(3L, "roblox.exe", new String[]{"PRIVILEGE_ALL"}, "other", new String[]{"mathe"});
-        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
 
         assertNotNull(fileEntity.getId());
         assertEquals(fileCreateModel.authorId(), fileEntity.getAuthorId());
@@ -48,7 +48,7 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
         assertDoesNotThrow(() -> fileEntity.uploadBatch("", batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
     }
@@ -64,7 +64,7 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
         assertDoesNotThrow(() -> fileEntity.uploadBatch(subdirectory, batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(subdirectory), mockMultipartFile.getOriginalFilename()))));
     }
@@ -74,7 +74,7 @@ public class FileServiceTest
     public void testDelete()
     {
         FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
+        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
         assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }
 
