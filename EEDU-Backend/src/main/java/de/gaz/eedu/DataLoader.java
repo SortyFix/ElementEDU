@@ -1,6 +1,5 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.security.PrivilegeProperties;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -23,13 +22,19 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED)
 public class DataLoader implements CommandLineRunner
@@ -40,7 +45,7 @@ public class DataLoader implements CommandLineRunner
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
 
-    private final PrivilegeProperties privilegeProperties;
+    private final Environment environment;
 
     @Value("${development:false}") private boolean development;
 
@@ -67,7 +72,7 @@ public class DataLoader implements CommandLineRunner
     {
         String randomPassword = randomPassword(15);
 
-        PrivilegeEntity privilegeEntity = createDefaultPrivileges();
+        List<PrivilegeEntity> privilegeEntity = createDefaultPrivileges();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
         setPassword(userEntity, randomPassword);
@@ -94,16 +99,17 @@ public class DataLoader implements CommandLineRunner
         getCredentialService().createEntity(Set.of(credential));
     }
 
-    private @NotNull PrivilegeEntity createDefaultPrivileges()
+    private @NotNull List<PrivilegeEntity> createDefaultPrivileges()
     {
-        getPrivilegeProperties().getPrivileges();
-        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN");
-        return getPrivilegeService().createEntity(Set.of(privilege)).getFirst();
+        Stream<PrivilegeCreateModel> modelStream = configuredPrivileges().stream().map(PrivilegeCreateModel::new);
+        return getPrivilegeService().createEntity(modelStream.collect(Collectors.toUnmodifiableSet()));
     }
 
-    private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
+    private @NotNull GroupEntity createDefaultGroup(@NotNull List<PrivilegeEntity> privileges)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", new Long[] { privilegeEntity.getId() });
+        Long[] ids = privileges.stream().map(PrivilegeEntity::getId).toArray(Long[]::new);
+        GroupCreateModel group = new GroupCreateModel("admin", ids);
+
         return getGroupService().createEntity(Set.of(group)).getFirst();
     }
 
@@ -162,5 +168,32 @@ public class DataLoader implements CommandLineRunner
         }
 
         return password.toString();
+    }
+
+    private @NotNull @Unmodifiable Set<String> configuredPrivileges() // I know it does not look good, but it is
+    {
+        if (!(environment instanceof ConfigurableEnvironment configurableEnvironment))
+        {
+            return Collections.emptySet();
+        }
+
+        Set<String> privileges = new HashSet<>();
+
+        for (PropertySource<?> propertySource : configurableEnvironment.getPropertySources())
+        {
+            if (!(propertySource instanceof EnumerablePropertySource<?> source))
+            {
+                continue;
+            }
+
+            for (String key : source.getPropertyNames())
+            {
+                if (key.startsWith("privilege"))
+                {
+                    privileges.add((String) propertySource.getProperty(key));
+                }
+            }
+        }
+        return privileges;
     }
 }

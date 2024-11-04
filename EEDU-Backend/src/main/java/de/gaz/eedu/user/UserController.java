@@ -199,8 +199,8 @@ public class UserController extends EntityController<UserService, UserModel, Use
         log.info("User {} has been logged out.", userId);
     }
 
-    @GetMapping("/all")
-    @Override public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
+    @PreAuthorize("hasAnyAuthority('USER_OTHERS_GET')") @GetMapping("/all") @Override
+    public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
         return super.fetchAll();
     }

@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS post_tags
 );
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
-VALUES ('Light', 30, 30, 30, 50, 50, 50);
+VALUES ('hehe', 30, 30, 30, 50, 50, 50);
 
 
 INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
