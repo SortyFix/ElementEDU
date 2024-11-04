@@ -15,6 +15,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.Set;
+
 
 @RestController
 @RequestMapping(value = "/user", method = RequestMethod.POST)
@@ -67,7 +70,7 @@ public class ThemeController
      * @param themeCreateModel template of the theme to be created
      * @return ThemeEntity
      */
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create") public @NotNull ResponseEntity<ThemeEntity> createTheme(@NotNull @RequestBody ThemeCreateModel themeCreateModel)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create") public @NotNull ResponseEntity<List<ThemeEntity>> createTheme(@NotNull @RequestBody Set<ThemeCreateModel> themeCreateModel)
     {
         try
         {

@@ -24,6 +24,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Set;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
@@ -88,7 +90,7 @@ import java.security.SecureRandom;
     private @NotNull ThemeEntity createDefaultTheme()
     {
         ThemeCreateModel theme = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000); //TODO use real values
-        return getThemeService().createEntity(theme);
+        return getThemeService().createEntity(Set.of(theme)).getFirst();
     }
 
     private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
