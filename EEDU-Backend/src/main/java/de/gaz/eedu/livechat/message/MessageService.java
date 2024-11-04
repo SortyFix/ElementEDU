@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED) public class MessageService extends EntityService<MessageRepository, MessageEntity, MessageModel, MessageCreateModel>
@@ -27,10 +30,11 @@ import java.util.function.Function;
         return messageRepository;
     }
 
-    public @NotNull MessageEntity createEntity(@NotNull MessageCreateModel messageCreateModel)
+    public @NotNull List<MessageEntity> createEntity(@NotNull Set<MessageCreateModel> messageCreateModel)
     {
-        return getRepository().save(messageCreateModel.toMessageEntity(getUserRepository().getReferenceById(
-                messageCreateModel.authorId()), new MessageEntity()));
+        List<MessageEntity> messageEntities = messageCreateModel.stream().map(model ->
+                model.toMessageEntity(getUserRepository().getReferenceById(model.authorId()), new MessageEntity())).toList();
+        return getRepository().saveAll(messageEntities);
     }
 
     @Override

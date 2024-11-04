@@ -94,8 +94,9 @@ import java.util.*;
     }
 
     @Transactional
-    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
+    public @NotNull List<FileEntity> createEntity(@NotNull Set<FileCreateModel> model)
     {
-        return getRepository().save(model.toEntity(new FileEntity()));
+        List<FileEntity> entities = model.stream().map(createModel -> createModel.toEntity(new FileEntity())).toList();
+        return getRepository().saveAll(entities);
     }
 }

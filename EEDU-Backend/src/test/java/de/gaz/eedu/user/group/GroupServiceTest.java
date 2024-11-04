@@ -33,7 +33,7 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
-        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new Long[0], new Long[0]);
+        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new Long[0]);
         GroupModel groupModel = new GroupModel(5L, "test");
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
@@ -43,7 +43,7 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
 
     @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
-        return new GroupCreateModel("Users", new Long[0], new Long[0]);
+        return new GroupCreateModel("Users", new Long[0]);
     }
 
     /**

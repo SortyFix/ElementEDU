@@ -23,8 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -43,24 +42,31 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     }
 
     @Transactional @Override
-    public @NotNull CredentialEntity createEntity(@NotNull CredentialCreateModel model) throws CreationException
+    public @NotNull List<CredentialEntity> createEntity(@NotNull Set<CredentialCreateModel> model) throws CreationException
     {
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
 
-        CredentialEntity entity = new CredentialEntity(model.method(), model.temporary(), userEntity);
-        CredentialEntity credentialEntity = model.toEntity(entity);
+        Set<UserEntity> users = new HashSet<>();
+        List<CredentialEntity> credentials = saveEntity(model.stream().map(current -> {
+            UserEntity userEntity = getUserService().loadEntityByIDSafe(current.userID());
 
-        if (getRepository().existsById(credentialEntity.getId()))
-        {
-            throw new OccupiedException();
-        }
+            CredentialEntity entity = new CredentialEntity(current.method(), current.temporary(), userEntity);
+            CredentialEntity credentialEntity = current.toEntity(entity);
 
-        credentialEntity.getMethod().getCredential().creation(credentialEntity);
-        validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
+            if (getRepository().existsById(credentialEntity.getId()))
+            {
+                throw new OccupiedException();
+            }
 
-        getUserService().save(userEntity);
+            credentialEntity.getMethod().getCredential().creation(credentialEntity);
+            validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
+            users.add(userEntity);
+            return credentialEntity;
+        }).toList());
 
-        return credentialEntity;
+        // save users having new credentials
+        getUserService().saveEntity(users);
+
+        return credentials;
     }
 
     @Transactional

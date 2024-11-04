@@ -41,14 +41,22 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     }
 
     @Override
-    public @NotNull ChatEntity createEntity(@NotNull ChatCreateModel model) throws CreationException
+    public @NotNull List<ChatEntity> createEntity(@NotNull Set<ChatCreateModel> model) throws CreationException
     {
         List<ChatEntity> empty = Collections.emptyList();
-        boolean noChatroomFound = loadEntityByUserIDs(Arrays.stream(model.users()).toList()).equals(Optional.of(empty));
-        if(!noChatroomFound){
-            throw new OccupiedException();
-        }
-        return chatRepository.save(model.toEntity(new ChatEntity()));
+        List<ChatEntity> entities = model.stream()
+                                         .map(chatCreateModel -> {
+                                             boolean noChatroomFound =
+                                                     loadEntityByUserIDs(Arrays.stream(chatCreateModel.users())
+                                                                               .toList()).equals(Optional.of(empty));
+                                             if(!noChatroomFound){
+                                                 throw new OccupiedException();
+                                             }
+                                             return chatCreateModel.toEntity(new ChatEntity());
+                                         })
+                                         .toList();
+
+        return chatRepository.saveAll(entities);
     }
 
     public @NotNull Optional<List<ChatEntity>> loadEntityByUserIDs(@NotNull List<Long> userIDs){
@@ -100,7 +108,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
         }
 
         ChatCreateModel chatCreateModel = new ChatCreateModel(users.toArray(new Long[0]), System.currentTimeMillis());
-        ChatEntity chatEntity = createEntity(chatCreateModel);
+        ChatEntity chatEntity = createEntity(Set.of(chatCreateModel)).getFirst();
         return chatEntity.toModel();
     }
 
@@ -154,7 +162,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
                 return HttpStatus.BAD_REQUEST;
             }
 
-            MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
+            MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
             chatEntity.getMessages().add(messageEntity.getMessageId());
             messagingTemplate.convertAndSend(wsIdentifiers.getBroker() + "/" + chatId, messageEntity.toModel());
 
