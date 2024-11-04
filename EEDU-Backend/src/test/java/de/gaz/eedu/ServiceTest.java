@@ -106,7 +106,7 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
     @Test @Transactional public void testCreateEntitySuccess() throws IOException, URISyntaxException
     {
         Eval<C, M> success = successEval();
-        success.evaluateResult(getService().create(success.request()));
+        success.evaluateResult(getService().create(Set.of(success.request())).getFirst());
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
      */
     @Test public void testCreateEntityOccupied()
     {
-        Assertions.assertThrows(OccupiedException.class, () -> getService().create(occupiedCreateModel()));
+        Assertions.assertThrows(OccupiedException.class, () -> getService().create(Set.of(occupiedCreateModel())));
     }
 
     /**

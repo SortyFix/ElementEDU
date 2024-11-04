@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import java.util.Set;
     private String name;
     @JsonBackReference
     @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    private Set<GroupEntity> groupEntities;
+    private final Set<GroupEntity> groupEntities = new HashSet<>();
 
     public @NotNull SimpleGrantedAuthority toAuthority()
     {
