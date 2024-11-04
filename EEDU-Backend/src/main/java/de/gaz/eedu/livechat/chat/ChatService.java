@@ -162,7 +162,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
                 return HttpStatus.BAD_REQUEST;
             }
 
-            MessageEntity messageEntity = messageService.createEntity(messageCreateModel);
+            MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
             chatEntity.getMessages().add(messageEntity.getMessageId());
             messagingTemplate.convertAndSend(wsIdentifiers.getBroker() + "/" + chatId, messageEntity.toModel());
 
