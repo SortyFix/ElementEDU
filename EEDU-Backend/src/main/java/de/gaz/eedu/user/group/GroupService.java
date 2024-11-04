@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.group;
 
+import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -9,7 +10,6 @@ import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeRepository;
-import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 @Service
@@ -38,22 +37,19 @@ public class GroupService extends EntityService<GroupRepository, GroupEntity, Gr
         return groupRepository;
     }
 
-    @Override public @NotNull GroupEntity[] createEntity(@NotNull GroupCreateModel... createModel) throws CreationException
+    @Override public @NotNull List<GroupEntity> createEntity(@NotNull Set<GroupCreateModel> createModel) throws CreationException
     {
-        List<String> groups = Arrays.stream(createModel).map(GroupCreateModel::name).toList();
-        boolean duplicates = groups.size() != groups.stream().collect(Collectors.toUnmodifiableSet()).size();
-
-        if(getRepository().existsByNameIn(groups) || duplicates)
+        if (getRepository().existsByNameIn(createModel.stream().map(GroupCreateModel::name).toList()))
         {
             throw new OccupiedException();
         }
 
-        return getRepository().saveAll(Stream.of(createModel).map(current -> current.toEntity(new GroupEntity(), group ->
+        return getRepository().saveAll(createModel.stream().map(current -> current.toEntity(new GroupEntity(), group ->
         {
             List<Long> ids = Arrays.asList(current.privileges());
             group.grantPrivilege(getPrivilegeRepository().findAllById(ids).toArray(PrivilegeEntity[]::new));
             return group;
-        })).collect(Collectors.toList())).toArray(new GroupEntity[createModel.length]);
+        })).toList());
     }
 
     @Override public void deleteRelations(@NotNull GroupEntity entry)

@@ -26,7 +26,7 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
     //@PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create")
     @Override
-    public @NotNull ResponseEntity<SubjectModel> create(@NotNull @RequestBody SubjectCreateModel model)
+    public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model)
     {
         return super.create(model);
     }
