@@ -81,7 +81,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
         return create(userID, model);
     }
 
-    @PreAuthorize("@verificationService.hasAuthority('privilege.user.credential.create')") @PostMapping("/create/{userId}")
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
@@ -89,8 +89,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
-    @PreAuthorize("@verificationService.hasAuthority('privilege.user.credential.create.temporary')")
-    @PostMapping("/create/temporary/{userId}")
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY')") @PostMapping("/create/temporary/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
