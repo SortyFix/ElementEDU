@@ -26,7 +26,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/user/group/privilege")
 @RequiredArgsConstructor
-@Slf4j @Getter(AccessLevel.PROTECTED)
+@Slf4j
+@Getter(AccessLevel.PROTECTED)
 public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
     private final PrivilegeService service;
@@ -45,8 +46,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      *              Must not be null.
      * @return a {@link ResponseEntity} containing the created {@link PrivilegeModel} upon successful creation.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.privilege.create')") @PostMapping("/create")
-    @Override
+    @PreAuthorize("hasAuthority('PRIVILEGE_CREATE')") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<PrivilegeModel[]> create(@NotNull @RequestBody PrivilegeCreateModel[] model) throws CreationException
     {
         return super.create(model);
@@ -65,8 +65,8 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param id the unique identifier of the privilege to be deleted, provided as a path variable. Must not be null.
      * @return {@code true} if the privilege was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.privilege.delete')")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAuthority('PRIVILEGE_DELETE')") @DeleteMapping("/delete/{id}") @Override
+    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
@@ -84,8 +84,8 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param id the unique identifier of the privilege to retrieve, provided as a path variable. Must not be null.
      * @return a {@link ResponseEntity} containing the {@link PrivilegeModel} of the specified privilege.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.privilege.get')") @GetMapping("/get/{id}")
-    @Override public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
+    @PreAuthorize("hasAuthority('PRIVILEGE_GET')") @GetMapping("/get/{id}") @Override
+    public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }
@@ -104,8 +104,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param privileges an array of privilege IDs to grant to the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.group.privilege.grant')")
-    @PostMapping("/{group}/grant")
+    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_GRANT')") @PostMapping("/{group}/grant")
     public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
@@ -129,8 +128,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param privileges an array of privilege IDs to revoke from the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.group.privilege.revoke')")
-    @PostMapping("/{group}/revoke")
+    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_REVOKE')") @PostMapping("/{group}/revoke")
     public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);

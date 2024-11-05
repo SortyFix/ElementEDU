@@ -61,7 +61,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing the newly created {@link UserModel}.
      * @throws CreationException if an error occurs during the user creation process.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.user.create')") @PostMapping("/create") @Override
+    @PreAuthorize("hasAuthority('USER_CREATE')") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<UserModel[]> create(@NotNull @RequestBody UserCreateModel[] model) throws CreationException
     {
         return super.create(model);
@@ -79,7 +79,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user to be deleted.
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.user.delete')") @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
     @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
@@ -97,7 +97,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("@verificationService.hasAuthority('privilege.user.get') or #id == authentication.principal")
+    @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);

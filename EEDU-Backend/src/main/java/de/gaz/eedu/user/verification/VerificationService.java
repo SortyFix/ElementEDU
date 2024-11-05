@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import java.time.*;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -51,7 +49,6 @@ import java.util.stream.Stream;
 public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
-    private final Environment environment;
 
     /**
      * Checks for a specific token type.
@@ -110,72 +107,6 @@ public class VerificationService
             }
             return false;
         });
-    }
-
-    /**
-     * Checks if the current user has any of the specified authorities from the configuration.
-     * <p>
-     * This method checks whether the current {@link Authentication} context has at least one authority
-     * that matches any of the authorities defined in the {@code application.properties} or another configuration
-     * source. The method compares the user's granted authorities against the environment properties to determine
-     * if there's a match.
-     * <p>
-     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize}
-     * by referencing this service to enforce authority-based access control.
-     * <p>
-     * NOTE: This method does not accept plain authorities directly. For checking individual authorities,
-     * use {@code hasAuthority} in SpEL expressions instead. This method is intended for use with
-     *      * configuration-driven authority checks.
-     * </p>
-     *
-     * <pre>
-     * {@code
-     *     @PreAuthorize("@verificationService.hasAnyAuthority('privilege.secret.get')")
-     *     @GetMapping("/secret") public @NotNull ResponseEntity<String> getData()
-     *     {
-     *         return "Secret Data!";
-     *     }
-     * }
-     * </pre>
-     *
-     * @param properties the properties representing the authorities to check for, as defined in configuration.
-     * @return {@code true} if the user has at least one of the specified authorities from the environment properties,
-     *         {@code false} otherwise.
-     *
-     * @see #hasAuthority(Authentication, String...)
-     */
-    public boolean hasAuthority(@NotNull String... properties)
-    {
-        return hasAuthority(SecurityContextHolder.getContext().getAuthentication(), properties);
-    }
-
-    /**
-     * Checks if the specified {@link Authentication} context has any of the specified authorities
-     * from the configuration.
-     * <p>
-     * This method checks whether the provided {@link Authentication} object has at least one authority
-     * that matches any of the authorities defined in the {@code application.properties} or another
-     * configuration source. It compares the user's granted authorities against the environment properties
-     * to determine if there is a match.
-     * <p>
-     * This method does not accept plain authorities directly. If you need to check for plain authorities,
-     * use {@code hasAuthority} in SpEL expressions instead. This method is intended for use with
-     * configuration-driven authority checks.
-     *
-     * @param authentication the {@link Authentication} context to check for authorities.
-     * @param properties the properties representing the authorities to check for, as defined in configuration.
-     * @return {@code true} if the specified {@link Authentication} has at least one of the specified authorities
-     *         from the environment properties, {@code false} otherwise.
-     *
-     * @see #hasAuthority(String...)
-     */
-    public boolean hasAuthority(@NotNull Authentication authentication, @NotNull String... properties)
-    {
-        Stream<? extends GrantedAuthority> authorityStream = authentication.getAuthorities().stream();
-        Set<String> userAuthorities = authorityStream.map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-        Set<String> propertyValues = Arrays.stream(properties).map(environment::getProperty).collect(Collectors.toSet());
-
-        return !Collections.disjoint(userAuthorities, propertyValues);
     }
 
     /**
