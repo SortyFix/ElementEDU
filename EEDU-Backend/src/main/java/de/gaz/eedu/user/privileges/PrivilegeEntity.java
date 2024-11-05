@@ -22,6 +22,7 @@ import java.util.Set;
                 "USER_GET",
                 "USER_DELETE",
                 "USER_CREATE",
+                "USER_OTHERS_GET",
 
                 "USER_GROUP_ATTACH",
                 "USER_GROUP_DETACH",
