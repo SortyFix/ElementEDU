@@ -13,25 +13,24 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.VerificationService;
-import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class manages user related tasks.
@@ -120,15 +119,11 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        try
+        if (token.isBlank())
         {
-            Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
-            AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
-            return getVerificationService().validate(token, authorityFactory);
-        } catch (ExpiredJwtException ignored)
-        {
-            log.warn("An incoming request has been received with an expired token.");
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        return getVerificationService().validate(token, this::loadEntityByIDSafe);
     }
 }

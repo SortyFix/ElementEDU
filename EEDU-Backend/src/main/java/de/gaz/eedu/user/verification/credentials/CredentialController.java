@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
@@ -56,7 +57,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
     @PreAuthorize(
-            "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${user.credential.delete})"
+            "((#id == authentication.principal.id) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${user.credential.delete})"
     ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
         return super.delete(id);
@@ -76,9 +77,9 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize(
             "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
     ) @PostMapping("/create")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal UserEntity userEntity)
     {
-        return create(userID, model);
+        return create(userEntity.getId(), model);
     }
 
     @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
