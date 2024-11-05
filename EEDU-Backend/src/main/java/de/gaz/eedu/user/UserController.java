@@ -99,6 +99,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
+        validate(Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
         return super.getData(id);
     }
 
@@ -110,7 +111,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * The invoking user must be the owner of the data being accessed to perform this action.
      *
-     * @param user the unique identifier of the currently authenticated user, provided automatically.
+     * @param user the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
@@ -151,7 +152,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * This endpoint is accessible only to authenticated users, identified by a valid authentication principal.
      *
-     * @param userID the unique identifier of the currently authenticated user, provided automatically
+     * @param userID the authenticated user, provided automatically
      *               through the {@link AuthenticationPrincipal} annotation.
      * @return a {@link ResponseEntity} containing a success message upon successful login.
      */
@@ -175,7 +176,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * This endpoint is accessible to all users, regardless of authentication status.
      *
-     * @param userId   the unique identifier of the currently authenticated user, if available;
+     * @param user   the currently authenticated user, if available;
      *                 {@code null} if the user is not identified.
      * @param response the {@link HttpServletResponse} to which the logout cookie is added.
      */
