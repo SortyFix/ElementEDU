@@ -14,6 +14,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,12 +45,138 @@ import java.util.stream.Stream;
  *
  * @author ivo
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
     private final Environment environment;
+
+    /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     * <p>
+     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize} by referencing this service
+     *
+     * <pre>
+     * {@code
+     *     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+     *     @GetMapping("/secretdata") public @NotNull ResponseEntity<String> getData()
+     *     {
+     *         return "Secret Data!";
+     *     }
+     * }
+     * </pre>
+     *
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(Authentication, JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
+    {
+        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
+    }
+
+    /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     *
+     * @param authentication the authentication context to check for.
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
+    {
+        List<JwtTokenType> tokenTypes = Arrays.asList(jwtTokenType);
+        return authentication.getAuthorities().stream().anyMatch(verification ->
+        {
+            if (verification instanceof VerificationAuthority verificationAuthority)
+            {
+                return tokenTypes.contains(verificationAuthority.jwtTokenType());
+            }
+            return false;
+        });
+    }
+
+    /**
+     * Checks if the current user has any of the specified authorities from the configuration.
+     * <p>
+     * This method checks whether the current {@link Authentication} context has at least one authority
+     * that matches any of the authorities defined in the {@code application.properties} or another configuration
+     * source. The method compares the user's granted authorities against the environment properties to determine
+     * if there's a match.
+     * <p>
+     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize}
+     * by referencing this service to enforce authority-based access control.
+     * <p>
+     * NOTE: This method does not accept plain authorities directly. For checking individual authorities,
+     * use {@code hasAuthority} in SpEL expressions instead. This method is intended for use with
+     *      * configuration-driven authority checks.
+     * </p>
+     *
+     * <pre>
+     * {@code
+     *     @PreAuthorize("@verificationService.hasAnyAuthority('privilege.secret.get')")
+     *     @GetMapping("/secret") public @NotNull ResponseEntity<String> getData()
+     *     {
+     *         return "Secret Data!";
+     *     }
+     * }
+     * </pre>
+     *
+     * @param properties the properties representing the authorities to check for, as defined in configuration.
+     * @return {@code true} if the user has at least one of the specified authorities from the environment properties,
+     *         {@code false} otherwise.
+     *
+     * @see #hasAuthority(Authentication, String...)
+     */
+    public boolean hasAuthority(@NotNull String... properties)
+    {
+        return hasAuthority(SecurityContextHolder.getContext().getAuthentication(), properties);
+    }
+
+    /**
+     * Checks if the specified {@link Authentication} context has any of the specified authorities
+     * from the configuration.
+     * <p>
+     * This method checks whether the provided {@link Authentication} object has at least one authority
+     * that matches any of the authorities defined in the {@code application.properties} or another
+     * configuration source. It compares the user's granted authorities against the environment properties
+     * to determine if there is a match.
+     * <p>
+     * This method does not accept plain authorities directly. If you need to check for plain authorities,
+     * use {@code hasAuthority} in SpEL expressions instead. This method is intended for use with
+     * configuration-driven authority checks.
+     *
+     * @param authentication the {@link Authentication} context to check for authorities.
+     * @param properties the properties representing the authorities to check for, as defined in configuration.
+     * @return {@code true} if the specified {@link Authentication} has at least one of the specified authorities
+     *         from the environment properties, {@code false} otherwise.
+     *
+     * @see #hasAuthority(String...)
+     */
+    public boolean hasAuthority(@NotNull Authentication authentication, @NotNull String... properties)
+    {
+        Stream<? extends GrantedAuthority> authorityStream = authentication.getAuthorities().stream();
+        Set<String> userAuthorities = authorityStream.map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+        Set<String> propertyValues = Arrays.stream(properties).map(environment::getProperty).collect(Collectors.toSet());
+
+        return !Collections.disjoint(userAuthorities, propertyValues);
+    }
 
     /**
      * Generates a login JWT token for a user based on their user model and login model.
@@ -215,24 +342,6 @@ public class VerificationService
         });
     }
 
-    /**
-     * Generates a collection of authorities based on JwtTokenType, AuthorityFactory, and user ID.
-     * <p>
-     * The method determines the authorities of a user based on the type of JWT token, user ID and utilizes
-     * AuthorityFactory. Depending on different JwtTokenTypes, different authorities are generated:
-     * <ul>
-     *   <li>ADVANCED_AUTHORIZATION, AUTHORIZED - create a new collection of authorities. For ADVANCED_AUTHORIZATION,
-     *   add an additional authority</li>
-     *   <li>TWO_FACTOR_SELECTION, TWO_FACTOR_PENDING - only single authority is generated</li>
-     * </ul>
-     *
-     * @param jwtTokenType     the JwtTokenType identifying the type of JWT token
-     * @param authorityFactory factory used to generate user authorities according to user ID
-     * @param userID           the ID of the user whose authorities are to be generated
-     * @return an unmodifiable collection of authorities, derived from type, authorityFactory and user ID
-     * @throws IllegalStateException if the type does not match any case in the switch statement
-     */
-
     private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
     {
         return switch (jwtTokenType)
@@ -250,36 +359,5 @@ public class VerificationService
             case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
-    }
-
-    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
-    {
-        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
-    }
-
-    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
-    {
-        Set<JwtTokenType> tokenTypes = Set.of(jwtTokenType);
-        return authentication.getAuthorities().stream().anyMatch(verification ->
-        {
-            if (verification instanceof VerificationAuthority verificationAuthority)
-            {
-                return tokenTypes.contains(verificationAuthority.jwtTokenType());
-            }
-            return false;
-        });
-    }
-
-    public boolean hasAnyAuthority(@NotNull String... properties)
-    {
-        return hasAnyAuthority(SecurityContextHolder.getContext().getAuthentication(), properties);
-    }
-
-    public boolean hasAnyAuthority(@NotNull Authentication authentication, @NotNull String... properties)
-    {
-        Stream<String> authorityStream = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
-        Set<String> userAuthorize = authorityStream.collect(Collectors.toUnmodifiableSet());
-
-        return Arrays.stream(properties).map(environment::getProperty).anyMatch(userAuthorize::contains);
     }
 }
