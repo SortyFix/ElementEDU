@@ -50,7 +50,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     /**
      * Creates a new user utilizing the provided {@link UserCreateModel}.
      * <p>
-     * This method invokes {@code entityServices} to execute {@link UserService#create(UserCreateModel)}.
+     * This method invokes {@code entityServices} to execute {@link UserService#create(java.util.Set)}.
      * If a user with the same longin name already exists, an {@link OccupiedException} is thrown.
      * <p>
      * Note that the invoking user must possess the "privilege.user.create" privilege,
