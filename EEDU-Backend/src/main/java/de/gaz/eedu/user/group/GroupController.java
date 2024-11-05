@@ -47,7 +47,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @param groups an array of group IDs to attach to the specified user, provided in the request body.
      *               Must not be null.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.user.group.attach}, ${privilege.user.all})")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.user.group.attach')")
     @PostMapping("/{user}/attach")
     public void attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
@@ -72,7 +72,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @param groups an array of group IDs to detach from the specified user, provided in the request body.
      *               Must not be null.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.user.group.detach}, ${privilege.user.all})")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.user.group.detach')")
     @PostMapping("/{user}/detach")
     public void detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
@@ -97,7 +97,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @return a {@link ResponseEntity} containing the created {@link GroupModel} upon successful creation.
      * @throws CreationException if an error occurs during the creation of the group.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.group.create}, ${privilege.group.all})") @PostMapping("/create")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.group.create')") @PostMapping("/create")
     @Override
     public @NotNull ResponseEntity<GroupModel[]> create(@NotNull @RequestBody GroupCreateModel[] model) throws CreationException
     {
@@ -117,7 +117,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @param id the unique identifier of the group to be deleted, provided as a path variable. Must not be null.
      * @return {@code true} if the group was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.group.delete}, ${privilege.group.all})") @DeleteMapping("/delete/{id}")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.group.delete')") @DeleteMapping("/delete/{id}")
     @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
@@ -136,7 +136,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @param id the unique identifier of the group to retrieve, provided as a path variable. Must not be null.
      * @return a {@link ResponseEntity} containing the {@link GroupModel} of the specified group.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.group.get}, ${privilege.group.all})") @GetMapping("/get/{id}") @Override
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.group.get')") @GetMapping("/get/{id}") @Override
     public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);

@@ -45,7 +45,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      *              Must not be null.
      * @return a {@link ResponseEntity} containing the created {@link PrivilegeModel} upon successful creation.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.privilege.create}, ${privilege.privilege.all})") @PostMapping("/create")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.privilege.create')") @PostMapping("/create")
     @Override
     public @NotNull ResponseEntity<PrivilegeModel[]> create(@NotNull @RequestBody PrivilegeCreateModel[] model) throws CreationException
     {
@@ -65,7 +65,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param id the unique identifier of the privilege to be deleted, provided as a path variable. Must not be null.
      * @return {@code true} if the privilege was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.privilege.delete}, ${privilege.privilege.all})")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.privilege.delete')")
     @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
@@ -84,7 +84,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param id the unique identifier of the privilege to retrieve, provided as a path variable. Must not be null.
      * @return a {@link ResponseEntity} containing the {@link PrivilegeModel} of the specified privilege.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.privilege.get}, ${privilege.privilege.all})") @GetMapping("/get/{id}")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.privilege.get')") @GetMapping("/get/{id}")
     @Override public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
@@ -104,7 +104,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param privileges an array of privilege IDs to grant to the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.group.privilege.grant}, ${privilege.group.all})")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.group.privilege.grant')")
     @PostMapping("/{group}/grant")
     public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
@@ -129,7 +129,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @param privileges an array of privilege IDs to revoke from the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.group.privilege.revoke}, ${privilege.group.all})")
+    @PreAuthorize("@verificationService.hasAnyAuthority('privilege.group.privilege.revoke')")
     @PostMapping("/{group}/revoke")
     public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
