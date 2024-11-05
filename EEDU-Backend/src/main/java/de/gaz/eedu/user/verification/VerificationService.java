@@ -8,11 +8,16 @@ import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,6 +27,8 @@ import org.springframework.stereotype.Service;
 import java.time.*;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The VerificationService is responsible for handling operations related to user verification and authorization.
@@ -38,9 +45,11 @@ import java.util.*;
  * @author ivo
  */
 @Service
+@RequiredArgsConstructor
 public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
+    private final Environment environment;
 
     /**
      * Generates a login JWT token for a user based on their user model and login model.
@@ -259,5 +268,18 @@ public class VerificationService
             }
             return false;
         });
+    }
+
+    public boolean hasAnyAuthority(@NotNull String... properties)
+    {
+        return hasAnyAuthority(SecurityContextHolder.getContext().getAuthentication(), properties);
+    }
+
+    public boolean hasAnyAuthority(@NotNull Authentication authentication, @NotNull String... properties)
+    {
+        Stream<String> authorityStream = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
+        Set<String> userAuthorize = authorityStream.collect(Collectors.toUnmodifiableSet());
+
+        return Arrays.stream(properties).map(environment::getProperty).anyMatch(userAuthorize::contains);
     }
 }
