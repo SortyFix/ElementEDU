@@ -267,9 +267,8 @@ public class VerificationService
         String jwtTokenTypeName = data.getParent().map(Claims::getSubject).orElseThrow();
         JwtTokenType type = JwtTokenType.valueOf(jwtTokenTypeName);
 
-        long userId = data.get("userId", Long.class);
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, userId, authorityFactory);
-        return Optional.of(new UsernamePasswordAuthenticationToken(userId, null, authorities)).map((auth) ->
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, data.userId(), authorityFactory);
+        return Optional.of(new UsernamePasswordAuthenticationToken(data.userId(), null, authorities)).map((auth) ->
         {
             auth.setDetails(data);
             return auth;
