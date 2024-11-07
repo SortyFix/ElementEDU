@@ -117,7 +117,9 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
     @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal UserEntity user)
     {
-        return ResponseEntity.ok(user.toModel());
+        // because of lazy loading the users needs to be loaded by the service in order to provide an active session
+        // we need that because theme entity is loaded lazily and therefore cannot be loaded otherwise
+        return ResponseEntity.ok(getService().loadByIdSafe(user.getId()));
     }
 
     /**
