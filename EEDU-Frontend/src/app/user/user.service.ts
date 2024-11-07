@@ -4,8 +4,8 @@ import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
 import {ThemeEntity} from "../theming/theme-entity";
 import {environment} from "../../environments/environment";
-import {GroupModel} from "./GroupModel";
-import {PrivilegeModel} from "./PrivilegeModel";
+import {GroupModel} from "./group-model";
+import {PrivilegeModel} from "./privilege-model";
 
 @Injectable({
     providedIn: 'root'

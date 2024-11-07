@@ -1,5 +1,6 @@
 import {ThemeEntity} from "../theming/theme-entity";
-import {GroupModel} from "./GroupModel";
+import {GroupModel} from "./group-model";
+import {PrivilegeModel} from "./privilege-model";
 
 export enum UserStatus
 {
@@ -15,4 +16,12 @@ export class UserModel
                 public readonly status: UserStatus,
                 public readonly groups: GroupModel[],
                 public readonly theme: ThemeEntity) { }
+
+    public inGroup(name: string): boolean {
+        return this.groups.map((value: GroupModel): string => value.name).includes(name);
+    }
+
+    public hasPrivilege(privilege: string): boolean {
+        return this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
+    }
 }
