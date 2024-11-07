@@ -22,13 +22,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -80,6 +76,7 @@ public class DataLoader implements CommandLineRunner
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
+
         log.info("USERNAME: {}", userEntity.getLoginName());
         log.info("PASSWORD: {}", randomPassword);
         log.info("-".repeat(20));
@@ -101,7 +98,7 @@ public class DataLoader implements CommandLineRunner
 
     private @NotNull List<PrivilegeEntity> createDefaultPrivileges()
     {
-        Stream<PrivilegeCreateModel> modelStream = configuredPrivileges().stream().map(PrivilegeCreateModel::new);
+        Stream<PrivilegeCreateModel> modelStream = PrivilegeEntity.getProtectedPrivileges().stream().map(PrivilegeCreateModel::new);
         return getPrivilegeService().createEntity(modelStream.collect(Collectors.toUnmodifiableSet()));
     }
 
@@ -168,32 +165,5 @@ public class DataLoader implements CommandLineRunner
         }
 
         return password.toString();
-    }
-
-    private @NotNull @Unmodifiable Set<String> configuredPrivileges() // I know it does not look good, but it is
-    {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnvironment))
-        {
-            return Collections.emptySet();
-        }
-
-        Set<String> privileges = new HashSet<>();
-
-        for (PropertySource<?> propertySource : configurableEnvironment.getPropertySources())
-        {
-            if (!(propertySource instanceof EnumerablePropertySource<?> source))
-            {
-                continue;
-            }
-
-            for (String key : source.getPropertyNames())
-            {
-                if (key.startsWith("privilege"))
-                {
-                    privileges.add((String) propertySource.getProperty(key));
-                }
-            }
-        }
-        return privileges;
     }
 }

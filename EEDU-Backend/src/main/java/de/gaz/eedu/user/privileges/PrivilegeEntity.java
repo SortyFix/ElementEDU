@@ -15,6 +15,7 @@ import java.util.Set;
 
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity") public class PrivilegeEntity implements EntityModelRelation<PrivilegeModel>
 {
+
     private final static Set<String> PROTECTED_PRIVILEGES;
 
     static {
@@ -42,6 +43,11 @@ import java.util.Set;
                 "USER_CREDENTIAL_OTHERS_DELETE",
                 "USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY"
         ));
+    }
+
+    public static Set<String> getProtectedPrivileges()
+    {
+        return PROTECTED_PRIVILEGES;
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) // ID is final
