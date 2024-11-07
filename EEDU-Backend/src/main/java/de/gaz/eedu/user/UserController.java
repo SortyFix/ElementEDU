@@ -112,15 +112,13 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * The invoking user must be the owner of the data being accessed to perform this action.
      *
-     * @param user the currently authenticated user, provided automatically.
+     * @param userId the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
-    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal UserEntity user)
+    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long userId)
     {
-        // because of lazy loading the users needs to be loaded by the service in order to provide an active session
-        // we need that because theme entity is loaded lazily and therefore cannot be loaded otherwise
-        return ResponseEntity.ok(getService().loadByIdSafe(user.getId()));
+        return ResponseEntity.ok(getService().loadByIdSafe(userId));
     }
 
     /**
@@ -160,10 +158,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing a success message upon successful login.
      */
     @PostMapping("/login/advanced")
-    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal UserEntity userID)
+    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal long userID)
     {
         log.info("The server has recognized an incoming advanced login request for {}.", userID);
-        return getService().requestLogin(new AdvancedUserLoginModel(userID.getId())).map((token) ->
+        return getService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
         {
             String jwt = token.jwt();
             return ResponseEntity.ok(jwt);
@@ -184,7 +182,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param response the {@link HttpServletResponse} to which the logout cookie is added.
      */
     @GetMapping("/logout")
-    public void logout(@AuthenticationPrincipal @Nullable UserEntity user, @NotNull HttpServletResponse response)
+    public void logout(@AuthenticationPrincipal @Nullable Long user, @NotNull HttpServletResponse response)
     {
         Cookie cookie = new Cookie("token", null);
         cookie.setPath("/");

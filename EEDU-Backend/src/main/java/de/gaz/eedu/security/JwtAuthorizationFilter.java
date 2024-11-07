@@ -45,7 +45,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 request.setAttribute("token", auth.getDetails());
             }, () -> log.warn("The request did not contain a valid authorization token."));
-        } catch (ExpiredJwtException expiredJwtException)
+        }
+        catch (ExpiredJwtException expiredJwtException)
         {
             log.warn("An incoming request had an expired token.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The token is expired");

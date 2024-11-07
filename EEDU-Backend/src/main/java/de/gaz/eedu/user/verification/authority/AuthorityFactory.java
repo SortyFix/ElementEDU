@@ -5,12 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.Set;
 
 @FunctionalInterface
 public interface AuthorityFactory
 {
 
-    @NotNull @Unmodifiable UserEntity get(long id);
+    @NotNull @Unmodifiable Collection<? extends GrantedAuthority> get(long id);
 
 }

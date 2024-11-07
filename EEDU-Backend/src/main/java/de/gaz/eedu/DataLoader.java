@@ -51,10 +51,10 @@ public class DataLoader implements CommandLineRunner
 
     @Override @Transactional public void run(@NotNull String... args)
     {
-        if (userService.findAll().isEmpty())
-        {
+/*        if (userService.findAll().isEmpty())
+        {*/
             createDefaultUser();
-        }
+//        }
     }
 
     /**
