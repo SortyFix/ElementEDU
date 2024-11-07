@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -132,9 +131,10 @@ public class VerificationService
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }*/
 
-        Set<String> restricted = Collections.singleton("expiry");
+        Set<String> restricted = Set.of("expiry", "username");
         ClaimHolder<Long> expiry = new ClaimHolder<>("expiry", getExpiry(model).toEpochMilli());
-        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry);
+        ClaimHolder<String> username = new ClaimHolder<>("username", user.getUsername());
+        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry, username);
 
         if (user.getCredentials().isEmpty())
         {
@@ -263,23 +263,27 @@ public class VerificationService
     public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
         TokenData data = TokenData.deserialize(secret, token);
-        JwtTokenType type = JwtTokenType.valueOf(data.getParent().map(Claims::getSubject).orElseThrow());
 
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, authorityFactory, data.userId());
-        return Optional.of(new UsernamePasswordAuthenticationToken(data.userId(), null, authorities)).map((auth) ->
+        String jwtTokenTypeName = data.getParent().map(Claims::getSubject).orElseThrow();
+        JwtTokenType type = JwtTokenType.valueOf(jwtTokenTypeName);
+
+        UserEntity user = authorityFactory.get(data.userId());
+
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, user);
+        return Optional.of(new UsernamePasswordAuthenticationToken(user, null, authorities)).map((auth) ->
         {
             auth.setDetails(data);
             return auth;
         });
     }
 
-    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
+    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull UserEntity user)
     {
         return switch (jwtTokenType)
         {
             case ADVANCED_AUTHORIZATION, AUTHORIZED ->
             {
-                Collection<GrantedAuthority> authorities = new HashSet<>(authorityFactory.get(userID));
+                Collection<GrantedAuthority> authorities = new HashSet<>(user.getAuthorities());
                 authorities.add(JwtTokenType.AUTHORIZED.getAuthority());
                 if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION))
                 {

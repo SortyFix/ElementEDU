@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,10 +57,12 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @Value("${development}") private final boolean development = false;
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
-    @PreAuthorize(
-            "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${user.credential.delete})"
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)"
     ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
+        boolean hasPrivilege = isAuthorized("USER_CREDENTIAL_OTHERS_DELETE");
+        validate(hasPrivilege || Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
+
         return super.delete(id);
     }
 
@@ -76,9 +80,9 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize(
             "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
     ) @PostMapping("/create")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal UserEntity userEntity)
     {
-        return create(userID, model);
+        return create(userEntity.getId(), model);
     }
 
     @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")

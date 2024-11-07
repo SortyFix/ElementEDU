@@ -3,6 +3,7 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -87,9 +90,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
-        return getService().loadById(id)
-                           .map(ResponseEntity::ok)
-                           .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     public @NotNull ResponseEntity<Set<M>> fetchAll()
@@ -101,6 +102,16 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
+    }
+
+    protected long getPrincipalId()
+    {
+        Object principal = getAuthentication().getPrincipal();
+        if(Objects.nonNull(principal))
+        {
+            throw new IllegalStateException("Not logged in");
+        }
+        return ((UserEntity)getAuthentication().getPrincipal()).getId();
     }
 
     protected boolean isAuthorized(@NotNull String authority)
