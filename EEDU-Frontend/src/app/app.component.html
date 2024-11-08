@@ -1,5 +1,5 @@
 <div class="content">
-    <app-load *ngIf="!isLoaded() && !userService.isLoggedIn" [errorSignal]="errorSignal"></app-load>
+    <app-load *ngIf="!isLoaded()" [errorSignal]="errorSignal"></app-load>
     @if (isLoaded()) {
         <div class="background-image" *ngIf="!userService.isLoggedIn">
             <app-authentication></app-authentication>

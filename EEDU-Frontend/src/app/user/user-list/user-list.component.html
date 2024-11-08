@@ -15,7 +15,7 @@
     >Select All
     </mat-checkbox>
 
-    <mat-expansion-panel *ngFor="let user of users">
+    <mat-expansion-panel *ngFor="let user of users" style="width: 100%">
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
                 <a matListItemTitle>
@@ -25,16 +25,17 @@
                         (click)="$event.stopPropagation()"
                         (keydown)="handleKeyDown($event, user)"
                     ></mat-checkbox>
-                    <mat-icon class="icon">person</mat-icon>
-
+                    <mat-icon class="icon">{{ icon(user) }}</mat-icon>
                     {{ user.loginName }}
                 </a>
+
             </mat-panel-title>
             <mat-panel-description>
-                <mat-chip-set *ngIf="!accessibilityService.mobile">
-                    <mat-chip>Schüler</mat-chip>
-                    <mat-chip>5B</mat-chip>
-                    <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
+                <mat-chip-set>
+                    @for(tag of tags(user); track tag)
+                    {
+                        <mat-chip>{{ tag }}</mat-chip>
+                    }
                 </mat-chip-set>
 
                 <mat-icon class="icon" [matTooltip]="user.status">{{ status(user) }}
@@ -42,8 +43,40 @@
             </mat-panel-description>
 
         </mat-expansion-panel-header>
-        <p>
-            Hier könnte ihre Werbung stehen
-        </p>
+
+        <div style="padding: 16px 0;">
+            <button mat-stroked-button>
+                Change Password
+            </button>
+        </div>
+
+        <mat-divider></mat-divider>
+
+
+        <div *ngIf="user.groups && user.groups.length > 0">
+            <h3>Groups</h3>
+            <mat-list>
+                <mat-list-item *ngFor="let group of user.groups">
+                    <mat-icon class="icon">group</mat-icon>
+                    <span mat-line>{{ group.name }}</span>
+                    <span mat-line *ngIf="group.privileges.length > 0">
+                        <strong>Privileges:</strong>
+                        <span *ngFor="let privilege of group.privileges; let isLast = last">
+                            {{ privilege.name }}<span *ngIf="!isLast">, </span>
+                        </span>
+                    </span>
+                </mat-list-item>
+            </mat-list>
+        </div>
+
+        <div *ngIf="!user.groups || user.groups.length === 0">
+            <p>No groups assigned.</p>
+        </div>
+
+        <div style="padding: 16px 0;">
+            <button mat-raised-button color="primary">
+                Edit Groups
+            </button>
+        </div>
     </mat-expansion-panel>
 </mat-accordion>

@@ -2,6 +2,7 @@ package de.gaz.eedu.security;
 
 import de.gaz.eedu.user.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -46,10 +46,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
                 request.setAttribute("token", auth.getDetails());
             }, () -> log.warn("The request did not contain a valid authorization token."));
         }
-        catch (ExpiredJwtException expiredJwtException)
+        catch (ExpiredJwtException | SignatureException expiredJwtException)
         {
             log.warn("An incoming request had an expired token.");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The token is expired");
+            response.addCookie(getUserService().getVerificationService().logoutCookie());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
 
         filterChain.doFilter(request, response);
@@ -62,7 +63,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
         {
             return Optional.empty();
         }
-        log.info("Authorization header detected. Proceed to validate token.");
         return Optional.of(header.substring("Bearer ".length()));
     }
 
@@ -73,7 +73,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
         {
             return Optional.empty();
         }
-        log.info("Authorization cookie detected. Proceed to validate token.");
         Predicate<Cookie> isJwtToken = cookie -> Objects.equals("token", cookie.getName());
         return Stream.of(cookies).filter(isJwtToken).findFirst().map(Cookie::getValue);
     }

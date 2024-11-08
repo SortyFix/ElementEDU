@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -105,13 +106,15 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      *                   Must not be null.
      */
     @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_GRANT')") @PostMapping("/{group}/grant")
-    public void grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    public @NotNull HttpStatus grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
 
         PrivilegeEntity[] entities = getService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
         GroupService groupService = getService().getGroupService();
-        groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
+
+        boolean modified = groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
+        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**
@@ -129,11 +132,12 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      *                   Must not be null.
      */
     @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_REVOKE')") @PostMapping("/{group}/revoke")
-    public void revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    public @NotNull HttpStatus revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
     {
         log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);
 
         GroupService groupService = getService().getGroupService();
-        groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
+        boolean modified = groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
+        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 }

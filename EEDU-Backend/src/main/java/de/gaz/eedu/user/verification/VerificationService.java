@@ -13,9 +13,12 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +51,7 @@ import java.util.*;
 public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
+    @Value("${development}") private boolean development = false;
 
     /**
      * Checks for a specific token type.
@@ -275,7 +279,7 @@ public class VerificationService
         });
     }
 
-    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, long userId, @NotNull AuthorityFactory factory)
+    public @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, long userId, @NotNull AuthorityFactory factory)
     {
         return switch (jwtTokenType)
         {
@@ -292,5 +296,23 @@ public class VerificationService
             case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
+    }
+
+    @Contract(pure = true, value = "-> new")
+    public @NotNull Cookie logoutCookie()
+    {
+        return authCookie(null);
+    }
+
+    @Contract(pure = true, value = "_ -> new")
+    public @NotNull Cookie authCookie(@Nullable String token)
+    {
+        Cookie cookie = new Cookie("token", token);
+        cookie.setPath("/");
+        cookie.setDomain("localhost");
+        cookie.setMaxAge(3600);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!development);
+        return cookie;
     }
 }

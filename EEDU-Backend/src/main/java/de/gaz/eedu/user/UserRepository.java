@@ -2,10 +2,13 @@ package de.gaz.eedu.user;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class represents the repository that contains the users.
@@ -20,8 +23,20 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @NotNull Optional<UserEntity> findByLoginName(@NotNull String loginName);
 
-    @NotNull boolean existsByLoginName(@NotNull String loginName);
-
-
     @NotNull boolean existsByLoginNameIn(@NotNull Collection<String> loginNames);
+
+    @Query("SELECT u FROM UserEntity u " +
+            "LEFT JOIN FETCH u.groups g " +
+            "LEFT JOIN FETCH g.privileges p " +
+            "LEFT JOIN FETCH u.themeEntity t " +
+            "WHERE u.id = :userId")
+    @NotNull Optional<UserEntity> findByIdEagerly(@Param("userId") long userId);
+
+
+    @Query("SELECT u FROM UserEntity u " +
+            "LEFT JOIN FETCH u.groups g " +
+            "LEFT JOIN FETCH g.privileges p " +
+            "LEFT JOIN FETCH u.themeEntity t")
+    @NotNull Set<UserEntity> findAllEagerly();
+
 }

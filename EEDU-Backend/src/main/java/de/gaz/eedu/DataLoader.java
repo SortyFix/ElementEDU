@@ -73,7 +73,6 @@ public class DataLoader implements CommandLineRunner
         UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
         setPassword(userEntity, randomPassword);
 
-
         log.info("A default user has been created");
         log.info("-".repeat(20));
 
@@ -90,7 +89,7 @@ public class DataLoader implements CommandLineRunner
     private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
-        int bitMask = CredentialMethod.bitMask(CredentialMethod.PASSWORD, CredentialMethod.TOTP);
+        int bitMask = CredentialMethod.bitMask(password);
 
         CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
         getCredentialService().createEntity(Set.of(credential));
@@ -98,16 +97,26 @@ public class DataLoader implements CommandLineRunner
 
     private @NotNull List<PrivilegeEntity> createDefaultPrivileges()
     {
-        Stream<PrivilegeCreateModel> modelStream = PrivilegeEntity.getProtectedPrivileges().stream().map(PrivilegeCreateModel::new);
-        return getPrivilegeService().createEntity(modelStream.collect(Collectors.toUnmodifiableSet()));
+        Stream<PrivilegeCreateModel> stream = PrivilegeEntity.getProtectedPrivileges().stream().map(PrivilegeCreateModel::new);
+        return getPrivilegeService().createEntity(stream.collect(Collectors.toSet()));
     }
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull List<PrivilegeEntity> privileges)
     {
-        Long[] ids = privileges.stream().map(PrivilegeEntity::getId).toArray(Long[]::new);
-        GroupCreateModel group = new GroupCreateModel("admin", ids);
+        Stream<GroupCreateModel> stream = GroupEntity.getProtectedGroups().stream().map(group ->
+        {
+            if(Objects.equals(group, "administrator"))
+            {
+                return new GroupCreateModel(group, privileges.stream().map(PrivilegeEntity::getId).toArray(Long[]::new));
+            }
+            if(Objects.equals(group, "student") || Objects.equals(group, "teacher"))
+            {
+                return null;
+            }
+            return new GroupCreateModel(group, new Long[0]);
+        });
 
-        return getGroupService().createEntity(Set.of(group)).getFirst();
+        return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getName(), "administrator")).findFirst().orElseThrow();
     }
 
     private @NotNull ThemeEntity createDefaultThemes()

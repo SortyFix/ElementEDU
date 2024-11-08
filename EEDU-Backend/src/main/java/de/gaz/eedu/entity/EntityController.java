@@ -87,7 +87,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
-        return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return getService().loadById(id).map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     public @NotNull ResponseEntity<Set<M>> fetchAll()

@@ -39,7 +39,7 @@ export class UserService
         }
 
         return this.fetchUserData.pipe(tap<UserModel>({
-            next: (value: UserModel): void => this.storeUserData(JSON.stringify(value))
+            next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
     }
 
@@ -62,7 +62,6 @@ export class UserService
     {
         if (!this.isLoggedIn)
         {
-            console.log("wlll")
             return of();
         }
 
@@ -86,7 +85,11 @@ export class UserService
     public get fetchAll(): Observable<UserModel[]>
     {
         const url: string = `${this.BACKEND_URL}/user/all`;
-        return this.http.get<UserModel[]>(url, {withCredentials: true});
+        return this.http.get<string[]>(url, { withCredentials: true }).pipe(
+            map((response: string[]): UserModel[] =>
+                response.map((element: string): UserModel => this.toUser(JSON.stringify(element)))
+            )
+        );
     }
 
     private storeUserData(userData: string)

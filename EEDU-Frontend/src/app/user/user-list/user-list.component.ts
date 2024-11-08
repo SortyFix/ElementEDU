@@ -1,6 +1,13 @@
 import {Component, input, InputSignal} from '@angular/core';
 import {UserModel, UserStatus} from "../user-model";
-import {MatListItem, MatListItemLine, MatListItemMeta, MatListItemTitle, MatNavList} from "@angular/material/list";
+import {
+    MatList,
+    MatListItem,
+    MatListItemLine,
+    MatListItemMeta,
+    MatListItemTitle,
+    MatNavList
+} from "@angular/material/list";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatChip, MatChipRow, MatChipSet} from "@angular/material/chips";
@@ -19,6 +26,8 @@ import {NgForOf, NgIf, NgStyle} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ThemeService} from "../../theming/theme.service";
+import {MatDivider} from "@angular/material/divider";
+import {MatLine} from "@angular/material/core";
 
 @Component({
   selector: 'app-user-list',
@@ -48,7 +57,10 @@ import {ThemeService} from "../../theming/theme.service";
         FormsModule,
         NgForOf,
         MatTooltip,
-        NgStyle
+        NgStyle,
+        MatDivider,
+        MatList,
+        MatLine
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -113,6 +125,35 @@ export class UserListComponent {
         }
 
         this._selected.add(entry.loginName);
+    }
+
+    protected icon(user: UserModel): 'person' | 'how_to_reg' | 'manage_accounts'
+    {
+        if(user.inGroup('administrator'))
+        {
+            return 'manage_accounts';
+        }
+        else if(user.inGroup('teacher'))
+        {
+            return 'how_to_reg'
+        }
+
+        return 'person';
+    }
+
+    protected tags(user: UserModel): string[]
+    {
+        if(user.inGroup('administrator'))
+        {
+            return ['Administrator']
+        }
+
+        let accountType: string = 'Schüler';
+        if(user.inGroup('teacher'))
+        {
+            accountType = 'Lehrer'
+        }
+        return [accountType, `${user.lastName}, ${user.firstName}`];
     }
 
     protected status(user: UserModel): 'check_circle' | 'error' | 'receipt_long' | 'pending' {

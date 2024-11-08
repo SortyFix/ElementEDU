@@ -17,12 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -100,7 +102,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        return super.getData(id);
+        // I must override the default behavior, because this method is used heavily used. It has got its own
+        // sql query UserRepository#findByIdEagerly(Long)
+        Optional<UserModel> user = getService().getRepository().findByIdEagerly(id).map(getService().toModel());
+        return user.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     /**
@@ -117,7 +122,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
     @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long userId)
     {
-        return ResponseEntity.ok(getService().loadByIdSafe(userId));
+        return getData(userId);
     }
 
     /**

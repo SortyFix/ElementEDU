@@ -40,6 +40,21 @@ import java.util.stream.Stream;
 public class GroupEntity implements EntityModelRelation<GroupModel>
 {
 
+    private final static Set<String> PROTECTED_GROUPS;
+
+    static {
+        PROTECTED_GROUPS = Set.of(
+                "administrator",
+                "teacher",
+                "students"
+        );
+    }
+
+    public static @NotNull @Unmodifiable Set<String> getProtectedGroups()
+    {
+        return PROTECTED_GROUPS;
+    }
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
 
@@ -143,7 +158,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
-        return privileges.addAll(Arrays.stream(privilegeEntity).collect(Collectors.toSet()));
+        return privileges.addAll(Arrays.asList(privilegeEntity));
     }
 
     /**
@@ -217,6 +232,11 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
         }
         this.privileges.clear();
         return true;
+    }
+
+    @Override public boolean isDeletable()
+    {
+        return getProtectedGroups().contains(getName());
     }
 
     @Override public String toString()

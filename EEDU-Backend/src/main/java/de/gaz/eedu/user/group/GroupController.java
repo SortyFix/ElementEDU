@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,13 +50,15 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      */
     @PreAuthorize("hasAuthority('USER_GROUP_ATTACH')")
     @PostMapping("/{user}/attach")
-    public void attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    public HttpStatus attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
 
         GroupEntity[] entities = getService().loadEntityById(groups).toArray(GroupEntity[]::new);
         UserService userService = getService().getUserService();
-        userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
+
+        boolean modified = userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
+        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**
@@ -74,12 +77,13 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      */
     @PreAuthorize("hasAuthority('USER_GROUP_DETACH')")
     @PostMapping("/{user}/detach")
-    public void detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    public @NotNull HttpStatus detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
         log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
 
         UserService userService = getService().getUserService();
-        userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
+        boolean modified = userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
+        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**

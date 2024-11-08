@@ -162,13 +162,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
         {
             if (Objects.equals(jwtToken.type(), JwtTokenType.AUTHORIZED))
             {
-                Cookie cookie = new Cookie("token", jwtToken.jwt());
-                cookie.setPath("/");
-                cookie.setDomain("localhost");
-                cookie.setMaxAge(3600);
-                cookie.setHttpOnly(true);
-                cookie.setSecure(!development);
-                response.addCookie(cookie);
+                response.addCookie(getService().getUserService().getVerificationService().authCookie(jwtToken.jwt()));
             }
             return ResponseEntity.ok(jwtToken.jwt());
         }).orElseThrow(this::unauthorizedThrowable);

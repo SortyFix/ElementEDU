@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.user.exception.GroupConflictException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
@@ -175,11 +176,32 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      */
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
-        // Filter already attached groups out
-        Predicate<GroupEntity> predicate = requestedGroup -> getGroups().stream().noneMatch(presentGroup -> Objects.equals(
-                presentGroup,
-                requestedGroup));
-        return this.groups.addAll(Arrays.stream(groupEntities).filter(predicate).collect(Collectors.toSet()));
+
+
+
+        List<GroupEntity> entities = Arrays.asList(groupEntities);
+
+        if(inGroup("teacher") && containsGroup(entities, "student"))
+        {
+            throw new GroupConflictException("Teachers cannot be labeled as students.");
+        }
+
+        if(inGroup("student") && containsGroup(entities, "teacher"))
+        {
+            throw new GroupConflictException("Students cannot be labeled as teachers.");
+        }
+
+        if(!Collections.disjoint(getGroups(), entities))
+        {
+            throw new IllegalStateException("The user already has one of these groups.");
+        }
+
+        return this.groups.addAll(entities);
+    }
+
+    private static boolean containsGroup(@NotNull Collection<GroupEntity> entities, @NotNull String name)
+    {
+        return entities.stream().anyMatch(group -> Objects.equals(group.getName(), name));
     }
 
     /**
