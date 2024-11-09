@@ -14,11 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter(AccessLevel.PROTECTED)
@@ -58,5 +61,10 @@ public class GroupService extends EntityService<GroupRepository, GroupEntity, Gr
         Set<UserEntity> users = entry.getUsers();
         users.forEach(user -> user.detachGroups(entry.getId()));
         getUserService().saveEntity(users);
+    }
+
+    @Override public @NotNull @Unmodifiable Set<GroupEntity> findAllEntities(@NotNull Predicate<GroupEntity> predicate)
+    {
+        return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 }

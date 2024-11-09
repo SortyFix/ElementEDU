@@ -7,13 +7,19 @@
            (input)="unselectAll()"
            autofocus matInput>
 </mat-form-field>
-<mat-accordion >
-    <mat-checkbox [checked]="isSelected('all')"
-                  [indeterminate]="partiallySelected"
-                  (change)="toggle('all')"
-                  *ngIf="users.length != 0"
-    >Select All
-    </mat-checkbox>
+<mat-accordion>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <mat-checkbox [checked]="isSelected('all')"
+                      [indeterminate]="partiallySelected"
+                      (change)="toggle('all')"
+                      *ngIf="users.length != 0">
+            Select All
+        </mat-checkbox>
+
+        <button mat-button  style="text-align: right;">
+            Filter
+        </button>
+    </div>
 
     <mat-expansion-panel *ngFor="let user of users" style="width: 100%">
         <mat-expansion-panel-header tabindex="-1">
@@ -44,15 +50,6 @@
 
         </mat-expansion-panel-header>
 
-        <div style="padding: 16px 0;">
-            <button mat-stroked-button>
-                Change Password
-            </button>
-        </div>
-
-        <mat-divider></mat-divider>
-
-
         <div *ngIf="user.groups && user.groups.length > 0">
             <h3>Groups</h3>
             <mat-list>
@@ -74,8 +71,14 @@
         </div>
 
         <div style="padding: 16px 0;">
-            <button mat-raised-button color="primary">
+            <button mat-raised-button color="primary" (click)="openGroupDialog(user)">
                 Edit Groups
+            </button>
+            <button mat-stroked-button style="margin-left: 10px">
+                Change Password
+            </button>
+            <button mat-raised-button color="warn" style="margin-left: 10px">
+                Delete User
             </button>
         </div>
     </mat-expansion-panel>

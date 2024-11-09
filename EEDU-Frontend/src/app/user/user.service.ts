@@ -2,10 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
-import {ThemeEntity} from "../theming/theme-entity";
 import {environment} from "../../environments/environment";
-import {GroupModel} from "./group-model";
-import {PrivilegeModel} from "./privilege-model";
 
 @Injectable({
     providedIn: 'root'
@@ -50,7 +47,7 @@ export class UserService
         {
             throw new Error("User is not logged in, or user data is corrupt.");
         }
-        return this.toUser(userData);
+        return UserModel.fromObject(JSON.parse(userData));
     }
 
     public get hasLoaded(): boolean
@@ -85,9 +82,9 @@ export class UserService
     public get fetchAll(): Observable<UserModel[]>
     {
         const url: string = `${this.BACKEND_URL}/user/all`;
-        return this.http.get<string[]>(url, { withCredentials: true }).pipe(
-            map((response: string[]): UserModel[] =>
-                response.map((element: string): UserModel => this.toUser(JSON.stringify(element)))
+        return this.http.get<any[]>(url, { withCredentials: true }).pipe(
+            map((response: any[]): UserModel[] =>
+                response.map((element: any): UserModel => UserModel.fromObject(element))
             )
         );
     }
@@ -97,7 +94,7 @@ export class UserService
         localStorage.setItem("userData", userData)
     }
 
-    private toUser(json: string): UserModel
+/*    private toUser(json: string): UserModel
     {
         const parsedJson: any = JSON.parse(json);
         const theme: any = parsedJson.theme;
@@ -113,12 +110,8 @@ export class UserService
             theme.widgetColor_b
         );
 
-        const groups: GroupModel[] = parsedJson.groups.map((group: any): GroupModel => {
-            const privileges: any = group.privileges.map((privilege: any): PrivilegeModel => new PrivilegeModel(privilege.name, privilege.level));
 
-            return new GroupModel(BigInt(group.id), group.name, privileges);
-        })
 
         return new UserModel(BigInt(parsedJson.id), parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, groups, themeEntity);
-    }
+    }*/
 }

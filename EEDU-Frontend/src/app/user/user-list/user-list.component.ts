@@ -21,13 +21,15 @@ import {
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {AccessibilityService} from "../../accessibility.service";
 import {NgForOf, NgIf, NgStyle} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
-import {ThemeService} from "../../theming/theme.service";
 import {MatDivider} from "@angular/material/divider";
 import {MatLine} from "@angular/material/core";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {GroupDialogComponent} from "../group/group-dialog/group-dialog.component";
+import {MatCard, MatCardTitle} from "@angular/material/card";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
 
 @Component({
   selector: 'app-user-list',
@@ -60,7 +62,10 @@ import {MatLine} from "@angular/material/core";
         NgStyle,
         MatDivider,
         MatList,
-        MatLine
+        MatLine,
+        MatCard,
+        MatCardTitle,
+        MatSlideToggle
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -71,7 +76,7 @@ export class UserListComponent {
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
     private _selected: Set<string> = new Set();
 
-    constructor(protected accessibilityService: AccessibilityService, protected themeService: ThemeService) {}
+    constructor(protected dialog: MatDialog) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -188,5 +193,14 @@ export class UserListComponent {
 
     private sorted(users: UserModel[]): UserModel[] {
         return users.sort((a: UserModel, b: UserModel): number => a.lastName.localeCompare(b.lastName));
+    }
+
+    protected openGroupDialog(user: UserModel): void
+    {
+        let dia: MatDialogRef<GroupDialogComponent> = this.dialog.open(GroupDialogComponent, {
+            height: '500px',
+            width: '500px',
+            data: user
+        })
     }
 }

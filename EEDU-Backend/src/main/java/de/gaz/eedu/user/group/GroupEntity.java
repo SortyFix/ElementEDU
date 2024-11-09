@@ -46,7 +46,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
         PROTECTED_GROUPS = Set.of(
                 "administrator",
                 "teacher",
-                "students"
+                "student"
         );
     }
 
@@ -236,7 +236,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
 
     @Override public boolean isDeletable()
     {
-        return getProtectedGroups().contains(getName());
+        return !getProtectedGroups().contains(getName());
     }
 
     @Override public String toString()

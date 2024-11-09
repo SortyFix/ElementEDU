@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * Controller for managing group-related operations for users.
  * <p>
@@ -134,14 +136,20 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * This endpoint is restricted to users with appropriate privileges.
      * <p>
      * This endpoint is accessible only to users with any of the following authorities: {@code ${privilege.group.get}}
-     * or {@code ${privilege.group.all}}.
+     * or {@code ${privilege.group.all}}. //TODO rework javadoc
      *
      * @param id the unique identifier of the group to retrieve, provided as a path variable. Must not be null.
      * @return a {@link ResponseEntity} containing the {@link GroupModel} of the specified group.
      */
-    @PreAuthorize("hasAuthority('GROUP_GET')") @GetMapping("/get/{id}") @Override
+    @PreAuthorize("hasAnyAuthority('USER_GROUP_ATTACH', 'USER_GROUP_DETACH', 'DELETE', 'CREATE')") @GetMapping("/get/{id}") @Override
     public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('USER_GROUP_ATTACH', 'USER_GROUP_DETACH', 'DELETE', 'CREATE')") @GetMapping("/get/all") @Override
+    public @NotNull ResponseEntity<Set<GroupModel>> fetchAll()
+    {
+        return super.fetchAll();
     }
 }
