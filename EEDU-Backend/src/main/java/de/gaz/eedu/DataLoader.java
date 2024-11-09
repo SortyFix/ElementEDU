@@ -61,7 +61,7 @@ import java.util.Set;
 
         PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(randomPassword, createDefaultTheme(), groupEntity);
+        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity); //TODO set password
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -77,14 +77,14 @@ import java.util.Set;
 
     private @NotNull PrivilegeEntity createDefaultPrivilege()
     {
-        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
-        return getPrivilegeService().createEntity(privilege);
+        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN");
+        return getPrivilegeService().createEntity(Set.of(privilege)).getFirst();
     }
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", true, new Long[0], new Long[] {privilegeEntity.getId()});
-        return getGroupService().createEntity(group);
+        GroupCreateModel group = new GroupCreateModel("admin", true, new Long[] {privilegeEntity.getId() });
+        return getGroupService().createEntity(Set.of(group)).getFirst();
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
@@ -93,11 +93,11 @@ import java.util.Set;
         return getThemeService().createEntity(Set.of(theme)).getFirst();
     }
 
-    private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         // long line -.-
-        UserCreateModel user = new UserCreateModel("root", "root", "root", password, true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
-        UserEntity userEntity = getUserService().createEntity(user);
+        UserCreateModel user = new UserCreateModel("root", "root", "root", true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
+        UserEntity userEntity = getUserService().createEntity(Set.of(user)).getFirst();
         userEntity.setSystemAccount(true);
         return getUserService().saveEntity(userEntity);
     }

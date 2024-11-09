@@ -76,10 +76,14 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
 
     @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException
     {
+        if(getRepository().existsByNameIn(model.stream().map(CourseCreateModel::name).toList()))
+        {
+            throw new OccupiedException();
+        }
+
         Set<FileEntity> repositories = new HashSet<>(model.size());
         List<CourseEntity> courseEntities = model.stream().map(clazzModel ->
         {
-
             //TODO Yonas: please add a way of creating entities without instantly saving them
             FileCreateModel file = new FileCreateModel(1L, clazzModel.name(), new String[0], "", new String[0]);
             FileEntity fileEntity = file.toEntity(new FileEntity());
