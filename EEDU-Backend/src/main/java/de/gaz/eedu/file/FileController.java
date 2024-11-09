@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@RestController @RequiredArgsConstructor @RequestMapping(value = "/file") public class FileController
+@RestController @RequiredArgsConstructor @RequestMapping(value = "/api/v1/file") public class FileController
 {
     private final @NotNull UserService userService;
     private final @NotNull FileService fileService;
