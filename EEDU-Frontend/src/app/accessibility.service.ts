@@ -1,4 +1,4 @@
-import {HostListener, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
@@ -6,7 +6,7 @@ import {HostListener, Injectable} from '@angular/core';
 export class AccessibilityService {
 
     private _mobile: boolean = false;
-
+    private _dimensions: {width: number, height: number} = {width: 1000, height: 1000};
 
     constructor() {
         this.checkScreenSize();
@@ -25,6 +25,11 @@ export class AccessibilityService {
      * Checks the screen size and sets the mobile property based on the width.
      */
     private checkScreenSize(): void {
-        this._mobile = window.innerWidth <= 600 || window.innerHeight <= 600;
+        this._dimensions = {width: window.innerWidth, height: window.innerHeight};
+        this._mobile = this._dimensions.width <= 650 || this._dimensions.height <= 600;
+    }
+
+    public get dimensions(): { width: number; height: number } {
+        return this._dimensions;
     }
 }

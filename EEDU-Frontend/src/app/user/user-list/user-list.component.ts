@@ -30,6 +30,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {GroupDialogComponent} from "../group/group-dialog/group-dialog.component";
 import {MatCard, MatCardTitle} from "@angular/material/card";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {AccessibilityService} from "../../accessibility.service";
 
 @Component({
   selector: 'app-user-list',
@@ -76,7 +77,7 @@ export class UserListComponent {
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
     private _selected: Set<string> = new Set();
 
-    constructor(protected dialog: MatDialog) {}
+    constructor(protected accessibilityService: AccessibilityService, protected dialog: MatDialog) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -153,10 +154,10 @@ export class UserListComponent {
             return ['Administrator']
         }
 
-        let accountType: string = 'Schüler';
+        let accountType: string = 'Student';
         if(user.inGroup('teacher'))
         {
-            accountType = 'Lehrer'
+            accountType = 'Teacher'
         }
         return [accountType, `${user.lastName}, ${user.firstName}`];
     }
