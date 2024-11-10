@@ -19,7 +19,7 @@ import java.util.Set;
 
 
 @RestController
-@RequestMapping(value = "/user", method = RequestMethod.POST)
+@RequestMapping(value = "/api/v1/user", method = RequestMethod.POST)
 @AllArgsConstructor
 public class ThemeController
 {

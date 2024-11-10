@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RestController @RequestMapping(value = "/illness/management") @AllArgsConstructor
+@RestController @RequestMapping(value = "/api/v1/illness/management") @AllArgsConstructor
 public class IllnessNotificationManagementController
 {
     private final IllnessNotificationManagementService illnessNotificationManagementService;
