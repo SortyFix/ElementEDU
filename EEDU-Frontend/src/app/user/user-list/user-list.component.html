@@ -20,8 +20,7 @@
             Filter
         </button>
     </div>
-
-    <mat-expansion-panel *ngFor="let user of users">
+    <mat-expansion-panel *ngFor="let user of users" (closed)="editGroup = undefined">
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
                 <a matListItemTitle>
@@ -29,8 +28,8 @@
                         [checked]="isSelected(user)"
                         (change)="toggle(user)"
                         (click)="$event.stopPropagation()"
-                        (keydown)="handleKeyDown($event, user)"
-                    ></mat-checkbox>
+                        (keydown)="handleKeyDown($event, user)">
+                    </mat-checkbox>
                     <mat-icon class="icon">{{ icon(user) }}</mat-icon>
                     {{ user.loginName }}
                 </a>
@@ -56,36 +55,41 @@
 
         </mat-expansion-panel-header>
 
-        <div *ngIf="user.groups && user.groups.length > 0">
-            <h3>Groups</h3>
-            <mat-list>
-                <mat-list-item *ngFor="let group of user.groups">
-                    <mat-icon class="icon">group</mat-icon>
-                    <span mat-line>{{ group.name }}</span>
-                    <span mat-line *ngIf="group.privileges.length > 0">
+        <h3>Groups</h3>
+        @if (isEditingGroups(user)) {
+            <app-group-selection-list [user]="user"></app-group-selection-list>
+
+            <div>
+                <button mat-stroked-button color="warn"
+                        (click)="editGroup = undefined"
+                        style="margin-right: 10px">
+                    Cancel
+                </button>
+                <button mat-stroked-button>Apply</button>
+            </div>
+
+        } @else {
+            <div *ngIf="user.groups && user.groups.length > 0">
+                <mat-list>
+                    <mat-list-item *ngFor="let group of user.groups">
+                        <mat-icon class="icon">group</mat-icon>
+                        <span mat-line>{{ group.name }}</span>
+                        <span mat-line *ngIf="group.privileges.length > 0">
                         <strong>Privileges:</strong>
                         <span *ngFor="let privilege of group.privileges; let isLast = last">
                             {{ privilege.name }}<span *ngIf="!isLast">, </span>
                         </span>
                     </span>
-                </mat-list-item>
-            </mat-list>
-        </div>
+                    </mat-list-item>
+                </mat-list>
+            </div>
 
-        <div *ngIf="!user.groups || user.groups.length === 0">
-            <p>No groups assigned.</p>
-        </div>
+            <div *ngIf="!user.groups || user.groups.length === 0">
+                <p>No groups assigned.</p>
+            </div>
 
-        <div style="padding: 16px 0;">
-            <button mat-raised-button color="primary" (click)="openGroupDialog(user)">
-                Edit Groups
-            </button>
-            <button mat-stroked-button style="margin-left: 10px">
-                Change Password
-            </button>
-            <button mat-raised-button color="warn" style="margin-left: 10px">
-                Delete User
-            </button>
-        </div>
+            <button (click)="editGroup = user" mat-stroked-button>Test</button>
+        }
+
     </mat-expansion-panel>
 </mat-accordion>

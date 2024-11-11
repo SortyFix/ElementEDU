@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS post_tags
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
-INSERT INTO group_entity (name) VALUES ('teacher'), ('student');
+INSERT INTO group_entity (name) VALUES ('teacher'), ('student'), ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('hehe', 30, 30, 30, 50, 50, 50);

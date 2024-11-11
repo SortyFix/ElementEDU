@@ -31,6 +31,8 @@ import {GroupDialogComponent} from "../group/group-dialog/group-dialog.component
 import {MatCard, MatCardTitle} from "@angular/material/card";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {AccessibilityService} from "../../accessibility.service";
+import {GroupSelectionList} from "../group/group-list/group-selection-list.component";
+import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 
 @Component({
   selector: 'app-user-list',
@@ -66,7 +68,10 @@ import {AccessibilityService} from "../../accessibility.service";
         MatLine,
         MatCard,
         MatCardTitle,
-        MatSlideToggle
+        MatSlideToggle,
+        GroupSelectionList,
+        MatRadioGroup,
+        MatRadioButton
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -76,6 +81,7 @@ export class UserListComponent {
     protected filteredString: string = '';
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
     private _selected: Set<string> = new Set();
+    private _editGroup: string | undefined = undefined;
 
     constructor(protected accessibilityService: AccessibilityService, protected dialog: MatDialog) {}
 
@@ -196,12 +202,13 @@ export class UserListComponent {
         return users.sort((a: UserModel, b: UserModel): number => a.lastName.localeCompare(b.lastName));
     }
 
-    protected openGroupDialog(user: UserModel): void
+    protected isEditingGroups(user: UserModel): boolean
     {
-        let dia: MatDialogRef<GroupDialogComponent> = this.dialog.open(GroupDialogComponent, {
-            height: '500px',
-            width: '500px',
-            data: user
-        })
+        return this._editGroup === user.loginName;
+    }
+
+    protected set editGroup(user: UserModel | undefined)
+    {
+        this._editGroup = user?.loginName;
     }
 }

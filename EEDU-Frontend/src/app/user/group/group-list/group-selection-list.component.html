@@ -4,6 +4,28 @@
 
 @if (!loading)
 {
+    <ng-container *ngIf="user()">
+        <mat-radio-group>
+            <mat-radio-button
+                value="teacher"
+                [checked]="user()?.inGroup('teacher')">
+                Teacher
+            </mat-radio-button>
+
+            <mat-radio-button
+                value="student"
+                [checked]="user()?.inGroup('student')">
+                Student
+            </mat-radio-button>
+
+            <mat-radio-button
+                value="other"
+                [checked]="!user()?.inGroup('student') && !user()?.inGroup('teacher')">
+                Other
+            </mat-radio-button>
+        </mat-radio-group>
+    </ng-container>
+
     <section *ngFor="let group of groups" style="user-select: none">
         <mat-checkbox [disabled]="isDisabled(group)"
                       [checked]="isChecked(group)"

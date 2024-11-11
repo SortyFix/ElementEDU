@@ -6,6 +6,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {UserModel} from "../../user-model";
 import {GroupService} from "../group.service";
+import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 
 @Component({
   selector: 'app-group-selection-list',
@@ -14,8 +15,7 @@ import {GroupService} from "../group.service";
         MatDialogContent,
         MatProgressSpinner,
         NgForOf,
-        MatCheckbox,
-        NgIf
+        MatCheckbox, NgIf, MatRadioGroup, MatRadioButton
     ],
   templateUrl: './group-selection-list.component.html',
   styleUrl: './group-selection-list.component.scss'
@@ -31,7 +31,9 @@ export class GroupSelectionList implements OnInit {
 
     public ngOnInit(): void {
         this._groupService.fetchAll().subscribe((groups: GroupModel[]): void => {
-            this._groups = groups;
+            this._groups = groups.filter((value: GroupModel): boolean => {
+                return value.name !== 'student' && value.name !== 'teacher'
+            });
             this._loading = false;
         });
     }
@@ -44,14 +46,7 @@ export class GroupSelectionList implements OnInit {
         const groupName: string = group.name;
         const user: UserModel | undefined = this.user();
 
-        if (!user || user.inGroup(groupName) ||
-            (groupName === 'student' && user.inGroup('teacher')) ||
-            (groupName === 'teacher' && user.inGroup('student'))) {
-            return true;
-        }
-
-        return (groupName === 'teacher' && this._selected.has('student'))
-            || (groupName === 'student' && this._selected.has('teacher'));
+        return !!user && user.loginName === 'root' && groupName === 'administrator';
     }
 
     protected isChecked(group: GroupModel): boolean {
