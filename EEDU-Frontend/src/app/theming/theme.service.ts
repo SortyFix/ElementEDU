@@ -1,6 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {UserService} from "../user/user.service";
 import {DOCUMENT} from "@angular/common";
+import {ThemeEntity} from "./theme-entity";
 
 @Injectable({
     providedIn: 'root'
@@ -13,10 +14,13 @@ import {DOCUMENT} from "@angular/common";
 export class ThemeService {
     constructor(@Inject(DOCUMENT) private document: Document, public userService: UserService) { }
 
-    public theme: any = this.userService.getUserData.theme;
+    public theme: any = new ThemeEntity(BigInt(0), "fallback", 255, 255, 255, 230, 230, 230);
 
     ngOnInit(): void {
-        this.theme = this.userService.getUserData.theme;
+        if(this.userService.isLoggedIn)
+        {
+            this.theme = this.userService.getUserData.theme;
+        }
     }
 
     /**
