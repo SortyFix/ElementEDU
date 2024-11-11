@@ -62,11 +62,11 @@ export class ThemeService {
     }
 
     /**
-     * Class to be called via HTML. Retrieves the appropriate theme information from local storage
+     * Retrieves the appropriate theme information from local storage
      * and calculates the result via {@link getTextColorByLuminance()}.
      * @param type Either 'background' or 'widget', depending on the background of the text in question.
      * @param isTitle True if the text in question requires dark blue on a light background (See
-     * {@link getTextColorByLuminance()}
+     * @see getTextColorByLuminance
      */
     public getTextColor(type: 'background' | 'widget', isTitle: boolean): string
     {
@@ -86,6 +86,15 @@ export class ThemeService {
         return this.getTextColorByLuminance(r, g, b, isTitle);
     }
 
+    /**
+     * Updates the global CSS variables that control deep Angular styling configurations.
+     *
+     * These CSS variables are defined in the global styles (':root' in the styles.scss) and can be accessed
+     * by CSS rules that use `var(--floating-label-color)` and `var(--background-color)`.
+     *
+     * @see getTextColor
+     * @see getBackgroundColor
+     */
     public updateDeepAngularStyles(): void
     {
         this.document.documentElement.style.setProperty('--floating-label-color', this.getTextColor("background", false));
