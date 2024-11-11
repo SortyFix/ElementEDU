@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {UserService} from "../user/user.service";
+import {DOCUMENT} from "@angular/common";
 
 @Injectable({
     providedIn: 'root'
@@ -10,13 +11,12 @@ import {UserService} from "../user/user.service";
  * logic based on the luminance of the given background for better readability.
  */
 export class ThemeService {
-    constructor(public userService: UserService) { }
+    constructor(@Inject(DOCUMENT) private document: Document, public userService: UserService) { }
 
     public theme: any = this.userService.getUserData.theme;
 
     ngOnInit(): void {
         this.theme = this.userService.getUserData.theme;
-
     }
 
     /**
@@ -84,5 +84,11 @@ export class ThemeService {
                 break;
         }
         return this.getTextColorByLuminance(r, g, b, isTitle);
+    }
+
+    public updateDeepAngularStyles(): void
+    {
+        this.document.documentElement.style.setProperty('--floating-label-color', this.getTextColor("background", false));
+        this.document.documentElement.style.setProperty('--background-color', this.getBackgroundColor);
     }
 }
