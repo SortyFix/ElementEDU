@@ -10,6 +10,8 @@ import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
 import {ThemeService} from "../theming/theme.service";
+import {UserService} from "../user/user.service";
+import {UserEntity} from "../user/user-entity";
 
 @Component({
   selector: 'app-settings',
@@ -29,7 +31,7 @@ import {ThemeService} from "../theming/theme.service";
 })
 
 export class SettingsComponent {
-    constructor(public http: HttpClient, public themeService: ThemeService) {
+    constructor(public http: HttpClient, public userService: UserService) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
@@ -59,6 +61,10 @@ export class SettingsComponent {
         {
             return JSON.parse(userData);
         }
+    }
+
+    public get user(): UserEntity {
+        return this.userService.getUserData;
     }
 
     /**

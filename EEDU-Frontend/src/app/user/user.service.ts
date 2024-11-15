@@ -29,6 +29,7 @@ export class UserService
 
     public get getUserData(): UserEntity
     {
+        console.log(this.isLoggedIn);
         const userData: string | null = localStorage.getItem('userData')
         if (!this.isLoggedIn || !userData)
         {
@@ -45,6 +46,7 @@ export class UserService
             theme.widgetColor_r,
             theme.widgetColor_g,
             theme.widgetColor_b);
+        themeEntity.updateDeepAngularStyles();
 
         return new UserEntity(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
     }

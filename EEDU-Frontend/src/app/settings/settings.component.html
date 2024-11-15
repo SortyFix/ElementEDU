@@ -1,6 +1,6 @@
-<h1 [style.color]="themeService.getTextColor('background', false)">Settings</h1>
-<h3 [style.color]="themeService.getTextColor('background', false)">Themes</h3>
-<p [style.color]="themeService.getTextColor('background', false)">
+<h1 [style.color]="user.theme.getTextColor('background', false)">Settings</h1>
+<h3 [style.color]="user.theme.getTextColor('background', false)">Themes</h3>
+<p [style.color]="user.theme.getTextColor('background', false)">
     User themes allow users to switch to a color scheme they feel comfortable with. <br>
     They can only be created by the system admin.
 </p>
@@ -12,4 +12,4 @@
         </mat-option>
     </mat-select>
 </mat-form-field> <br>
-<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>

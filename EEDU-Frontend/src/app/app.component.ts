@@ -2,6 +2,7 @@ import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@ang
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
 import {ThemeService} from "./theming/theme.service";
+import { startWith } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -11,17 +12,14 @@ import {ThemeService} from "./theming/theme.service";
 })
 export class AppComponent implements OnInit
 {
-
     errorSignal: WritableSignal<string> = signal('')
 
     constructor(public userService: UserService, public router: Router, public themeService: ThemeService)
-    {
-    }
+    {}
 
     ngOnInit(): void
     {
         this.loadUserData();
-        this.themeService.updateDeepAngularStyles();
     }
 
     protected isLoaded(): boolean
