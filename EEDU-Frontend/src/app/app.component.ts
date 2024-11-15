@@ -2,7 +2,6 @@ import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@ang
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
 import {ThemeService} from "./theming/theme.service";
-import { startWith } from 'rxjs';
 
 @Component({
     selector: 'app-root',

@@ -1,4 +1,4 @@
-import {Inject, Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {UserService} from "../user/user.service";
 import {ThemeEntity} from "./theme-entity";
 

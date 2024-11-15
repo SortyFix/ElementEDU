@@ -9,7 +9,6 @@ import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
-import {ThemeService} from "../theming/theme.service";
 import {UserService} from "../user/user.service";
 import {UserEntity} from "../user/user-entity";
 

@@ -1,7 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {UserService} from "../user/user.service";
-import {ThemeService} from "../theming/theme.service";
 
 @Component({
   selector: 'app-abstract',
