@@ -10,7 +10,6 @@ import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
 import {UserService} from "../user/user.service";
-import {UserEntity} from "../user/user-entity";
 import {UserModel} from "../user/user-model";
 import {UserListComponent} from "../user/user-list/user-list.component";
 
@@ -67,7 +66,7 @@ export class SettingsComponent {
         }
     }
 
-    public get user(): UserEntity {
+    public get user(): UserModel {
         return this.userService.getUserData;
     }
 
