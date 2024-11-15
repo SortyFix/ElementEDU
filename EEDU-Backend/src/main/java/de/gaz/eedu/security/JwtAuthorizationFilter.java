@@ -1,6 +1,8 @@
 package de.gaz.eedu.security;
 
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.TokenData;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -30,13 +33,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
 
     private final UserService userService;
 
-    private static @NotNull Runnable noToken(@NotNull HttpServletRequest request)
+    private static @NotNull Runnable noToken()
     {
-        return () ->
-        {
-            log.warn("The request did not contain a valid authorization token.");
-            request.setAttribute("claims", Jwts.claims().build());
-        };
+        return () -> log.warn("The request did not contain a valid authorization token.");
     }
 
     @Override protected void doFilterInternal(@NotNull HttpServletRequest request,
@@ -50,10 +49,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
             {
                 log.info("The authorization token was successfully validated.");
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordToken);
-                request.setAttribute("claims", usernamePasswordToken.getDetails());
+                request.setAttribute("token", usernamePasswordToken.getDetails());
             };
-            getUserService().validate(token).ifPresentOrElse(tokenConsumer, noToken(request));
-        }, noToken(request));
+            getUserService().validate(token).ifPresentOrElse(tokenConsumer, noToken());
+        }, noToken());
 
         filterChain.doFilter(request, response);
     }
@@ -71,6 +70,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter
 
     private @NotNull Optional<String> checkCookies(@NotNull HttpServletRequest request)
     {
+        System.out.println(Arrays.toString(request.getCookies()));
         Cookie[] cookies = request.getCookies();
         if (Objects.isNull(cookies))
         {

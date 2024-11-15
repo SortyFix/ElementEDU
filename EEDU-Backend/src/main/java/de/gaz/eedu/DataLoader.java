@@ -1,5 +1,6 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.security.PrivilegeProperties;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -37,6 +38,8 @@ public class DataLoader implements CommandLineRunner
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
 
+    private final PrivilegeProperties privilegeProperties;
+
     @Value("${development:false}") private boolean development;
 
     @Override @Transactional public void run(@NotNull String... args)
@@ -62,11 +65,11 @@ public class DataLoader implements CommandLineRunner
     {
         String randomPassword = randomPassword(15);
 
-        PrivilegeEntity privilegeEntity = createDefaultPrivilege();
+        PrivilegeEntity privilegeEntity = createDefaultPrivileges();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
         UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
         setPassword(userEntity, randomPassword);
-        setEmail(userEntity);
+
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -83,19 +86,15 @@ public class DataLoader implements CommandLineRunner
     private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, randomPassword);
-        getCredentialService().create(credential);
+        int bitMask = CredentialMethod.bitMask(CredentialMethod.PASSWORD, CredentialMethod.TOTP);
+        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
+
+        getCredentialService().createEntity(credential);
     }
 
-    private void setEmail(@NotNull UserEntity userEntity)
+    private @NotNull PrivilegeEntity createDefaultPrivileges()
     {
-        CredentialMethod password = CredentialMethod.EMAIL;
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, "");
-        getCredentialService().create(credential);
-    }
-
-    private @NotNull PrivilegeEntity createDefaultPrivilege()
-    {
+        getPrivilegeProperties().getPrivileges();
         PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
         return getPrivilegeService().createEntity(privilege);
     }

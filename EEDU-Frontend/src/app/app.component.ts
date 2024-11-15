@@ -30,7 +30,7 @@ export class AppComponent implements OnInit
     {
         // load user data when site loads
         this.userService.loadData().subscribe({
-            error: error =>
+            error: (error: any): void =>
             {
                 if (error.status == 403) // not logged in
                 {

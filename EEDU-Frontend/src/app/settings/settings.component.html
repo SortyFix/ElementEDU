@@ -13,3 +13,9 @@
     </mat-select>
 </mat-form-field> <br>
 <button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+
+@if (this.userList.length != 0) {
+    <div style="background-color: #eeeefa; padding: 20px">
+        <app-user-list [userList]="userList"></app-user-list>
+    </div>
+}

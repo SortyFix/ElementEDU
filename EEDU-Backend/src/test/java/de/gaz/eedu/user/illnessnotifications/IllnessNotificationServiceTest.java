@@ -16,7 +16,6 @@ import org.springframework.mock.web.MockMultipartFile;
 
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationService, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>

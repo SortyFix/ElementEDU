@@ -1,7 +1,9 @@
 <div class="content">
     <app-load *ngIf="!isLoaded() && !userService.isLoggedIn" [errorSignal]="errorSignal"></app-load>
-    @if(isLoaded()) {
-        <app-authentication *ngIf="!userService.isLoggedIn"></app-authentication>
+    @if (isLoaded()) {
+        <div class="background-image" *ngIf="!userService.isLoggedIn">
+            <app-authentication></app-authentication>
+        </div>
         <app-abstract *ngIf="userService.isLoggedIn"></app-abstract>
     }
 </div>

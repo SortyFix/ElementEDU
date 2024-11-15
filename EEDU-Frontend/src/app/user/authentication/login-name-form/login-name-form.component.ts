@@ -8,9 +8,9 @@ import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angula
 import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {AbstractLoginForm} from "../abstract-login-form";
-import {merge} from "rxjs";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {LoginRequest} from "../login-data/login-request";
+import {AuthenticationService} from "../authentication.service";
+import {FormTitleComponent} from "../common/form-title/form-title.component";
 
 @Component({
     selector: 'app-login-name-form',
@@ -28,35 +28,34 @@ import {LoginRequest} from "../login-data/login-request";
         FormsModule,
         NgIf,
         MatIcon,
-        MatSuffix
+        MatSuffix,
+        FormTitleComponent
     ],
     templateUrl: './login-name-form.component.html',
     styleUrl: './login-name-form.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginNameFormComponent extends AbstractLoginForm<LoginRequest>
-{
-    constructor(formBuilder: FormBuilder)
-    {
+export class LoginNameFormComponent extends AbstractLoginForm {
+    constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
             loginName: ['', Validators.required], rememberMe: [false]
-        }), 'loginName');
+        }), authenticationService);
 
-    }
-    protected override get errorMessage(): string | undefined
-    {
-        const currentStatus: number | undefined = this.responseStatusCode();
-        switch (currentStatus)
-        {
-            case 401:
-                return "The user " + this.form.get('loginName')!.value + " is not registered."
-        }
-        return undefined;
+        this.registerField('loginName')
     }
 
     protected override onSubmit(): void {
         const loginName = this.form.get('loginName')?.value;
         const rememberMe = this.form.get('rememberMe')?.value;
-        this.emit(new LoginRequest(loginName, rememberMe))
+
+        const loginRequest: LoginRequest = new LoginRequest(loginName, rememberMe);
+        this.authenticationService.requestAuthorization(loginRequest).subscribe(this.exceptionHandler('loginName'));
+    }
+
+    protected override errorMessage(error: number): string {
+        if (error == 401) {
+            return `The user ${this.form.get('loginName')?.value} was not found.`
+        }
+        return super.errorMessage(error);
     }
 }

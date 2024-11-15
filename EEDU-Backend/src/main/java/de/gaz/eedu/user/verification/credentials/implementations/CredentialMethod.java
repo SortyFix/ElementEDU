@@ -1,29 +1,40 @@
 package de.gaz.eedu.user.verification.credentials.implementations;
 
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.HashingAlgorithm;
 import de.gaz.eedu.user.verification.credentials.implementations.totp.TOPTHandler;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Objects;
-
-@Getter public enum CredentialMethod {
-    PASSWORD(new PasswordCredential(new BCryptPasswordEncoder())),
-    EMAIL(new EmailCredential()),
-    SMS(new SMSCredential()),
-    TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA1)));
+@RequiredArgsConstructor
+@Getter
+public enum CredentialMethod
+{
+    PASSWORD(new PasswordCredential(new BCryptPasswordEncoder()), false), EMAIL(new EmailCredential(),
+        true), SMS(new SMSCredential(), true), TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA1)), true);
 
     private final Credential credential;
+    private final boolean enablingRequired;
 
-    CredentialMethod(@NotNull Credential credential)
+    @Contract(pure = true) public static int bitMask(@NotNull CredentialMethod @NotNull ... methods)
     {
-        this.credential = credential;
+        int value = 0;
+        for (CredentialMethod method : methods)
+        {
+            value |= method.getBitValue();
+        }
+        return value;
     }
 
-    public long toId(@NotNull UserEntity user)
+    public boolean contains(int bitmask)
     {
-        return Objects.hash(user.getId(), ordinal());
+        return (bitmask & getBitValue()) != 0;
+    }
+
+    public int getBitValue()
+    {
+        return 1 << ordinal();
     }
 }
