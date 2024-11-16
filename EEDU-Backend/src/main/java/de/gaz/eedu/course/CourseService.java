@@ -68,10 +68,22 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
     }
 
+    public @NotNull CourseModel[] getCourses(long user)
+    {
+        UserEntity userEntity = getUserRepository().findById(user).orElseThrow();
+
+        System.out.println("----");
+        userEntity.getCourses().stream().forEach(course -> {
+            System.out.println(course.getId() + " " + course.getName());
+            System.out.println(course.getScheduledAppointments());
+        });
+        return new CourseModel[0];
+    }
+
     @Contract(pure = true, value = "_, _ -> _")
     private static long generateId(@NotNull Long timeStamp, @NotNull CourseEntity entity)
     {
-        return (entity.getId() + "-" + timeStamp).hashCode();
+        return Objects.hash(entity.getId(), timeStamp);
     }
 
     @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException

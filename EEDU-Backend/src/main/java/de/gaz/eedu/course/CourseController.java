@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -58,5 +59,17 @@ public class CourseController extends EntityController<CourseService, CourseMode
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/courses/{user}")
+    public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
+    {
+        return ResponseEntity.ok(getService().getCourses(user));
+    }
+
+    @GetMapping("/get/courses/")
+    public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
+    {
+        return getCourses(user);
     }
 }

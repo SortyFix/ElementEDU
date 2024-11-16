@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -51,9 +52,13 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
         return (long) this.getPeriod().getDays() * 24 * 60 * 60;
     }
 
+    @Contract(pure = true, value = "-> new")
     @Override public String toString()
     {
-        return "ScheduledAppointmentEntity{" + "id=" + id + ", course=" + course + ", timeStamp=" + timeStamp + ", duration=" + duration + ", period=" + period + '}';
+        return "ScheduledAppointmentEntity{" +
+                "id=" + id +
+                ", timeStamp=" + timeStamp +
+                '}';
     }
 
     @Override public boolean equals(Object object)

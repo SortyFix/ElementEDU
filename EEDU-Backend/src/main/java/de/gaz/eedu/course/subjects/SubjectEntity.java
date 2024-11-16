@@ -41,7 +41,6 @@ public class SubjectEntity implements EntityModelRelation<SubjectModel>
         return "SubjectEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", courses=" + courses +
                 '}';
     }
 

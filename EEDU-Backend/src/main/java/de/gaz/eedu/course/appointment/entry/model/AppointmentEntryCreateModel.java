@@ -1,6 +1,6 @@
 package de.gaz.eedu.course.appointment.entry.model;
 
-import de.gaz.eedu.InstantArgumentAdapter;
+import de.gaz.eedu.adapter.InstantArgumentAdapter;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 

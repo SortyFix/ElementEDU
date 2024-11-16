@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
     course_id  BIGINT         NOT NULL,
     time_stamp BIGINT         NOT NULL,
     duration   BIGINT         NOT NULL,
-    period     VARBINARY(255) NOT NULL,
+    period     INT NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id)
 );
 
@@ -239,11 +239,22 @@ CREATE TABLE IF NOT EXISTS post_tags
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
+
+INSERT INTO class_room_entity (name)
+VALUES ('Room 101'),
+       ('Room 102'),
+       ('Room 103');
+
+INSERT INTO subject_entity (name)
+VALUES ('Mathematics'),
+       ('Physics'),
+       ('History'),
+       ('Computer Science');
+
 INSERT INTO group_entity (name) VALUES ('teacher'), ('student'), ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('hehe', 30, 30, 30, 50, 50, 50);
-
 
 INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- PRESENT
@@ -263,6 +274,24 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- 
        ('Charlotte', 'Zimmer', 'charlotte.zimmer', FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED
        ('James', 'Krause', 'james.krause', FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED
 
+INSERT INTO file_entity (author_id, file_name, data_directory)
+VALUES (5, 'Algebra 101 Repository', '/repo/algebra/101'),   -- File for Algebra 101
+       (6, 'Calculus 101 Repository', '/repo/calculus/101'), -- File for Calculus 101
+       (7, 'Physics 101 Repository', '/repo/physics/101'),   -- File for Physics 101
+       (8, 'History 101 Repository', '/repo/history/101'),   -- File for History 101
+       (9, 'Programming Repository', '/repo/programming'); -- File for Introduction to Programming
+
+INSERT INTO course_entity (name, subject_id, repository_id, class_room_id)
+VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
+       ('Calculus 101', 1, 2, 1), -- Mathematics (Calculus), Room 101
+       ('Physics 101', 2, 3, 2),  -- Physics, Room 102
+       ('History 101', 3, 4, 3),  -- History, Room 103
+       ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
+
+INSERT INTO scheduled_appointment_entity (course_id, time_stamp, duration, period) VALUES
+        (1, 1731779748, 90, 7),
+        (1, 1731778748, 4000, 6);
+
 INSERT INTO user_groups (group_id, user_id) VALUES
        (1, 5),   -- Sara Müller (teacher)
        (1, 6),   -- Tom Bauer (teacher)
@@ -279,3 +308,22 @@ INSERT INTO user_groups (group_id, user_id) VALUES
        (2, 11),  -- Emma Fischer (student)
        (2, 14),  -- Charlotte Zimmer (student)
        (2, 15);  -- James Krause (student)
+
+INSERT INTO course_users (course_id, user_id)
+VALUES (1, 5), -- Sara Müller to Algebra 101
+       (1, 6), -- Tom Bauer to Algebra 101
+       (2, 5), -- Sara Müller to Calculus 101
+       (3, 7), -- Lisa Klein to Physics 101
+       (4, 5), -- Sara Müller to History 101
+       (5, 5), -- Sara Müller to Introduction to Programming
+       (1, 1), -- Max Mustermann to Algebra 101
+       (1, 2), -- John Zimmermann to Algebra 101
+       (1, 3), -- Martin Hansen to Algebra 101
+       (2, 1), -- Max Mustermann to Calculus 101
+       (2, 7), -- Lisa Klein to Calculus 101
+       (3, 1), -- Max Mustermann to Physics 101
+       (3, 4), -- Lora Schmidt to Physics 101
+       (4, 3), -- Martin Hansen to History 101
+       (4, 4), -- Lora Schmidt to History 101
+       (5, 2), -- John Zimmermann to Introduction to Programming
+       (5, 10); -- Liam Schneider to Introduction to Programming

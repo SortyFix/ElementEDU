@@ -1,4 +1,4 @@
-package de.gaz.eedu;
+package de.gaz.eedu.adapter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
