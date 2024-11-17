@@ -9,7 +9,9 @@ import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
-import {ThemeService} from "../theming/theme.service";
+import {UserService} from "../user/user.service";
+import {UserModel} from "../user/user-model";
+import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
   selector: 'app-settings',
@@ -22,20 +24,23 @@ import {ThemeService} from "../theming/theme.service";
         MatLabel,
         AsyncPipe,
         NgForOf,
-        MatButton
+        MatButton,
+        UserListComponent
     ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
 
 export class SettingsComponent {
-    constructor(public http: HttpClient, public themeService: ThemeService) {
+    constructor(public http: HttpClient, public userService: UserService) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
     public selectedTheme!: bigint;
     public currentThemeName: string = this.getUserData().theme.name;
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
+
+    private _userList: UserModel[] = [];
 
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
@@ -59,6 +64,10 @@ export class SettingsComponent {
         {
             return JSON.parse(userData);
         }
+    }
+
+    public get user(): UserModel {
+        return this.userService.getUserData;
     }
 
     /**
@@ -126,5 +135,13 @@ export class SettingsComponent {
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
         const url: string = "http://localhost:8080/user/theme/all";
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
+    }
+
+    ngAfterViewInit(): void {
+        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this._userList = users });
+    }
+
+    get userList(): UserModel[] {
+        return this._userList;
     }
 }

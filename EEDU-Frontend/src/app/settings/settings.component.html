@@ -1,10 +1,21 @@
-<p>settings works!</p>
+<h1 [style.color]="user.theme.getTextColor('background', false)">Settings</h1>
+<h3 [style.color]="user.theme.getTextColor('background', false)">Themes</h3>
+<p [style.color]="user.theme.getTextColor('background', false)">
+    User themes allow users to switch to a color scheme they feel comfortable with. <br>
+    They can only be created by the system admin.
+</p>
 <mat-form-field>
     <mat-label>{{ currentThemeName }}</mat-label>
-    <mat-select [formControl]="themeForm">
+    <mat-select [formControl]="themeForm" panelClass>
         <mat-option *ngFor="let theme of themes | async" [value]="theme">
             {{ theme.name }}
         </mat-option>
     </mat-select>
 </mat-form-field> <br>
-<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+
+@if (this.userList.length != 0) {
+    <div style="background-color: #eeeefa; padding: 20px">
+        <app-user-list [userList]="userList"></app-user-list>
+    </div>
+}

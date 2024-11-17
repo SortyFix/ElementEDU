@@ -1,0 +1,49 @@
+<mat-form-field appearance="outline">
+    <mat-label>User Search</mat-label>
+    <input name="search"
+           type="search"
+           placeholder="Filter..."
+           [(ngModel)]="filteredString"
+           (input)="unselectAll()"
+           autofocus matInput>
+</mat-form-field>
+<mat-accordion >
+    <mat-checkbox [checked]="isSelected('all')"
+                  [indeterminate]="partiallySelected"
+                  (change)="toggle('all')"
+                  *ngIf="users.length != 0"
+    >Select All
+    </mat-checkbox>
+
+    <mat-expansion-panel *ngFor="let user of users">
+        <mat-expansion-panel-header tabindex="-1">
+            <mat-panel-title>
+                <a matListItemTitle>
+                    <mat-checkbox
+                        [checked]="isSelected(user)"
+                        (change)="toggle(user)"
+                        (click)="$event.stopPropagation()"
+                        (keydown)="handleKeyDown($event, user)"
+                    ></mat-checkbox>
+                    <mat-icon class="icon">person</mat-icon>
+
+                    {{ user.loginName }}
+                </a>
+            </mat-panel-title>
+            <mat-panel-description>
+                <mat-chip-set *ngIf="!accessibilityService.mobile">
+                    <mat-chip>Schüler</mat-chip>
+                    <mat-chip>5B</mat-chip>
+                    <mat-chip>{{ user.lastName }}, {{ user.firstName }}</mat-chip>
+                </mat-chip-set>
+
+                <mat-icon class="icon" [matTooltip]="user.status">{{ status(user) }}
+                </mat-icon>
+            </mat-panel-description>
+
+        </mat-expansion-panel-header>
+        <p>
+            Hier könnte ihre Werbung stehen
+        </p>
+    </mat-expansion-panel>
+</mat-accordion>

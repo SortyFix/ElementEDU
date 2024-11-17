@@ -5,6 +5,7 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
 import de.gaz.eedu.user.group.GroupEntity;
+import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.theming.ThemeModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,9 +32,8 @@ import java.util.Objects;
  * @see GroupEntity
  */
 public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull String lastName,
-                        @NotNull String loginName, @NotNull UserStatus status, @NotNull ThemeModel theme) implements EntityModel
+                        @NotNull String loginName, @NotNull UserStatus status, @NotNull GroupModel[] groups, @NotNull ThemeModel theme) implements EntityModel
 {
-
 
     @Contract(pure = true) @Override public @NotNull String toString()
     {

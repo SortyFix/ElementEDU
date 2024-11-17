@@ -1,13 +1,15 @@
 package de.gaz.eedu.user.group.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name) implements EntityModel
+public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
+                         @NotNull PrivilegeModel[] privileges) implements EntityModel
 {
 
 

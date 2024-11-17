@@ -43,14 +43,14 @@ public class SecurityConfig implements WebMvcConfigurer
         return http.build();
     }
 
-    @Override
-    public void addCorsMappings(@NotNull CorsRegistry registry) {
+    @Override public void addCorsMappings(@NotNull CorsRegistry registry)
+    {
         String[] methods = {"GET", "POST", "PUT", "DELETE"};
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:4200")
-                .exposedHeaders(HttpHeaders.SET_COOKIE)
+                .allowedOrigins("http://localhost:4200") // Ensure no trailing slash
                 .allowCredentials(true)
                 .allowedMethods(methods)
+                .exposedHeaders(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaders.SET_COOKIE)
                 .maxAge(3600);
     }
 }
