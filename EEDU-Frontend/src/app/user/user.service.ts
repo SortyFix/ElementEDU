@@ -109,6 +109,7 @@ export class UserService
             theme.widgetColor_g,
             theme.widgetColor_b
         );
+        themeEntity.updateDeepAngularStyles();
 
 
 
