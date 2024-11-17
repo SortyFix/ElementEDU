@@ -1,5 +1,10 @@
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
+:root {
+    --floating-label-color: black;
+    --background-color: black;
+}
+
 html, body {
     height: 100%;
     width: 100%;
@@ -14,7 +19,21 @@ html, body {
     margin-bottom: 4px
 }
 
+// Remove mat-form-field background color
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background-color: transparent !important;
+}
+
+.mdc-floating-label, .mat-mdc-select, .mat-mdc-option  {
+    color: var(--floating-label-color) !important;
+}
+
+.mat-mdc-select-panel {
+    background-color: var(--background-color) !important;
+}
+
 // This is a temporary solution
+// ok
 mat-form-field
 {
     width: 100%;

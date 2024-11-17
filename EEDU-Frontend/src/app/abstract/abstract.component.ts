@@ -1,7 +1,6 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {UserService} from "../user/user.service";
-import {ThemeService} from "../theming/theme.service";
 
 @Component({
   selector: 'app-abstract',
@@ -13,7 +12,7 @@ export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
     private _portrait: boolean = false;
 
-    constructor(public router: Router, public userService: UserService, public themeService: ThemeService) { }
+    constructor(public router: Router, public userService: UserService) { }
 
     sidebar_buttons = [
         {title:'Dashboard', icon_name: 'dashboard', route:'dashboard'},
@@ -30,6 +29,11 @@ export class AbstractComponent implements OnInit {
             'width': this.portrait ? '' : 'calc(100% - 100px)',
             'margin-left': this.portrait ? '' : '40px'
         };
+    }
+
+    public get user()
+    {
+        return this.userService.getUserData;
     }
 
     public logout() {

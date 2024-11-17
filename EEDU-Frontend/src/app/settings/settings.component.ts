@@ -1,7 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {UserService} from "../user/user.service";
-import {UserModel} from "../user/user-model";
-import {UserListComponent} from "../user/user-list/user-list.component";
+import {Component, OnInit} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -12,7 +9,9 @@ import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
-import {ThemeService} from "../theming/theme.service";
+import {UserService} from "../user/user.service";
+import {UserModel} from "../user/user-model";
+import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
   selector: 'app-settings',
@@ -31,7 +30,7 @@ import {ThemeService} from "../theming/theme.service";
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
-export class SettingsComponent implements AfterViewInit, OnInit {
+export class SettingsComponent implements OnInit {
 
     private _userList: UserModel[] = [];
 
@@ -41,7 +40,7 @@ export class SettingsComponent implements AfterViewInit, OnInit {
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
 
 
-    constructor(private userService: UserService, public http: HttpClient, public themeService: ThemeService) {}
+    constructor(private userService: UserService, public http: HttpClient) {}
 
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
@@ -50,14 +49,8 @@ export class SettingsComponent implements AfterViewInit, OnInit {
                 this.selectedTheme = selectedTheme.id;
             }
         });
-    }
 
-    ngAfterViewInit(): void {
         this.userService.fetchAll.subscribe((users: UserModel[]): void => { this._userList = users });
-    }
-
-    get userList(): UserModel[] {
-        return this._userList;
     }
 
     /**
@@ -73,6 +66,10 @@ export class SettingsComponent implements AfterViewInit, OnInit {
         {
             return JSON.parse(userData);
         }
+    }
+
+    public get user(): UserModel {
+        return this.userService.getUserData;
     }
 
     /**
@@ -140,5 +137,9 @@ export class SettingsComponent implements AfterViewInit, OnInit {
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
         const url: string = "http://localhost:8080/user/theme/all";
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
+    }
+
+    protected get userList(): UserModel[] {
+        return this._userList;
     }
 }

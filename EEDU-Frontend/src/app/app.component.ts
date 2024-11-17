@@ -1,6 +1,7 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
+import {ThemeService} from "./theming/theme.service";
 
 @Component({
     selector: 'app-root',
@@ -10,12 +11,10 @@ import {Router} from "@angular/router";
 })
 export class AppComponent implements OnInit
 {
-
     errorSignal: WritableSignal<string> = signal('')
 
-    constructor(public userService: UserService, public router: Router)
-    {
-    }
+    constructor(public userService: UserService, public router: Router, public themeService: ThemeService)
+    {}
 
     ngOnInit(): void
     {
