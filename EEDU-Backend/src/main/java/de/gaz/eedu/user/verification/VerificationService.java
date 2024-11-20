@@ -8,8 +8,13 @@ import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,10 +42,71 @@ import java.util.*;
  *
  * @author ivo
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
+
+    /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     * <p>
+     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize} by referencing this service
+     *
+     * <pre>
+     * {@code
+     *     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+     *     @GetMapping("/secretdata") public @NotNull ResponseEntity<String> getData()
+     *     {
+     *         return "Secret Data!";
+     *     }
+     * }
+     * </pre>
+     *
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(Authentication, JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
+    {
+        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
+    }
+
+    /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     *
+     * @param authentication the authentication context to check for.
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
+    {
+        List<JwtTokenType> tokenTypes = Arrays.asList(jwtTokenType);
+        return authentication.getAuthorities().stream().anyMatch(verification ->
+        {
+            if (verification instanceof VerificationAuthority(JwtTokenType tokenType))
+            {
+                return tokenTypes.contains(tokenType);
+            }
+            return false;
+        });
+    }
 
     /**
      * Generates a login JWT token for a user based on their user model and login model.
@@ -65,9 +131,10 @@ public class VerificationService
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }*/
 
-        Set<String> restricted = Collections.singleton("expiry");
+        Set<String> restricted = Set.of("expiry", "username");
         ClaimHolder<Long> expiry = new ClaimHolder<>("expiry", getExpiry(model).toEpochMilli());
-        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry);
+        ClaimHolder<String> username = new ClaimHolder<>("username", user.getUsername());
+        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry, username);
 
         if (user.getCredentials().isEmpty())
         {
@@ -196,41 +263,27 @@ public class VerificationService
     public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token, @NotNull AuthorityFactory authorityFactory) throws ExpiredJwtException
     {
         TokenData data = TokenData.deserialize(secret, token);
-        JwtTokenType type = JwtTokenType.valueOf(data.getParent().map(Claims::getSubject).orElseThrow());
 
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, authorityFactory, data.userId());
-        return Optional.of(new UsernamePasswordAuthenticationToken(data.userId(), null, authorities)).map((auth) ->
+        String jwtTokenTypeName = data.getParent().map(Claims::getSubject).orElseThrow();
+        JwtTokenType type = JwtTokenType.valueOf(jwtTokenTypeName);
+
+        UserEntity user = authorityFactory.get(data.userId());
+
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, user);
+        return Optional.of(new UsernamePasswordAuthenticationToken(user, null, authorities)).map((auth) ->
         {
             auth.setDetails(data);
             return auth;
         });
     }
 
-    /**
-     * Generates a collection of authorities based on JwtTokenType, AuthorityFactory, and user ID.
-     * <p>
-     * The method determines the authorities of a user based on the type of JWT token, user ID and utilizes
-     * AuthorityFactory. Depending on different JwtTokenTypes, different authorities are generated:
-     * <ul>
-     *   <li>ADVANCED_AUTHORIZATION, AUTHORIZED - create a new collection of authorities. For ADVANCED_AUTHORIZATION,
-     *   add an additional authority</li>
-     *   <li>TWO_FACTOR_SELECTION, TWO_FACTOR_PENDING - only single authority is generated</li>
-     * </ul>
-     *
-     * @param jwtTokenType     the JwtTokenType identifying the type of JWT token
-     * @param authorityFactory factory used to generate user authorities according to user ID
-     * @param userID           the ID of the user whose authorities are to be generated
-     * @return an unmodifiable collection of authorities, derived from type, authorityFactory and user ID
-     * @throws IllegalStateException if the type does not match any case in the switch statement
-     */
-
-    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull AuthorityFactory authorityFactory, long userID)
+    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull UserEntity user)
     {
         return switch (jwtTokenType)
         {
             case ADVANCED_AUTHORIZATION, AUTHORIZED ->
             {
-                Collection<GrantedAuthority> authorities = new HashSet<>(authorityFactory.get(userID));
+                Collection<GrantedAuthority> authorities = new HashSet<>(user.getAuthorities());
                 authorities.add(JwtTokenType.AUTHORIZED.getAuthority());
                 if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION))
                 {
@@ -241,23 +294,5 @@ public class VerificationService
             case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
-    }
-
-    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
-    {
-        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
-    }
-
-    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
-    {
-        Set<JwtTokenType> tokenTypes = Set.of(jwtTokenType);
-        return authentication.getAuthorities().stream().anyMatch(verification ->
-        {
-            if (verification instanceof VerificationAuthority verificationAuthority)
-            {
-                return tokenTypes.contains(verificationAuthority.jwtTokenType());
-            }
-            return false;
-        });
     }
 }

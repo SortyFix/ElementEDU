@@ -13,9 +13,6 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
-import de.gaz.eedu.user.verification.credentials.CredentialService;
-import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
-import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,16 +24,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.Objects;
+import java.util.Set;
 
-@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED)
-public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
-
-    private final PrivilegeProperties privilegeProperties;
 
     @Value("${development:false}") private boolean development;
 
@@ -63,11 +59,9 @@ public class DataLoader implements CommandLineRunner
     {
         String randomPassword = randomPassword(15);
 
-        PrivilegeEntity privilegeEntity = createDefaultPrivileges();
+        PrivilegeEntity privilegeEntity = createDefaultPrivilege();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
-        setPassword(userEntity, randomPassword);
-
+        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity); //TODO set password
 
         log.info("A default user has been created");
         log.info("-".repeat(20));
@@ -81,51 +75,35 @@ public class DataLoader implements CommandLineRunner
         }
     }
 
-    private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
+    private @NotNull PrivilegeEntity createDefaultPrivilege()
     {
-        CredentialMethod password = CredentialMethod.PASSWORD;
-        int bitMask = CredentialMethod.bitMask(CredentialMethod.PASSWORD, CredentialMethod.TOTP);
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
-
-        getCredentialService().createEntity(credential);
-    }
-
-    private @NotNull PrivilegeEntity createDefaultPrivileges()
-    {
-        getPrivilegeProperties().getPrivileges();
-        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN", new Long[0]);
-        return getPrivilegeService().createEntity(privilege);
+        PrivilegeCreateModel privilege = new PrivilegeCreateModel("ADMIN");
+        return getPrivilegeService().createEntity(Set.of(privilege)).getFirst();
     }
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", new Long[0], new Long[] { privilegeEntity.getId() });
-        return getGroupService().createEntity(group);
+        GroupCreateModel group = new GroupCreateModel("admin", new Long[] {privilegeEntity.getId() });
+        return getGroupService().createEntity(Set.of(group)).getFirst();
     }
 
-    private @NotNull ThemeEntity createDefaultThemes()
+    private @NotNull ThemeEntity createDefaultTheme()
     {
         ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark", new short[]{5, 5, 5}, new short[]{10, 10, 10});
         ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight", new short[]{255, 255, 255}, new short[]{220, 220, 220});
-        getThemeService().createEntity(defaultLight);
-        // Dark will be set as default
-        return getThemeService().createEntity(defaultDark);
+        return getThemeService().createEntity(Set.of(defaultDark, defaultLight)).stream().filter(theme ->
+        {
+            // Dark will be set as default
+            return Objects.equals(theme.getName(), "defaultDark");
+        }).findFirst().orElseThrow();
     }
 
-    private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         // long line -.-
-        UserCreateModel user = new UserCreateModel("root",
-                "root",
-                "root",
-                true,
-                false,
-                UserStatus.PROSPECTIVE,
-                themeEntity.getId(),
-                new Long[] { groupEntity.getId() });
-        UserEntity userEntity = getUserService().createEntity(user);
+        UserCreateModel user = new UserCreateModel("root", "root", "root", true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
+        UserEntity userEntity = getUserService().createEntity(Set.of(user)).getFirst();
         userEntity.setSystemAccount(true);
-
         return getUserService().saveEntity(userEntity);
     }
 

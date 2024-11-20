@@ -3,7 +3,6 @@ package de.gaz.eedu.user.theming;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 
 @RestController
-@RequestMapping(value = "/user", method = RequestMethod.POST)
+@RequestMapping(value = "/api/v1/user", method = RequestMethod.POST)
 @AllArgsConstructor
 public class ThemeController
 {

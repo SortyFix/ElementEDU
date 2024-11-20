@@ -5,6 +5,7 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.exception.InsecurePasswordException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
+import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeModel;
@@ -21,8 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.stream.Stream;
 
 /**
  * UserServiceTest is a concrete extension of {@link ServiceTest}, which is specifically
@@ -65,22 +64,15 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities()
-    {
-        return new TestData[]{new TestData<>(4, true)};
-    }
-
-
-        @Override protected @NotNull UserCreateModel occupiedCreateModel()
-    {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", true, false, UserStatus.PRESENT, 1L, new Long[0]);
+    protected @NotNull TestData<Boolean>[] deleteEntities() {
+        return new TestData[] { new TestData<>(4, true) };
     }
 
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
         final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
         final ThemeModel themeModel = themeService.loadByIdSafe(1L);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, themeModel);
+        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, new GroupModel[0], themeModel);
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
             Assertions.assertEquals(expect.firstName(), result.firstName());
@@ -129,83 +121,10 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @ParameterizedTest
     @MethodSource("testPasswords")
     public void testInsecurePassword(@NotNull String password) {
-        Assertions.assertThrows(InsecurePasswordException.class, () ->
-        {
+        Assertions.assertThrows(InsecurePasswordException.class, () -> {
             CredentialEntity entity = new CredentialEntity();
             entity.setData(password);
             CredentialMethod.PASSWORD.getCredential().creation(entity);
         });
-    }
-
-    @Override
-    protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()
-    {
-        final UserCreateModel createModel = new UserCreateModel("jonas",
-                "yonas",
-                "jonas.yonas",
-                true,
-                false,
-                UserStatus.PRESENT, 1L, new Long[0]);
-        final UserModel expected = new UserModel(5L,
-                "jonas",
-                "yonas",
-                "jonas.yonas",
-                true,
-                false,
-                new TwoFactorModel[0],
-                getThemeService().loadEntityById(1L).map(ThemeEntity::toSimpleModel).orElseThrow(),
-                new SimpleUserGroupModel[0],
-                UserStatus.PRESENT);
-
-        return Eval.eval(createModel, expected, (request, expect, result) ->
-        {
-            Assertions.assertEquals(expect.firstName(), result.firstName());
-            Assertions.assertEquals(expect.lastName(), result.lastName());
-            Assertions.assertEquals(expect.loginName(), result.loginName());
-            Assertions.assertEquals(expect.enabled(), result.enabled());
-            Assertions.assertEquals(expect.locked(), result.locked());
-            Assertions.assertEquals(expect.groups().length, result.groups().length);
-            Assertions.assertEquals(expect.theme(), result.theme());
-        });
-    }
-
-    /**
-     * Test insecure password security.
-     * <p>
-     * This method tests if the {@link InsecurePasswordException} is thrown when the given password is too weak.
-     * Below are some passwords and their reasons why they should fail.
-     * <p>
-     * A secure password must contain at least one lowercase, one uppercase, one number, one special character, and
-     * it must be 6 characters long at least.
-     * Otherwise, the password will cause a {@link InsecurePasswordException} as mentioned above.
-     */
-    public void testCreateUserInsecurePassword() // TODO add back credential test (@Test annotation)
-    {
-        for (String password : List.of("password", // no numbers + no uppercase + no special character
-                "Password123", // no special character
-                "password!", // no numbers + no uppercase
-                "password123!", // no uppercase
-                "PASSWORD123!", // no lowercase
-                "Pa1!!" // to short
-        ))
-        {
-            // TODO update, then do TODO above
-            //Assertions.assertThrows(InsecurePasswordException.class, () -> getService().create(Set.of(createModel)));
-        }
-    }
-
-    public record LoginTestData(@NotNull Boolean expected, @NotNull String userName, @NotNull String password)
-    {
-        @Contract(pure = true, value = "-> new")
-        private @NotNull Eval<LoginModel, Boolean> createEval()
-        {
-            return Eval.eval(createLoginModel(), expected(), Validator.equals());
-        }
-
-        @Contract(pure = true, value = "-> new")
-        private @NotNull LoginModel createLoginModel()
-        {
-            return new UserLoginModel(userName(), password(), true);
-        }
     }
 }

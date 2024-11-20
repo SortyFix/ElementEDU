@@ -417,7 +417,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return Objects.hash(getId());
     }
 
-    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity, @org.jetbrains.annotations.NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity, @NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

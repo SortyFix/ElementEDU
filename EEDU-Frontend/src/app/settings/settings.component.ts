@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -31,7 +31,7 @@ import {UserListComponent} from "../user/user-list/user-list.component";
   styleUrl: './settings.component.scss'
 })
 
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
     constructor(public http: HttpClient, public userService: UserService) {
     }
 
@@ -135,10 +135,6 @@ export class SettingsComponent {
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
         const url: string = "http://localhost:8080/user/theme/all";
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
-    }
-
-    ngAfterViewInit(): void {
-        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this._userList = users });
     }
 
     get userList(): UserModel[] {

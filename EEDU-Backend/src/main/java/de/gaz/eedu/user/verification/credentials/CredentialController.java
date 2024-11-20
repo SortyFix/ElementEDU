@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
@@ -39,8 +41,8 @@ import java.util.Optional;
  *
  * @author Ivo
  * @see org.springframework.stereotype.Controller
- * @see org.springframework.web.bind.annotation.RestController
- * @see org.springframework.web.bind.annotation.RequestMapping
+ * @see RestController
+ * @see RequestMapping
  * @see EntityController
  * @see CredentialService
  * @see CredentialModel
@@ -54,10 +56,12 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @Value("${development}") private final boolean development = false;
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
-    @PreAuthorize(
-            "((#id == authentication.principal) and @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)) or hasAuthority(${privilege.user.credential.delete})"
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)"
     ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
+        boolean hasPrivilege = isAuthorized("USER_CREDENTIAL_OTHERS_DELETE");
+        validate(hasPrivilege || Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
+
         return super.delete(id);
     }
 
@@ -75,23 +79,24 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize(
             "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
     ) @PostMapping("/create")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal UserEntity userEntity)
     {
-        return create(userID, model);
+        return create(userEntity.getId(), model);
     }
 
-    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create})") @PostMapping("/create/{userId}")
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
-        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
-    @PreAuthorize("hasAnyAuthority(${privilege.user.credential.create.temporary})")
-    @PostMapping("/create/temporary/{userId}")
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY')") @PostMapping("/create/temporary/{userId}")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
-        CredentialEntity credential = getService().createEntity(new CredentialCreateModel(userId, model));
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 

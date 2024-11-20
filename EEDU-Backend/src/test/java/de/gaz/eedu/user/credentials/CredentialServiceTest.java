@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 @Getter(AccessLevel.PROTECTED)
 public class CredentialServiceTest extends ServiceTest<CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
@@ -24,7 +26,7 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
     @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
     {
         CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, null, "");
-        CredentialModel credentialModel = new CredentialModel(1086L, CredentialMethod.TOTP, false);
+        CredentialModel credentialModel = new CredentialModel(1055L, CredentialMethod.TOTP, false);
 
         return Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
@@ -48,7 +50,7 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.method(), result.method());
             Assertions.assertEquals(expect.enabled(), result.enabled());
-        })), getService()::create);
+        })), creation -> getService().create(Set.of(creation)).getFirst());
     }
 
     @Override protected @NotNull CredentialCreateModel occupiedCreateModel()

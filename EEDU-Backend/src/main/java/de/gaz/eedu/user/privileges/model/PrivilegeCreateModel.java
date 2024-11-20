@@ -1,14 +1,11 @@
 package de.gaz.eedu.user.privileges.model;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public record PrivilegeCreateModel(@NotNull String name) implements CreationModel<PrivilegeEntity>
 {

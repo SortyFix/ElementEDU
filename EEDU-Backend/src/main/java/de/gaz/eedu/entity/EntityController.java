@@ -3,6 +3,7 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -42,7 +44,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @throws CreationException If there is a problem with creating the entity,
      *                           this exception will be thrown. It contains the HTTP status code for the error response.
      */
-    public @NotNull ResponseEntity<M[]> create(@NotNull C[] model)
+    public @NotNull ResponseEntity<M[]> create(@NotNull C[] model) throws CreationException
     {
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
@@ -86,10 +88,8 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
-        log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getService().loadById(id)
-                           .map(ResponseEntity::ok)
-                           .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
+        return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     public @NotNull ResponseEntity<Set<M>> fetchAll()
@@ -101,6 +101,16 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
+    }
+
+    protected long getPrincipalId()
+    {
+        Object principal = getAuthentication().getPrincipal();
+        if(Objects.nonNull(principal))
+        {
+            throw new IllegalStateException("Not logged in");
+        }
+        return ((UserEntity)getAuthentication().getPrincipal()).getId();
     }
 
     protected boolean isAuthorized(@NotNull String authority)
@@ -121,7 +131,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
                                   .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
-    private @NotNull Authentication getAuthentication()
+    protected @NotNull Authentication getAuthentication()
     {
         return SecurityContextHolder.getContext().getAuthentication();
     }

@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class ScheduledAppointmentService extends EntityService<ScheduledAppointmentRepository, ScheduledAppointmentEntity, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>

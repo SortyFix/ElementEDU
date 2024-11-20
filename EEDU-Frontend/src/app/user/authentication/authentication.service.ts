@@ -6,7 +6,7 @@ import {map, Observable, OperatorFunction, tap} from "rxjs";
 import {LoginData} from "./login-data/login-data";
 import {CredentialMethod} from "./login-data/credential-method";
 import {jwtDecode, JwtPayload} from "jwt-decode";
-import {environment} from "../../../environments/environment";
+import {environment} from "../../../environment/environment";
 
 /**
  * Service responsible for handling user authentication and credential management.

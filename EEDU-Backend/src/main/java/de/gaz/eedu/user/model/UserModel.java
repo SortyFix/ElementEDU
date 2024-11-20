@@ -23,8 +23,6 @@ import java.util.Objects;
  * @param id        of the user.
  * @param firstName of the user.
  * @param lastName  of the user.
- * @param enabled   whether the user allowed to log in.
- * @param locked    whether the user allowed to log in.
  * @param groups    groups this user is in.
  * @param status
  * @author ivo

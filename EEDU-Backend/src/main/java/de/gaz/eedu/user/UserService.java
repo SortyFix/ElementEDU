@@ -4,7 +4,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.NameOccupiedException;
+import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
@@ -13,28 +13,24 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.VerificationService;
-import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * This class manages user related tasks.
@@ -71,19 +67,21 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     }
 
     @Transactional @Override
-    public @NotNull UserEntity createEntity(@NotNull UserCreateModel model) throws CreationException
+    public @NotNull List<UserEntity> createEntity(@NotNull Set<UserCreateModel> model) throws CreationException
     {
-        if (getRepository().existsByLoginName(model.loginName()))
+        if (getRepository().existsByLoginNameIn(model.stream().map(UserCreateModel::loginName).toList()))
         {
-            throw new NameOccupiedException(model.loginName());
+            throw new OccupiedException();
         }
 
-        return saveEntity(model.toEntity(new UserEntity(), entity ->
+        return saveEntity(model.stream().map(current -> current.toEntity(new UserEntity(), entity ->
         {
-            entity.setThemeEntity(themeRepository.getReferenceById(model.theme()));
-            entity.attachGroups(getGroupRepository().findAllById(List.of(model.groups())).toArray(GroupEntity[]::new));
+            entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
+
+            List<Long> ids = Arrays.asList(current.groups());
+            entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        }));
+        })).toList());
     }
 
     @Transactional @Override
@@ -121,15 +119,11 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        try
+        if (token.isBlank())
         {
-            Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
-            AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
-            return getVerificationService().validate(token, authorityFactory);
-        } catch (ExpiredJwtException ignored)
-        {
-            log.warn("An incoming request has been received with an expired token.");
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        return getVerificationService().validate(token, this::loadEntityByIDSafe);
     }
 }

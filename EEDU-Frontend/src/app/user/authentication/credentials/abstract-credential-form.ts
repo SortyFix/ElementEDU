@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormGroup} from "@angular/forms";
 import {AuthenticationService} from "../authentication.service";
 import {LoginData} from "../login-data/login-data";
 import {AbstractLoginForm} from "../abstract-login-form";

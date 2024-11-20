@@ -23,7 +23,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Contains methods to interact with the {@link UserService} using a http request.
@@ -51,7 +50,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     /**
      * Creates a new user utilizing the provided {@link UserCreateModel}.
      * <p>
-     * This method invokes {@code entityServices} to execute {@link UserService#create(UserCreateModel)}.
+     * This method invokes {@code entityServices} to execute {@link UserService#create(java.util.Set)}.
      * If a user with the same longin name already exists, an {@link OccupiedException} is thrown.
      * <p>
      * Note that the invoking user must possess the "privilege.user.create" privilege,
@@ -61,7 +60,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing the newly created {@link UserModel}.
      * @throws CreationException if an error occurs during the user creation process.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.user.create})") @PostMapping("/create") @Override
+    @PreAuthorize("hasAuthority('USER_CREATE')") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<UserModel[]> create(@NotNull @RequestBody UserCreateModel[] model) throws CreationException
     {
         return super.create(model);
@@ -79,7 +78,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user to be deleted.
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.user.delete})") @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
     @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
@@ -97,9 +96,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("hasAnyAuthority(${privilege.user.get}) or #id == authentication.principal")
+    @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
+        validate(Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
         return super.getData(id);
     }
 
@@ -111,13 +111,15 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * The invoking user must be the owner of the data being accessed to perform this action.
      *
-     * @param userId the unique identifier of the currently authenticated user, provided automatically.
+     * @param user the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
-    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal Long userId)
+    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal UserEntity user)
     {
-        return super.getData(userId);
+        // because of lazy loading the users needs to be loaded by the service in order to provide an active session
+        // we need that because theme entity is loaded lazily and therefore cannot be loaded otherwise
+        return ResponseEntity.ok(getService().loadByIdSafe(user.getId()));
     }
 
     /**
@@ -152,15 +154,15 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * This endpoint is accessible only to authenticated users, identified by a valid authentication principal.
      *
-     * @param userID the unique identifier of the currently authenticated user, provided automatically
+     * @param userID the authenticated user, provided automatically
      *               through the {@link AuthenticationPrincipal} annotation.
      * @return a {@link ResponseEntity} containing a success message upon successful login.
      */
     @PostMapping("/login/advanced")
-    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal long userID)
+    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal UserEntity userID)
     {
         log.info("The server has recognized an incoming advanced login request for {}.", userID);
-        return getService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
+        return getService().requestLogin(new AdvancedUserLoginModel(userID.getId())).map((token) ->
         {
             String jwt = token.jwt();
             return ResponseEntity.ok(jwt);
@@ -176,12 +178,12 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * This endpoint is accessible to all users, regardless of authentication status.
      *
-     * @param userId   the unique identifier of the currently authenticated user, if available;
+     * @param user   the currently authenticated user, if available;
      *                 {@code null} if the user is not identified.
      * @param response the {@link HttpServletResponse} to which the logout cookie is added.
      */
     @GetMapping("/logout")
-    public void logout(@AuthenticationPrincipal @Nullable Long userId, @NotNull HttpServletResponse response)
+    public void logout(@AuthenticationPrincipal @Nullable UserEntity user, @NotNull HttpServletResponse response)
     {
         Cookie cookie = new Cookie("token", null);
         cookie.setPath("/");
@@ -191,17 +193,11 @@ public class UserController extends EntityController<UserService, UserModel, Use
         cookie.setSecure(!development);
         response.addCookie(cookie);
 
-        if (Objects.isNull(userId))
+        if (Objects.isNull(user))
         {
             log.info("An unidentified user has been logged out, likely due to token expiration.");
             return;
         }
-        log.info("User {} has been logged out.", userId);
-    }
-
-    @GetMapping("/all")
-    @Override public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
-    {
-        return super.fetchAll();
+        log.info("User {} has been logged out.", user);
     }
 }
