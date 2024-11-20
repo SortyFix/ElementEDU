@@ -29,10 +29,10 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     private Long timeOfCreation;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_user_read_privileges", joinColumns = @JoinColumn(name = "post_id"))
-    private Set<String> readPrivileges;
+    private final Set<String> readPrivileges = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_user_edit_privileges", joinColumns = @JoinColumn(name = "post_id"))
-    private Set<String> editPrivileges;
+    private final Set<String> editPrivileges = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
     private final Set<String> tags = new HashSet<>();

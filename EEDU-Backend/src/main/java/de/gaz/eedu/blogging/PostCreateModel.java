@@ -20,8 +20,8 @@ public record PostCreateModel(@NotNull String author, @NotNull String title, @No
         entity.setBody(body());
         entity.setAuthor(author());
         entity.setThumbnailURL(thumbnailURL());
-        entity.setReadPrivileges(combinePrivileges());
-        entity.setEditPrivileges(Arrays.stream(editPrivileges()).collect(Collectors.toSet()));
+        entity.attachReadPrivileges(combinePrivileges().toArray(new String[0]));
+        entity.attachEditPrivileges(editPrivileges());
         entity.setTimeOfCreation(System.currentTimeMillis());
         entity.attachTags(tags());
         return entity;

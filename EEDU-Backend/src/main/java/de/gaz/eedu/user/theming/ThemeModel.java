@@ -1,24 +1,25 @@
 package de.gaz.eedu.user.theming;
 
 import de.gaz.eedu.entity.model.EntityModel;
-import de.gaz.eedu.entity.model.Model;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.Set;
 
-public record ThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor, int widgetColor, int textColor, @NotNull Set<SimpleUserModel> users) implements EntityModel
+public record ThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor_r, int backgroundColor_g, int backgroundColor_b,
+                         int widgetColor_r, int widgetColor_g, int widgetColor_b) implements EntityModel
 {
-    @Contract(pure = true) @Override public @NotNull String toString()
+    @Contract(pure = true) @Override public String toString()
     {
         return "ThemeModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", backgroundColor=" + backgroundColor +
-                ", widgetColor=" + widgetColor +
-                ", textColor=" + textColor +
+                ", backgroundColor_r=" + backgroundColor_r +
+                ", backgroundColor_g=" + backgroundColor_g +
+                ", backgroundColor_b=" + backgroundColor_b +
+                ", widgetColor_r=" + widgetColor_r +
+                ", widgetColor_g=" + widgetColor_g +
+                ", widgetColor_b=" + widgetColor_b +
                 '}';
     }
 

@@ -1,6 +1,5 @@
 package de.gaz.eedu.user.group;
 
-import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -13,14 +12,15 @@ import de.gaz.eedu.user.privileges.PrivilegeRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor

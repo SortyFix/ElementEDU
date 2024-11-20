@@ -24,7 +24,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.Set;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
@@ -83,13 +82,13 @@ import java.util.Set;
 
     private @NotNull GroupEntity createDefaultGroup(@NotNull PrivilegeEntity privilegeEntity)
     {
-        GroupCreateModel group = new GroupCreateModel("admin", true, new Long[] {privilegeEntity.getId() });
+        GroupCreateModel group = new GroupCreateModel("admin", new Long[] {privilegeEntity.getId() });
         return getGroupService().createEntity(Set.of(group)).getFirst();
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel theme = new ThemeCreateModel("Dark", 0x0000000, 0x000000, 0x000000); //TODO use real values
+        ThemeCreateModel theme = new ThemeCreateModel("Dark", new short[] {0, 0, 0}, new short[] {255, 255, 255}); //TODO use real values
         return getThemeService().createEntity(Set.of(theme)).getFirst();
     }
 

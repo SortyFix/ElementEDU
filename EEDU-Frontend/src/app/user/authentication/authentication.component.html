@@ -1,0 +1,34 @@
+<div class="backdrop-blur">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                <mat-icon class="icon">person</mat-icon>
+                Login to ElementEDU
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-grid-list [cols]="mobile ? 1 : 2">
+                <mat-grid-tile *ngIf="!mobile">
+                    <img alt="element_edu_logo" height="200" ngSrc="/assets/favicon.svg" priority width="200">
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <div class="form-container">
+                        <div class="current-form">
+                            <ng-container *ngComponentOutlet="currentComponent"></ng-container>
+                        </div>
+                    </div>
+                </mat-grid-tile>
+            </mat-grid-list>
+            <mat-card-footer class="footer">
+                <nav>
+                    @for (footerEntry of this.footerLinks; track footerEntry) {
+                        <a href="{{ footerEntry.link }}" mat-button>
+                            <mat-icon>{{ footerEntry.icon }}</mat-icon>
+                            {{ footerEntry.name }}
+                        </a>
+                    }
+                </nav>
+            </mat-card-footer>
+        </mat-card-content>
+    </mat-card>
+</div>

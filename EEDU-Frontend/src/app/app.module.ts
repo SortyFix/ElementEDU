@@ -2,53 +2,65 @@ import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {HeadBarComponent} from './head-bar/head-bar.component';
-import {DashComponent} from './dash/dash.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DashboardComponent } from './card/dashboard/dashboard.component';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { CardComponent } from './card/card.component';
-import { KlausurenCardComponent } from './card/klausuren-card/klausuren-card.component';
-import { ChatCardComponent } from './card/chat-card/chat-card.component';
-import { HausaufgabenCardComponent } from './card/hausaufgaben-card/hausaufgaben-card.component';
-import { LoginPageComponent } from './user/login-page/login-page.component';
-import { HomePageComponent } from './card/home-page/home-page.component';
-import { HttpClientModule } from "@angular/common/http";
-import { SettingsComponent } from './user/settings/settings.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
 import {NgOptimizedImage} from "@angular/common";
+import {FormsModule} from "@angular/forms";
+import {MatDialogModule} from "@angular/material/dialog";
+import {provideHttpClient, withFetch} from "@angular/common/http";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatCheckbox} from "@angular/material/checkbox";
+import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
+import {CdkCopyToClipboard} from "@angular/cdk/clipboard";
+import {MatTooltip} from "@angular/material/tooltip";
+import {LoadComponent} from "./load/load.component";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AbstractComponent } from './abstract/abstract.component';
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {Authentication} from "./user/authentication/authentication.component";
 
 @NgModule({
     declarations: [
         AppComponent,
-        HeadBarComponent,
-        DashComponent,
         DashboardComponent,
-        CardComponent,
-        KlausurenCardComponent,
-        ChatCardComponent,
-        HausaufgabenCardComponent,
-        LoginPageComponent,
-        HomePageComponent,
-        SettingsComponent
+        AbstractComponent
     ],
     imports: [
+        MatLabel,
+        FormsModule,
+        MatHint,
+        MatLabel,
+        MatDialogModule,
         BrowserModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        MatGridListModule,
-        MatCardModule,
-        MatMenuModule,
         MatIconModule,
-        HttpClientModule,
         MatButtonModule,
-        NgOptimizedImage
+        NgOptimizedImage,
+        FormsModule,
+        MatSlideToggle,
+        MatCheckbox,
+        MatFormField,
+        MatError,
+        MatInput,
+        MatSuffix,
+        CdkCopyToClipboard,
+        MatTooltip,
+        LoadComponent,
+        NgOptimizedImage,
+        MatSidenavModule,
+        Authentication
     ],
-    providers: [],
-    bootstrap: [AppComponent]
+    providers: [
+        provideHttpClient(withFetch())
+    ],
+    bootstrap: [AppComponent],
+    exports: [
+        AbstractComponent
+    ]
 })
 export class AppModule {
+
 }

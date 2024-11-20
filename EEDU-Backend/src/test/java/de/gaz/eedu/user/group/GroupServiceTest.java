@@ -3,10 +3,9 @@ package de.gaz.eedu.user.group;
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,19 +34,18 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
-        GroupCreateModel groupCreateModel = new GroupCreateModel("test", false, new Long[0]);
-        GroupModel groupModel = new GroupModel(5L, "test", false, new SimpleUserModel[0], new SimplePrivilegeModel[0]);
+        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new Long[0]);
+        GroupModel groupModel = new GroupModel(5L, "test", new PrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
             Assertions.assertEquals(expect.privileges().length, result.privileges().length);
-            Assertions.assertEquals(expect.users().length, result.users().length);
         });
     }
 
     @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
-        return new GroupCreateModel("Users", false, new Long[0]);
+        return new GroupCreateModel("Users", new Long[0]);
     }
 
     /**

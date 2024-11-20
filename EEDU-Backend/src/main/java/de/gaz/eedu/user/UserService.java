@@ -11,26 +11,26 @@ import de.gaz.eedu.user.model.LoginModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
-import de.gaz.eedu.user.verfication.AuthorizeService;
-import de.gaz.eedu.user.verfication.authority.AuthorityFactory;
-import io.jsonwebtoken.ExpiredJwtException;
+import de.gaz.eedu.user.verification.GeneratedToken;
+import de.gaz.eedu.user.verification.VerificationService;
+import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
+import de.gaz.eedu.user.verification.model.UserLoginModel;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class manages user related tasks.
@@ -49,10 +49,13 @@ import java.util.stream.Stream;
  * @see Service
  * @see AllArgsConstructor
  */
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) @Slf4j
+@Service
+@AllArgsConstructor
+@Getter(AccessLevel.PROTECTED)
+@Slf4j
 public class UserService extends EntityService<UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
 {
-    @Getter private final AuthorizeService authorizeService;
+    @Getter private final VerificationService verificationService;
     @Getter private final ClassRoomService classRoomService;
     @Getter(AccessLevel.NONE) private final UserRepository userRepository;
     private final GroupRepository groupRepository;
@@ -63,7 +66,8 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return userRepository;
     }
 
-    @Transactional @Override public @NotNull List<UserEntity> createEntity(@NotNull Set<UserCreateModel> model) throws CreationException
+    @Transactional @Override
+    public @NotNull List<UserEntity> createEntity(@NotNull Set<UserCreateModel> model) throws CreationException
     {
         if (getRepository().existsByLoginNameIn(model.stream().map(UserCreateModel::loginName).toList()))
         {
@@ -80,8 +84,8 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         })).toList());
     }
 
-    @Transactional @Override public @NotNull UserDetails loadUserByUsername(
-            @NotNull String username) throws UsernameNotFoundException
+    @Transactional @Override
+    public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException
     {
         return getRepository().findByLoginName(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
@@ -97,25 +101,29 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         entry.getClassRoom().ifPresent(clazz -> clazz.detachStudents(getClassRoomService(), entry.getId()));
     }
 
-    @Transactional public @NotNull Optional<String> login(@NotNull LoginModel loginModel)
+    @Transactional public @NotNull Optional<GeneratedToken> requestLogin(@NotNull LoginModel loginModel)
     {
-        Optional<UserEntity> userOptional = getRepository().findByLoginName(loginModel.loginName());
-        Function<UserEntity, String> auth = user -> getAuthorizeService().login(user, user.getPassword(), loginModel);
-        return userOptional.filter(UserEntity::isAccountNonLocked).map(auth);
+        Optional<UserEntity> potentialUser = switch (loginModel)
+        {
+            case UserLoginModel userLoginModel -> getRepository().findByLoginName(userLoginModel.loginName());
+            case AdvancedUserLoginModel advancedUserLoginModel -> getRepository().findById(advancedUserLoginModel.id());
+            default -> Optional.empty();
+        };
+
+        return potentialUser.filter(UserEntity::isAccountNonLocked).map(user ->
+        {
+            VerificationService service = getVerificationService();
+            return service.requestLogin(user, loginModel);
+        });
     }
 
     @Transactional public @NotNull Optional<UsernamePasswordAuthenticationToken> validate(@NotNull String token)
     {
-        try
+        if (token.isBlank())
         {
-            Function<UserEntity, Set<? extends GrantedAuthority>> function = UserEntity::getAuthorities;
-            AuthorityFactory authorityFactory = (id) -> loadEntityById(id).map(function).orElse(new HashSet<>());
-            return getAuthorizeService().validate(token, authorityFactory);
+            return Optional.empty();
         }
-        catch (ExpiredJwtException ignored)
-        {
-            log.warn("An incoming request has been received with an expired token.");
-        }
-        return Optional.empty();
+
+        return getVerificationService().validate(token, this::loadEntityByIDSafe);
     }
 }

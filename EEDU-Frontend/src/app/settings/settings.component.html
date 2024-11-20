@@ -1,0 +1,10 @@
+<p>settings works!</p>
+<mat-form-field>
+    <mat-label>{{ currentThemeName }}</mat-label>
+    <mat-select [formControl]="themeForm">
+        <mat-option *ngFor="let theme of themes | async" [value]="theme">
+            {{ theme.name }}
+        </mat-option>
+    </mat-select>
+</mat-form-field> <br>
+<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>

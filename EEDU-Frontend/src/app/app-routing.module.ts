@@ -1,14 +1,20 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {LoginPageComponent} from './user/login-page/login-page.component';
-import {HomePageComponent} from "./card/home-page/home-page.component";
 import {CommonModule} from "@angular/common";
+import {DashboardComponent} from "./dashboard/dashboard.component";
+import {CoursesComponent} from "./courses/courses.component";
+import {TimetableComponent} from "./timetable/timetable.component";
+import {NewsComponent} from "./news/news.component";
+import {ChatComponent} from "./chat/chat.component";
+import {SettingsComponent} from "./settings/settings.component";
 
 const routes: Routes = [
-    // set 'home' as main page if URL is /localhost:4200/
-    {path: '', redirectTo: '/home', pathMatch: "full"},
-    {path: 'user-login', component: LoginPageComponent},
-    {path: 'home', component: HomePageComponent}
+    {path: 'dashboard', component: DashboardComponent},
+    {path: 'courses', component: CoursesComponent},
+    {path: 'timetable', component: TimetableComponent},
+    {path: 'news', component: NewsComponent},
+    {path: 'chat', component: ChatComponent},
+    {path: 'settings', component: SettingsComponent}
 ];
 
 @NgModule({

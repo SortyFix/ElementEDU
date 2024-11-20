@@ -2,12 +2,8 @@ package de.gaz.eedu.user.privileges;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.GroupEntity;
-import de.gaz.eedu.user.group.model.SimplePrivilegeGroupModel;
-import de.gaz.eedu.user.model.SimpleUserModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
-import de.gaz.eedu.user.privileges.model.SimplePrivilegeModel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -19,38 +15,52 @@ import java.util.Set;
 
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity") public class PrivilegeEntity implements EntityModelRelation<PrivilegeModel>
 {
+    private final static Set<String> PROTECTED_PRIVILEGES;
+
+    static {
+        PROTECTED_PRIVILEGES = new HashSet<>(Set.of(
+                "USER_GET",
+                "USER_DELETE",
+                "USER_CREATE",
+
+                "USER_GROUP_ATTACH",
+                "USER_GROUP_DETACH",
+
+                "GROUP_GET",
+                "GROUP_CREATE",
+                "GROUP_DELETE",
+
+                "GROUP_PRIVILEGE_GRANT",
+                "GROUP_PRIVILEGE_REVOKE",
+
+                "PRIVILEGE_GET",
+                "PRIVILEGE_CREATE",
+                "PRIVILEGE_DELETE",
+
+                "USER_CREDENTIAL_OTHERS_CREATE",
+                "USER_CREDENTIAL_OTHERS_DELETE",
+                "USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY"
+        ));
+    }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) // ID is final
     private Long id;
     private String name;
-    @JsonBackReference
-    @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
-    private final Set<GroupEntity> groupEntities = new HashSet<>();
+    @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER) private final Set<GroupEntity> groupEntities = new HashSet<>();
 
     public @NotNull SimpleGrantedAuthority toAuthority()
     {
         return new SimpleGrantedAuthority(getName());
     }
 
-    public @NotNull SimplePrivilegeModel toSimpleModel()
-    {
-        return new SimplePrivilegeModel(getId(), getName());
-    }
-
     @Override public PrivilegeModel toModel()
     {
-        return new PrivilegeModel(getId(),
-                getName(),
-                getGroupEntities().stream()
-                        .map(groupEntity -> new SimplePrivilegeGroupModel(groupEntity.getId(),
-                                groupEntity.getName(),
-                                groupEntity.isTwoFactorRequired(),
-                                groupEntity.getUsers()
-                                        .stream()
-                                        .map(UserEntity::toSimpleModel)
-                                        .toArray(SimpleUserModel[]::new)))
-                        .distinct()
-                        .toArray(SimplePrivilegeGroupModel[]::new));
+        return new PrivilegeModel(getId(), getName());
+    }
+
+    @Override public boolean isDeletable()
+    {
+        return !PROTECTED_PRIVILEGES.contains(getName());
     }
 
     @Override public String toString()
