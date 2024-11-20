@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
-import {UserEntity} from "./user-entity";
+import {UserModel} from "./user-model";
 import {ThemeEntity} from "../theming/theme-entity";
 import {environment} from "../../environment/environment";
 
@@ -23,7 +23,7 @@ export class UserService
         if (this._loaded)
         {
             return this.fetchUserData.pipe(tap({
-                next: (value: UserEntity): void => this.storeUserData(JSON.stringify(value)),
+                next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
                 error: (error: any): void  => {
                     if(error && 'status' in error && typeof error.status === 'number' && error.status === 403)
                     {
@@ -36,31 +36,19 @@ export class UserService
             }), map((): void => {}));
         }
 
-        return this.fetchUserData.pipe(tap<UserEntity>({
-            next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
+        return this.fetchUserData.pipe(tap<UserModel>({
+            next: (value: UserModel) => this.storeUserData(JSON.stringify(value))
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
     }
 
-    public get getUserData(): UserEntity
+    public get getUserData(): UserModel
     {
         const userData: string | null = localStorage.getItem('userData')
         if (!this.isLoggedIn || !userData)
         {
             throw new Error("User is not logged in, or user data is corrupt.");
         }
-        const parsedJson: any = JSON.parse(userData);
-        const theme: any = parsedJson.theme;
-        const themeEntity: ThemeEntity = new ThemeEntity(
-            theme.id,
-            theme.name,
-            theme.backgroundColor_r,
-            theme.backgroundColor_g,
-            theme.backgroundColor_b,
-            theme.widgetColor_r,
-            theme.widgetColor_g,
-            theme.widgetColor_b);
-
-        return new UserEntity(parsedJson.id, parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, themeEntity);
+        return UserModel.fromObject(JSON.parse(userData));
     }
 
     public get hasLoaded(): boolean
@@ -86,10 +74,20 @@ export class UserService
         return !!localStorage.getItem("userData");
     }
 
-    private get fetchUserData(): Observable<UserEntity>
+    private get fetchUserData(): Observable<UserModel>
     {
         const url: string = `${this.BACKEND_URL}/user/get`;
-        return this.http.get<UserEntity>(url, {withCredentials: true});
+        return this.http.get<UserModel>(url, {withCredentials: true});
+    }
+
+    public get fetchAll(): Observable<UserModel[]>
+    {
+        const url: string = `${this.BACKEND_URL}/user/all`;
+        return this.http.get<any[]>(url, { withCredentials: true }).pipe(
+            map((response: any[]): UserModel[] =>
+                response.map((element: any): UserModel => UserModel.fromObject(element))
+            )
+        );
     }
 
     private storeUserData(userData: string)
