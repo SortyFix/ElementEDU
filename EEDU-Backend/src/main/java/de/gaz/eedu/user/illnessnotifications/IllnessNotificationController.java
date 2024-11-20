@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
-@RestController @RequestMapping(value = "/illness/me") public class IllnessNotificationController
+@RestController @RequestMapping(value = "/api/v1/illness/me") public class IllnessNotificationController
 {
     private final UserService userService;
     private final IllnessNotificationService illnessNotificationService;

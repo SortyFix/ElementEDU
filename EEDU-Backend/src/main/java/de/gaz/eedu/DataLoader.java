@@ -1,6 +1,5 @@
 package de.gaz.eedu;
 
-import de.gaz.eedu.security.PrivilegeProperties;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -33,7 +32,6 @@ import java.security.SecureRandom;
 public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
-    private final CredentialService credentialService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
@@ -114,7 +112,7 @@ public class DataLoader implements CommandLineRunner
         return getThemeService().createEntity(defaultDark);
     }
 
-    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    private @NotNull UserEntity createDefaultUser(@NotNull String password, @NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         // long line -.-
         UserCreateModel user = new UserCreateModel("root",

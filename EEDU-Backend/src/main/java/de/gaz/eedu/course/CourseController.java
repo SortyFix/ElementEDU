@@ -46,7 +46,7 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<CourseModel> create(@NotNull @RequestBody CourseCreateModel model) throws CreationException
+    @PostMapping("/create") @Override public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
     {
         return super.create(model);
     }

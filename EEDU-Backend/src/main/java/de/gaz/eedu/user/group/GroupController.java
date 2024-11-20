@@ -100,6 +100,12 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
     @PreAuthorize("hasAnyAuthority(${privilege.group.create})") @PostMapping("/create")
     @Override
     public @NotNull ResponseEntity<GroupModel> create(@NotNull @RequestBody GroupCreateModel model) throws CreationException
+    protected @NotNull GroupService getService()
+    {
+        return groupService;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<GroupModel[]> create(@NotNull @RequestBody GroupCreateModel[] model)
     {
         return super.create(model);
     }

@@ -27,13 +27,9 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
 
     @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUserData()
     {
-        return Stream.of(new ArrayTestData<>(1L, new Long[]{1L}), // comes from class
-                new ArrayTestData<>(2L, new Long[]{
-                        1L, 2L
-                }), // 1 comes from class, 2 is in course
-                new ArrayTestData<>(3, new Long[]{
-                        1L, 2L, 3L
-                }) // 1 is in course, 2 and 3 come from class
+        return Stream.of(new ArrayTestData<>(1L, 1L), // comes from class
+                new ArrayTestData<>(2L, 1L, 2L), // 1 comes from class, 2 is in course
+                new ArrayTestData<>(3, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
         );
     }
 

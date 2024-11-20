@@ -72,7 +72,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return classRoom.detachStudents(getService(), users) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel> create(@NotNull @RequestBody ClassRoomCreateModel model) throws CreationException
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
     {
         return super.create(model);
     }

@@ -3,6 +3,7 @@ package de.gaz.eedu.user.theming;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import jakarta.annotation.security.PermitAll;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -94,8 +95,7 @@ public class ThemeController
     }
 
     // Possibly set for deletion.
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete")
-    public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
     {
         if(!themeService.delete(themeId))
         {

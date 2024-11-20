@@ -3,8 +3,8 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.verification.JwtTokenType;
-import de.gaz.eedu.user.verification.authority.VerificationAuthority;
+import de.gaz.eedu.user.verfication.JwtTokenType;
+import de.gaz.eedu.user.verfication.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,14 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @throws CreationException If there is a problem with creating the entity,
      *                           this exception will be thrown. It contains the HTTP status code for the error response.
      */
-    public @NotNull ResponseEntity<M> create(@NotNull C model) throws CreationException
+    public @NotNull ResponseEntity<M[]> create(@NotNull C[] model)
     {
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
-            return ResponseEntity.status(HttpStatus.CREATED).body(getService().create(model));
+            List<M> created = getService().create(Set.of(model));
+            M[] models = created.toArray((M[]) Array.newInstance(created.getFirst().getClass(), created.size()));
+            return ResponseEntity.status(HttpStatus.CREATED).body(models);
         }
         catch (CreationException creationException)
         {
@@ -84,7 +86,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      */
     public @NotNull ResponseEntity<M> getData(@NotNull Long id)
     {
-        log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
+        log.info("Received an incoming get request from class {} with id {}.", getClass().getSuperclass(), id);
         return getService().loadById(id)
                            .map(ResponseEntity::ok)
                            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -119,7 +121,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
                                   .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
     }
 
-    protected @NotNull Authentication getAuthentication()
+    private @NotNull Authentication getAuthentication()
     {
         return SecurityContextHolder.getContext().getAuthentication();
     }
