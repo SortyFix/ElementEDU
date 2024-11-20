@@ -65,9 +65,10 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities() {
-        return new TestData[] {new TestData<>(4, true)};
-        }
+    protected @NotNull TestData<Boolean>[] deleteEntities()
+    {
+        return new TestData[]{new TestData<>(4, true)};
+    }
 
 
         @Override protected @NotNull UserCreateModel occupiedCreateModel()
@@ -128,12 +129,13 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @ParameterizedTest
     @MethodSource("testPasswords")
     public void testInsecurePassword(@NotNull String password) {
-        Assertions.assertThrows(InsecurePasswordException.class, () -> {
+        Assertions.assertThrows(InsecurePasswordException.class, () ->
+        {
             CredentialEntity entity = new CredentialEntity();
             entity.setData(password);
             CredentialMethod.PASSWORD.getCredential().creation(entity);
-            });
-        }
+        });
+    }
 
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval()

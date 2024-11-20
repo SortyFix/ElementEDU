@@ -47,7 +47,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      */
     @PreAuthorize("hasAnyAuthority(${privilege.privilege.create})") @PostMapping("/create")
     @Override
-    public @NotNull ResponseEntity<PrivilegeModel> create(@NotNull @RequestBody PrivilegeCreateModel model) throws CreationException
+    public @NotNull ResponseEntity<PrivilegeModel[]> create(@NotNull @RequestBody PrivilegeCreateModel[] model) throws CreationException
     {
         return super.create(model);
     }

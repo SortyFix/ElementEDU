@@ -15,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Set;
+
 
 @RestController
 @RequestMapping(value = "/user", method = RequestMethod.POST)
@@ -82,11 +84,11 @@ public class ThemeController
      * @return ThemeEntity
      */
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create")
-    public @NotNull ResponseEntity<ThemeEntity> createTheme(@NotNull @RequestBody ThemeCreateModel themeCreateModel)
+    public @NotNull ResponseEntity<ThemeEntity[]> createTheme(@NotNull @RequestBody ThemeCreateModel[] themeCreateModel)
     {
         try
         {
-            return ResponseEntity.ok(themeService.createEntity(themeCreateModel));
+            return ResponseEntity.ok(themeService.createEntity(Set.of(themeCreateModel)).toArray(ThemeEntity[]::new));
         }
         catch(NameOccupiedException nameOccupiedException)
         {
