@@ -5,105 +5,149 @@ import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.GeneratedToken;
+import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.TokenData;
+import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.credentials.implementations.Credential;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
-import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class CredentialService extends EntityService<CredentialRepository, CredentialEntity, CredentialModel, CredentialCreateModel>
+@Slf4j
+@Service
+@AllArgsConstructor
+@Getter(AccessLevel.PROTECTED)
+public class CredentialService extends EntityService<CredentialRepository, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
-    @Getter(AccessLevel.NONE)
-    private final CredentialRepository credentialRepository;
+    @Getter(AccessLevel.NONE) private final CredentialRepository credentialRepository;
     private final UserService userService;
 
-    @Override
-    public @NotNull CredentialRepository getRepository()
+    @Override public @NotNull CredentialRepository getRepository()
     {
         return credentialRepository;
     }
 
-    @Override public @NotNull CredentialEntity createEntity(@NotNull CredentialCreateModel model) throws CreationException
+    @Transactional @Override
+    public @NotNull List<CredentialEntity> createEntity(@NotNull Set<CredentialCreateModel> model) throws CreationException
     {
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(model.userID());
-        CredentialEntity credentialEntity = populateEntity(model, userEntity);
-        credentialEntity.getMethod().getCredential().creation(credentialEntity);
 
-        validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
+        Set<UserEntity> users = new HashSet<>();
+        List<CredentialEntity> credentials = saveEntity(model.stream().map(current -> {
+            UserEntity userEntity = getUserService().loadEntityByIDSafe(current.userID());
 
-        getRepository().save(credentialEntity);
-        getUserService().save(userEntity);
+            CredentialEntity entity = new CredentialEntity(current.method(), current.temporary(), userEntity);
+            CredentialEntity credentialEntity = current.toEntity(entity);
 
-        return credentialEntity;
-    }
-
-    public @NotNull Optional<String> verify(@NotNull CredentialMethod method, String code, @NotNull Claims claims)
-    {
-        long userID = claims.get("userID", Long.class);
-        UserEntity userEntity = getUserService().loadEntityByIDSafe(userID);
-
-        return userEntity.getCredentials(method).map(credentialEntity ->
-        {
-            Credential credential = credentialEntity.getMethod().getCredential();
-            if (credentialEntity.isEnabled() && credential.verify(credentialEntity, code))
+            if (getRepository().existsById(credentialEntity.getId()))
             {
-                return getUserService().getAuthorizeService().authorize(userEntity.getId(), claims);
+                throw new OccupiedException();
             }
-            return null;
-        });
+
+            credentialEntity.getMethod().getCredential().creation(credentialEntity);
+            validate(userEntity.initCredential(credentialEntity), new CreationException(HttpStatus.CONFLICT));
+            users.add(userEntity);
+            return credentialEntity;
+        }).toList());
+
+        // save users having new credentials
+        getUserService().saveEntity(users);
+
+        return credentials;
     }
 
     @Transactional
-    public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull Claims claims)
+    public @NotNull Optional<GeneratedToken> verify(@NotNull CredentialMethod method, String code, @NotNull TokenData tokenData)
     {
-        long userID = claims.get("userID", Long.class);
-        Function<CredentialEntity, Boolean> mapper = credentialEntity ->
+        UserEntity userEntity = getUserService().loadEntityByIDSafe(tokenData.userId());
+        return userEntity.getCredentials(method).stream().filter(credentialEntity ->
         {
-            if (credentialEntity.isEnabled())
+            Credential credential = credentialEntity.getMethod().getCredential();
+            return credentialEntity.isEnabled() && credential.verify(credentialEntity, code);
+        }).findFirst().map(toToken(tokenData));
+    }
+
+    @Transactional @Contract(pure = true, value = "_ -> new")
+    protected @NotNull Function<CredentialEntity, GeneratedToken> toToken(@NotNull TokenData tokenData)
+    {
+        VerificationService verificationService = getUserService().getVerificationService();
+        return (entity) ->
+        {
+            tokenData.restrictClaim("expiry");
+            if (entity.isTemporary())
+            {
+                tokenData.addRestrictedClaim("temporary", entity.getMethod());
+                JwtTokenType type = JwtTokenType.CREDENTIAL_REQUIRED;
+                if (entity.allowedMethods().length == 1)
+                {
+                    type = JwtTokenType.CREDENTIAL_CREATION_PENDING;
+                }
+                return verificationService.credentialToken(type, tokenData, entity.allowedMethods());
+            }
+
+            return verificationService.authorizeToken(tokenData);
+        };
+    }
+
+    @Transactional
+    public boolean enable(@NotNull CredentialMethod method, @NotNull String code, @NotNull TokenData tokenData)
+    {
+        UserEntity user = getUserService().loadEntityByIDSafe(tokenData.userId());
+        return user.getCredentials(method).stream().anyMatch(enabled(method, code, tokenData));
+    }
+
+    @Transactional
+    protected @NotNull Predicate<CredentialEntity> enabled(@NotNull CredentialMethod method, @NotNull String code, @NotNull TokenData tokenData)
+    {
+        return credential ->
+        {
+            if (method.isEnablingRequired() && credential.isEnabled())
             {
                 return false;
             }
 
-            if (credentialEntity.getMethod().getCredential().verify(credentialEntity, code))
+            if (credential.getMethod().getCredential().verify(credential, code))
             {
-                credentialEntity.setEnabled(true);
-                save(credentialEntity);
+                if (tokenData.additionalClaims().containsKey("temporary"))
+                {
+                    long userId = credential.getUser().getId();
+                    deleteTemporary(Objects.hash(tokenData.get("temporary", String.class), userId), credential);
+                }
+
+                if (!credential.isEnabled())
+                {
+                    credential.setEnabled(true);
+                    save(credential);
+                }
                 return true;
             }
+
             return false;
         };
-        return getUserService().loadEntityByIDSafe(userID).getCredentials(method).map(mapper).orElse(false);
     }
 
-    /**
-     * This method populates an {@link CredentialEntity}.
-     * <p>
-     * This method creates a new {@link CredentialEntity} by a {@link CredentialCreateModel}.
-     *
-     * @param model      the two-factor model to create the {@link CredentialEntity}.
-     * @param userEntity the entity associated with.
-     * @return the created {@link CredentialEntity}.
-     */
-    @Contract(value = "_, _ -> new", pure = true) private @NotNull CredentialEntity populateEntity(@NotNull CredentialCreateModel model, @NotNull UserEntity userEntity)
+    @Transactional
+    protected void deleteTemporary(long id, @NotNull CredentialEntity credential)
     {
-        long id = model.method().toId(userEntity);
-
-        if(getRepository().existsById(id))
+        if (delete(id))
         {
-            throw new OccupiedException();
+            return;
         }
 
-        return model.toEntity(new CredentialEntity(id, userEntity));
+        String warnMessage = "The user {} attempted to create a new credential using a temporary one; however, it appears that the temporary credential with the id {} does not exist.";
+        log.warn(warnMessage, credential.getUser().getId(), id);
     }
 }

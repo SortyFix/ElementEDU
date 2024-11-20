@@ -2,6 +2,7 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subjects.model.SubjectModel;
@@ -26,13 +27,9 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
 
     @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUserData()
     {
-        return Stream.of(new ArrayTestData<>(1L, new Long[]{1L}), // comes from class
-                new ArrayTestData<>(2L, new Long[]{
-                        1L, 2L
-                }), // 1 comes from class, 2 is in course
-                new ArrayTestData<>(3, new Long[]{
-                        1L, 2L, 3L
-                }) // 1 is in course, 2 and 3 come from class
+        return Stream.of(new ArrayTestData<>(1L, 1L), // comes from class
+                new ArrayTestData<>(2L, 1L, 2L), // 1 comes from class, 2 is in course
+                new ArrayTestData<>(3, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
         );
     }
 
@@ -42,7 +39,7 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
         CourseCreateModel create = new CourseCreateModel("7b-German", 1L, null, new Long[0]);
 
         SubjectModel subjectModel = new SubjectModel(1L, "German");
-        CourseModel courseModel = new CourseModel(5L, "7b-German", subjectModel, new UserModel[0]);
+        CourseModel courseModel = new CourseModel(5L, "7b-German", subjectModel, new UserModel[0], new ScheduledAppointmentModel[0]);
 
         return Eval.eval(create, courseModel, (request, expect, result) ->
         {

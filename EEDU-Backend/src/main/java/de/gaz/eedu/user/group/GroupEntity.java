@@ -7,6 +7,7 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -42,47 +43,27 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.PRIVATE)
-    private Set<UserEntity> users = new HashSet<>();
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference
+    private final Set<UserEntity> users = new HashSet<>();
 
     @ManyToMany @JsonManagedReference
     @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private Set<PrivilegeEntity> privileges;
-
-    /**
-     * Creates an instance with a {@link Set} of users.
-     * <p>
-     * This constructor creates an instance of the group entity only requiring a users set. This is necessary
-     * as this reference is not managed in this class but outside of it.
-     * <p>
-     * As a result, this constructor prioritizes the users set, primarily because the necessary data might not
-     * be immediately available when first creating the group entity. Other properties of the group entity,
-     * like privileges or name, can be changed later as required using their respective setter methods.
-     * <p>
-     * Therefore, this constructor provides greater flexibility when initial data is minimal or when the
-     * group entity undergoes significant changes post-instantiation.
-     *
-     * @param users the set of {@link UserEntity} objects to be associated with this group.
-     */
-    public GroupEntity(@NotNull Set<UserEntity> users)
-    {
-        this.users = users;
-    }
+    private final Set<PrivilegeEntity> privileges = new HashSet<>();
 
     public @NotNull @Unmodifiable Set<GrantedAuthority> toSpringSecurity()
     {
         return Stream.concat(getAuthorities().stream(), Stream.of(toRole())).collect(Collectors.toSet());
     }
 
-
     @Override public @NotNull GroupModel toModel()
     {
-        return new GroupModel(getId(), getName());
+        PrivilegeModel[] models = getPrivileges().stream().map(PrivilegeEntity::toModel).toArray(PrivilegeModel[]::new);
+        return new GroupModel(getId(), getName(), models);
     }
 
     /**
      * This method is used to convert the name of a user/role to a format that aligns with spring API,
-     * specifically {@link org.springframework.security.core.GrantedAuthority}.
+     * specifically {@link GrantedAuthority}.
      * <p>
      * The format adopted is to prefix the name with "ROLE_", this is because the spring API
      * uses roles to check authorizations and expects role names to be in specific formats.
@@ -90,11 +71,11 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      * authority that's been granted to an Authentication object. The main benefit of this
      * convention is that it enables method level security.
      *
-     * @return a new {@link org.springframework.security.core.authority.SimpleGrantedAuthority} object which
+     * @return a new {@link SimpleGrantedAuthority} object which
      * incorporates the adjusted (prefixed) name/role. SimpleGrantedAuthority is a basic,
-     * immutable implementation of {@link org.springframework.security.core.GrantedAuthority}.
-     * @see org.springframework.security.core.authority.SimpleGrantedAuthority
-     * @see org.springframework.security.core.GrantedAuthority
+     * immutable implementation of {@link GrantedAuthority}.
+     * @see SimpleGrantedAuthority
+     * @see GrantedAuthority
      */
     private @NotNull GrantedAuthority toRole()
     {
@@ -113,9 +94,9 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      * that the returned Set instance is unmodifiable and any attempt to modify it would
      * result in an UnsupportedOperationException.
      *
-     * @return an unmodifiable set of {@link org.springframework.security.core.GrantedAuthority} objects, each
+     * @return an unmodifiable set of {@link GrantedAuthority} objects, each
      * representing a user authority (privilege). It may be empty but is never null.
-     * @see org.springframework.security.core.GrantedAuthority
+     * @see GrantedAuthority
      */
     private @NotNull @Unmodifiable Set<GrantedAuthority> getAuthorities()
     {

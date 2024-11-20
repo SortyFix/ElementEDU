@@ -1,47 +1,3 @@
-/*
-=============================================================================
-
-This SQL script populates the 'user_entity', 'group_entity', 'privilege_entity',
-'user_groups', and 'group_privileges' tables with test data that demonstrate
-the assignment of groups and privileges to users in 3 distinct levels of access,
-plus a dummy/test scenario.
-
-This script reflects the following design pattern:
-
-1. Users: There are four test users, each at a different level, from least to most privileged:
-    - 'Max Mustermann' is at level 1, the most basic level of access
-    - 'John Zimmermann' is at level 2, with slightly more access
-    - 'Martin Hansen' is at level 3, having the highest level of access or broader privileges
-    - Additionally, there is a 'dummy' user primarily used for testing delete operations
-
-2. Groups: These are the roles or positions users can occupy within the application.
-Every user belongs to one or more groups:
-    - The 'Users' group is the basic level, associated with normal users
-    - 'Moderators' occupy the middle ground in terms of access rights
-    - 'Admins' possesses the highest privileges
-    - 'Dummy' is a testing group designed for testing delete operations
-
-3. Privileges: These are the specific rights or permissions granted to a group. A group
-can have one or more privileges:
-    - 'READ' is the most basic privilege
-    - 'WRITE' is an intermediate privilege
-    - 'MODERATE' is the highest privilege
-    - 'DUMMY' is a test privilege for testing the delete operation
-
-4. 'user_groups' and 'group_privileges' tables are junction tables that represent many-to-many
-relationships between users and groups as well as groups and privileges.
-
-In summary, each user has a corresponding group and privilege following a pattern from the
-least to the most privileged. User 'Max' is associated with the 'Users' group and 'READ' privilege,
-'Martin' with the 'Admins' group and 'MODERATE' privilege, so on and so forth. The pattern is
-strictly consistent except for the last 'dummy' case meant for delete tests.
-
-Please note that this is simulated data and does not necessarily reflect real-world users,
-groups, or privileges. The main objective is to provide test data that demonstrates the
-assignment and hierarchy of users, groups, and privileges.
-
-=============================================================================
-*/
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('Light', 0, 0, 0, 0, 0, 0),
        ('Medium', 0, 0, 0, 0, 0, 0),
@@ -108,7 +64,6 @@ VALUES ('Q1-German', 1, 1),
        ('5e-Math', 2, 1),
        ('2e-Informatics', 3, 3),
        ('Dummy', 4, 4);
----
 
 INSERT INTO chat_entity (time_of_creation)
 VALUES (90234802),

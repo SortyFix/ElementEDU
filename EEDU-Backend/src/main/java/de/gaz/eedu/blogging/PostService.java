@@ -19,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +32,10 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     @Value("${blog.write}") private String writePrivilege;
 
-    public @NotNull PostEntity createEntity(@NotNull PostCreateModel model) throws CreationException
+    @Transactional
+    public @NotNull List<PostEntity> createEntity(@NotNull Set<PostCreateModel> model) throws CreationException
     {
-        return model.toEntity(new PostEntity());
+        return saveEntity(model.stream().map(postCreateModel -> postCreateModel.toEntity(new PostEntity())).toList());
     }
 
     /**
@@ -115,8 +118,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         {
             FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), createModel.readPrivileges(), "blog", createModel.tags()).toEntity(new FileEntity());
             thumbnailFile.uploadBatch("", thumbnail);
-            return createEntity(new PostCreateModel(createModel.author(), createModel.title(),
-                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags())).toModel();
+            return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
+                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }

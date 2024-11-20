@@ -12,18 +12,27 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
 @Slf4j
 public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
 {
-    @NotNull public abstract R getRepository();
+    @NotNull protected abstract R getRepository();
+
+    protected final boolean duplicates(@NotNull C @NotNull [] data)
+    {
+        Set<C> set = new HashSet<>();
+        for (C element : data) {
+            if (!set.add(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Loads an entity {@link E} by its id.
@@ -63,7 +72,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      *
      * @param id an array of all ids that should be loaded.
      * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
-     * @see #loadById(Long...) 
+     * @see #loadById(Long...)
      * @see Transactional
      */
     @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Long... id)
@@ -91,7 +100,12 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      */
     @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> findAllEntities()
     {
-        return Set.copyOf(getRepository().findAll());
+        return findAllEntities((e) -> true);
+    }
+
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> findAllEntities(@NotNull Predicate<E> predicate)
+    {
+        return getRepository().findAll().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -111,7 +125,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @throws CreationException is thrown when anything went wrong while creating
      * @see Transactional
      */
-    @Transactional public abstract @NotNull E createEntity(@NotNull C model) throws CreationException;
+    @Transactional public abstract @NotNull List<E> createEntity(@NotNull Set<C> model) throws CreationException;
 
     /**
      * Deletes an {@link E} from the database.
@@ -162,7 +176,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
         }).orElse(false);
     }
 
-    public void deleteRelations(@NotNull E entry) {}
+    public void deleteRelations(@NotNull E entry) { }
 
     /**
      * Saves multiply {@link E}s in the database.
@@ -326,7 +340,6 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
         return toModel().apply(loadEntityByIDSafe(id));
     }
 
-
     /**
      * Loads a {@link M} by its id.
      * <p>
@@ -361,12 +374,17 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
 
     @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> findAll()
     {
-        return findAllEntities().stream().map(toModel()).collect(Collectors.toSet());
+        return findAll((m) -> true);
     }
 
-    @Transactional public @NotNull M create(@NotNull C model)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> findAll(@NotNull Predicate<M> predicate)
     {
-        return toModel().apply(createEntity(model));
+        return findAllEntities().stream().map(toModel()).filter(predicate).collect(Collectors.toSet());
+    }
+
+    @Transactional public @NotNull List<M> create(@NotNull Set<C> model)
+    {
+        return createEntity(model).stream().map(toModel()).toList();
     }
 
     @Transactional public @NotNull M save(@NotNull E entity)

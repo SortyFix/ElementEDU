@@ -9,6 +9,7 @@ public enum JwtTokenType
     CREDENTIAL_SELECTION,
     CREDENTIAL_PENDING,
     CREDENTIAL_REQUIRED,
+    CREDENTIAL_CREATION_PENDING,
     ADVANCED_AUTHORIZATION, // authorities from actual user and advanced
     AUTHORIZED; // authorities from actual user
 

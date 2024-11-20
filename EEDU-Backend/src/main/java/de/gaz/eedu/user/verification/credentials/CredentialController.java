@@ -1,13 +1,16 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.verification.AuthorizeService;
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
+import de.gaz.eedu.user.verification.TokenData;
+import de.gaz.eedu.user.verification.VerificationService;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
+import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreateModel;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -23,7 +26,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * This is a Rest Controller class named {@code TwoFactorController} which extends {@link EntityController}
@@ -36,33 +41,62 @@ import java.util.Optional;
  *
  * @author Ivo
  * @see org.springframework.stereotype.Controller
- * @see org.springframework.web.bind.annotation.RestController
- * @see org.springframework.web.bind.annotation.RequestMapping
+ * @see RestController
+ * @see RequestMapping
  * @see EntityController
  * @see CredentialService
  * @see CredentialModel
  * @see CredentialCreateModel
  */
-@RestController @RequestMapping("/user/login/credentials") @RequiredArgsConstructor public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
+@RestController
+@RequestMapping("/api/v1/user/login/credentials")
+@RequiredArgsConstructor
+public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {
     @Value("${development}") private final boolean development = false;
-    @Getter(AccessLevel.PROTECTED) private final CredentialService entityService;
+    @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
-    @PreAuthorize("(#id == authentication.principal) && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)")
-    @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long id) {return super.delete(id);}
-
-    @PostMapping("/create")
-    @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal Long userID, @RequestAttribute("claims") Claims claims)
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION)"
+    ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
-        // validate that this method is allowed to be created by the token
-        if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED))
-        {
-            validate(claims.get("available", List.class).contains(model.method().name()), unauthorizedThrowable());
-        }
+        boolean hasPrivilege = isAuthorized("USER_CREDENTIAL_OTHERS_DELETE");
+        validate(hasPrivilege || Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
 
-        CredentialEntity credential = getEntityService().createEntity(new CredentialCreateModel(userID, model));
+        return super.delete(id);
+    }
+
+    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
+    @GetMapping("/create/select/{method}")
+    public @NotNull ResponseEntity<String> selectCreate(@PathVariable CredentialMethod method, @RequestAttribute TokenData token)
+    {
+        token.restrictClaim("expiry");
+        VerificationService service = getService().getUserService().getVerificationService();
+
+        GeneratedToken generated = service.credentialToken(JwtTokenType.CREDENTIAL_CREATION_PENDING, token, method);
+        return ResponseEntity.ok(generated.jwt());
+    }
+
+    @PreAuthorize(
+            "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
+    ) @PostMapping("/create")
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal UserEntity userEntity)
+    {
+        return create(userEntity.getId(), model);
+    }
+
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
+    {
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
+        return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
+    }
+
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY')") @PostMapping("/create/temporary/{userId}")
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
+    {
+        Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
+        CredentialEntity credential = getService().createEntity(createModels).getFirst();
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
@@ -76,18 +110,19 @@ import java.util.Optional;
      *
      * @param method This is the two factor method for which verification is done.
      * @param code   This is the provided verification code.
-     * @param claims These are the claims associated with the JWT token.
+     * @param token  These are the claims associated with the JWT token.
      * @return A {@link HttpStatus} representing the state of the request.
      */
-    @PostMapping("/enable/{method}")
-    @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_REQUIRED)")
-    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute("claims") Claims claims, @NotNull HttpServletResponse response)
+    @PreAuthorize(
+            "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
+    ) @PostMapping("/enable/{method}")
+    public @NotNull ResponseEntity<String> enable(@PathVariable @NotNull CredentialMethod method, @RequestBody String code, @RequestAttribute @NotNull TokenData token, @NotNull HttpServletResponse response)
     {
-        validate(getEntityService().enable(method, code, claims), unauthorizedThrowable());
+        validate(getService().enable(method, code, token), unauthorizedThrowable());
 
-        if (isAuthorized(JwtTokenType.CREDENTIAL_REQUIRED)) // return login token after user has setup two factor
+        if (isAuthorized(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
         {
-            return authorizeToken(getEntityService().verify(method, code, claims), claims, response);
+            return authorizeToken(getService().verify(method, code, token), response);
         }
         return ResponseEntity.ok(null);
     }
@@ -98,46 +133,39 @@ import java.util.Optional;
      * and the code verification is successful, it returns a successful response. If the
      * verification fails, it returns an HTTP 401 Unauthorized response.
      *
-     * @param code   This is the provided Two-Factor Authentication code.
-     * @param claims These are the claims associated with the associated JWT token.
-     * @return Returns ResponseEntity of type {@link String}.
+     * @param code  this is the provided Two-Factor Authentication code.
+     * @param token these are the claims associated with the associated JWT token.
+     * @return returns ResponseEntity of type {@link String}.
      */
+
+    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_PENDING)")
     @PostMapping("/verify")
-    @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_PENDING)")
-    public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute("claims") @NotNull Claims claims, @NotNull HttpServletResponse response)
+    public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute @NotNull TokenData token, @NotNull HttpServletResponse response)
     {
-        List<String> credentials = claims.get("available", List.class);
+        List<String> credentials = token.get("available", List.class);
         CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
 
-        return authorizeToken(getEntityService().verify(method, code, claims), claims, response);
+        return authorizeToken(getService().verify(method, code, token), response);
     }
 
-    /**
-     * This method implements the API mapped to the "/select/{method}" path to
-     * facilitate the selection of a Two-Factor Authentication method. It checks if
-     * the JWT Token type is {@link JwtTokenType#CREDENTIAL_SELECTION}. If the check is not satisfied,
-     * it returns an HTTP 401 Unauthorized response, else it returns the Two Factor method
-     * selection response.
-     *
-     * @param method This is the provided Two-Factor Authentication method.
-     * @param claims These are the claims associated with the associated JWT token.
-     * @return ResponseEntity of type {@link String}.
-     */
+
+    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_SELECTION)")
     @GetMapping("/select/{method}")
-    @PreAuthorize("isAuthenticated() && @verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_SELECTION)")
-    public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute("claims") Claims claims)
+    public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute @NotNull TokenData token)
     {
-        AuthorizeService authorizeService = getEntityService().getUserService().getAuthorizeService();
-        return ResponseEntity.ok().body(authorizeService.selectTwoFactor(method, claims));
+        token.restrictClaim("expiry");
+        VerificationService verificationService = getService().getUserService().getVerificationService();
+        GeneratedToken generated = verificationService.credentialToken(JwtTokenType.CREDENTIAL_REQUIRED, token, method);
+        return ResponseEntity.ok(generated.jwt());
     }
 
-    private @NotNull ResponseEntity<String> authorizeToken(@NotNull Optional<String> token, @NotNull Claims claims, @NotNull HttpServletResponse response)
+    private @NotNull ResponseEntity<String> authorizeToken(@NotNull Optional<GeneratedToken> token, @NotNull HttpServletResponse response)
     {
         return token.map(jwtToken ->
         {
-            if (!claims.get("advanced", Boolean.class))
+            if (Objects.equals(jwtToken.type(), JwtTokenType.AUTHORIZED))
             {
-                Cookie cookie = new Cookie("token", jwtToken);
+                Cookie cookie = new Cookie("token", jwtToken.jwt());
                 cookie.setPath("/");
                 cookie.setDomain("localhost");
                 cookie.setMaxAge(3600);
@@ -145,7 +173,7 @@ import java.util.Optional;
                 cookie.setSecure(!development);
                 response.addCookie(cookie);
             }
-            return ResponseEntity.ok(jwtToken);
+            return ResponseEntity.ok(jwtToken.jwt());
         }).orElseThrow(this::unauthorizedThrowable);
     }
 }
