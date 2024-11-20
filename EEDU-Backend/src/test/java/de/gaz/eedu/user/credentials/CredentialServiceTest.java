@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Set;
 
 @Getter(AccessLevel.PROTECTED)
@@ -25,23 +23,17 @@ public class CredentialServiceTest extends ServiceTest<CredentialService, Creden
 
     @Autowired private CredentialService service;
 
-    @Override public void testCreateEntitySuccess() throws IOException, URISyntaxException
-    {
-        // ignore
-    }
-
     @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
     {
-        throw new UnsupportedOperationException();
-/*        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.PASSWORD, null, "");
-        CredentialModel credentialModel = new CredentialModel(1L, CredentialMethod.TOTP, false);
+        CredentialCreateModel createModel = new CredentialCreateModel(1L, CredentialMethod.TOTP, null, "");
+        CredentialModel credentialModel = new CredentialModel(1055L, CredentialMethod.TOTP, false);
 
         return Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.method(), result.method());
             Assertions.assertFalse(result.enabled());
-        }));*/
+        }));
     }
 
     @Test public void successCreateTemporary()
