@@ -3,12 +3,14 @@ import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserEntity} from "./user-entity";
 import {ThemeEntity} from "../theming/theme-entity";
+import {environment} from "../../environment/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService
 {
+    private readonly BACKEND_URL: string = environment.backendUrl;
     private _loaded: boolean = false;
 
     constructor(private http: HttpClient)
@@ -20,8 +22,20 @@ export class UserService
         this._loaded = this.isLoggedIn;
         if (this._loaded)
         {
-            return of();
+            return this.fetchUserData.pipe(tap({
+                next: (value: UserEntity): void => this.storeUserData(JSON.stringify(value)),
+                error: (error: any): void  => {
+                    if(error && 'status' in error && typeof error.status === 'number' && error.status === 403)
+                    {
+                        // logout when token expired
+                        this.logout().subscribe();
+                        return;
+                    }
+                    // idk??
+                }
+            }), map((): void => {}));
         }
+
         return this.fetchUserData.pipe(tap<UserEntity>({
             next: (value: UserEntity) => this.storeUserData(JSON.stringify(value))
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
@@ -61,7 +75,7 @@ export class UserService
             return of();
         }
 
-        const url = "http://localhost:8080/user/logout";
+        const url: string = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
             next: () => localStorage.removeItem("userData")
         }));
@@ -74,7 +88,7 @@ export class UserService
 
     private get fetchUserData(): Observable<UserEntity>
     {
-        const url: string = "http://localhost:8080/user/get";
+        const url: string = `${this.BACKEND_URL}/user/get`;
         return this.http.get<UserEntity>(url, {withCredentials: true});
     }
 

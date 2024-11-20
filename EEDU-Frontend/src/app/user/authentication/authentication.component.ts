@@ -1,62 +1,54 @@
-import {Component, EventEmitter, HostListener, OnInit, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatCard, MatCardContent, MatCardFooter, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {NgIf, NgOptimizedImage} from "@angular/common";
+import {NgComponentOutlet, NgIf, NgOptimizedImage} from "@angular/common";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
-import {MatProgressBar} from "@angular/material/progress-bar";
-import {finalize, MonoTypeOperatorFunction} from "rxjs";
 import {SelectCredentialComponent} from "./select-credential-form/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
-import {LoginData} from "./login-data/login-data";
-import {LoginRequest} from "./login-data/login-request";
 import {CredentialMethod} from "./login-data/credential-method";
 import {MatAnchor} from "@angular/material/button";
-import {MatDivider} from "@angular/material/divider";
-import {MatError, MatLabel} from "@angular/material/form-field";
 import {AuthenticationService} from "./authentication.service";
-import {CredentialTotpFormComponent} from "./credentials/form/credential-totp-form/credential-totp-form.component";
-import {CredentialEmailFormComponent} from "./credentials/form/credential-email-form/credential-email-form.component";
 import {
-    CredentialPasswordFormComponent
-} from "./credentials/form/credential-password-form/credential-password-form.component";
+    CredentialTotpVerifyFormComponent
+} from "./credentials/credential-totp/credential-totp-verify-form/credential-totp-verify-form.component";
 import {
-    SetupEmailCredentialComponent
-} from "./credentials/setup/setup-email-credential/setup-email-credential/setup-email-credential.component";
+    CredentialEmailVerifyFormComponent
+} from "./credentials/credential-email/credential-email-verify-form/credential-email-verify-form.component";
 import {
-    SetupPasswordCredentialComponent
-} from "./credentials/setup/setup-password-credential/setup-password-credential.component";
+    CredentialPasswordVerifyFormComponent
+} from "./credentials/credential-password/credential-password-verify-form/credential-password-verify-form.component";
 import {
-    SetupSmsCredentialComponent
-} from "./credentials/setup/setup-sms-credential/setup-sms-credential/setup-sms-credential.component";
-import {SetupTotpCredentialComponent} from "./credentials/setup/setup-totp-credential/setup-totp-credential.component";
+    CredentialEmailSetupFormComponent
+} from "./credentials/credential-email/credential-email-setup-form/credential-email-setup-form/credential-email-setup-form.component";
+import {
+    CredentialPasswordSetupFormComponent
+} from "./credentials/credential-password/credential-password-setup-form/credential-password-setup-form.component";
+import {
+    CredentialSmsSetupFormComponent
+} from "./credentials/credential-sms/credential-sms-setup-form/credential-sms-setup-form/credential-sms-setup-form.component";
+import {
+    CredentialTotpSetupFormComponent
+} from "./credentials/credential-totp/credential-totp-setup-form/credential-totp-setup-form.component";
+import {
+    CredentialSmsVerifyFormComponent
+} from "./credentials/credential-sms/credential-sms-verify-form/credential-sms-verify-form.component";
+import {AccessibilityService} from "../../accessibility.service";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
         MatCard,
-        MatProgressBar,
         MatCardHeader,
         MatCardTitle,
         MatIcon,
         MatCardContent,
         MatGridList,
         MatGridTile,
-        LoginNameFormComponent,
         MatCardFooter,
         NgOptimizedImage,
         NgIf,
-        SelectCredentialComponent,
         MatAnchor,
-        MatDivider,
-        MatError,
-        MatLabel,
-        CredentialTotpFormComponent,
-        CredentialEmailFormComponent,
-        CredentialPasswordFormComponent,
-        SetupEmailCredentialComponent,
-        SetupPasswordCredentialComponent,
-        SetupSmsCredentialComponent,
-        SetupTotpCredentialComponent,
+        NgComponentOutlet,
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [
@@ -71,161 +63,87 @@ import {SetupTotpCredentialComponent} from "./credentials/setup/setup-totp-crede
         ])
     ]
 })
-export class Authentication implements OnInit
-{
-    @Output() submit: EventEmitter<void> = new EventEmitter<void>();
-    protected readonly CredentialMethod: typeof CredentialMethod = CredentialMethod;
-    private _loginData?: LoginData;
-    private _mobile: boolean = false;
-    private _loadingAnimation: boolean = false;
-    private _statusCode?: number;
+export class Authentication {
+
+    private readonly _footerLinks: {name: string, link: string, icon: string}[] = [
+        {name: "Privacy", link: "#", icon: "privacy_tip"},
+        {name: "Legal Notice", link: "#", icon: "gavel"},
+        {name: "Contact", link: "#", icon: "contact_mail"},
+        {name: "Terms of Service", link: "#", icon: "description"},
+        {name: "Help", link: "#", icon: "help"},
+    ];
+
+    protected get footerLinks(): { name: string; link: string; icon: string }[] {
+        return this._footerLinks;
+    }
+
+    constructor(private accessibilityService: AccessibilityService, protected authService: AuthenticationService) {}
+
+    protected get mobile(): boolean {
+        return this.accessibilityService.mobile;
+    }
 
     /**
-     * Constructor to initialize the LoginComponent.
+     * Determines and returns the current component based on the login state and credential method.
+     * If no login data is present, the {@link LoginNameFormComponent} is returned.
+     * If the login data exists but no credential method is selected, the {@link SelectCredentialComponent} is returned.
+     * Depending on whether the credential setup process is in progress or not, it returns the appropriate setup or verification component.
      *
-     * @param loginService The service used for login-related operations such as login and password verification.
+     * @return The component to be displayed based on the user's login state and credential method.
      */
-    constructor(private loginService: AuthenticationService)
-    {
+    protected get currentComponent(): any {
+        if (!this.authService.loginData) {
+            return LoginNameFormComponent;
+        }
+
+        if (!this.authService.loginData.credential) {
+            return SelectCredentialComponent;
+        }
+
+        const credential: CredentialMethod = this.authService.loginData.credential;
+
+        if (this.authService.loginData.credentialRequired) {
+            return this.setupComponent(credential);
+        }
+
+        return this.verifyComponent(credential);
     }
 
     /**
-     * Lifecycle hook that is called after data-bound properties of a directive are initialized.
-     * Initializes the screen size check.
-     */
-    public ngOnInit(): void
-    {
-        this.checkScreenSize()
-    }
-
-    /**
-     * Listens for window resize events to check and update the screen size.
-     */
-    @HostListener("window:resize")
-    public onResize(): void
-    {
-        this.checkScreenSize()
-    }
-
-    /**
-     * Checks the screen size and sets the mobile property based on the width.
-     */
-    private checkScreenSize(): void
-    {
-        this._mobile = window.innerWidth <= 600;
-    }
-
-    /**
-     * Handles the submission of login data. Determines if the provided data is a password or login request and processes it accordingly.
+     * Returns the appropriate credential setup form component based on the provided credential method.
      *
-     * @param data The data submitted for login, either a password string or a LoginRequest object.
+     * @param credentialMethod The method of credential (e.g., PASSWORD, EMAIL, SMS, TOTP).
+     * @return The credential setup form component corresponding to the specified credential method.
      */
-    protected onSubmit(data: any): void
-    {
-        this._statusCode = undefined;
-        if (typeof data == 'boolean')
-        {
-            this._loginData = undefined;
-            return;
-        }
-
-        if (data instanceof LoginRequest)
-        {
-            this.requestCredentials(data);
-            return;
-        }
-
-        if (!data || typeof data != "object" || !this.loginData)
-        {
-            return;
-        }
-
-        if ('method' in data && typeof data.method === 'string')
-        {
-            this.loginService.selectCredential(data.method, this.loginData).pipe(this.finalizeLoading()).subscribe();
-        }
-        else if (this.loginData.credential && 'secret' in data && typeof data.secret === 'string')
-        {
-            this.loginService.verifyCredential(data.secret, this.loginData).pipe(this.finalizeLoading()).subscribe({
-                next: () => this.submit.emit(), error: error => this.statusCode = error
-            });
+    private setupComponent(credentialMethod: CredentialMethod): any {
+        switch (credentialMethod) {
+            case CredentialMethod.PASSWORD:
+                return CredentialPasswordSetupFormComponent;
+            case CredentialMethod.EMAIL:
+                return CredentialEmailSetupFormComponent;
+            case CredentialMethod.SMS:
+                return CredentialSmsSetupFormComponent;
+            case CredentialMethod.TOTP:
+                return CredentialTotpSetupFormComponent;
         }
     }
 
     /**
-     * Sends a login request to the server.
+     * Returns the appropriate credential verification form component based on the provided credential method.
      *
-     * This method sends an HTTP POST request to the backend server to verify the existence of the given user.
-     * If the user exists, it sets the login data to the given credentials and proceeds accordingly.
-     *
-     * @param data The login request data containing user credentials.
-     * @private
+     * @param credentialMethod The method of credential (e.g., PASSWORD, EMAIL, SMS, TOTP).
+     * @return The credential verification form component corresponding to the specified credential method.
      */
-    private requestCredentials(data: LoginRequest): void
-    {
-        this.loginService.request(data).pipe(this.finalizeLoading()).subscribe({
-            next: (loginData) => this._loginData = loginData,
-            error: (error) => this.statusCode = error
-
-        });
-    }
-
-    private set statusCode(error: any)
-    {
-        if(typeof error == 'object' && 'status' in error && typeof error.status == 'number')
-        {
-            this._statusCode = error.status;
+    private verifyComponent(credentialMethod: CredentialMethod): any {
+        switch (credentialMethod) {
+            case CredentialMethod.PASSWORD:
+                return CredentialPasswordVerifyFormComponent;
+            case CredentialMethod.EMAIL:
+                return CredentialEmailVerifyFormComponent;
+            case CredentialMethod.SMS:
+                return CredentialSmsVerifyFormComponent;
+            case CredentialMethod.TOTP:
+                return CredentialTotpVerifyFormComponent;
         }
     }
-
-    private finalizeLoading(): MonoTypeOperatorFunction<any>
-    {
-        return finalize((): void => {this._loadingAnimation = false;});
-    }
-
-
-    protected get mobile(): boolean
-    {
-        return this._mobile;
-    }
-
-    protected get loadingAnimation(): boolean
-    {
-        return this._loadingAnimation;
-    }
-
-    protected get loginData(): LoginData | undefined
-    {
-        return this._loginData;
-    }
-
-    protected get statusCode(): number | undefined
-    {
-        return this._statusCode;
-    }
-
-    /**
-     * Retrieves an appropriate error message based on the provided error.
-     *
-     * This method takes an error object as input and returns a user-friendly error message. The method
-     * analyzes the error type and details to provide a specific and helpful error message to the user.
-     *
-     * @param error The error object containing information about the error that occurred.
-     * @return A string representing the specific error message.
-     * @private
-     */
-    private getErrorMessage(error: any): string
-    {
-        if (typeof error == 'object' && 'status' in error && typeof error.status == 'number')
-        {
-            switch (error.status)
-            {
-                case 401:
-                    return "The user has not been found."
-            }
-        }
-        return "An error occurred"
-    }
-
-    protected readonly LoginData = LoginData;
 }

@@ -1,70 +1,57 @@
-import {Component, effect, Inject, input, output, signal, WritableSignal} from "@angular/core";
+import {Component, Inject, signal, WritableSignal} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {AuthenticationService} from "./authentication.service";
 
 @Component({standalone: true, template: ''})
-export abstract class AbstractLoginForm<T>  {
+export abstract class AbstractLoginForm {
 
-    public readonly responseStatusCode = input<number | undefined>();
-    private readonly _fieldName: string;
-    protected readonly _submit = output<T | boolean>();
     private readonly _errorMessageSignal: WritableSignal<string | undefined>;
     private readonly _form: FormGroup;
 
-    protected constructor(form: FormGroup, @Inject(String) fieldName: string)
-    {
+    protected constructor(form: FormGroup, protected authenticationService: AuthenticationService) {
         this._errorMessageSignal = signal(undefined);
         this._form = form;
-        this._fieldName = fieldName;
-
-        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessage());
-
-        effect(() =>
-        {
-            const serverError: string | undefined = this.errorMessage;
-            if (!!serverError)
-            {
-                this.error = serverError;
-            }
-        });
     }
 
-    protected emit(data: T): void
-    {
-        if(this.form.valid)
-        {
-            this.submit.emit(data);
-        }
+    protected registerField(@Inject(String) fieldName: string): void {
+        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessage(fieldName));
     }
 
-    protected get submit()
-    {
-        return this._submit;
-    }
-
-    protected get errorMessageSignal(): WritableSignal<string | undefined>
-    {
+    protected get errorMessageSignal(): WritableSignal<string | undefined> {
         return this._errorMessageSignal;
     }
 
-    protected get form(): FormGroup
-    {
+    protected get form(): FormGroup {
         return this._form;
     }
 
-    protected updateErrorMessage(): void
-    {
-        const field = this.form.get(this._fieldName)!;
+    protected exceptionHandler(fieldName: string) {
+        return {error: (error: any): void => {
+            let status: number = 0;
+            if(typeof error === 'object' && 'status' in error && typeof error.status === 'number')
+            {
+                status = error.status;
+            }
+            this.error = {field: fieldName, serverError: this.errorMessage(status)}
+        }}
+    }
 
-        if(field.hasError('required'))
-        {
+    protected errorMessage(status: number): string
+    {
+        return "An unknown error occurred."
+    }
+
+    protected updateErrorMessage(fieldName: string): void {
+        const field = this.form.get(fieldName)!;
+
+        if (field.hasError('required')) {
             this.errorMessageSignal.set("This field is required");
             return;
         }
 
-        if(field.hasError('serverError'))
-        {
+        if (field.hasError('serverError')) {
             this.errorMessageSignal.set(field.getError('serverError'));
             return;
         }
@@ -72,20 +59,10 @@ export abstract class AbstractLoginForm<T>  {
         this.errorMessageSignal.set(undefined);
     }
 
-    protected get fieldName(): string
-    {
-        return this._fieldName;
-    }
-
-    protected get errorMessage(): string | undefined
-    {
-        return undefined;
-    }
-
-
-    protected set error(serverError: string)
-    {
-        this.form.get(this._fieldName)!.setErrors({serverError});
+    protected set error(data: { field: string, serverError: string }) {
+        const field: string = data.field;
+        const serverError: string = data.serverError;
+        this.form.get(field)!.setErrors({serverError});
     }
 
     protected abstract onSubmit(): void;
