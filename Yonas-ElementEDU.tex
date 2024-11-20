@@ -26,31 +26,69 @@ Unser Projekt, welches wir "ElementEDU" nennen, soll DSGVO-konform sein und mith
 \begin{itemize}
     Als Webframework verwenden wir Spring Boot, da es momentan die gängigste Methode ist, ein Server-Backend zu entwickeln. Da Spring Boot dadurch besonders gut dokumentiert ist, ist es für uns möglich, bei Problemen fast immer eine Lösung zu finden. Dazu verwendet es als Programmiersprache Java, eine Sprache, die wir im Informatikunterricht bereits erlernt haben. 
 \end{itemize}
-
+\break
 \item Hibernate
 \begin{itemize}
 Hibernate ist ein Framework zur Persistierung und objektrelationalen Abbildung (ORM) von relationalen Datenbanken. Mithilfe von Hibernate ist es bspw. möglich, Plain Old Java Objects (POJOs) in einer Datenbank darzustellen und aus Datenbankeinträgen ein POJO zusammenzustellen.
 \end{itemize}
 \item JPA
 \begin{itemize}
-JPA (Jakarta Perisitence API) ist eine standartisierte API für ORM. Sie bietet eine Schnittstelle zur Kommunikation mit Hibernate, welches die ORM-Implementierung enthält.
+JPA (Jakarta Persistence API) ist eine standartisierte API für ORM. Sie bietet eine Schnittstelle zur Kommunikation mit Hibernate, welches die ORM-Implementierung enthält.
 \end{itemize}
 \item Docker
+\begin{itemize}
+Docker ist eine Software zur Containerisierung von Anwendungen. Die zu programmierende Software wird hierbei samt ihrer benötigten Abhängigkeiten in einem sog. \textit{Docker-Container} auf Kernelebene vom Rest des Systems isoliert, um ungewünschte Interaktionen zwischen mehreren Anwendungen zu vermeiden. Die Abhängigkeiten sorgen zudem dafür, dass Docker-Container auf allen Betriebssystemen ausgeführt werden können, welche Docker unterstützen.
+\end{itemize}
 \item JJWT
+\begin{itemize}
+JJWT (Java JWT) ist eine Bibliothek zur Generierung und Verifizierung von JSON Web Tokens (JWTs).
+\end{itemize}
 \item Jetbrains Annotations
+\begin{itemize}
+Eine Bibliothek von Annotationen von JetBrains für die Reduzierung von falschen Fehlern innerhalb von JetBrains IDEs.
+\end{itemize}
 \item Lombok
+\begin{itemize}
+Lombok ist eine Bibliothek von Annotationen zur Beschleunigung repetitiver Aufgaben und Reduzierung von sog. \textit{"Boilerplate-Code"}.
+\end{itemize}
 \item ClamAV
+\begin{itemize}
+Open-source Antivirussystem für die Malware-Untersuchung von eingesendeten Dateien. Benötigt den \textit{ClamAV Daemon}, um Ergebnisse zu erzielen.
+\end{itemize}
 \item zxing-core
+\begin{itemize}
+Open-source De- und Enkodierungsbibliothek für Bar- und QR-Codes.
+\end{itemize}
 \item commons-codec
+\begin{itemize}
+De- und Enkodierungsbibliothek für verschiedene kryptographische Codierungsstrategien, insbesondere Base64.
+\end{itemize}
+\break
 \item MariaDB
+\begin{itemize}
+Quelloffenes relationales Datenbankmanagementsystem. Entstand als Fork von MySQL, weswegen die beiden Systeme weitgehend miteinander kompatibel sind. MariaDB besitzt im Gegensatz zu MySQL z.B. erweiterte Speicherengines wie Aria, welche bspw. höhere Schreib- und Lesegeschwindigkeiten erreichen können und Crash-Schutzfunktionen beinhalten.
+\end{itemize}
 \item H2
 \end{itemize}
 \subsection{\textbf{TypeScript:}}
 \begin{itemize}
     \item Angular
+\begin{itemize}
+Quelloffenes, auf TypeScript basierendes Webapplikationsframefork (WAF) für die Entwicklung von Webanwendungen und -Services. Das Projekt wird unter der Führung von Google entwickelt und, im Gegensatz zu React, welches idR. eine Vielzahl von Drittanbieterbibliotheken benötigt, direkt ein umfangreiches Ökosystem zur Entwicklung von Webapplikationen bietet.
+\end{itemize}
     \item JWT Decode
+\begin{itemize}
+Dekodierungstool für JSON-Web-Tokens. JWTs sind einmalige Zeichenfolgen, um einen bestimmten Nutzer identifizieren zu können. Wird vor Allem bei der Anmeldedatenspeicherung angewendet.
+\end{itemize}
     \item rxjs
-    \item tslib
+\begin{itemize}
+RxJS (Reactive Extensions for JavaScript) ist eine Bibliothek, welche die Arbeit mit asynchronen Datenströmen wie HTTP-Anfragen oder Timern in JavaScript ermöglicht. Dies wird bspw. durch Konzepte wie Observables ("Beobachtbare" Objekte), welche Werte über die Zeit ausgeben können, und Operator erzielt, welche die von Observables ausgegebenen Daten in funktionaler Programmierweise modifizieren können.
+\end{itemize}
+\item tslib
+\begin{itemize}
+Die Bibliothek tslib enthält alle Hilfsfunktionen TypeScripts. TypeScript wird bei der Kompilierung in nativen JavaScript-Code konvertiert. Hierbei tritt jedoch oft der Fall ein, dass die Sprache redundanten JavaScript-Code generiert. Dieser Code wird durch die Auslagerung häufig vorkommender und redundanter Codeblöcke in die tslib-Bibliothek verkürzt; Der JavaScript-Code verweist in solchen Fällen nun zur tslib-Bibliothek, statt immer den im Grunde selben Code zu generieren, was kleinere Dateigrößen zur Folge hat.
+\end{itemize}
+
 
 
 
