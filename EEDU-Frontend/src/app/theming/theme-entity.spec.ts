@@ -1,7 +1,7 @@
-import { ThemeEntity } from './theme-entity';
+import { ThemeModel } from './theme-model';
 
 describe('ThemeEntity', () => {
   it('should create an instance', () => {
-    expect(new ThemeEntity(0n, "", 0, 0, 0)).toBeTruthy();
+    expect(new ThemeModel(0n, "", 0, 0, 0)).toBeTruthy();
   });
 });

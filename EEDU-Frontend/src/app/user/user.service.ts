@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
-import {ThemeEntity} from "../theming/theme-entity";
+import {ThemeModel} from "../theming/theme-model";
 import {environment} from "../../environment/environment";
 
 @Injectable({

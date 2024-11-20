@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {UserService} from "../user/user.service";
-import {ThemeEntity} from "./theme-entity";
+import {ThemeModel} from "./theme-model";
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +13,8 @@ import {ThemeEntity} from "./theme-entity";
 export class ThemeService {
     constructor(public userService: UserService) { }
 
-    public loadTheme(): ThemeEntity {
-        const theme: ThemeEntity = this.userService.getUserData.theme;
+    public loadTheme(): ThemeModel {
+        const theme: ThemeModel = this.userService.getUserData.theme;
         theme.updateDeepAngularStyles();
         console.log(theme);
         return theme;

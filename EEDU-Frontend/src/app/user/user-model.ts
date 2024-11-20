@@ -1,4 +1,4 @@
-import {ThemeEntity} from "../theming/theme-entity";
+import {ThemeModel} from "../theming/theme-model";
 import {GroupModel} from "./group/group-model";
 
 export enum UserStatus
@@ -14,12 +14,13 @@ export class UserModel
                 public readonly loginName: string,
                 public readonly status: UserStatus,
                 public readonly groups: GroupModel[],
-                public readonly theme: ThemeEntity) { }
+                public readonly theme: ThemeModel) { }
 
     public static fromObject(object: any): UserModel
     {
+        const themeModel: ThemeModel = ThemeModel.fromObject(object.theme);
         const groupModel: GroupModel[] = object.groups.map((value: any): GroupModel => GroupModel.fromObject(value));
-        return new UserModel(object.id, object.firstName, object.lastName, object.loginName, object.status, groupModel, object.theme);
+        return new UserModel(object.id, object.firstName, object.lastName, object.loginName, object.status, groupModel, themeModel);
     }
 
     public inGroup(name: string): boolean {

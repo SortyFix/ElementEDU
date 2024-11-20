@@ -7,7 +7,7 @@ import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
-import {ThemeEntity} from "../theming/theme-entity";
+import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {UserService} from "../user/user.service";
 import {UserModel} from "../user/user-model";
@@ -120,7 +120,7 @@ export class SettingsComponent implements OnInit {
      */
     public setTheme(themeId: bigint) {
         const url: string = `http://localhost:8080/user/me/theme/set`;
-        return this.http.put<ThemeEntity>(url, themeId, {
+        return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         });
     }
