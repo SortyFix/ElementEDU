@@ -52,6 +52,12 @@ VALUES (992, 0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', 
 
        (1088, 3, NULL, '', true, 4);
 
+INSERT INTO file_entity (file_name, author_id, data_directory)
+VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
+       ('ivo_hausaufgaben.exe', 2, 'root'),
+       ('informatik_themen_fr_kühnel.docx', 3, 'Informatik_Q1'),
+       ('ivo_präsentation_cover.svg', 2, 'other');
+
 --- Courses
 INSERT INTO subject_entity(name)
 VALUES ('German'),
@@ -59,23 +65,17 @@ VALUES ('German'),
        ('Informatics'),
        ('Dummy');
 
-INSERT INTO course_entity(name, subject_id, class_room_id)
-VALUES ('Q1-German', 1, 1),
-       ('5e-Math', 2, 1),
-       ('2e-Informatics', 3, 3),
-       ('Dummy', 4, 4);
+INSERT INTO course_entity(name, subject_id, repository_id, class_room_id)
+VALUES ('Q1-German', 1, 1, 1),
+       ('5e-Math', 2, 2, 1),
+       ('2e-Informatics', 3, 3, 3),
+       ('Dummy', 4, 4, 4);
 
 INSERT INTO chat_entity (time_of_creation)
 VALUES (90234802),
        (92038200),
        (33400000),
        (75839435);
-
-INSERT INTO file_entity (file_name, author_id, data_directory)
-VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
-       ('ivo_hausaufgaben.exe', 2, 'root'),
-       ('informatik_themen_fr_kühnel.docx', 3, 'Informatik_Q1'),
-       ('ivo_präsentation_cover.svg', 2, 'other');
 
 INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time, file_entity_id)
 VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 35000000, 1),
