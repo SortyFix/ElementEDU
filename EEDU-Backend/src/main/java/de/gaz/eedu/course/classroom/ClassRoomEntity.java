@@ -80,13 +80,13 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "teacher" role.
      * If the classroom already has a tutor, it will be overridden by the new tutor. This method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #setTutor(ClassRoomService, UserEntity)}, or {@link ClassRoomService#saveEntity(EntityModelRelation)} after calling this method.
+     * {@link #setTutor(ClassRoomService, UserEntity)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method.
      *
      * @param userEntity the {@link UserEntity} instance representing the tutor to be set for the classroom.
      * @return true if the tutor was successfully set, false otherwise.
      * @throws ResponseStatusException if the specified user lacks the "teacher" role.
      * @see #setTutor(ClassRoomService, UserEntity)
-     * @see ClassRoomService#saveEntity(EntityModelRelation)
+     * @see ClassRoomService#saveEntity(Iterable) 
      */
     public boolean setTutor(@NotNull UserEntity userEntity) throws ResponseStatusException
     {
@@ -123,11 +123,11 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * This method removes the tutor from the classroom. This method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #unsetTutor(ClassRoomService)}, or {@link ClassRoomService#saveEntity(EntityModelRelation)} after calling this method.
+     * {@link #unsetTutor(ClassRoomService)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method.
      *
      * @return true if the tutor was successfully unset, false otherwise.
      * @see #unsetTutor(ClassRoomService)
-     * @see ClassRoomService#saveEntity(EntityModelRelation)
+     * @see ClassRoomService#saveEntity(Iterable) 
      */
     public boolean unsetTutor()
     {
@@ -159,12 +159,12 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * Note that this method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #attachStudents(ClassRoomService, UserEntity...)}, or {@link ClassRoomService#saveEntity(EntityModelRelation)} after calling this method
+     * {@link #attachStudents(ClassRoomService, UserEntity...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
      *
      * @param user The array of {@link UserEntity} instances representing students to be attached to the classroom.
      * @return true if any students were attached, false otherwise.
      * @see #attachStudents(ClassRoomService, UserEntity...)
-     * @see ClassRoomService#saveEntity(EntityModelRelation)
+     * @see ClassRoomService#saveEntity(Iterable) 
      */
     public boolean attachStudents(@NonNull UserEntity... user)
     {
@@ -195,12 +195,12 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * Note that this method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #detachStudents(ClassRoomService, Long...)}, or {@link ClassRoomService#saveEntity(EntityModelRelation)} after calling this method
+     * {@link #detachStudents(ClassRoomService, Long...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
      *
      * @param ids The array of student IDs to be detached from the classroom.
      * @return true if any students were detached, false otherwise.
      * @see #detachStudents(ClassRoomService, Long...)
-     * @see ClassRoomService#saveEntity(EntityModelRelation)
+     * @see ClassRoomService#saveEntity(Iterable) 
      */
     public boolean detachStudents(@NonNull Long... ids)
     {

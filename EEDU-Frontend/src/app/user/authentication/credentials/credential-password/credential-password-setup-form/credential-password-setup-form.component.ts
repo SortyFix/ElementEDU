@@ -9,23 +9,21 @@ import {
     Validators
 } from "@angular/forms";
 import {AuthenticationService} from "../../../authentication.service";
-import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatError, MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatDialogClose} from "@angular/material/dialog";
+import {MatIconButton} from "@angular/material/button";
 import {CredentialMethod} from "../../../login-data/credential-method";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgIf} from "@angular/common";
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
 import {FormTitleComponent} from "../../../common/form-title/form-title.component";
-import {MatList, MatListItem} from "@angular/material/list";
 
 type inputFieldType = 'password' | 'repeatPassword';
 
 @Component({
     selector: 'app-credential-password-setup-form',
     standalone: true,
-    imports: [MatFormField, MatIcon, MatLabel, MatHint, MatInput, ReactiveFormsModule, MatIconButton, MatDialogClose, MatButton, MatError, MatSuffix, NgIf, FooterButtonsComponent, FormTitleComponent, MatList, MatListItem, NgForOf,],
+    imports: [MatFormField, MatIcon, MatLabel, MatInput, ReactiveFormsModule, MatIconButton, MatError, MatSuffix, NgIf, FooterButtonsComponent, FormTitleComponent,],
     templateUrl: './credential-password-setup-form.component.html',
     styleUrl: './credential-password-setup-form.component.scss'
 })

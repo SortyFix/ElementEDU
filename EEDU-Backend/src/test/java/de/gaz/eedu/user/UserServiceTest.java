@@ -23,8 +23,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.stream.Stream;
-
 /**
  * UserServiceTest is a concrete extension of {@link ServiceTest}, which is specifically
  * designed to run tests on {@link UserService}.
@@ -67,7 +65,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
 
     @Override
     protected @NotNull TestData<Boolean>[] deleteEntities() {
-        return new TestData[] {new TestData<>(4, true)};
+        return new TestData[] { new TestData<>(4, true) };
     }
 
     @Override

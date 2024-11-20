@@ -27,9 +27,9 @@ tasks.register("printVersion", NodeTask).configure {
 }
 
 tasks.register("installAngularCli", NpmTask).configure {
-    args = ["install", "@angular/cli@${angularVersion}", "--force"]
+    args = ["install", "@angular/cli@${angularVersion}"]
 }
 
 tasks.register("npmUpdate", NpmTask).configure {
-    args = ["update", "--force"]
+    args = ["update"]
 }

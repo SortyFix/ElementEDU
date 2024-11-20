@@ -113,6 +113,65 @@ public class VerificationService
     }
 
     /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     * <p>
+     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize} by referencing this service
+     *
+     * <pre>
+     * {@code
+     *     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+     *     @GetMapping("/secretdata") public @NotNull ResponseEntity<String> getData()
+     *     {
+     *         return "Secret Data!";
+     *     }
+     * }
+     * </pre>
+     *
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(Authentication, JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
+    {
+        return hasToken(SecurityContextHolder.getContext().getAuthentication(), jwtTokenType);
+    }
+
+    /**
+     * Checks for a specific token type.
+     * <p>
+     * This token checks whether the current {@link Authentication} is authenticated with a specific {@link JwtTokenType}.
+     * It does so by iterating over the authorities and checking for {@link VerificationAuthority} objects of that
+     * token type.
+     * <p>
+     * Users will always be granted a token with a {@link JwtTokenType} attached.
+     *
+     * @param authentication the authentication context to check for.
+     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @return whether the token is present or not.
+     *
+     * @see #hasToken(JwtTokenType...)
+     */
+    public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
+    {
+        List<JwtTokenType> tokenTypes = Arrays.asList(jwtTokenType);
+        return authentication.getAuthorities().stream().anyMatch(verification ->
+        {
+            if (verification instanceof VerificationAuthority(JwtTokenType tokenType))
+            {
+                return tokenTypes.contains(tokenType);
+            }
+            return false;
+        });
+    }
+
+    /**
      * Generates a login JWT token for a user based on their user model and login model.
      * <p>
      * This method generates a JWT token for a user that is logging in. The process varies based on whether the user

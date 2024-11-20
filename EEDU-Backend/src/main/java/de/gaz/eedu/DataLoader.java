@@ -13,9 +13,6 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
-import de.gaz.eedu.user.verification.credentials.CredentialService;
-import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
-import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,15 +25,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED)
-public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
-    private final CredentialService credentialService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
     private final ThemeService themeService;
@@ -118,7 +110,7 @@ public class DataLoader implements CommandLineRunner
         return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getName(), "administrator")).findFirst().orElseThrow();
     }
 
-    private @NotNull ThemeEntity createDefaultThemes()
+    private @NotNull ThemeEntity createDefaultTheme()
     {
         ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark", new short[]{5, 5, 5}, new short[]{10, 10, 10});
         ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight", new short[]{255, 255, 255}, new short[]{220, 220, 220});
@@ -130,17 +122,9 @@ public class DataLoader implements CommandLineRunner
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         // long line -.-
-        UserCreateModel user = new UserCreateModel("root",
-                "root",
-                "root",
-                true,
-                false,
-                UserStatus.PROSPECTIVE,
-                themeEntity.getId(),
-                new Long[] { groupEntity.getId() });
+        UserCreateModel user = new UserCreateModel("root", "root", "root", true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
         UserEntity userEntity = getUserService().createEntity(Set.of(user)).getFirst();
         userEntity.setSystemAccount(true);
-
         return getUserService().saveEntity(userEntity);
     }
 

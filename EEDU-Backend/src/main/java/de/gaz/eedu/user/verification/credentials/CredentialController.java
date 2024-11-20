@@ -41,8 +41,8 @@ import java.util.Set;
  *
  * @author Ivo
  * @see org.springframework.stereotype.Controller
- * @see org.springframework.web.bind.annotation.RestController
- * @see org.springframework.web.bind.annotation.RequestMapping
+ * @see RestController
+ * @see RequestMapping
  * @see EntityController
  * @see CredentialService
  * @see CredentialModel
@@ -56,8 +56,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @Value("${development}") private final boolean development = false;
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
-    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or (@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and #id == authentication.principal))"
-    ) @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or (@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and #id == authentication.principal))") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
     {
         return super.delete(id);
     }

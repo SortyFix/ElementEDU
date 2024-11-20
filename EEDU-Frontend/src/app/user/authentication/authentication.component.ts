@@ -4,13 +4,10 @@ import {MatIcon} from "@angular/material/icon";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {NgComponentOutlet, NgIf, NgOptimizedImage} from "@angular/common";
 import {LoginNameFormComponent} from "./login-name-form/login-name-form.component";
-import {MatProgressBar} from "@angular/material/progress-bar";
 import {SelectCredentialComponent} from "./select-credential-form/select-credential.component";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {CredentialMethod} from "./login-data/credential-method";
 import {MatAnchor} from "@angular/material/button";
-import {MatDivider} from "@angular/material/divider";
-import {MatError, MatLabel} from "@angular/material/form-field";
 import {AuthenticationService} from "./authentication.service";
 import {
     CredentialTotpVerifyFormComponent
@@ -36,37 +33,22 @@ import {
 import {
     CredentialSmsVerifyFormComponent
 } from "./credentials/credential-sms/credential-sms-verify-form/credential-sms-verify-form.component";
-import {MatListOption} from "@angular/material/list";
 import {AccessibilityService} from "../../accessibility.service";
 
 @Component({
     selector: 'app-authentication', standalone: true, imports: [
         MatCard,
-        MatProgressBar,
         MatCardHeader,
         MatCardTitle,
         MatIcon,
         MatCardContent,
         MatGridList,
         MatGridTile,
-        LoginNameFormComponent,
         MatCardFooter,
         NgOptimizedImage,
         NgIf,
-        SelectCredentialComponent,
         MatAnchor,
-        MatDivider,
-        MatError,
-        MatLabel,
-        CredentialTotpVerifyFormComponent,
-        CredentialEmailVerifyFormComponent,
-        CredentialPasswordVerifyFormComponent,
-        CredentialEmailSetupFormComponent,
-        CredentialPasswordSetupFormComponent,
-        CredentialSmsSetupFormComponent,
-        CredentialTotpSetupFormComponent,
         NgComponentOutlet,
-        MatListOption
     ], templateUrl: './authentication.component.html', styleUrl: './authentication.component.scss', animations: [
         trigger('loginNameAnimation', [
             transition(':leave', [

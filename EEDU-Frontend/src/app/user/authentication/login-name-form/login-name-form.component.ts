@@ -1,12 +1,9 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {MatCheckbox} from "@angular/material/checkbox";
-import {MatDialogClose} from "@angular/material/dialog";
-import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {NgIf} from "@angular/common";
-import {MatIcon} from "@angular/material/icon";
 import {AbstractLoginForm} from "../abstract-login-form";
 import {LoginRequest} from "../login-data/login-request";
 import {AuthenticationService} from "../authentication.service";
@@ -17,18 +14,13 @@ import {FormTitleComponent} from "../common/form-title/form-title.component";
     standalone: true,
     imports: [
         MatButton,
-        MatHint,
         MatError,
         MatCheckbox,
-        MatDialogClose,
         MatFormField,
         MatInput,
         MatLabel,
         ReactiveFormsModule,
         FormsModule,
-        NgIf,
-        MatIcon,
-        MatSuffix,
         FormTitleComponent
     ],
     templateUrl: './login-name-form.component.html',
