@@ -106,11 +106,11 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     protected long getPrincipalId()
     {
         Object principal = getAuthentication().getPrincipal();
-        if(Objects.nonNull(principal))
+        if(Objects.isNull(principal))
         {
             throw new IllegalStateException("Not logged in");
         }
-        return ((UserEntity)getAuthentication().getPrincipal()).getId();
+        return (long) principal;
     }
 
     protected boolean isAuthorized(@NotNull String authority)

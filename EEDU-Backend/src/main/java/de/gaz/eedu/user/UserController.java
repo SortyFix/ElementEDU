@@ -99,7 +99,6 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        validate(Objects.equals(getPrincipalId(), id), unauthorizedThrowable());
         return super.getData(id);
     }
 
