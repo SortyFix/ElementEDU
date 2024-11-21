@@ -267,23 +267,26 @@ public class VerificationService
         String jwtTokenTypeName = data.getParent().map(Claims::getSubject).orElseThrow();
         JwtTokenType type = JwtTokenType.valueOf(jwtTokenTypeName);
 
-        UserEntity user = authorityFactory.get(data.userId());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                data.userId(),
+                null,
+                getAuthorities(type, data.userId(), authorityFactory)
+        );
 
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(type, user);
-        return Optional.of(new UsernamePasswordAuthenticationToken(user, null, authorities)).map((auth) ->
+        return Optional.of(authenticationToken).map((auth) ->
         {
             auth.setDetails(data);
             return auth;
         });
     }
 
-    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, @NotNull UserEntity user)
+    private @Unmodifiable @NotNull Collection<? extends GrantedAuthority> getAuthorities(@NotNull JwtTokenType jwtTokenType, long userId, @NotNull AuthorityFactory factory)
     {
         return switch (jwtTokenType)
         {
             case ADVANCED_AUTHORIZATION, AUTHORIZED ->
             {
-                Collection<GrantedAuthority> authorities = new HashSet<>(user.getAuthorities());
+                Collection<GrantedAuthority> authorities = new HashSet<>(factory.get(userId));
                 authorities.add(JwtTokenType.AUTHORIZED.getAuthority());
                 if (jwtTokenType.equals(JwtTokenType.ADVANCED_AUTHORIZATION))
                 {

@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
@@ -79,9 +78,9 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PreAuthorize(
             "@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION, T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_CREATION_PENDING)"
     ) @PostMapping("/create")
-    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @NotNull @AuthenticationPrincipal UserEntity userEntity)
+    public <T> @NotNull ResponseEntity<@Nullable T> create(@NotNull @RequestBody UndefinedCredentialCreateModel model, @AuthenticationPrincipal long userId)
     {
-        return create(userEntity.getId(), model);
+        return create(userId, model);
     }
 
     @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
