@@ -128,8 +128,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
             return Optional.empty();
         }
 
-        AuthorityFactory factory = (id) -> this.getRepository().findByIdEagerly(id).map(UserEntity::getAuthorities).orElseGet(Collections::emptySet);
-        return getVerificationService().validate(token, factory);
+        return getVerificationService().validate(token, (user) -> loadEntityByIDSafe(user).getAuthorities());
     }
 
     @Override public @NotNull @Unmodifiable Set<UserEntity> findAllEntities(@NotNull Predicate<UserEntity> predicate)
