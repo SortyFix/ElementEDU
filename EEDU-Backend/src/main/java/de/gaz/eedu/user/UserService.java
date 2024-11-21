@@ -124,6 +124,6 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
             return Optional.empty();
         }
 
-        return getVerificationService().validate(token, this::loadEntityByIDSafe);
+        return getVerificationService().validate(token, (user) -> loadEntityByIDSafe(user).getAuthorities());
     }
 }
