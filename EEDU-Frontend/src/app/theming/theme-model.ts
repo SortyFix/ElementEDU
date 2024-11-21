@@ -1,5 +1,3 @@
-import Any = jasmine.Any;
-
 export class ThemeModel {
     constructor(public readonly id: bigint,
                 public readonly name: string,
