@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
-import {ThemeModel} from "../theming/theme-model";
 import {environment} from "../../environment/environment";
 
 @Injectable({
@@ -53,8 +52,7 @@ export class UserService
 
     public get hasLoaded(): boolean
     {
-        return this._loaded;
-    }
+        return this._loaded;   }
 
     public logout(): Observable<any> // TODO maybe move to login service??
     {
