@@ -143,7 +143,6 @@ public class CredentialController extends EntityController<CredentialService, Cr
         return authorizeToken(getService().verify(method, code, token), response);
     }
 
-
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_SELECTION)")
     @GetMapping("/select/{method}")
     public @NotNull ResponseEntity<String> select(@PathVariable @NotNull CredentialMethod method, @RequestAttribute @NotNull TokenData token)
