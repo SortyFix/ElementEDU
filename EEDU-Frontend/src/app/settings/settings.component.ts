@@ -7,7 +7,7 @@ import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
-import {ThemeEntity} from "../theming/theme-entity";
+import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {UserService} from "../user/user.service";
 import {UserModel} from "../user/user-model";
@@ -32,15 +32,17 @@ import {UserListComponent} from "../user/user-list/user-list.component";
 })
 export class SettingsComponent implements OnInit {
 
-    private _userList: UserModel[] = [];
+    constructor(public userService: UserService, public http: HttpClient) {
+    }
 
     public themes!: Observable<SimpleThemeEntity[]>;
     public selectedTheme!: bigint;
     public currentThemeName: string = this.getUserData().theme.name;
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
 
+    public THEME_URL: string = "api/v1/user";
 
-    constructor(private userService: UserService, public http: HttpClient) {}
+    private _userList: UserModel[] = [];
 
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
@@ -121,8 +123,8 @@ export class SettingsComponent implements OnInit {
      * @returns Observable<ThemeEntity> carrying the full newly selected theme.
      */
     public setTheme(themeId: bigint) {
-        const url: string = `http://localhost:8080/user/me/theme/set`;
-        return this.http.put<ThemeEntity>(url, themeId, {
+        const url: string = `http://localhost:8080/${this.THEME_URL}/me/theme/set`;
+        return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         });
     }
@@ -135,7 +137,7 @@ export class SettingsComponent implements OnInit {
      *          id, name format.
      */
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
-        const url: string = "http://localhost:8080/user/theme/all";
+        const url: string = `http://localhost:8080/${this.THEME_URL}/theme/all`;
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
     }
 
