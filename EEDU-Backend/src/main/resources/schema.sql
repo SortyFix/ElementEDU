@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS file_user_privileges
     file_id   BIGINT       NOT NULL,
     privilege VARCHAR(255) NOT NULL,
     FOREIGN KEY (file_id) REFERENCES file_entity (id)
-    );
+);
 
 
 CREATE TABLE IF NOT EXISTS file_entity_tags

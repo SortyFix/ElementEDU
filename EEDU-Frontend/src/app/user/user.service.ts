@@ -52,8 +52,7 @@ export class UserService
 
     public get hasLoaded(): boolean
     {
-        return this._loaded;
-    }
+        return this._loaded;   }
 
     public logout(): Observable<any> // TODO maybe move to login service??
     {

@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.verification.credentials;
 
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
@@ -143,7 +142,6 @@ public class CredentialController extends EntityController<CredentialService, Cr
 
         return authorizeToken(getService().verify(method, code, token), response);
     }
-
 
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).CREDENTIAL_SELECTION)")
     @GetMapping("/select/{method}")

@@ -20,9 +20,9 @@ import java.util.Set;
 
     static {
         PROTECTED_PRIVILEGES = new HashSet<>(Set.of(
-                "USER_GET",
                 "USER_DELETE",
                 "USER_CREATE",
+                "USER_OTHERS_GET",
 
                 "USER_GROUP_ATTACH",
                 "USER_GROUP_DETACH",

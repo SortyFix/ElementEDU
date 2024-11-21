@@ -99,13 +99,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
+    @PreAuthorize("hasAuthority('USER_OTHERS_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
-        // I must override the default behavior, because this method is used heavily used. It has got its own
-        // sql query UserRepository#findByIdEagerly(Long)
-        Optional<UserModel> user = getService().getRepository().findByIdEagerly(id).map(getService().toModel());
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return super.getData(id);
     }
 
     /**
@@ -120,9 +117,9 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
-    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long userId)
+    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long user)
     {
-        return getData(userId);
+        return getData(user);
     }
 
     /**
