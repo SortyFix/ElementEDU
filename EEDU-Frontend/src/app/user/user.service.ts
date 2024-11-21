@@ -47,7 +47,9 @@ export class UserService
         {
             throw new Error("User is not logged in, or user data is corrupt.");
         }
-        return UserModel.fromObject(JSON.parse(userData));
+        const userModel = UserModel.fromObject(JSON.parse(userData));
+        userModel.theme.updateDeepAngularStyles();
+        return userModel;
     }
 
     public get hasLoaded(): boolean
