@@ -7,9 +7,7 @@ export class ThemeModel {
                 public readonly widgetColor_r: number,
                 public readonly widgetColor_g: number,
                 public readonly widgetColor_b: number)
-    {
-        this.updateDeepAngularStyles();
-    }
+    { }
 
     public static fromObject(obj: any): ThemeModel
     {
