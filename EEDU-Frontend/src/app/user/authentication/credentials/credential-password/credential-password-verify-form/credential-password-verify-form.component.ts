@@ -3,8 +3,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import {MatError, MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatIcon} from "@angular/material/icon";
 import {MatInput} from "@angular/material/input";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatDialogClose} from "@angular/material/dialog";
+import {MatIconButton} from "@angular/material/button";
 import {AbstractCredentialVerifyCode} from "../../abstract-credential-verify-code";
 import {FormTitleComponent} from "../../../common/form-title/form-title.component";
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
@@ -16,8 +15,6 @@ import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-butt
         MatIcon,
         MatInput,
         MatIconButton,
-        MatButton,
-        MatDialogClose,
         ReactiveFormsModule,
         MatLabel,
         MatSuffix,

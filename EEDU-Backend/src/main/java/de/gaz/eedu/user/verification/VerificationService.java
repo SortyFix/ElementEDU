@@ -104,9 +104,9 @@ public class VerificationService
         List<JwtTokenType> tokenTypes = Arrays.asList(jwtTokenType);
         return authentication.getAuthorities().stream().anyMatch(verification ->
         {
-            if (verification instanceof VerificationAuthority verificationAuthority)
+            if (verification instanceof VerificationAuthority(JwtTokenType tokenType))
             {
-                return tokenTypes.contains(verificationAuthority.jwtTokenType());
+                return tokenTypes.contains(tokenType);
             }
             return false;
         });

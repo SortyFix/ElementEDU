@@ -1,5 +1,5 @@
 import {ThemeEntity} from "../theming/theme-entity";
-import {GroupModel} from "./group-model";
+import {GroupModel} from "./group/group-model";
 
 export enum UserStatus
 {

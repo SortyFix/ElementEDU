@@ -24,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
             @AuthenticationPrincipal Long id, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
     {
         return userService.loadEntityById(id).map(userEntity ->
-                ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
+                                  ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
                           .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
 }

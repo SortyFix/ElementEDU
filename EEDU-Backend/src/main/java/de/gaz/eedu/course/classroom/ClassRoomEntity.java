@@ -123,7 +123,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * This method removes the tutor from the classroom. This method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #unsetTutor(ClassRoomService)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method.
+     * {@link #unsetTutor(ClassRoomService)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method.
      *
      * @return true if the tutor was successfully unset, false otherwise.
      * @see #unsetTutor(ClassRoomService)
@@ -159,7 +159,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * Note that this method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #attachStudents(ClassRoomService, UserEntity...)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method
+     * {@link #attachStudents(ClassRoomService, UserEntity...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
      *
      * @param user The array of {@link UserEntity} instances representing students to be attached to the classroom.
      * @return true if any students were attached, false otherwise.
@@ -195,12 +195,12 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      * <p>
      * Note that this method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #detachStudents(ClassRoomService, Long...)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method
+     * {@link #detachStudents(ClassRoomService, Long...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
      *
      * @param ids The array of student IDs to be detached from the classroom.
      * @return true if any students were detached, false otherwise.
      * @see #detachStudents(ClassRoomService, Long...)
-     * @see ClassRoomService#saveEntity(Iterable) 
+     * @see ClassRoomService#saveEntity(Iterable)
      */
     public boolean detachStudents(@NonNull Long... ids)
     {

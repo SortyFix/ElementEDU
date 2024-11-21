@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
-import {environment} from "../../environments/environment";
+import {environment} from "../../environment/environment";
 
 @Injectable({
     providedIn: 'root'
@@ -62,7 +62,7 @@ export class UserService
             return of();
         }
 
-        const url = `${this.BACKEND_URL}/user/logout`;
+        const url: string = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
             next: (): void => localStorage.removeItem("userData")
         }));

@@ -16,7 +16,6 @@ import java.util.Set;
 
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity") public class PrivilegeEntity implements EntityModelRelation<PrivilegeModel>
 {
-
     private final static Set<String> PROTECTED_PRIVILEGES;
 
     static {
@@ -24,7 +23,6 @@ import java.util.Set;
                 "USER_GET",
                 "USER_DELETE",
                 "USER_CREATE",
-                "USER_OTHERS_GET",
 
                 "USER_GROUP_ATTACH",
                 "USER_GROUP_DETACH",

@@ -37,25 +37,20 @@ VALUES ('READ'),
        ('DUMMY');
 
 /* 0 = PASSWORD, 1 = EMAIL, 2 = SMS, 3 = TOTP */
-INSERT INTO credential_entity(id, method, data, secret, allowed_methods, enabled, user_id)
-VALUES (992, 0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', '', NULL, true, 1),
-       (993, 1, 'mustermann@example.com', '', NULL, true, 1),
+INSERT INTO credential_entity(method, data, secret, enabled, user_id)
+VALUES (0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', '', true, 1),
+       (1, 'mustermann@example.com', '', true, 1),
 
-       (1023, 0, '$2y$10$4urnpOegHUXoQaQakLcKP.iNZxrGeaKhS.55FlAI1eJqkLeGqF.iO', '', NULL, true, 2),
-       (1024, 1, 'mustermann@example.com', '', NULL, false, 2),
-       (1025, 2, '555 5555555', '', NULL, true, 2),
+       (0, '$2y$10$4urnpOegHUXoQaQakLcKP.iNZxrGeaKhS.55FlAI1eJqkLeGqF.iO', '', true, 2),
+       (1, 'mustermann@example.com', '', false, 2),
+       (2, '555 5555555', '', true, 2),
 
-       (1054, 0, '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', '', NULL, true, 3),
-       (1056, 2, '555 5555555', '', NULL, true, 1),
-       (1057, 3, NULL, '', NULL, false, 3),
+       (0, '$2y$10$eHQ64sFwMpF0Gz4Fc2aKVuRoND6v78AAx/Oplh.uVBYLIGATUnBQq', '', true, 3),
+       (1, 'mustermann@examle.com', '', true, 3),
+       (2, '555 5555555', '', true, 3),
+       (3, NULL, '', false, 3),
 
-       (1088, 3, NULL, '', NULL, true, 4);
-
-INSERT INTO chat_entity (time_of_creation)
-VALUES (90234802),
-       (92038200),
-       (33400000),
-       (75839435);
+       (3, NULL, '', true, 4);
 
 INSERT INTO file_entity (file_name, author_id, data_directory)
 VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
@@ -63,12 +58,7 @@ VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
        ('informatik_themen_fr_kühnel.docx', 3, 'Informatik_Q1'),
        ('ivo_präsentation_cover.svg', 2, 'other');
 
-INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time, file_entity_id)
-VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 35000000, 1),
-       (2, 0, 'ich mag kein erdkunde', 239482094, 35000000, 2),
-       (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000, 3),
-       (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000, 4);
-
+--- Courses
 INSERT INTO subject_entity(name)
 VALUES ('German'),
        ('Mathematics'),
@@ -80,6 +70,18 @@ VALUES ('Q1-German', 1, 1, 1),
        ('5e-Math', 2, 2, 1),
        ('2e-Informatics', 3, 3, 3),
        ('Dummy', 4, 4, 4);
+
+INSERT INTO chat_entity (time_of_creation)
+VALUES (90234802),
+       (92038200),
+       (33400000),
+       (75839435);
+
+INSERT INTO illness_notification_entity (user_id, status, reason, time_stamp, expiration_time, file_entity_id)
+VALUES (1, 1, 'meine kakerlake hat fieber, kann nich kommen', 293948232, 35000000, 1),
+       (2, 0, 'ich mag kein erdkunde', 239482094, 35000000, 2),
+       (3, 2, 'ich schwöre wenn ich jetzt keine antwort vom sekreteriat bekomm dann...', 23837348, 35000000, 3),
+       (4, 0, 'ich habe 45 grad fieber', 87293933, 35000000, 4);
 
 MERGE INTO chat_entity_messages (chat_id, message_id) VALUES (1, 1), (2, 2), (3, 3), (4, 4);
 

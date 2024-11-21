@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
 
 @Converter(autoApply = true)

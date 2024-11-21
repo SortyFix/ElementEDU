@@ -39,6 +39,7 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.name(), result.name());
+            Assertions.assertEquals(expect.privileges().length, result.privileges().length);
         });
     }
 
