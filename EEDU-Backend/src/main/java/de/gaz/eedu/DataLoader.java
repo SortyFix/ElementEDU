@@ -13,6 +13,9 @@ import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
+import de.gaz.eedu.user.verification.credentials.CredentialService;
+import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
+import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,12 +28,18 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
     private final GroupService groupService;
     private final PrivilegeService privilegeService;
+    private final CredentialService credentialService;
     private final ThemeService themeService;
 
     private final Environment environment;
@@ -62,7 +71,7 @@ import java.security.SecureRandom;
 
         List<PrivilegeEntity> privilegeEntity = createDefaultPrivileges();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(createDefaultThemes(), groupEntity);
+        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
         setPassword(userEntity, randomPassword);
 
         log.info("A default user has been created");

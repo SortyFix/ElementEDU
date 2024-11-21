@@ -43,35 +43,6 @@ import java.util.Set;
         ));
     }
 
-    private final static Set<String> PROTECTED_PRIVILEGES;
-
-    static {
-        PROTECTED_PRIVILEGES = new HashSet<>(Set.of(
-                "USER_GET",
-                "USER_DELETE",
-                "USER_CREATE",
-                "USER_OTHERS_GET",
-
-                "USER_GROUP_ATTACH",
-                "USER_GROUP_DETACH",
-
-                "GROUP_GET",
-                "GROUP_CREATE",
-                "GROUP_DELETE",
-
-                "GROUP_PRIVILEGE_GRANT",
-                "GROUP_PRIVILEGE_REVOKE",
-
-                "PRIVILEGE_GET",
-                "PRIVILEGE_CREATE",
-                "PRIVILEGE_DELETE",
-
-                "USER_CREDENTIAL_OTHERS_CREATE",
-                "USER_CREDENTIAL_OTHERS_DELETE",
-                "USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY"
-        ));
-    }
-
     public static Set<String> getProtectedPrivileges()
     {
         return PROTECTED_PRIVILEGES;
