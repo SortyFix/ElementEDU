@@ -115,11 +115,9 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
-    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal UserEntity user)
+    @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long user)
     {
-        // because of lazy loading the users needs to be loaded by the service in order to provide an active session
-        // we need that because theme entity is loaded lazily and therefore cannot be loaded otherwise
-        return ResponseEntity.ok(getService().loadByIdSafe(user.getId()));
+        return getData(user);
     }
 
     /**
@@ -159,10 +157,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return a {@link ResponseEntity} containing a success message upon successful login.
      */
     @PostMapping("/login/advanced")
-    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal UserEntity userID)
+    public @NotNull ResponseEntity<String> requestAdvancedLogin(@AuthenticationPrincipal long userID)
     {
         log.info("The server has recognized an incoming advanced login request for {}.", userID);
-        return getService().requestLogin(new AdvancedUserLoginModel(userID.getId())).map((token) ->
+        return getService().requestLogin(new AdvancedUserLoginModel(userID)).map((token) ->
         {
             String jwt = token.jwt();
             return ResponseEntity.ok(jwt);
