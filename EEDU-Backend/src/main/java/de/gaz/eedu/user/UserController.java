@@ -99,7 +99,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("hasAuthority('USER_GET') or #id == authentication.principal")
+    @PreAuthorize("hasAuthority('USER_OTHERS_GET') or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
         // I must override the default behavior, because this method is used heavily used. It has got its own
