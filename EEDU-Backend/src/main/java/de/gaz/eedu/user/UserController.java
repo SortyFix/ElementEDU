@@ -199,6 +199,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
         log.info("User {} has been logged out.", user);
     }
 
+    // TODO: Revert to previous permissions
     @PermitAll @GetMapping("/all") @Override
     public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
