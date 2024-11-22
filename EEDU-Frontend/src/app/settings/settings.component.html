@@ -14,8 +14,15 @@
 </mat-form-field> <br>
 <button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
 
-@if (this.userList.length != 0) {
-    <div style="background-color: #eeeefa; padding: 20px">
-        <app-user-list [userList]="userList"></app-user-list>
-    </div>
-}
+<h3 [style.color]="user.theme.getTextColor('background', false)">User management</h3>
+<p [style.color]="user.theme.getTextColor('background', false)">
+    Manage specific user privileges and states and view the information of all users.
+</p>
+
+<p>
+    @if (this.userList.length != 0) {
+        <div class="background">
+            <app-user-list [userList]="userList"></app-user-list>
+        </div>
+    }
+</p>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -14,8 +14,8 @@ import {UserModel} from "../user/user-model";
 import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
+    selector: 'app-settings',
+    standalone: true,
     imports: [
         MatFormField,
         ReactiveFormsModule,
@@ -27,12 +27,13 @@ import {UserListComponent} from "../user/user-list/user-list.component";
         MatButton,
         UserListComponent
     ],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss'
+    templateUrl: './settings.component.html',
+    styleUrl: './settings.component.scss',
+    encapsulation: ViewEncapsulation.None
 })
 
 export class SettingsComponent implements OnInit {
-    constructor(public http: HttpClient, public userService: UserService) {
+    constructor(public userService: UserService, public http: HttpClient) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
@@ -51,6 +52,8 @@ export class SettingsComponent implements OnInit {
                 this.selectedTheme = selectedTheme.id;
             }
         });
+
+        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this._userList = users });
     }
 
     /**
@@ -139,7 +142,7 @@ export class SettingsComponent implements OnInit {
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
     }
 
-    get userList(): UserModel[] {
+    protected get userList(): UserModel[] {
         return this._userList;
     }
 }

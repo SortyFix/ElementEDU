@@ -19,6 +19,7 @@ import {NgForOf, NgIf, NgStyle} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {ThemeService} from "../../theming/theme.service";
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-user-list',
@@ -59,7 +60,7 @@ export class UserListComponent {
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
     private _selected: Set<string> = new Set();
 
-    constructor(protected accessibilityService: AccessibilityService, protected themeService: ThemeService) {}
+    constructor(protected accessibilityService: AccessibilityService, public userService: UserService, protected themeService: ThemeService) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -147,5 +148,9 @@ export class UserListComponent {
 
     private sorted(users: UserModel[]): UserModel[] {
         return users.sort((a: UserModel, b: UserModel): number => a.lastName.localeCompare(b.lastName));
+    }
+
+    public get getTheme() {
+        return this.userService.getUserData.theme;
     }
 }

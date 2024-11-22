@@ -8,6 +8,7 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
+import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -23,6 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Contains methods to interact with the {@link UserService} using a http request.
@@ -189,12 +191,17 @@ public class UserController extends EntityController<UserService, UserModel, Use
         cookie.setHttpOnly(true);
         cookie.setSecure(!development);
         response.addCookie(cookie);
-
         if (Objects.isNull(user))
         {
             log.info("An unidentified user has been logged out, likely due to token expiration.");
             return;
         }
         log.info("User {} has been logged out.", user);
+    }
+
+    @PermitAll @GetMapping("/all") @Override
+    public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
+    {
+        return super.fetchAll();
     }
 }

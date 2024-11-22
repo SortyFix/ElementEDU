@@ -3,6 +3,7 @@
 :root {
     --floating-label-color: black;
     --background-color: black;
+    --widget-color: black;
 }
 
 html, body {
@@ -29,6 +30,54 @@ html, body {
 
 .mat-mdc-select-panel {
     background-color: var(--background-color) !important;
+}
+
+.mdc-label {
+    color: var(--floating-label-color) !important;
+}
+
+.mat-expansion-panel-header{
+    background-color: var(--background-color) !important;
+}
+
+// symbol color
+.mat-ligature-font {
+    color: var(--floating-label-color) !important;
+}
+
+// mat-checkbox color
+.mdc-checkbox__background {
+    border-color: var(--floating-label-color) !important;
+}
+
+// tag font color
+.mdc-evolution-chip__text-label {
+    color: var(--floating-label-color) !important;
+}
+
+.mat-expansion-panel-body {
+    color: var(--floating-label-color) !important;
+}
+
+// tag background color
+.mat-mdc-standard-chip {
+    --mdc-chip-elevated-container-color: var(--widget-color) !important;
+}
+
+.mat-expansion-panel-content {
+    background-color: var(--background-color) !important;
+}
+
+.mat-expansion-panel {
+    background: var(--background-color) !important;
+}
+
+.mdc-text-field__input {
+    color: var(--floating-label-color) !important;
+}
+
+.mat-input-placeholder {
+    color: var(--floating-label-color) !important;
 }
 
 // This is a temporary solution
