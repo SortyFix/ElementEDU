@@ -20,6 +20,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AbstractComponent } from './abstract/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {Authentication} from "./user/authentication/authentication.component";
+import {FullCalendarModule} from "@fullcalendar/angular";
 
 @NgModule({
     declarations: [
@@ -51,7 +52,8 @@ import {Authentication} from "./user/authentication/authentication.component";
         LoadComponent,
         NgOptimizedImage,
         MatSidenavModule,
-        Authentication
+        Authentication,
+        FullCalendarModule
     ],
     providers: [
         provideHttpClient(withFetch())

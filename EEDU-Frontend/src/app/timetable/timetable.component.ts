@@ -1,44 +1,54 @@
 import {Component, OnInit} from '@angular/core';
-import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
-import {
-    MatCell,
-    MatCellDef,
-    MatColumnDef,
-    MatHeaderCell,
-    MatHeaderCellDef,
-    MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
-    MatTable
-} from "@angular/material/table";
 import {CourseService} from "../user/courses/course.service";
+import {CourseModel} from "../user/courses/models/course-model";
+import {CalendarOptions, EventInput} from "@fullcalendar/core";
+import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
+import {FullCalendarModule} from "@fullcalendar/angular";
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
     imports: [
-        MatTable,
-        MatColumnDef,
-        MatHeaderCell,
-        MatCell,
-        MatCellDef,
-        MatHeaderCellDef,
-        MatHeaderRow,
-        MatRow,
-        MatRowDef,
-        MatHeaderRowDef
+        FullCalendarModule
     ],
   templateUrl: './timetable.component.html',
   styleUrl: './timetable.component.scss'
 })
 export class TimetableComponent implements OnInit{
-    displayedColumns: string[] = ['time', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-    timeSlots = ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'];
+
+    events: EventInput[] = [];
+    calendarOptions: CalendarOptions = {
+        plugins: [dayGridPlugin],
+        initialView: 'dayGridMonth',
+        events: this.events,
+    };
 
     constructor(private courseService: CourseService) {}
 
     ngOnInit(): void {
-        this.courseService.fetchCourses().subscribe((value) => {
-            console.log(value);
+        this.courseService.fetchCourses().subscribe((value: CourseModel[]) => {
+            value.forEach(v => {
+                v.appointments.forEach(a => {
+                    this.toEvents(v.name, a).forEach(g => {
+                        this.events.push(g);
+                    })
+                })
+            })
         })
+    }
+
+    private toEvents(title: string, appointment: ScheduledAppointmentModel): EventInput[]
+    {
+        const eventdd: EventInput[] = [];
+        const startDate = new Date(Number(appointment.start));
+        for (let i = 0; i < 52; i++) { // Assume 1 year of weekly repetition
+            eventdd.push({
+                title: title,
+                start: new Date(startDate.getTime() + i * Number(appointment.period)),
+                end: new Date(startDate.getTime() + i * Number(appointment.period) + Number(appointment.duration)),
+            });
+        }
+        return eventdd;
     }
 }

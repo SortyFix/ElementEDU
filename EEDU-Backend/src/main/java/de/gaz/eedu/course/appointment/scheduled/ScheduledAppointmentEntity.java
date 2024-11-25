@@ -33,7 +33,7 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
 
     @Override public @NotNull ScheduledAppointmentModel toModel()
     {
-        return new ScheduledAppointmentModel(getId(), getTimeStamp().getEpochSecond(), getPeriodSeconds());
+        return new ScheduledAppointmentModel(getId(), getTimeStamp().getEpochSecond(), getDuration().getSeconds(), getPeriodSeconds());
     }
 
     public boolean inPeriod(@NotNull Instant timeStamp)
