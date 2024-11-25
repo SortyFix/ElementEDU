@@ -7,9 +7,7 @@ export class ThemeModel {
                 public readonly widgetColor_r: number,
                 public readonly widgetColor_g: number,
                 public readonly widgetColor_b: number)
-    {
-        this.updateDeepAngularStyles();
-    }
+    { }
 
     public static fromObject(obj: any): ThemeModel
     {
@@ -104,5 +102,6 @@ export class ThemeModel {
     {
         document.documentElement.style.setProperty('--floating-label-color', this.getTextColor("background", false));
         document.documentElement.style.setProperty('--background-color', this.getBackgroundColor);
+        document.documentElement.style.setProperty('--widget-color', this.getWidgetColor);
     }
 }

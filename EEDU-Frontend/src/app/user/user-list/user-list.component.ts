@@ -83,7 +83,7 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService, protected dialog: MatDialog) {}
+    constructor(protected accessibilityService: AccessibilityService, public userService: UserService, protected dialog: MatDialog) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -210,5 +210,9 @@ export class UserListComponent {
     protected set editGroup(user: UserModel | undefined)
     {
         this._editGroup = user?.loginName;
+    }
+
+    public get getTheme() {
+        return this.userService.getUserData.theme;
     }
 }

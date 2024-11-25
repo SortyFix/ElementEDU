@@ -2,19 +2,18 @@
     <mat-label>User Search</mat-label>
     <input name="search"
            type="search"
-           placeholder="Filter..."
            [(ngModel)]="filteredString"
            (input)="unselectAll()"
            autofocus matInput>
 </mat-form-field>
 <mat-accordion>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <mat-checkbox [checked]="isSelected('all')"
-                      [indeterminate]="partiallySelected"
-                      (change)="toggle('all')"
-                      *ngIf="users.length != 0">
-            Select All
-        </mat-checkbox>
+    <mat-checkbox [checked]="isSelected('all')"
+                  [indeterminate]="partiallySelected"
+                  (change)="toggle('all')"
+                  *ngIf="users.length != 0"
+                  class="text-color"
+    >Select All
+    </mat-checkbox>
 
         <button mat-button  style="text-align: right;">
             Filter
@@ -30,8 +29,9 @@
                         (click)="$event.stopPropagation()"
                         (keydown)="handleKeyDown($event, user)">
                     </mat-checkbox>
-                    <mat-icon class="icon">{{ icon(user) }}</mat-icon>
-                    {{ user.loginName }}
+                    <mat-icon class="icon">{{ icon(user) }}</mat-icon><a [style.color]="getTheme.getTextColor('background', false)">
+                        {{ user.loginName }}
+                    </a>
                 </a>
 
             </mat-panel-title>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -14,8 +14,8 @@ import {UserModel} from "../user/user-model";
 import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
+    selector: 'app-settings',
+    standalone: true,
     imports: [
         UserListComponent,
         MatFormField,
@@ -27,8 +27,9 @@ import {UserListComponent} from "../user/user-list/user-list.component";
         NgForOf,
         MatButton
     ],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss'
+    templateUrl: './settings.component.html',
+    styleUrl: './settings.component.scss',
+    encapsulation: ViewEncapsulation.None
 })
 export class SettingsComponent implements OnInit {
 
