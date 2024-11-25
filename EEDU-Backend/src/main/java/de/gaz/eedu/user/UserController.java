@@ -8,6 +8,7 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
+import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -192,7 +193,6 @@ public class UserController extends EntityController<UserService, UserModel, Use
         cookie.setHttpOnly(true);
         cookie.setSecure(!development);
         response.addCookie(cookie);
-
         if (Objects.isNull(user))
         {
             log.info("An unidentified user has been logged out, likely due to token expiration.");

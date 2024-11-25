@@ -4,10 +4,12 @@ import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.TestData;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 @Getter(AccessLevel.PROTECTED)
 public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
@@ -17,7 +19,7 @@ public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, The
     @Override protected @NotNull Eval<ThemeCreateModel, ThemeModel> successEval()
     {
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("test", new short[]{1, 2, 3}, new short[]{4, 5, 6});
-        ThemeModel themeModel = new ThemeModel(5L, "test", 1, 2, 3, 4, 5, 6);
+        ThemeModel themeModel = new ThemeModel(7L, "test", 1, 2, 3, 4, 5, 6);
         return Eval.eval(themeCreateModel, themeModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());

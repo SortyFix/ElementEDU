@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS post_tags
 INSERT INTO group_entity (name) VALUES ('teacher'), ('student'), ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
-VALUES ('dark', 30, 30, 30, 50, 50, 50);
+VALUES ('dark', 30, 30, 30, 20, 20, 20);
 
 INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- PRESENT
