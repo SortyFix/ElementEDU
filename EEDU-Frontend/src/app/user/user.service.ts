@@ -65,8 +65,17 @@ export class UserService
 
         const url: string = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
-            next: () => localStorage.removeItem("userData")
+            next: () => {
+                localStorage.removeItem("userData");
+                this.resetDeepAngularStyles();
+            }
         }));
+    }
+
+    public resetDeepAngularStyles(): void{
+        document.documentElement.style.setProperty('--floating-label-color', 'rgb(0, 0, 0)');
+        document.documentElement.style.setProperty('--background-color', 'rgb(255, 255, 255)');
+        document.documentElement.style.setProperty('--widget-color', 'rgb(230, 230, 230)');
     }
 
     public get isLoggedIn(): boolean
