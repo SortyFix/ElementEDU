@@ -73,7 +73,7 @@ export class UserService
     }
 
     public resetDeepAngularStyles(): void{
-        document.documentElement.style.setProperty('--floating-label-color', 'rgb(0, 0, 0)');
+        document.documentElement.style.setProperty('--text-color', 'rgb(0, 0, 0)');
         document.documentElement.style.setProperty('--background-color', 'rgb(255, 255, 255)');
         document.documentElement.style.setProperty('--widget-color', 'rgb(230, 230, 230)');
     }
