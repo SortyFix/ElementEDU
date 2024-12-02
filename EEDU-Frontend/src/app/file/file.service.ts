@@ -11,6 +11,21 @@ export class FileService {
 
     URL_PREFIX: string = "/api/v1/file";
 
+    public async uploadFile(url: string, files: File[]) {
+        const formData = new FormData();
+        files.forEach((file) => formData.append('file[]', file));
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if(!response.ok)
+        {
+            throw new Error('File upload failed');
+        }
+    }
+
     public async fetchFile(id: bigint) {
         const response: Response = await fetch(`${(this.URL_PREFIX)}/get/${id}`, {
             method: 'GET',
@@ -55,5 +70,4 @@ export class FileService {
 
         URL.revokeObjectURL(url);
     }
-
 }
