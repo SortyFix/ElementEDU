@@ -11,7 +11,7 @@ export class FileService {
 
     URL_PREFIX: string = "/api/v1/file";
 
-    public async uploadFile(url: string, files: File[]) {
+    public async uploadFile(url: string, files: File[]): Promise<void> {
         const formData = new FormData();
         files.forEach((file) => formData.append('file[]', file));
 
@@ -26,7 +26,8 @@ export class FileService {
         }
     }
 
-    public async fetchFile(id: bigint) {
+    public async fetchFile(id: bigint): Promise<Uint8Array> {
+        console.log("Fetching file binaries...");
         const response: Response = await fetch(`${(this.URL_PREFIX)}/get/${id}`, {
             method: 'GET',
             headers: {
@@ -38,18 +39,20 @@ export class FileService {
             console.error(`Failed to fetch resource with id ${id}`);
         }
 
-        const arrayBuffer = await response.arrayBuffer();
+        const arrayBuffer: ArrayBuffer = await response.arrayBuffer();
         return new Uint8Array(arrayBuffer);
     }
 
     public getFileInfo(id: bigint): Observable<FileModel> {
+        console.log("Fetching file info...");
         const url: string = `${this.URL_PREFIX}/get/info/${id}`
         return this.http.get<FileModel>(url, {withCredentials: true});
     }
 
-    public downloadFile(id: bigint) {
+    public downloadFile(id: bigint): void {
         this.getFileInfo(id).subscribe({
             next: (fileModel) => {
+                console.log("File info recieved.")
                 this.fetchFile(id).then((byteArray) => {
                     this.triggerDownload(byteArray, fileModel.fileName);
                 })
@@ -57,17 +60,18 @@ export class FileService {
         })
     }
 
-    public triggerDownload(byteArray: Uint8Array, fileName: string)
+    public triggerDownload(byteArray: Uint8Array, fileName: string): void
     {
+        console.log("Creating blob...");
         const blob = new Blob([byteArray]);
         const url: string = URL.createObjectURL(blob);
-
         const anchor: HTMLAnchorElement = document.createElement('a');
 
         anchor.href = url;
         anchor.download = fileName;
         anchor.click();
 
+        console.log("Anchor element executed. Revoking URL...")
         URL.revokeObjectURL(url);
     }
 }
