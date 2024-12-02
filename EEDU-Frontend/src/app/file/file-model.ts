@@ -6,7 +6,5 @@ export class FileModel {
         public readonly dataDirectory: string,
         public readonly privileges: string[],
         public readonly tags: string[]
-    ) {
-    }
-
+    ) { }
 }
