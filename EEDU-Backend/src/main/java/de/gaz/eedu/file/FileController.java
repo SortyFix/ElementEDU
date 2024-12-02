@@ -35,6 +35,18 @@ import java.util.stream.Collectors;
         return HttpStatus.UNAUTHORIZED;
     }
 
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/info/{fileId}") public ResponseEntity<FileModel> getFileInfoById(
+            @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
+    {
+        Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
+        if(fileService.getRepository().findById(fileId).map(access).orElse(false))
+        {
+            return ResponseEntity.ok(fileService.loadEntityById(fileId).toModel());
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}") public ResponseEntity<ByteArrayResource> downloadFileWithID(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId) throws IOException
     {

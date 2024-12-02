@@ -88,6 +88,11 @@ import java.util.*;
         return zipper.zipBatch(files);
     }
 
+    public @NotNull FileEntity loadEntityById(@NotNull Long id)
+    {
+        return fileRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
     public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
     {
         return fileRepository.findFileEntitiesByAuthorId(id);
