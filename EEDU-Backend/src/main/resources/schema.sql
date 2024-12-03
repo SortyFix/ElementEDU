@@ -290,7 +290,7 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
 
 INSERT INTO scheduled_appointment_entity (course_id, time_stamp, duration, period) VALUES
         (1, 1731779748, 90, 7),
-        (1, 1731778748, 4000, 6);
+        (2, 1731778748, 4000, 6);
 
 INSERT INTO user_groups (group_id, user_id) VALUES
        (1, 5),   -- Sara Müller (teacher)
