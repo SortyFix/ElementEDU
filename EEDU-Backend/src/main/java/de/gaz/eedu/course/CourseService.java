@@ -71,16 +71,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     public @NotNull CourseModel[] getCourses(long user)
     {
         UserEntity userEntity = getUserRepository().findById(user).orElseThrow();
-
-        return userEntity.getCourses().stream().map(course -> {
-            return course.toModel();
-        }).toArray(CourseModel[]::new);
-  /*      System.out.println("----");
-*//*        userEntity.getCourses().stream().forEach(course -> {
-            System.out.println(course.getId() + " " + course.getName());
-            System.out.println(course.getScheduledAppointments());
-        });
-        return new CourseModel[0];*/
+        return userEntity.getCourses().stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
     }
 
     @Contract(pure = true, value = "_, _ -> _")
