@@ -62,21 +62,6 @@ export class TimetableComponent implements OnInit{
         });
     }
 
-    private toEvents(title: string, appointment: ScheduledAppointmentModel): EventInput
-    {
-        const rootDate = new Date(Number(appointment.start) * 1000);
-        const periodInMinutes = Number(appointment.period) / 60;
-
-        return {
-            title: title,
-            start: rootDate.toISOString(),
-            end: new Date(rootDate.getTime() + (Number(appointment.duration) * 1000)).toISOString(),
-            rrule: {
-                freq: RRule.MINUTELY, interval: periodInMinutes, dtstart: rootDate.toISOString(), count: 52,
-            },
-        };
-    }
-
     protected get calendarOptions(): CalendarOptions {
         return this._calendarOptions;
     }
