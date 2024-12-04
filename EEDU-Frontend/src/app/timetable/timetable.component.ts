@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {CourseModel} from "../user/courses/models/course-model";
-import {Calendar, CalendarOptions, EventInput} from "@fullcalendar/core";
+import {Calendar, CalendarOptions, EventMountArg} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {UserService} from "../user/user.service";
@@ -22,13 +22,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 export class TimetableComponent implements OnInit{
 
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
-    private _calendarOptions: CalendarOptions = {
+    private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, rrulePlugin],
         initialView: 'dayGridMonth',
         eventTimeFormat: {
             hour: '2-digit', minute: '2-digit', hour12: false
         },
-        eventDidMount: (info) => {
+        eventDidMount: (info: EventMountArg): void => {
             info.el.style.color = this.userService.getUserData.theme.getTextColor('widget', false);
         },
         events: []
