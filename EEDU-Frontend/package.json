@@ -24,6 +24,7 @@
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/rrule": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "angularx-qrcode": "^18.0.1",
     "jwt-decode": "^4.0.0",
     "rrule": "^2.8.1",

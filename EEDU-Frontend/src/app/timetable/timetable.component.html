@@ -1,4 +1,4 @@
-<full-calendar #calendar [options]="calendarOptions">
+<full-calendar #calendar [options]="calendarOptions" mat-card-title>
     <ng-template #eventContent let-arg>
         <span>{{arg.timeText}} {{arg.event.title}}</span>
     </ng-template>
