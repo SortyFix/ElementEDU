@@ -1,12 +1,14 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {CourseModel} from "../user/courses/models/course-model";
-import {CalendarOptions, EventInput} from "@fullcalendar/core";
+import {Calendar, CalendarOptions, EventInput} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
-import {FullCalendarModule} from "@fullcalendar/angular";
-import dayGridPlugin from '@fullcalendar/daygrid';
+import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {UserService} from "../user/user.service";
-import {ThemeModel} from "../theming/theme-model";
+import {RRule} from "rrule";
+
+import rrulePlugin from '@fullcalendar/rrule'
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 @Component({
   selector: 'app-timetable',
@@ -19,51 +21,60 @@ import {ThemeModel} from "../theming/theme-model";
 })
 export class TimetableComponent implements OnInit{
 
+    @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private _calendarOptions: CalendarOptions = {
-        plugins: [dayGridPlugin],
+        plugins: [dayGridPlugin, rrulePlugin],
         initialView: 'dayGridMonth',
         eventTimeFormat: {
             hour: '2-digit', minute: '2-digit', hour12: false
         },
         eventDidMount: (info) => {
-            const theme: ThemeModel = this.userService.getUserData.theme;
-            info.el.style.color = theme.getTextColor('widget', false);
-            info.el.style.backgroundColor = theme.getBackgroundColor;
+            info.el.style.color = this.userService.getUserData.theme.getTextColor('widget', false);
         },
         events: []
     };
 
-    constructor(private userService: UserService, private courseService: CourseService, private changeDetector: ChangeDetectorRef) {}
+    constructor(private userService: UserService, private courseService: CourseService) {}
 
     ngOnInit(): void {
-        this.courseService.fetchCourses().subscribe((value: CourseModel[]) => {
-            this._calendarOptions = {
-                ...this._calendarOptions,
-                events: value.flatMap((model: CourseModel): EventInput[] => {
-                    const name: string = model.name;
-                    return model.appointments.flatMap((scheduledModel: ScheduledAppointmentModel): EventInput[] => {
-                        return this.toEvents(name, scheduledModel);
+        this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
+            const api: Calendar = this.calendarComponent!.getApi();
+
+            courses.forEach(({ name, appointments }: CourseModel): void =>
+                appointments.forEach(({ start, duration, period }: ScheduledAppointmentModel): void => {
+                    const timeStamp: number = Number(start) * 1000;
+                    const startDate: string = new Date(timeStamp).toISOString();
+                    const endDate: string = new Date(timeStamp + Number(duration) * 1000).toISOString();
+
+                    api.addEvent({
+                        title: name,
+                        start: startDate,
+                        end: endDate,
+                        rrule: {
+                            freq: RRule.MINUTELY,
+                            interval: Number(period) / 60,
+                            dtstart: startDate,
+                            count: 52,
+                        },
                     });
                 })
-            };
-
-            this.changeDetector.detectChanges();
+            );
         });
     }
 
-    private toEvents(title: string, appointment: ScheduledAppointmentModel): EventInput[]
+    private toEvents(title: string, appointment: ScheduledAppointmentModel): EventInput
     {
-        const generatedEvents: EventInput[] = [];
         const rootDate = new Date(Number(appointment.start) * 1000);
+        const periodInMinutes = Number(appointment.period) / 60;
 
-        for (let i = 0; i < 52; i++) { // Assume 1 year of weekly repetition
-            const currentStart = new Date(rootDate.getTime() + (i * (Number(appointment.period) * 1000)))
-            const currentEnd = new Date(currentStart.getTime() + (Number(appointment.duration) * 1000))
-            generatedEvents.push({
-                title: title, start: currentStart, end: currentEnd,
-            });
-        }
-        return generatedEvents;
+        return {
+            title: title,
+            start: rootDate.toISOString(),
+            end: new Date(rootDate.getTime() + (Number(appointment.duration) * 1000)).toISOString(),
+            rrule: {
+                freq: RRule.MINUTELY, interval: periodInMinutes, dtstart: rootDate.toISOString(), count: 52,
+            },
+        };
     }
 
     protected get calendarOptions(): CalendarOptions {
