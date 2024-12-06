@@ -4,6 +4,8 @@
     --text-color: black;
     --background-color: black;
     --widget-color: black;
+
+    --fc-border-color: color-mix(in srgb, var(--text-color) 10%, transparent);
 }
 
 html, body {

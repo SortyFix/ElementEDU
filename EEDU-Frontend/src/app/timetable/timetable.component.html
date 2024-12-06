@@ -1,5 +1,8 @@
-<full-calendar #calendar [options]="calendarOptions" mat-card-title>
-    <ng-template #eventContent let-arg>
-        <span>{{arg.timeText}} {{arg.event.title}}</span>
-    </ng-template>
-</full-calendar>
+<div>
+    <full-calendar #calendar [options]="calendarOptions" style="margin: 10px 1px 1px 1px"></full-calendar>
+
+</div>
+<mat-card *ngIf="selectedEventDescription" style="margin: 10px 1px 1px 1px">
+    <mat-card-header>Event Selected</mat-card-header>
+    <mat-card-content> {{ selectedEventDescription }}</mat-card-content>
+</mat-card>
