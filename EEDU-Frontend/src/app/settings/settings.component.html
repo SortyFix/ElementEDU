@@ -8,3 +8,4 @@
     </mat-select>
 </mat-form-field> <br>
 <button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+<input type="file" (change)="this.fileService.selectFile($event)" multiple style="display: block;" />

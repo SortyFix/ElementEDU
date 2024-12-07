@@ -11,6 +11,17 @@ export class FileService {
 
     URL_PREFIX: string = "/api/v1/file";
 
+    public selectFile(event: Event): File[] | null {
+        const input = event.target as HTMLInputElement;
+
+        if(input.files && input.files.length > 0) {
+            return Array.from(input.files);
+        }
+
+        console.error("Could not identify file selection as longer than 0.")
+        return null;
+    }
+
     public async uploadFile(url: string, files: File[]): Promise<void> {
         const formData = new FormData();
         files.forEach((file) => formData.append('file[]', file));
@@ -52,7 +63,7 @@ export class FileService {
     public downloadFile(id: bigint): void {
         this.getFileInfo(id).subscribe({
             next: (fileModel) => {
-                console.log("File info recieved.")
+                console.log("File info received.")
                 this.fetchFile(id).then((byteArray) => {
                     this.triggerDownload(byteArray, fileModel.fileName);
                 })
