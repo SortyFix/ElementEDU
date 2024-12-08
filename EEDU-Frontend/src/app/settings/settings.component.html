@@ -8,4 +8,4 @@
 </mat-form-field> <br>
 <button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
 <input type="file" id="file_input" (change)="this.fileService.selectFiles($event)" multiple style="display: block;" class="uploadField" />
-<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="this.fileService.testUpload($event)">Upload</button>
+<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="this.fileService.testUpload()">Upload</button>

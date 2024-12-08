@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-
 @RequiredArgsConstructor
 @RestController @RequestMapping(value = "/api/v1/illness/me") public class IllnessNotificationController
 {
