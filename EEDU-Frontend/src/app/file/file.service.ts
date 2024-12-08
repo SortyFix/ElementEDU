@@ -1,6 +1,6 @@
-import {HttpClient, HttpEvent, HttpEventType} from "@angular/common/http";
+import {HttpClient, HttpEvent} from "@angular/common/http";
 import {FileModel} from "./file-model";
-import {Observable, Subscription} from "rxjs";
+import {Observable} from "rxjs";
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -18,7 +18,7 @@ export class FileService {
     constructor(private http: HttpClient) { }
 
     // TODO REMOVE!!!
-    public testUpload(event: Event)
+    public testUpload()
     {
         this.uploadSelection("http://localhost:8080/api/v1/illness/me/uploadTest");
     }
