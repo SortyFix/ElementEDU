@@ -29,10 +29,12 @@ export class FileService {
             this.uploadFiles(url, this.selectedFiles).subscribe({
                 error: err => {
                     console.log(err);
+                },
+                complete: () => {
+                    this.reset();
                 }
             });
         }
-        this.reset();
     }
 
     public selectFiles(event: Event): File[] | null {
@@ -42,18 +44,31 @@ export class FileService {
             this.selectedFiles = Array.from(input.files);
         }
 
-        console.error("Could not identify file selection as longer than 0.")
         return null;
     }
 
-    public uploadFiles(url: string, files: File[]): Observable<HttpEvent<any>>  {
+    public uploadFiles(url: string, files: File[], additionalData?: { [key: string]: any }): Observable<HttpEvent<any>>  {
         const formData = new FormData();
+
+        if(additionalData) {
+            this.appendKeys(additionalData, formData);
+        }
+
         files.forEach((file: File): void => formData.append('file', file));
+
+        console.log(formData);
 
         return this.http.post(url, formData, {
             reportProgress: true,
             withCredentials: true,
             observe: 'events'
+        });
+    }
+
+    public appendKeys(keys: { [key: string]: any }, formData: FormData)
+    {
+        Object.keys(keys).forEach((key: string): void => {
+            formData.append(key, keys[key]);
         });
     }
 
