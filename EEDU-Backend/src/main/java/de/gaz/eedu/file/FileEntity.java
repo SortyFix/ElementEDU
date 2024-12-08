@@ -18,6 +18,7 @@ import xyz.capybara.clamav.commands.scan.result.ScanResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
 
@@ -98,13 +99,11 @@ import java.util.Set;
         {
             for(MultipartFile file : batch)
             {
-                String fileName = Objects.requireNonNull(file.getName());
-                File storageFile = new File(getFilePath(subdirectory), fileName);
-
+                Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
                 createDirectory(subdirectory);
                 if (virusCheck(file.getInputStream()))
                 {
-                    file.transferTo(storageFile);
+                    file.transferTo(path);
                 }
             }
         }

@@ -1,42 +1,66 @@
-import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpEventType} from "@angular/common/http";
 import {FileModel} from "./file-model";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
+import {Injectable} from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
 })
+/**
+ * Used sources:
+ * https://blog.angular-university.io/angular-file-upload/
+ */
 export class FileService {
-    constructor(private http: HttpClient) { }
-
     URL_PREFIX: string = "/api/v1/file";
 
-    public selectFile(event: Event): File[] | null {
+    public selectedFiles!: File[] | null;
+
+    constructor(private http: HttpClient) { }
+
+    // TODO REMOVE!!!
+    public testUpload(event: Event)
+    {
+        this.uploadSelection("http://localhost:8080/api/v1/illness/me/uploadTest");
+    }
+
+    // ------------------------------ UPLOAD -----------------------------------
+    public uploadSelection(url: string): void {
+        if(this.selectedFiles){
+            this.uploadFiles(url, this.selectedFiles).subscribe({
+                error: err => {
+                    console.log(err);
+                }
+            });
+        }
+    }
+
+    public selectFiles(event: Event): File[] | null {
         const input = event.target as HTMLInputElement;
 
         if(input.files && input.files.length > 0) {
-            return Array.from(input.files);
+            this.selectedFiles = Array.from(input.files);
         }
 
         console.error("Could not identify file selection as longer than 0.")
         return null;
     }
 
-    public async uploadFile(url: string, files: File[]): Promise<void> {
-        const formData = new FormData();
-        files.forEach((file) => formData.append('file[]', file));
-
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
-
-        if(!response.ok)
-        {
-            throw new Error('File upload failed');
-        }
+    public unselectFile(index: number): void {
+        this.selectedFiles?.splice(index, 1);
     }
 
+    public uploadFiles(url: string, files: File[]): Observable<HttpEvent<any>>  {
+        const formData = new FormData();
+        files.forEach((file: File): void => formData.append('file', file));
+
+        return this.http.post(url, formData, {
+            reportProgress: true,
+            withCredentials: true,
+            observe: 'events'
+        });
+    }
+
+    // ------------------------------ DOWNLOAD -----------------------------------
     public async fetchFile(id: bigint): Promise<Uint8Array> {
         console.log("Fetching file binaries...");
         const response: Response = await fetch(`${(this.URL_PREFIX)}/get/${id}`, {

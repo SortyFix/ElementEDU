@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +65,26 @@ import java.util.Set;
                 fileEntity.getId())));
 
         return true;
+    }
+
+    //TODO REMOVE!!!!
+    public boolean testUpload(@NotNull Long userId, @NotNull MultipartFile[] file)
+    {
+        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
+                file[0].getName(),
+                new String[] { "Management" },
+                "test",
+                new String[] { "test" }))).getFirst();
+
+        try
+        {
+            fileEntity.uploadBatch("", file);
+            return true;
+        }
+        catch (MaliciousFileException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public ResponseEntity<Boolean> respondToNotification(@NotNull IllnessNotificationEntity entity, @NotNull IllnessNotificationStatus status)

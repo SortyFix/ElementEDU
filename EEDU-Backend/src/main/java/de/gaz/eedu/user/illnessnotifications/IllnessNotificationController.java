@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+
 @RequiredArgsConstructor
 @RestController @RequestMapping(value = "/api/v1/illness/me") public class IllnessNotificationController
 {
@@ -26,5 +28,11 @@ import org.springframework.web.server.ResponseStatusException;
         return userService.loadEntityById(id).map(userEntity ->
                                   ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
                           .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    }
+
+    // TODO REMOVE!!!
+    @PreAuthorize("isAuthenticated()") @PostMapping("/uploadTest") public ResponseEntity<Boolean> uploadTest(@AuthenticationPrincipal Long id, @NotNull MultipartFile[] file)
+    {
+        return ResponseEntity.ok(illnessNotificationService.testUpload(id, file));
     }
 }
