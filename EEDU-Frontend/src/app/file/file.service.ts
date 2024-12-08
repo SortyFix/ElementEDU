@@ -32,6 +32,7 @@ export class FileService {
                 }
             });
         }
+        this.reset();
     }
 
     public selectFiles(event: Event): File[] | null {
@@ -45,10 +46,6 @@ export class FileService {
         return null;
     }
 
-    public unselectFile(index: number): void {
-        this.selectedFiles?.splice(index, 1);
-    }
-
     public uploadFiles(url: string, files: File[]): Observable<HttpEvent<any>>  {
         const formData = new FormData();
         files.forEach((file: File): void => formData.append('file', file));
@@ -58,6 +55,14 @@ export class FileService {
             withCredentials: true,
             observe: 'events'
         });
+    }
+
+    public unselectFile(index: number): void {
+        this.selectedFiles?.splice(index, 1);
+    }
+
+    public reset(): void {
+        this.selectedFiles = null;
     }
 
     // ------------------------------ DOWNLOAD -----------------------------------
