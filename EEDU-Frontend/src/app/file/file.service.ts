@@ -29,7 +29,7 @@ export class FileService {
     }
 
     public testDownload(): void {
-        this.downloadFile(BigInt(2));
+        this.downloadFile(BigInt(1));
     }
 
     // ------------------------------ UPLOAD -----------------------------------

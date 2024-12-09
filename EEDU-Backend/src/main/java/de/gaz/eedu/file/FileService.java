@@ -100,7 +100,7 @@ import java.util.zip.ZipOutputStream;
         }
 
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                                                                  .filename(files[0].getName())
+                                                                  .filename("zip-" + files[0].getName() + ".zip")
                                                                   .build();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(contentDisposition);
