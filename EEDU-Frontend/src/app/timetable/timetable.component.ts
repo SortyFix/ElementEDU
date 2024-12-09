@@ -5,56 +5,61 @@ import {Calendar, CalendarOptions, EventClickArg} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {RRule} from "rrule";
-import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
+import {AccessibilityService} from "../accessibility.service";
+import {MatDialog} from "@angular/material/dialog";
+import {EventDialogComponent} from "./event-dialog/event-dialog.component";
 
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridDay from '@fullcalendar/timegrid';
 import rrulePlugin from '@fullcalendar/rrule'
 import interactionPlugin from '@fullcalendar/interaction';
-import {AccessibilityService} from "../accessibility.service";
-import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
     imports: [
         FullCalendarModule,
-        MatCardContent,
-        NgIf,
-        MatCard,
-        MatCardHeader,
     ],
   templateUrl: './timetable.component.html',
   styleUrl: './timetable.component.scss'
 })
 export class TimetableComponent implements OnInit{
 
-    selectedEventDescription: string = '';
-
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridDay, interactionPlugin, rrulePlugin],
-        initialView: this.accessibilityService.mobile ? 'dayGridDay' : 'dayGridMonth',
+        initialView: window.innerWidth < 768 ? 'dayGridDay' : 'dayGridMonth', // Change view on smaller screens
         firstDay: 1,
         events: [], // to be altered when loaded
         selectable: true,
         eventClick: this.handleEventClick.bind(this),
         headerToolbar: {
-            left: 'dayGridDay,dayGridWeek,dayGridMonth',
-            center: 'title',
             right: 'prev,next'
         },
-        height: 700,
+        footerToolbar: {
+            center: 'dayGridMonth,timeGridWeek,timeGridDay',
+        },
+        height: 'auto', // Makes the calendar height adaptive to content
+        contentHeight: 'auto',
+        aspectRatio: 1.35,
         eventTimeFormat: {
             hour: '2-digit', minute: '2-digit', hour12: false
         },
     };
 
     handleEventClick(info: EventClickArg): void {
-        this.selectedEventDescription = info.event.extendedProps['description'] || 'No description available';
+        const eventDescription = info.event.extendedProps['description'] || 'This is a test description for the event.';
+        this.dialog.open(EventDialogComponent, {
+            data: { description: eventDescription },
+            position: { top: `${info.jsEvent.pageY}px`, left: `${info.jsEvent.pageX}px` },
+        });
     }
 
-    constructor(private courseService: CourseService, private accessibilityService: AccessibilityService) {}
+    constructor(
+        private courseService: CourseService,
+        private accessibilityService: AccessibilityService,
+        private dialog: MatDialog) {}
+
 
     ngOnInit(): void {
         this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
@@ -71,7 +76,7 @@ export class TimetableComponent implements OnInit{
                         start: startDate,
                         end: endDate,
                         extendedProps: {
-                            description: `test ahahaha ${name}`,
+                            description: `${timeStamp} - ${name}`,
                         },
                         rrule: {
                             freq: RRule.MINUTELY,
@@ -87,9 +92,5 @@ export class TimetableComponent implements OnInit{
 
     protected get calendarOptions(): CalendarOptions {
         return this._calendarOptions;
-    }
-
-    private click(event: any): void {
-
     }
 }
