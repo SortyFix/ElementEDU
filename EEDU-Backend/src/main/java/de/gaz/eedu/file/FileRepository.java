@@ -9,6 +9,4 @@ import java.util.Optional;
 public interface FileRepository extends JpaRepository<FileEntity, Long>
 {
     @NotNull Optional<FileEntity> findById(@NotNull Long id);
-    @NotNull List<FileEntity> findFileEntitiesByAuthorId(Long id);
-    @NotNull List<FileEntity> findFileEntityByDataDirectory(String dataDirectory);
 }

@@ -96,7 +96,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
-        FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), postEntity.getReadPrivileges().toArray(new String[0]), "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
+        FileEntity thumbnailFile = new FileCreateModel("blog", postEntity.getReadPrivileges().toArray(new String[0]), postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
         thumbnailFile.uploadBatch("", newThumbnail);
         postEntity.setThumbnailURL(thumbnailFile.getFilePath());
         getRepository().save(postEntity);
@@ -116,7 +116,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         if(getUserService().loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
         {
-            FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), createModel.readPrivileges(), "blog", createModel.tags()).toEntity(new FileEntity());
+            FileEntity thumbnailFile = new FileCreateModel("blog", createModel.readPrivileges(), createModel.tags()).toEntity(new FileEntity());
             thumbnailFile.uploadBatch("", thumbnail);
             return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
                     thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();

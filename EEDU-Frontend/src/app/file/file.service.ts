@@ -3,6 +3,11 @@ import {FileModel} from "./file-model";
 import {Observable} from "rxjs";
 import {Injectable} from '@angular/core';
 
+interface FileResponse {
+    blob: Uint8Array;
+    fileName: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -11,7 +16,7 @@ import {Injectable} from '@angular/core';
  * https://blog.angular-university.io/angular-file-upload/
  */
 export class FileService {
-    URL_PREFIX: string = "/api/v1/file";
+    URL_PREFIX: string = "http://localhost:8080/api/v1/file";
 
     public selectedFiles!: File[] | null;
 
@@ -21,6 +26,10 @@ export class FileService {
     public testUpload()
     {
         this.uploadSelection("http://localhost:8080/api/v1/illness/me/uploadTest");
+    }
+
+    public testDownload(): void {
+        this.downloadFile(BigInt(2));
     }
 
     // ------------------------------ UPLOAD -----------------------------------
@@ -81,21 +90,28 @@ export class FileService {
     }
 
     // ------------------------------ DOWNLOAD -----------------------------------
-    public async fetchFile(id: bigint): Promise<Uint8Array> {
+    public async fetchFile(id: bigint): Promise<FileResponse> {
         console.log("Fetching file binaries...");
         const response: Response = await fetch(`${(this.URL_PREFIX)}/get/${id}`, {
             method: 'GET',
             headers: {
-                'Accept': 'application/octet-stream'
-            }
+                'Accept': '*/*'
+            },
+            credentials: 'include'
         });
+
+        console.log(response.headers.get("Content-Type"));
 
         if(!response.ok) {
             console.error(`Failed to fetch resource with id ${id}`);
         }
 
         const arrayBuffer: ArrayBuffer = await response.arrayBuffer();
-        return new Uint8Array(arrayBuffer);
+
+        return {
+            blob: new Uint8Array(arrayBuffer),
+            fileName: this.extractFileName(response.headers)
+        };
     }
 
     public getFileInfo(id: bigint): Observable<FileModel> {
@@ -104,12 +120,21 @@ export class FileService {
         return this.http.get<FileModel>(url, {withCredentials: true});
     }
 
+    public extractFileName(responseHeaders: Headers): string
+    {
+        console.log(responseHeaders);
+        const disposition: string | null = responseHeaders.get('Content-Disposition');
+        console.log(disposition);
+        return disposition ? disposition.split('filename=')[1]?.replace(/"/g, '') || 'default-filename' : 'default-filename';
+    }
+
     public downloadFile(id: bigint): void {
         this.getFileInfo(id).subscribe({
             next: (fileModel) => {
-                console.log("File info received.")
-                this.fetchFile(id).then((byteArray) => {
-                    this.triggerDownload(byteArray, fileModel.fileName);
+                console.log("File info received.");
+                console.log(fileModel);
+                this.fetchFile(id).then((response: any) => {
+                    this.triggerDownload(response.blob, response.fileName);
                 })
             }
         })

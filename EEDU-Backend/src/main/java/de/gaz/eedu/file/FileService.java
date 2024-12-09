@@ -1,26 +1,32 @@
 package de.gaz.eedu.file;
 
 import de.gaz.eedu.file.exception.UnknownFileException;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeEntry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @Service @RequiredArgsConstructor public class FileService
 {
     private final FileRepository fileRepository;
-    private Zipper zipper;
 
     public @NotNull FileRepository getRepository(){
         return fileRepository;
@@ -50,7 +56,6 @@ import java.util.*;
      * @throws UnknownFileException if the path of a file entity is faulty and the file cannot be found
      *                              on the file system.
      */
-
     @Transactional
     public boolean delete(long id, @NotNull Runnable deleteTask)
     {
@@ -70,7 +75,7 @@ import java.util.*;
     }
 
     @Transactional
-    public @NotNull ByteArrayResource loadResourceById(@NotNull Long id) throws IOException
+    public @NotNull ResponseEntity<ByteArrayResource> loadResourceById(@NotNull Long id) throws IOException
     {
         File directory = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
         File[] files = directory.listFiles();
@@ -82,20 +87,49 @@ import java.util.*;
 
         if (files.length == 1)
         {
-            return new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath())));
+            ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                                                                      .filename(files[0].getName())
+                                                                      .build();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDisposition(contentDisposition);
+
+            System.out.println(files[0].getName() + " " + headers);
+
+            ResponseEntity<ByteArrayResource> responseEntity = ResponseEntity.ok()
+                                                                             .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
+                                                                             .headers(headers)
+                                                                             .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
+            System.out.println(responseEntity);
+            return responseEntity;
         }
 
-        return zipper.zipBatch(files);
+        return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType("application/zip; charset=UTF-8"))
+                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + files[0].getName() + "\"")
+                             .body(zipBatch(files));
+    }
+
+
+    public ByteArrayResource zipBatch(File @NotNull ... files)
+    {
+        try(ByteArrayOutputStream baos = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(baos)){
+            for (File file : files)
+            {
+                zos.putNextEntry(new ZipEntry(file.getName()));
+                zos.write(Files.readAllBytes(Path.of(file.getAbsolutePath())));
+                zos.closeEntry();
+            }
+            zos.finish();
+            return new ByteArrayResource(baos.toByteArray());
+        } catch(IOException exception)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public @NotNull FileEntity loadEntityById(@NotNull Long id)
     {
         return fileRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
-    public @NotNull List<FileEntity> loadEntitiesByAuthorId(@NotNull Long id)
-    {
-        return fileRepository.findFileEntitiesByAuthorId(id);
     }
 
     @Transactional

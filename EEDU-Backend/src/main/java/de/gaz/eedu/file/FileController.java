@@ -1,10 +1,12 @@
 package de.gaz.eedu.file;
 
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,12 +40,16 @@ import java.util.stream.Collectors;
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/info/{fileId}") public ResponseEntity<FileModel> getFileInfoById(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
     {
-        Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
+        Function<FileEntity, Boolean> access = file -> {
+            UserEntity userEntity = userService.loadEntityByIDSafe(userId);
+            System.out.println(file.hasAccess(userEntity) + " " + userEntity.getAuthorities());
+            return file.hasAccess(userEntity);
+        };
         if(fileService.getRepository().findById(fileId).map(access).orElse(false))
         {
             return ResponseEntity.ok(fileService.loadEntityById(fileId).toModel());
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
 
@@ -53,14 +59,8 @@ import java.util.stream.Collectors;
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
         if (fileService.getRepository().findById(fileId).map(access).orElse(false))
         {
-            return ResponseEntity.ok(fileService.loadResourceById(fileId));
+            return fileService.loadResourceById(userId);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
-
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}/info") public ResponseEntity<List<FileModel>> getUserFilesInfo(@PathVariable Long id){
-        return userService.loadEntityById(id).map(userEntity -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id)
-                                                                                             .stream().map(FileEntity::toModel).collect(Collectors.toList())))
-                          .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList()));
     }
 }

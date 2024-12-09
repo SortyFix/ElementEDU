@@ -42,10 +42,9 @@ import java.util.Set;
     public boolean excuse(@NotNull Long userId, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
     {
         // TODO: Add logic if current day is an exam day
-        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
-                file.getName(),
-                new String[] { "Management" },
+        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(
                 "illness_notifications",
+                new String[] { "Management" },
                 new String[] { "illness_notification" }))).getFirst();
 
         try
@@ -69,10 +68,9 @@ import java.util.Set;
     //TODO REMOVE!!!!
     public boolean testUpload(@NotNull Long userId, @NotNull MultipartFile[] file)
     {
-        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
-                file[0].getName(),
-                new String[] { "Management" },
+        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(
                 "test",
+                new String[] { "ADMIN" },
                 new String[] { "test" }))).getFirst();
 
         try

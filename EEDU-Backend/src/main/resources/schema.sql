@@ -2,8 +2,6 @@
 CREATE TABLE IF NOT EXISTS file_entity
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id      BIGINT       NULL,
-    file_name      VARCHAR(255) NULL,
     data_directory VARCHAR(255) NOT NULL
 );
 
