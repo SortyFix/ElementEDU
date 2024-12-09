@@ -1,11 +1,8 @@
 package de.gaz.eedu.file;
 
 import de.gaz.eedu.file.exception.UnknownFileException;
-import jakarta.activation.MimeType;
-import jakarta.activation.MimeTypeEntry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,7 +16,6 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -103,9 +99,15 @@ import java.util.zip.ZipOutputStream;
             return responseEntity;
         }
 
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                                                                  .filename(files[0].getName())
+                                                                  .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(contentDisposition);
+
         return ResponseEntity.ok()
                              .contentType(MediaType.parseMediaType("application/zip; charset=UTF-8"))
-                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + files[0].getName() + "\"")
+                             .headers(headers)
                              .body(zipBatch(files));
     }
 
@@ -133,9 +135,9 @@ import java.util.zip.ZipOutputStream;
     }
 
     @Transactional
-    public @NotNull List<FileEntity> createEntity(@NotNull Set<FileCreateModel> model)
+    public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
-        List<FileEntity> entities = model.stream().map(createModel -> createModel.toEntity(new FileEntity())).toList();
-        return getRepository().saveAll(entities);
+        FileEntity fileEntity = model.toEntity(new FileEntity());
+        return getRepository().save(fileEntity);
     }
 }

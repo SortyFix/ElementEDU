@@ -27,7 +27,7 @@ public class FileServiceTest
     public void testCreateEntity()
     {
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
 
         assertNotNull(fileEntity.getId());
         assertEquals(fileCreateModel.dataDirectory(), fileEntity.getDataDirectory());
@@ -46,7 +46,7 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertDoesNotThrow(() -> fileEntity.uploadBatch("", batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
     }
@@ -62,7 +62,7 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertDoesNotThrow(() -> fileEntity.uploadBatch(subdirectory, batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(subdirectory), mockMultipartFile.getOriginalFilename()))));
     }
@@ -72,7 +72,7 @@ public class FileServiceTest
     public void testDelete()
     {
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }
 

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,11 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController @RequiredArgsConstructor @RequestMapping(value = "/api/v1/file") public class FileController
 {
@@ -59,7 +55,7 @@ import java.util.stream.Collectors;
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
         if (fileService.getRepository().findById(fileId).map(access).orElse(false))
         {
-            return fileService.loadResourceById(userId);
+            return fileService.loadResourceById(fileId);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
