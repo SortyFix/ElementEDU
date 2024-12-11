@@ -48,14 +48,12 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 "burger king",
                 System.currentTimeMillis(),
                 new String[]{"NONE"},
-                new String[]{"NONE"},
                 new String[]{"test"});
 
         return Eval.eval(createModel, postModel, (request, expect, result) -> {
             Assertions.assertEquals(createModel.author(), postModel.author());
             Assertions.assertEquals(createModel.title(), postModel.title());
             Assertions.assertEquals(createModel.toEntity(new PostEntity()).toModel().thumbnailBlob(), encodedFile);
-            Assertions.assertArrayEquals(createModel.readPrivileges(), postModel.readPrivileges());
             Assertions.assertArrayEquals(createModel.editPrivileges(), postModel.editPrivileges());
             Assertions.assertArrayEquals(createModel.tags(), postModel.tags());
         });

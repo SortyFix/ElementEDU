@@ -57,26 +57,6 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         return this.editPrivileges.removeAll(Set.of(privileges));
     }
 
-    public boolean attachReadPrivileges(@NotNull PostService service, @NotNull String... privileges)
-    {
-        return updateDatabase(service, privileges, this::attachReadPrivileges);
-    }
-
-    public boolean attachReadPrivileges(@NotNull String... privileges)
-    {
-        return this.readPrivileges.addAll(Set.of(privileges));
-    }
-
-    public boolean detachReadPrivileges(@NotNull PostService service, @NotNull String... privileges)
-    {
-        return updateDatabase(service, privileges, this::detachReadPrivileges);
-    }
-
-    public boolean detachReadPrivileges(@NotNull String... privileges)
-    {
-        return this.readPrivileges.removeAll(Set.of(privileges));
-    }
-
     public boolean attachTags(@NotNull PostService service, @NotNull String... tags)
     {
         return updateDatabase(service, tags, this::attachTags);
@@ -115,7 +95,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     {
         String encodedThumbnail = encode();
         return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
-                    readPrivileges.toArray(String[]::new), editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
+                editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
     public @NotNull String encode()

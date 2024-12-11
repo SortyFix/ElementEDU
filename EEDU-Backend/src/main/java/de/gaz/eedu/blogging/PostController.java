@@ -12,19 +12,26 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
-@RestController @RequiredArgsConstructor @RequestMapping(value = "/blog") public class PostController
+@RestController @RequiredArgsConstructor @RequestMapping("/api/v1/blog") public class PostController
 {
     private final PostService postService;
     private final PostRepository postRepository;
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public PostModel getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
     {
         if(postService.userHasReadAuthority(userId, postId))
         {
-            return postService.getModel(postId);
+            return ResponseEntity.ok(postService.getModel(postId));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@AuthenticationPrincipal Long userId)
+    {
+        System.out.println("Works");
+        System.out.println(ResponseEntity.ok(postService.getAllPosts(userId)));
+        return ResponseEntity.ok(postService.getAllPosts(userId));
     }
 
     @PreAuthorize("hasAuthority(${blog.write})") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestBody PostCreateModel createModel, @NotNull @RequestPart("multipartFile") MultipartFile multipartFile)
@@ -83,30 +90,6 @@ import java.io.IOException;
         if (postService.userHasEditAuthority(userId, postId))
         {
             return ResponseEntity.ok(postRepository.getReferenceById(postId).detachEditPrivileges(postService, privileges));
-        }
-
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/edit/{postId}/attach/readPrivileges")
-    public ResponseEntity<Boolean> addReadPrivileges(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... privileges)
-    {
-        if (postService.userHasEditAuthority(userId, postId))
-        {
-            return ResponseEntity.ok(postRepository.getReferenceById(postId).attachReadPrivileges(postService, privileges));
-        }
-
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/edit/{postId}/detach/readPrivileges")
-    public ResponseEntity<Boolean> removeReadPrivileges(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... privileges)
-    {
-        if (postService.userHasEditAuthority(userId, postId))
-        {
-            return ResponseEntity.ok(postRepository.getReferenceById(postId).detachReadPrivileges(postService, privileges));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

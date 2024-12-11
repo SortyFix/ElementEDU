@@ -172,12 +172,12 @@ import java.util.Set;
     {
         try
         {
-            ClamavClient client = new ClamavClient("localhost");
-            client.ping();
+            ClamavClient client = new ClamavClient("http://localhost:3310");
             return client.scan(inputStream) instanceof ScanResult.OK;
         }
         catch (ClamavException | IllegalStateException ignored) {
-            // TODO: Remove in production
+            System.out.println(ignored.getMessage());
+            // TODO REMOVE LATER!!!!!!!!!!!!!!!!!!!!
             return true;
         }
     }

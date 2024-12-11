@@ -41,14 +41,8 @@ import java.util.stream.Collectors;
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
         if (fileService.getRepository().findById(fileId).map(access).orElse(false))
         {
-            return ResponseEntity.ok(fileService.loadResourceById(fileId));
+            return fileService.loadResourceById(fileId);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
-
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}/info") public ResponseEntity<List<FileModel>> getUserFilesInfo(@PathVariable Long id){
-        return userService.loadEntityById(id).map(userEntity -> ResponseEntity.ok(fileService.loadEntitiesByAuthorId(id)
-                                                                                             .stream().map(FileEntity::toModel).collect(Collectors.toList())))
-                          .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList()));
     }
 }

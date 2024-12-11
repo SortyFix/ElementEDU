@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +52,9 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
     {
-        return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
+        boolean i = getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
+        System.out.println(i);
+        return i;
     }
 
     public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
@@ -62,6 +65,15 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel getModel(@NotNull Long postId)
     {
         return getRepository().getReferenceById(postId).toModel();
+    }
+
+    public @NotNull PostModel[] getAllPosts(@NotNull Long userId)
+    {
+        System.out.println(userId);
+        System.out.println("Works2");
+        PostModel[] postModels = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
+        System.out.println(Arrays.toString(postModels));
+        return postModels;
     }
 
     /**

@@ -238,3 +238,31 @@ CREATE TABLE IF NOT EXISTS post_tags
     tags VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
+
+-- Insert more posts into the `post` table
+INSERT INTO post_entity (id, author, title, thumbnailURL, body, time_of_creation)
+VALUES
+    (3, 'Alice Cooper', 'Understanding Java Streams', 'http://example.com/image3.jpg', 'Dive deep into Java Streams API.', 1698854400000),
+    (4, 'Bob Marley', 'Kotlin for Beginners', 'http://example.com/image4.jpg', 'An introduction to Kotlin programming language.', 1698940800000),
+    (5, 'Eve Adams', 'Effective Unit Testing', 'http://example.com/image5.jpg', 'How to write effective unit tests in Java.', 1699027200000);
+
+-- Insert more into the `post_user_read_privileges` table
+INSERT INTO post_user_read_privileges (post_id, read_privileges)
+VALUES
+    (3, 'ADMIN'),
+    (4, 'ADMIN'),
+    (5, 'ADMIN');
+
+-- Insert more into the `post_user_edit_privileges` table
+INSERT INTO post_user_edit_privileges (post_id, edit_privileges)
+VALUES
+    (3, 'ADMIN'),
+    (4, 'ADMIN'),
+    (5, 'ADMIN');
+
+-- Insert more into the `post_tags` table
+INSERT INTO post_tags (post_id, tags)
+VALUES
+    (3, 'java'),
+    (4, 'kotlin'),
+    (5, 'testing');
