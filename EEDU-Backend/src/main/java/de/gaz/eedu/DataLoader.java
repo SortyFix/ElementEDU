@@ -88,7 +88,7 @@ import java.util.Set;
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel theme = new ThemeCreateModel("Dark", new short[] {0, 0, 0}, new short[] {255, 255, 255}); //TODO use real values
+        ThemeCreateModel theme = new ThemeCreateModel("Dark", new short[] {0, 0, 0}, new short[] {20, 20, 20}); //TODO use real values
         return getThemeService().createEntity(Set.of(theme)).getFirst();
     }
 

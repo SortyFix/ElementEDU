@@ -27,4 +27,10 @@ import org.springframework.web.server.ResponseStatusException;
                                   ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
                           .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
+
+    // TODO REMOVE!!!
+    @PreAuthorize("isAuthenticated()") @PostMapping("/uploadTest") public ResponseEntity<Boolean> uploadTest(@AuthenticationPrincipal Long id, @NotNull MultipartFile[] file)
+    {
+        return ResponseEntity.ok(illnessNotificationService.testUpload(id, file));
+    }
 }

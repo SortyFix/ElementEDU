@@ -73,8 +73,7 @@ import java.util.zip.ZipOutputStream;
     @Transactional
     public @NotNull ResponseEntity<ByteArrayResource> loadResourceById(@NotNull Long id) throws IOException
     {
-        File directory = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        File directory = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
         File[] files = directory.listFiles();
 
         if (files == null || files.length == 0)
@@ -90,10 +89,14 @@ import java.util.zip.ZipOutputStream;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(contentDisposition);
 
-            return ResponseEntity.ok()
-                         .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
-                         .headers(headers)
-                         .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
+            System.out.println(files[0].getName() + " " + headers);
+
+            ResponseEntity<ByteArrayResource> responseEntity = ResponseEntity.ok()
+                                                                             .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
+                                                                             .headers(headers)
+                                                                             .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
+            System.out.println(responseEntity);
+            return responseEntity;
         }
 
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")

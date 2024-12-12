@@ -19,8 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +49,11 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         getRepository().delete(getRepository().getReferenceById(postId));
     }
 
+    public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
+    {
+        return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
+    }
+
     public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
     {
         return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getEditPrivileges());
@@ -59,13 +62,6 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel getModel(@NotNull Long postId)
     {
         return getRepository().getReferenceById(postId).toModel();
-    }
-
-    public @NotNull PostModel[] getAllPosts(@NotNull Long userId)
-    {
-        PostModel[] posts = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
-        Arrays.sort(posts, Comparator.comparing(PostModel::timeOfCreation).reversed());
-        return posts;
     }
 
     /**
@@ -100,7 +96,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
-        FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), new String[]{"ADMIN"} /** TODO: Change once we have an ALL privilege **/, "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
+        FileEntity thumbnailFile = new FileCreateModel("blog", postEntity.getReadPrivileges().toArray(new String[0]), postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
         thumbnailFile.uploadBatch("", newThumbnail);
         postEntity.setThumbnailURL(thumbnailFile.getFilePath());
         getRepository().save(postEntity);
@@ -120,7 +116,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         if(getUserService().loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
         {
-            FileEntity thumbnailFile = new FileCreateModel(userId, thumbnail.getName(), createModel.readPrivileges(), "blog", createModel.tags()).toEntity(new FileEntity());
+            FileEntity thumbnailFile = new FileCreateModel("blog", createModel.readPrivileges(), createModel.tags()).toEntity(new FileEntity());
             thumbnailFile.uploadBatch("", thumbnail);
             return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
                     thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();

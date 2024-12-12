@@ -10,6 +10,7 @@ import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeEntity} from "../theming/theme-entity";
 import {MatButton} from "@angular/material/button";
 import {ThemeService} from "../theming/theme.service";
+import {FileService} from "../file/file.service";
 
 @Component({
   selector: 'app-settings',
@@ -29,7 +30,7 @@ import {ThemeService} from "../theming/theme.service";
 })
 
 export class SettingsComponent {
-    constructor(public http: HttpClient, public themeService: ThemeService) {
+    constructor(public http: HttpClient, public themeService: ThemeService, public fileService: FileService) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;

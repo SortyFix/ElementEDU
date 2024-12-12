@@ -49,7 +49,8 @@ public class SecurityConfig implements WebMvcConfigurer
                 .allowedOrigins("http://localhost:4200") // Ensure no trailing slash
                 .allowCredentials(true)
                 .allowedMethods(methods)
-                .exposedHeaders(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaders.SET_COOKIE)
+                .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_DISPOSITION)
+                .exposedHeaders(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaders.SET_COOKIE, HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_DISPOSITION)
                 .maxAge(3600);
     }
 }

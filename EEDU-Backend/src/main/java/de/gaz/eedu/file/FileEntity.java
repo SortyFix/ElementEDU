@@ -18,6 +18,7 @@ import xyz.capybara.clamav.commands.scan.result.ScanResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,8 +33,6 @@ import java.util.Set;
     public static final String BASE_DIRECTORY = "data";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
-    private String fileName;
-    private Long authorId;
     private String dataDirectory;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "file_user_privileges", joinColumns = @JoinColumn(name = "file_id"))
@@ -53,15 +52,13 @@ import java.util.Set;
     @Override
     public int hashCode()
     {
-        return Objects.hash(id, fileName, authorId, dataDirectory, privilege, tags);
+        return Objects.hash(id, dataDirectory, privilege, tags);
     }
 
     @Override public String toString()
     {
         return "FileEntity{" +
                 "id=" + id +
-                ", fileName='" + fileName + '\'' +
-                ", authorId=" + authorId +
                 ", dataDirectory='" + dataDirectory + '\'' +
                 ", privilege=" + privilege +
                 ", tags=" + tags +
@@ -75,7 +72,7 @@ import java.util.Set;
     @Override
     public FileModel toModel()
     {
-        return new FileModel(id, fileName, authorId, getDataDirectory(), privilege.toArray(String[]::new), tags.toArray(String[]::new));
+        return new FileModel(id, getDataDirectory(), privilege.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
     /**
@@ -98,13 +95,11 @@ import java.util.Set;
         {
             for(MultipartFile file : batch)
             {
-                String fileName = Objects.requireNonNull(file.getName());
-                File storageFile = new File(getFilePath(subdirectory), fileName);
-
+                Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
                 createDirectory(subdirectory);
                 if (virusCheck(file.getInputStream()))
                 {
-                    file.transferTo(storageFile);
+                    file.transferTo(path);
                 }
             }
         }
@@ -141,7 +136,7 @@ import java.util.Set;
      */
     public boolean hasAccess(@NotNull UserEntity userEntity)
     {
-        return userEntity.getId().equals(getAuthorId()) || userEntity.hasAnyAuthority(getPrivilege());
+        return userEntity.hasAnyAuthority(getPrivilege());
     }
 
     /**
