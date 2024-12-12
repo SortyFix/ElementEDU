@@ -3,6 +3,7 @@ export class ScheduledAppointmentModel {
     public constructor(
         public readonly id: bigint,
         public readonly start: bigint,
+        public readonly end: bigint,
         public readonly duration: bigint,
         public readonly period: bigint
     ) {}
@@ -11,6 +12,7 @@ export class ScheduledAppointmentModel {
         return new ScheduledAppointmentModel(
             BigInt(object.id),
             BigInt(object.start),
+            BigInt(object.end),
             BigInt(object.duration),
             BigInt(object.period)
         );

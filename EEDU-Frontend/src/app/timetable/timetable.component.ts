@@ -5,7 +5,6 @@ import {Calendar, CalendarOptions, EventClickArg} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {RRule} from "rrule";
-import {AccessibilityService} from "../accessibility.service";
 import {MatDialog} from "@angular/material/dialog";
 import {EventDialogComponent} from "./event-dialog/event-dialog.component";
 
@@ -13,35 +12,60 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridDay from '@fullcalendar/timegrid';
 import rrulePlugin from '@fullcalendar/rrule'
 import interactionPlugin from '@fullcalendar/interaction';
+import {MatList, MatListItem, MatListItemTitle} from "@angular/material/list";
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
     imports: [
         FullCalendarModule,
+        MatList,
+        MatListItem,
+        MatListItemTitle,
     ],
   templateUrl: './timetable.component.html',
   styleUrl: './timetable.component.scss'
 })
 export class TimetableComponent implements OnInit{
 
+    private convert: (date: Date) => string = function (date: Date) {
+        return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    };
+
+    private readonly _currentDate: Date = new Date();
+    private readonly _endDate: Date = new Date(this._currentDate.getTime() + (5 * 60 * 60 * 1000));
+
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridDay, interactionPlugin, rrulePlugin],
-        initialView: window.innerWidth < 768 ? 'dayGridDay' : 'dayGridMonth', // Change view on smaller screens
+        initialView: 'timeGridWeek', // Change view on smaller screens
         firstDay: 1,
         events: [], // to be altered when loaded
         selectable: true,
         eventClick: this.handleEventClick.bind(this),
         headerToolbar: {
-            right: 'prev,next'
+            left: '',
+            right: ''
         },
+        slotMinTime: this.convert(this._currentDate),
+        slotMaxTime: this._currentDate.getDay() === this._endDate.getDay() ? this.convert(this._endDate) : '23:59:59',
+        /*        headerToolbar: {
+                    right: 'prev,next'
+                },
+                footerToolbar: {
+                    center: 'dayGridMonth,timeGridWeek,timeGridDay',
+                },*/
         footerToolbar: {
-            center: 'dayGridMonth,timeGridWeek,timeGridDay',
+            right: 'prev,next',
         },
         height: 'auto', // Makes the calendar height adaptive to content
         contentHeight: 'auto',
         aspectRatio: 1.35,
+        slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        },
         eventTimeFormat: {
             hour: '2-digit', minute: '2-digit', hour12: false
         },
@@ -57,32 +81,28 @@ export class TimetableComponent implements OnInit{
 
     constructor(
         private courseService: CourseService,
-        private accessibilityService: AccessibilityService,
         private dialog: MatDialog) {}
 
 
     ngOnInit(): void {
+
         this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             const api: Calendar = this.calendarComponent!.getApi();
 
-            courses.forEach(({ name, appointments }: CourseModel): void =>
-                appointments.forEach(({ start, duration, period }: ScheduledAppointmentModel): void => {
-                    const timeStamp: number = Number(start) * 1000;
-                    const startDate: string = new Date(timeStamp).toISOString();
-                    const endDate: string = new Date(timeStamp + Number(duration) * 1000).toISOString();
+            courses.forEach(({ name, scheduledAppointments }: CourseModel): void =>
+                scheduledAppointments.forEach(({ start, end, period }: ScheduledAppointmentModel): void => {
+                    const startDate: string = new Date(Number(start) * 1000).toISOString();
+                    const endDate: string = new Date(Number(end) * 1000).toISOString();
 
                     api.addEvent({
                         title: name,
                         start: startDate,
                         end: endDate,
-                        extendedProps: {
-                            description: `${timeStamp} - ${name}`,
-                        },
                         rrule: {
                             freq: RRule.MINUTELY,
                             interval: Number(period) / 60,
                             dtstart: startDate,
-                            count: 52,
+                            until: endDate,
                         },
                     });
                 })

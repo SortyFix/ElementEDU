@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record ScheduledAppointmentModel(@NotNull Long id, @NotNull Long start, @NotNull Long duration, @NotNull Long period) implements EntityModel
+public record ScheduledAppointmentModel(@NotNull Long id, @NotNull Long start, @NotNull Long end, @NotNull Long duration, @NotNull Long period) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()

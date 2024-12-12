@@ -10,13 +10,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
-public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long duration, @NotNull Long period,
+public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long end, @NotNull Long duration, @NotNull Long period,
                                               @NotNull Long course) implements CreationModel<ScheduledAppointmentEntity>
 {
 
     @Override public @NotNull ScheduledAppointmentEntity toEntity(@NotNull ScheduledAppointmentEntity entity)
     {
-        entity.setTimeStamp(Instant.ofEpochSecond(start()));
+        entity.setStartTimeStamp(Instant.ofEpochSecond(start()));
+        entity.setEndTimeStamp(Instant.ofEpochSecond(end()));
         entity.setDuration(Duration.ofSeconds(duration()));
         entity.setPeriod(Period.ofDays(Math.toIntExact(periodAsDays())));
         return entity;

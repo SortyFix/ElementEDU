@@ -1,1 +1,39 @@
-<full-calendar #calendar [options]="calendarOptions" style="margin: 5% 1% 1% 1%;"></full-calendar>
+<div class="calendar-container mat-elevation-z4 mat-card">
+    <div class="calendar-info-wrapper">
+        <!-- FullCalendar Component -->
+        <div class="calendar-wrapper">
+            <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        </div>
+        <!-- Info Box -->
+        <div class="info-box mat-card">
+            <h3 class="mat-title">Upcoming Homeworks & Tests</h3>
+            <mat-list>
+                <mat-list-item>
+                    <span matListItemTitle>05.12.2024</span>
+                    <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span matListItemTitle>15.11.2024</span><br>
+                    <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span matListItemTitle>04.11.2024</span>
+                    <span matListItemLine>Chemistry: Organic Compounds Test</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span matListItemTitle>06.12.2024</span>
+                    <span matListItemLine>Biology: Cell Division Homework</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span matListItemTitle>13.12.2024</span>
+                    <span matListItemLine>History: World War II Assessment</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span matListItemTitle>25.12.2024</span>
+                    <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
+                </mat-list-item>
+            </mat-list>
+
+        </div>
+    </div>
+</div>

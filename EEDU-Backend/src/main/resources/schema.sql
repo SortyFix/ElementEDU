@@ -49,11 +49,12 @@ CREATE TABLE IF NOT EXISTS course_entity
 
 CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id  BIGINT         NOT NULL,
-    time_stamp BIGINT         NOT NULL,
-    duration   BIGINT         NOT NULL,
-    period     INT NOT NULL,
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id        BIGINT NOT NULL,
+    start_time_stamp BIGINT NOT NULL,
+    end_time_stamp   BIGINT NOT NULL,
+    duration         BIGINT NOT NULL,
+    period           INT    NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id)
 );
 
@@ -288,9 +289,9 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
        ('History 101', 3, 4, 3),  -- History, Room 103
        ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
 
-INSERT INTO scheduled_appointment_entity (course_id, time_stamp, duration, period) VALUES
-        (1, 1731779748, 90, 7),
-        (2, 1731778748, 4000, 6);
+INSERT INTO scheduled_appointment_entity (course_id, start_time_stamp, end_time_stamp, duration, period) VALUES
+        (1, 1731779748, 1751989748, 90, 7),
+        (2, 1731778748, 1751999748, 4000, 6);
 
 INSERT INTO user_groups (group_id, user_id) VALUES
        (1, 5),   -- Sara Müller (teacher)
