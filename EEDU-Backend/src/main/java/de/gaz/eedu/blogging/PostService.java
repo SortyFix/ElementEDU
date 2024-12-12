@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -50,13 +51,6 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         getRepository().delete(getRepository().getReferenceById(postId));
     }
 
-    public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
-    {
-        boolean i = getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
-        System.out.println(i);
-        return i;
-    }
-
     public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
     {
         return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getEditPrivileges());
@@ -69,11 +63,9 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 
     public @NotNull PostModel[] getAllPosts(@NotNull Long userId)
     {
-        System.out.println(userId);
-        System.out.println("Works2");
-        PostModel[] postModels = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
-        System.out.println(Arrays.toString(postModels));
-        return postModels;
+        PostModel[] posts = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
+        Arrays.sort(posts, Comparator.comparing(PostModel::timeOfCreation).reversed());
+        return posts;
     }
 
     /**
@@ -108,7 +100,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
-        FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), postEntity.getReadPrivileges().toArray(new String[0]), "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
+        FileEntity thumbnailFile = new FileCreateModel(userId, newThumbnail.getName(), new String[]{"ADMIN"} /** TODO: Change once we have an ALL privilege **/, "blog", postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
         thumbnailFile.uploadBatch("", newThumbnail);
         postEntity.setThumbnailURL(thumbnailFile.getFilePath());
         getRepository().save(postEntity);

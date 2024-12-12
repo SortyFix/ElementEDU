@@ -1,1 +1,44 @@
-<p>news works!</p>
+<div class="highlighted-article">
+    <div class="highlighted-banner">
+        <img src="https://gaz-reichelsheim.de/wp-content/uploads/Begruessung-Gaeste-aus-Italien-2024-2048x1237.jpeg" alt="Headline Background Image">
+    </div>
+    <div class="highlighted-overlay">
+        <h1 class="highlighted-title">Begrüßung der Gäste aus Italien</h1>
+        <div class="highlighted-details">
+            <div class="highlighted-author">
+                Raoul Giebenhain
+            </div>
+            <div class="highlighted-date">
+                October 23, 2023
+            </div>
+        </div>
+        <a href="#" class="highlighted-button">Read More</a>
+    </div>
+</div>
+
+<div id="container" #container>
+    <mat-grid-list [cols]="columns" rowHeight="420px" width="100%" (window:resize)="onBoxResize()">
+        <mat-grid-tile *ngFor="let x of articleList">
+            <div class="news-card" (click)="openArticle(x.id)">
+                <div class="news-thumbnail">
+                    <img src="https://via.placeholder.com/400x200" alt="Article Thumbnail">
+                </div>
+                <div class="news-content">
+                    <h3 class="news-title">{{ x.title }}</h3>
+                    <div class="news-footer">
+                        <div class="news-info">
+                            <div class="news-author">
+                                <span class="author-icon"></span>
+                                {{ x.author }}
+                            </div>
+                            <div class="news-date">
+                                <span class="date-icon"></span>
+                                {{ this.getTimeString(x.timeOfCreation) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-grid-tile>
+    </mat-grid-list>
+</div>

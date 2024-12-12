@@ -19,17 +19,11 @@ import java.io.IOException;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
     {
-        if(postService.userHasReadAuthority(userId, postId))
-        {
-            return ResponseEntity.ok(postService.getModel(postId));
-        }
-
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.ok(postService.getModel(postId));
     }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@AuthenticationPrincipal Long userId)
     {
-        System.out.println("Works");
         System.out.println(ResponseEntity.ok(postService.getAllPosts(userId)));
         return ResponseEntity.ok(postService.getAllPosts(userId));
     }

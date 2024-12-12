@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS post_entity
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     author VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    thumbnailurl VARCHAR(255) NOT NULL,
+    thumbnailurl VARCHAR(255),
     body VARCHAR(255) NOT NULL,
     time_of_creation BIGINT NOT NULL
 );
@@ -242,27 +242,50 @@ CREATE TABLE IF NOT EXISTS post_tags
 -- Insert more posts into the `post` table
 INSERT INTO post_entity (id, author, title, thumbnailURL, body, time_of_creation)
 VALUES
-    (3, 'Alice Cooper', 'Understanding Java Streams', 'http://example.com/image3.jpg', 'Dive deep into Java Streams API.', 1698854400000),
-    (4, 'Bob Marley', 'Kotlin for Beginners', 'http://example.com/image4.jpg', 'An introduction to Kotlin programming language.', 1698940800000),
-    (5, 'Eve Adams', 'Effective Unit Testing', 'http://example.com/image5.jpg', 'How to write effective unit tests in Java.', 1699027200000);
-
--- Insert more into the `post_user_read_privileges` table
-INSERT INTO post_user_read_privileges (post_id, read_privileges)
-VALUES
-    (3, 'ADMIN'),
-    (4, 'ADMIN'),
-    (5, 'ADMIN');
+    (3, 'Alice Cooper', 'Understanding Java Streams', null, 'Dive deep into Java Streams API.', 1698854400000),
+    (4, 'Bob Marley', 'Kotlin for Beginners', null, 'An introduction to Kotlin programming language.', 1698940800000),
+    (5, 'Eve Adams', 'Effective Unit Testing', null, 'How to write effective unit tests in Java.', 1699027200000),
+    (6, 'Charlie Daniels', 'REST APIs with Spring Boot', null, 'Guide to creating REST APIs with Spring Boot.', 1699113600000),
+    (7, 'Dana White', 'Microservices Architecture', null, 'Learn how to design microservices.', 1699200000000),
+    (8, 'Ernest Hemingway', 'Deploying Apps with Docker', null, 'An introduction to Docker and app deployment.', 1699286400000),
+    (9, 'Grace Hopper', 'Demystifying Kubernetes', null, 'Kubernetes for managing containerized apps.', 1699372800000),
+    (10, 'Ada Lovelace', 'AI for Beginners', null, 'Understanding the basics of Artificial Intelligence.', 1699459200000),
+    (11, 'Alan Turing', 'Intro to Cryptography', null, 'Learn about cryptography and securing information.', 1699545600000),
+    (12, 'Linus Torvalds', 'Version Control with Git', null, 'Master Git for version control.', 1699632000000),
+    (13, 'Margaret Hamilton', 'Building Robust Systems', null, 'How to build fault-tolerant and robust systems.', 1699718400000),
+    (14, 'Tim Berners-Lee', 'Web Development Basics', null, 'Basics of developing web applications.', 1699804800000),
+    (15, 'Guido van Rossum', 'Python for Data Science', null, 'Leveraging Python for data processing and analysis.', 1699891200000);
 
 -- Insert more into the `post_user_edit_privileges` table
 INSERT INTO post_user_edit_privileges (post_id, edit_privileges)
 VALUES
     (3, 'ADMIN'),
     (4, 'ADMIN'),
-    (5, 'ADMIN');
+    (5, 'ADMIN'),
+    (6, 'ADMIN'),
+    (7, 'ADMIN'),
+    (8, 'ADMIN'),
+    (9, 'ADMIN'),
+    (10, 'ADMIN'),
+    (11, 'ADMIN'),
+    (12, 'ADMIN'),
+    (13, 'ADMIN'),
+    (14, 'ADMIN'),
+    (15, 'ADMIN');
 
 -- Insert more into the `post_tags` table
 INSERT INTO post_tags (post_id, tags)
 VALUES
     (3, 'java'),
     (4, 'kotlin'),
-    (5, 'testing');
+    (5, 'testing'),
+    (6, 'springboot'),
+    (7, 'microservices'),
+    (8, 'docker'),
+    (9, 'kubernetes'),
+    (10, 'ai'),
+    (11, 'cryptography'),
+    (12, 'git'),
+    (13, 'systems'),
+    (14, 'webdev'),
+    (15, 'python');

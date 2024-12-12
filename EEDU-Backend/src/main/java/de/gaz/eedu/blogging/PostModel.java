@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public record PostModel(@NotNull Long id, @NotNull String author, @NotNull String title,
-                        @NotNull String thumbnailBlob, @NotNull String body, @NotNull Long timeOfCreation,
+                        String thumbnailBlob, @NotNull String body, @NotNull Long timeOfCreation,
                         @NotNull String[] editPrivileges, @NotNull String[] tags) implements EntityModel
 {
     @Override public boolean equals(Object o)

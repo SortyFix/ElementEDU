@@ -5,17 +5,16 @@ import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Entity @Getter @Setter
@@ -24,12 +23,9 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     private String author;
     private String title;
-    private String thumbnailURL;
+    @Nullable private String thumbnailURL;
     private String body;
     private Long timeOfCreation;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "post_user_read_privileges", joinColumns = @JoinColumn(name = "post_id"))
-    private final Set<String> readPrivileges = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_user_edit_privileges", joinColumns = @JoinColumn(name = "post_id"))
     private final Set<String> editPrivileges = new HashSet<>();
@@ -91,24 +87,31 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
         return Objects.hash(id);
     }
 
-    @Override @NotNull public PostModel toModel()
+    public PostModel toModel()
     {
-        String encodedThumbnail = encode();
+        String encodedThumbnail = null;
+        try
+        {
+            if (thumbnailURL != null)
+            {
+                encodedThumbnail = encode();
+            }
+        }
+        catch (IOException e)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to encode thumbnail.", e);
+        }
         return new PostModel(id, author, title, encodedThumbnail, body, timeOfCreation,
                 editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
-    public @NotNull String encode()
+    public @Nullable String encode() throws IOException
     {
-        try
-        {
+        if (thumbnailURL != null) {
             byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));
             return Base64.getEncoder().encodeToString(fileContent);
         }
-        catch(IOException ioException)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Not found: " + thumbnailURL, ioException);
-        }
+        return null;
     }
 
     private <T> boolean updateDatabase(@NotNull PostService userService, @NotNull T entity, @NotNull Predicate<T> predicate)
