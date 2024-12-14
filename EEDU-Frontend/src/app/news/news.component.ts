@@ -1,11 +1,15 @@
 import {AfterViewInit, Component, ElementRef, Injectable, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PostModel} from "./post-model";
-import {Observable, timestamp} from "rxjs";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {NgForOf} from "@angular/common";
-import {MatDialog} from "@angular/material/dialog";
 import {ActivatedRoute, Router} from "@angular/router";
+import {NewsService} from "./news.service";
+import {MatIcon} from "@angular/material/icon";
+import {MatFabButton} from "@angular/material/button";
+import {Dialog} from "@angular/cdk/dialog";
+import {ArticleCreationComponent} from "./article-creation/article-creation.component";
+import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-button.component";
 
 @Component({
   selector: 'app-news',
@@ -13,7 +17,10 @@ import {ActivatedRoute, Router} from "@angular/router";
     imports: [
         MatGridList,
         MatGridTile,
-        NgForOf
+        NgForOf,
+        MatIcon,
+        MatFabButton,
+        FileUploadButtonComponent
     ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss'
@@ -23,28 +30,26 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class NewsComponent implements AfterViewInit, OnInit {
 
+    ngAfterViewInit(): void {
+        this.calculateColumns();
+    }
+
+    constructor(public http: HttpClient, public newsService: NewsService, public route: ActivatedRoute, public router: Router, public dialog: Dialog) {
+    }
+
+    columns!: number;
+
+    @ViewChild('container', {static: false}) container: ElementRef | undefined;
+
     ngOnInit(): void
     {
+        this.newsService.getAllPosts();
         this.route.params.subscribe((params) => {
             if(params['id']) {
                 this.openArticle(BigInt(+params['id']));
             }
         })
     }
-
-    ngAfterViewInit(): void {
-        this.calculateColumns();
-    }
-
-    constructor(public http: HttpClient, public dialog: MatDialog, public route: ActivatedRoute, public router: Router) {
-        this.getAllPosts();
-    }
-
-    columns!: number;
-
-    articleList!: PostModel[];
-
-    @ViewChild('container', {static: false}) container: ElementRef | undefined;
 
     onBoxResize(): void {
         this.calculateColumns()
@@ -60,23 +65,22 @@ export class NewsComponent implements AfterViewInit, OnInit {
         this.router.navigate([`/news/`, articleId]);
     }
 
+    public openArticleCreation()
+    {
+        let dialogRef = this.dialog.open(ArticleCreationComponent, {
+            width: "80%"
+        })
+    }
+
     private calculateColumns(): void
     {
         // Source: https://stackblitz.com/edit/angular-dynamic-grid-list-cols-alprdz?file=src%2Fapp%2Fapp.component.html
         if (this.container) {
             const containerWidth = this.container.nativeElement.clientWidth;
-            let screenDivision = Math.floor(containerWidth / 400);
+            let screenDivision = Math.floor(containerWidth / 350);
             this.columns = (screenDivision > 0 ? screenDivision : 1);
         } else {
             this.columns = 1;
         }
-    }
-
-    public getAllPosts(): void {
-        this.http.get<PostModel[]>("http://localhost:8080/api/v1/blog/get/list", {
-            withCredentials: true
-        }).subscribe((list) => {
-            this.articleList = list;
-        });
     }
 }

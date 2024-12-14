@@ -105,7 +105,7 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
                 editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
-    public @Nullable String encode() throws IOException
+    public @NotNull String encode() throws IOException
     {
         if (thumbnailURL != null) {
             byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));

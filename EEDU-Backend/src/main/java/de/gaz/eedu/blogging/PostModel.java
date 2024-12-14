@@ -2,11 +2,12 @@ package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.model.EntityModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public record PostModel(@NotNull Long id, @NotNull String author, @NotNull String title,
-                        String thumbnailBlob, @NotNull String body, @NotNull Long timeOfCreation,
+                        @Nullable String thumbnailBlob, @NotNull String body, @NotNull Long timeOfCreation,
                         @NotNull String[] editPrivileges, @NotNull String[] tags) implements EntityModel
 {
     @Override public boolean equals(Object o)

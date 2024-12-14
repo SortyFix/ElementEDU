@@ -1,7 +1,9 @@
 package de.gaz.eedu.blogging;
 
+import de.gaz.eedu.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +18,7 @@ import java.io.IOException;
 {
     private final PostService postService;
     private final PostRepository postRepository;
+    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
     {
@@ -24,12 +27,12 @@ import java.io.IOException;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@AuthenticationPrincipal Long userId)
     {
-        System.out.println(ResponseEntity.ok(postService.getAllPosts(userId)));
-        return ResponseEntity.ok(postService.getAllPosts(userId));
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    @PreAuthorize("hasAuthority(${blog.write})") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestBody PostCreateModel createModel, @NotNull @RequestPart("multipartFile") MultipartFile multipartFile)
+    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestPart("createModel") PostCreateModel createModel, @Nullable @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile)
     {
+        System.out.println(userService.loadEntityByIDSafe(userId).getAuthorities().toString());
         return ResponseEntity.ok(postService.createPost(userId, multipartFile, createModel));
     }
 

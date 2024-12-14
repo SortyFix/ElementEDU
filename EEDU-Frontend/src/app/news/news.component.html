@@ -18,8 +18,8 @@
 
 <div id="container" #container>
     <mat-grid-list [cols]="columns" rowHeight="420px" width="100%" (window:resize)="onBoxResize()">
-        <mat-grid-tile *ngFor="let x of articleList">
-            <div class="news-card" (click)="openArticle(x.id)">
+        <mat-grid-tile *ngFor="let x of newsService.articleList">
+            <div class="news-card" (click)="openArticle(x.id)" style="cursor: pointer;">
                 <div class="news-thumbnail">
                     <img src="https://via.placeholder.com/400x200" alt="Article Thumbnail">
                 </div>
@@ -40,5 +40,11 @@
                 </div>
             </div>
         </mat-grid-tile>
-    </mat-grid-list>
+    </mat-grid-list>c
 </div>
+
+<button mat-fab class="add-article-button" (click)="openArticleCreation()">
+    <mat-icon>add</mat-icon>
+</button>
+
+

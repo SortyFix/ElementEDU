@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS post_entity
     author VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     thumbnailurl VARCHAR(255),
-    body VARCHAR(255) NOT NULL,
+    body VARCHAR(65000) NOT NULL,
     time_of_creation BIGINT NOT NULL
 );
 
@@ -252,7 +252,77 @@ VALUES
     (12, 'Linus Torvalds', 'Version Control with Git', null, 'Master Git for version control.', 1699632000000),
     (13, 'Margaret Hamilton', 'Building Robust Systems', null, 'How to build fault-tolerant and robust systems.', 1699718400000),
     (14, 'Tim Berners-Lee', 'Web Development Basics', null, 'Basics of developing web applications.', 1699804800000),
-    (15, 'Guido van Rossum', 'Python for Data Science', null, 'Leveraging Python for data processing and analysis.', 1699891200000);
+    (15, 'Yonas Nieder', 'The wonders of markdown with Yonas Nieder Fernández', null,
+     '# Markdown syntax guide
+
+## Headers
+
+# This is a Heading h1
+## This is a Heading h2
+###### This is a Heading h6
+
+## Emphasis
+
+*This text will be italic*
+_This will also be italic_
+
+**This text will be bold**
+__This will also be bold__
+
+_You **can** combine them_
+
+## Lists
+
+### Unordered
+
+* Item 1
+* Item 2
+* Item 2a
+* Item 2b
+    * Item 3a
+    * Item 3b
+
+### Ordered
+
+1. Item 1
+2. Item 2
+3. Item 3
+    1. Item 3a
+    2. Item 3b
+
+## Images
+
+![This is an alt text.](/image/sample.webp "This is a sample image.")
+
+## Links
+
+You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
+
+## Blockquotes
+
+> Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
+>
+>> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
+
+## Tables
+
+| Left columns  | Right columns |
+| ------------- |:-------------:|
+| left foo      | right foo     |
+| left bar      | right bar     |
+| left baz      | right baz     |
+
+## Blocks of code
+
+```
+let message = ''Hello world'';
+alert(message);
+```
+
+## Inline code
+
+This web site is using `markedjs/marked`.',
+     1699891200000);
 
 -- Insert more into the `post_user_edit_privileges` table
 INSERT INTO post_user_edit_privileges (post_id, edit_privileges)
@@ -286,4 +356,6 @@ VALUES
     (12, 'git'),
     (13, 'systems'),
     (14, 'webdev'),
-    (15, 'python');
+    (15, 'markdown'),
+    (15, 'yonas'),
+    (15, 'html');

@@ -1,4 +1,3 @@
-/* General Styling */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f9f9f9;
@@ -11,7 +10,13 @@ body {
     overflow: hidden;
 }
 
-/* Highlighted Article Container */
+.add-article-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 1000;
+}
+
 .highlighted-article {
     position: relative;
     max-width: 100%;
@@ -23,7 +28,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Banner Image */
 .highlighted-banner img {
     width: 100%;
     height: 100%;
@@ -31,7 +35,6 @@ body {
     display: block;
 }
 
-/* Overlay Content */
 .highlighted-overlay {
     position: absolute;
     top: 0;
@@ -47,7 +50,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Title Styling */
 .highlighted-title {
     font-size: 2.5rem;
     font-weight: bold;
@@ -55,7 +57,6 @@ body {
     line-height: 1.3;
 }
 
-/* Author and Date Details */
 .highlighted-details {
     display: flex;
     gap: 25px;
@@ -74,7 +75,6 @@ body {
     color: #f9f9f9;
 }
 
-/* Call-to-Action Button Styling */
 .highlighted-button {
     background-color: #e63946;
     color: white;
@@ -93,7 +93,6 @@ body {
     background-color: #d62839;
 }
 
-/* ---------------- TILES --------------- */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f9f9f9;
@@ -104,7 +103,6 @@ body {
     height: 100vh;
 }
 
-/* News Card Container */
 .news-card {
     background-color: #ffffff;
     border: 1px solid #eaeaea;
@@ -123,33 +121,28 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Thumbnail Image */
 .news-thumbnail img {
     width: 100%;
     display: block;
     border-bottom: 1px solid #eaeaea;
 }
 
-/* Content Section */
 .news-content {
     padding: 15px;
 }
 
-/* Title Styling */
 .news-title {
     font-size: 1.4rem;
     color: #333333;
     margin-bottom: 15px;
 }
 
-/* Footer Styling */
 .news-footer {
     padding: 15px 0;
     border-top: 1px solid #eaeaea;
     margin-top: 10px;
 }
 
-/* Author and Date Centered */
 .news-info {
     display: flex;
     flex-direction: column;
@@ -159,7 +152,6 @@ body {
     color: #555555;
 }
 
-/* Author Styling */
 .news-author, .news-date {
     display: flex;
     align-items: center;
@@ -171,7 +163,6 @@ body {
     color: #0073e6;
 }
 
-/* Read More Button */
 .read-more {
     color: #0073e6;
     text-decoration: none;

@@ -22,10 +22,9 @@ export class FileService {
 
     constructor(private http: HttpClient) { }
 
-    // TODO REMOVE!!!
-    public testUpload()
+    public uploadImageToPost()
     {
-        this.uploadSelection("http://localhost:8080/api/v1/illness/me/uploadTest");
+        this.uploadSelection("http://localhost:8080/api/v1/blog/post");
     }
 
     public testDownload(): void {
@@ -33,7 +32,7 @@ export class FileService {
     }
 
     // ------------------------------ UPLOAD -----------------------------------
-    public uploadSelection(url: string): void {
+    public uploadSelection(url: string, additionalData?: { [key: string]: any }): void {
         if(this.selectedFiles){
             this.uploadFiles(url, this.selectedFiles).subscribe({
                 error: err => {

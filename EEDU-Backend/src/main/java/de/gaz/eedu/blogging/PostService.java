@@ -4,6 +4,8 @@ import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
+import de.gaz.eedu.file.FileService;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Getter;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,8 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
 {
     @Getter private final PostRepository repository;
     @Getter private final UserService userService;
+    private final FileService fileService;
 
     @Value("${blog.write}") private String writePrivilege;
 
@@ -49,11 +52,6 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         getRepository().delete(getRepository().getReferenceById(postId));
     }
 
-    public boolean userHasReadAuthority(@NotNull Long userId, @NotNull Long postId)
-    {
-        return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getReadPrivileges());
-    }
-
     public boolean userHasEditAuthority(@NotNull Long userId, @NotNull Long postId)
     {
         return getUserService().loadEntityByIDSafe(userId).hasAnyAuthority(getRepository().getReferenceById(postId).getEditPrivileges());
@@ -62,6 +60,13 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel getModel(@NotNull Long postId)
     {
         return getRepository().getReferenceById(postId).toModel();
+    }
+
+    public @NotNull PostModel[] getAllPosts()
+    {
+        PostModel[] posts = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
+        Arrays.sort(posts, Comparator.comparing(PostModel::timeOfCreation).reversed());
+        return posts;
     }
 
     /**
@@ -96,7 +101,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));
-        FileEntity thumbnailFile = new FileCreateModel("blog", postEntity.getReadPrivileges().toArray(new String[0]), postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
+        FileEntity thumbnailFile = new FileCreateModel("blog", new String[]{"ADMIN", "ALL"}, postEntity.getTags().toArray(String[]::new)).toEntity(new FileEntity());
         thumbnailFile.uploadBatch("", newThumbnail);
         postEntity.setThumbnailURL(thumbnailFile.getFilePath());
         getRepository().save(postEntity);
@@ -112,15 +117,24 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
      * @return PostModel containing given data
      */
     @Transactional
-    public @NotNull PostModel createPost(@NotNull Long userId, @NotNull MultipartFile thumbnail, @NotNull PostCreateModel createModel)
+    public @NotNull PostModel createPost(@NotNull Long userId, @Nullable MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
-        if(getUserService().loadEntityByIDSafe(userId).hasAuthority(writePrivilege))
+        UserEntity userEntity = userService.loadEntityByIDSafe(userId);
+        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ADMIN"))
         {
-            FileEntity thumbnailFile = new FileCreateModel("blog", createModel.readPrivileges(), createModel.tags()).toEntity(new FileEntity());
-            thumbnailFile.uploadBatch("", thumbnail);
+            System.out.println("User has correct privileges, proceeding...");
+            if(Objects.nonNull(thumbnail))
+            {
+                FileEntity thumbnailFile = new FileCreateModel("blog", createModel.editPrivileges(), createModel.tags()).toEntity(new FileEntity());
+                thumbnailFile.uploadBatch("", thumbnail);
+                fileService.getRepository().save(thumbnailFile);
+                return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
+                        thumbnailFile.getFilePath(), createModel.body(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
+            }
             return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
-                    thumbnailFile.getFilePath(), createModel.body(), createModel.readPrivileges(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
+                    null, createModel.body(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
         }
+        System.out.println("User does not have the correct privileges: " + getUserService().loadEntityByIDSafe(userId).getAuthorities().toString() + " | Required: ADMIN || " + writePrivilege);
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }

@@ -10,7 +10,6 @@ import {Router} from "@angular/router";
 })
 export class AppComponent implements OnInit
 {
-
     errorSignal: WritableSignal<string> = signal('')
 
     constructor(public userService: UserService, public router: Router)
