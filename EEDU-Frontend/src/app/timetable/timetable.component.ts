@@ -12,7 +12,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridDay from '@fullcalendar/timegrid';
 import rrulePlugin from '@fullcalendar/rrule'
 import interactionPlugin from '@fullcalendar/interaction';
-import {MatList, MatListItem, MatListItemTitle} from "@angular/material/list";
+import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
+import {MatButton} from "@angular/material/button";
+import {AccessibilityService} from "../accessibility.service";
+import {MatLine} from "@angular/material/core";
 
 @Component({
   selector: 'app-timetable',
@@ -22,53 +25,51 @@ import {MatList, MatListItem, MatListItemTitle} from "@angular/material/list";
         MatList,
         MatListItem,
         MatListItemTitle,
+        MatListItemLine,
     ],
   templateUrl: './timetable.component.html',
   styleUrl: './timetable.component.scss'
 })
 export class TimetableComponent implements OnInit{
 
-    private convert: (date: Date) => string = function (date: Date) {
-        return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    };
-
-    private readonly _currentDate: Date = new Date();
-    private readonly _endDate: Date = new Date(this._currentDate.getTime() + (5 * 60 * 60 * 1000));
-
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridDay, interactionPlugin, rrulePlugin],
-        initialView: 'timeGridWeek', // Change view on smaller screens
+        initialView: 'timeGridWeek',
         firstDay: 1,
         events: [], // to be altered when loaded
         selectable: true,
         eventClick: this.handleEventClick.bind(this),
         headerToolbar: {
             left: '',
+            center: 'title',
             right: ''
         },
-        slotMinTime: this.convert(this._currentDate),
-        slotMaxTime: this._currentDate.getDay() === this._endDate.getDay() ? this.convert(this._endDate) : '23:59:59',
-        /*        headerToolbar: {
-                    right: 'prev,next'
-                },
-                footerToolbar: {
-                    center: 'dayGridMonth,timeGridWeek,timeGridDay',
-                },*/
         footerToolbar: {
             right: 'prev,next',
         },
-        height: 'auto', // Makes the calendar height adaptive to content
-        contentHeight: 'auto',
-        aspectRatio: 1.35,
         slotLabelFormat: {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false
         },
+        height: 'auto',
+        contentHeight: 'auto',
+        aspectRatio: 1.35,
         eventTimeFormat: {
             hour: '2-digit', minute: '2-digit', hour12: false
         },
+        displayEventTime: false,
+        slotMinTime: '05:00:00',
+        slotMaxTime: '23:00:00',
+        slotDuration: '01:00:00',
+        slotLabelInterval: '01:00:00',
+        titleFormat: {
+            hour12: false,
+            month: 'long',
+            weekday: 'long',
+            year: 'numeric',
+        }
     };
 
     handleEventClick(info: EventClickArg): void {
@@ -79,13 +80,9 @@ export class TimetableComponent implements OnInit{
         });
     }
 
-    constructor(
-        private courseService: CourseService,
-        private dialog: MatDialog) {}
-
+    constructor(private courseService: CourseService, private dialog: MatDialog, protected accessibilityService: AccessibilityService) {}
 
     ngOnInit(): void {
-
         this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             const api: Calendar = this.calendarComponent!.getApi();
 
