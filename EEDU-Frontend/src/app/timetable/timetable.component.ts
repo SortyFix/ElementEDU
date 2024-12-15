@@ -1,10 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {CourseModel} from "../user/courses/models/course-model";
-import {Calendar, CalendarOptions, EventClickArg} from "@fullcalendar/core";
+import {Calendar, CalendarOptions, EventClickArg, EventInput} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
-import {RRule} from "rrule";
 import {MatDialog} from "@angular/material/dialog";
 import {EventDialogComponent} from "./event-dialog/event-dialog.component";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
@@ -34,7 +33,7 @@ export class TimetableComponent implements OnInit{
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridDay, interactionPlugin, listPlugin, rrulePlugin],
-        initialView: 'listWeek', // dayGridMonth,timeGridWeek,timeGridDay
+        initialView: 'timeGridWeek', // dayGridMonth,timeGridWeek,timeGridDay
         firstDay: 1,
         events: [], // to be altered when loaded
         selectable: true,
@@ -82,22 +81,9 @@ export class TimetableComponent implements OnInit{
         this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             const api: Calendar = this.calendarComponent!.getApi();
 
-            courses.forEach(({ name, scheduledAppointments }: CourseModel): void =>
-                scheduledAppointments.forEach(({ start, end, period }: ScheduledAppointmentModel): void => {
-                    const startDate: string = new Date(Number(start) * 1000).toISOString();
-                    const endDate: string = new Date(Number(end) * 1000).toISOString();
-
-                    api.addEvent({
-                        title: name,
-                        start: startDate,
-                        end: endDate,
-                        rrule: {
-                            freq: RRule.MINUTELY,
-                            interval: Number(period) / 60,
-                            dtstart: startDate,
-                            until: endDate,
-                        },
-                    });
+            courses.forEach(({ name, entries, scheduledAppointments }: CourseModel): void =>
+                scheduledAppointments.forEach((entity: ScheduledAppointmentModel): void => {
+                    api.addEvent(entity.asEvent(name, entries));
                 })
             );
         });

@@ -29,6 +29,7 @@ public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Lon
         entity.setSubmitHomework(submitHomework());
         validateSubmitUntil();
         entity.setSubmitUntil(getSubmitUntil());
+        entity.setPublish(Instant.now());
         return entity;
     }
 

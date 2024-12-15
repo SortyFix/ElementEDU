@@ -41,20 +41,6 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final AppointmentEntryRepository appointmentEntryRepository;
     private final FileService fileService;
 
-    @Contract(pure = true, value = "_, _ -> new")
-    private static @NotNull CreationFactory<AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
-    {
-        return entity ->
-        {
-            if (Objects.isNull(entryCreateModel.duration()))
-            {
-                return attachScheduled(entryCreateModel, course, entity);
-            }
-            entity.setDuration(Duration.ofSeconds(entryCreateModel.duration()));
-            return entity;
-        };
-    }
-
     @Contract(pure = true, value = "_,_,_ -> param3")
     private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
     {
@@ -158,18 +144,24 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
      *  TODO I'll improve the doc once I get home
      *
      * @param id already computed before. Will be the id of the entity
-     * @param entryCreateModel entry blueprint
+     * @param createModel entry blueprint
      * @param course the course they are attached to.
      * @return the newly created entity.
      */
-    private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
+    private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel createModel, @NotNull CourseEntity course)
     {
-        CreationFactory<AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
-        AppointmentEntryEntity entry = entryCreateModel.toEntity(new AppointmentEntryEntity(id), factory);
-        getAppointmentEntryRepository().save(entry);
+        AppointmentEntryRepository entryRepository = getAppointmentEntryRepository();
 
-        course.setEntry(this, entry);
-        return entry;
+        AppointmentEntryEntity entity = new AppointmentEntryEntity(id, course);
+        return entryRepository.save(createModel.toEntity(entity, entryEntity ->
+        {
+            if (Objects.isNull(createModel.duration()))
+            {
+                return attachScheduled(createModel, course, entryEntity);
+            }
+            entryEntity.setDuration(Duration.ofSeconds(createModel.duration()));
+            return entryEntity;
+        }));
     }
 
 }
