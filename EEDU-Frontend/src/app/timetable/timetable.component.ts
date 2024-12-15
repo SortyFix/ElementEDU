@@ -7,15 +7,14 @@ import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {RRule} from "rrule";
 import {MatDialog} from "@angular/material/dialog";
 import {EventDialogComponent} from "./event-dialog/event-dialog.component";
+import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
+import {AccessibilityService} from "../accessibility.service";
 
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridDay from '@fullcalendar/timegrid';
 import rrulePlugin from '@fullcalendar/rrule'
 import interactionPlugin from '@fullcalendar/interaction';
-import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
-import {MatButton} from "@angular/material/button";
-import {AccessibilityService} from "../accessibility.service";
-import {MatLine} from "@angular/material/core";
+import listPlugin from '@fullcalendar/list';
 
 @Component({
   selector: 'app-timetable',
@@ -34,8 +33,8 @@ export class TimetableComponent implements OnInit{
 
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
-        plugins: [dayGridPlugin, timeGridDay, interactionPlugin, rrulePlugin],
-        initialView: 'timeGridWeek',
+        plugins: [dayGridPlugin, timeGridDay, interactionPlugin, listPlugin, rrulePlugin],
+        initialView: 'listWeek', // dayGridMonth,timeGridWeek,timeGridDay
         firstDay: 1,
         events: [], // to be altered when loaded
         selectable: true,
@@ -60,23 +59,20 @@ export class TimetableComponent implements OnInit{
             hour: '2-digit', minute: '2-digit', hour12: false
         },
         displayEventTime: false,
-        slotMinTime: '05:00:00',
-        slotMaxTime: '23:00:00',
         slotDuration: '01:00:00',
         slotLabelInterval: '01:00:00',
         titleFormat: {
-            hour12: false,
             month: 'long',
-            weekday: 'long',
             year: 'numeric',
         }
     };
 
-    handleEventClick(info: EventClickArg): void {
+    private handleEventClick(info: EventClickArg): void {
+
         const eventDescription = info.event.extendedProps['description'] || 'This is a test description for the event.';
+
         this.dialog.open(EventDialogComponent, {
             data: { description: eventDescription },
-            position: { top: `${info.jsEvent.pageY}px`, left: `${info.jsEvent.pageX}px` },
         });
     }
 

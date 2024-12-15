@@ -6,13 +6,12 @@
     --widget-color: black;
 
     // FullCalendar
-    --fc-border-color: rgba(0,0,0,0);
+    --fc-border-color: color-mix(in srgb, var(--text-color) 5%, transparent);
     --fc-page-bg-color: var(--background-color);
 
     --fc-button-bg-color: var(--widget-color);
     --fc-button-border-color: transparent;
     --fc-button-text-color: var(--text-color);
-    --fc-button-border-radius: 4px;
     --fc-button-hover-bg-color: rgba(0, 0, 0, 0.85);
     --fc-button-hover-border-color: transparent;
     --fc-button-active-bg-color: rgba(0, 0, 0, 0.65);
