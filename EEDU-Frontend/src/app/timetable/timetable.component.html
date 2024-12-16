@@ -1,12 +1,15 @@
 <div class="calendar-container">
-    <div class="calendar-info-wrapper">
+    <div class="calendar-info-wrapper" [style.flex-direction]="screenWidth <= wrapSize ? 'column' : 'default'">
         <!-- FullCalendar Component -->
         <div class="calendar-wrapper">
             <full-calendar #calendar [options]="calendarOptions"></full-calendar>
         </div>
 
         <!-- Info Box -->
-        <div class="info-box">
+        <div class="info-box"
+        [style.margin-top]="screenWidth <= 1200 ? '1.5rem' : '0rem'"
+        [style.margin-left]="screenWidth > 1200 ? '1.5rem' : '0rem'"
+        >
             <h3 class="mat-title">Upcoming Homeworks & Tests</h3>
             <mat-list>
                 <mat-list-item>

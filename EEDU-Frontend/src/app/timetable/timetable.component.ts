@@ -31,6 +31,12 @@ import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-mo
 })
 export class TimetableComponent implements OnInit{
 
+    protected readonly wrapSize: number = 1200;
+
+    protected get screenWidth(): number {
+        return this._accessibilityService.dimensions.width;
+    }
+
     @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
     private readonly _calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridDay, interactionPlugin, listPlugin, rrulePlugin],
@@ -61,6 +67,8 @@ export class TimetableComponent implements OnInit{
         displayEventTime: false,
         slotDuration: '01:00:00',
         slotLabelInterval: '01:00:00',
+        slotMinTime: '04:00:00',
+        slotMaxTime: '23:00:00',
         titleFormat: {
             month: 'long',
             year: 'numeric',
@@ -71,15 +79,15 @@ export class TimetableComponent implements OnInit{
 
         const eventDescription: any = info.event.extendedProps['description'] || 'This is a test description for the event.';
 
-        this.dialog.open(EventDialogComponent, {
+        this._dialog.open(EventDialogComponent, {
             data: { description: eventDescription },
         });
     }
 
-    constructor(private courseService: CourseService, private dialog: MatDialog, protected accessibilityService: AccessibilityService) {}
+    constructor(private _courseService: CourseService, private _dialog: MatDialog, private _accessibilityService: AccessibilityService) {}
 
     ngOnInit(): void {
-        this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
+        this._courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             const api: Calendar = this.calendarComponent!.getApi();
 
             courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void =>
