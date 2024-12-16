@@ -5,7 +5,6 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.Entity;
@@ -32,7 +31,7 @@ import java.util.Optional;
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityModelRelation<AppointmentEntryModel>
 {
     @Setter(AccessLevel.NONE) @Id private long id;
-    private Instant timeStamp;
+    private Instant startTimeStamp;
     private Duration duration;
     private String description, homework;
     private boolean submitHomework;
@@ -115,7 +114,7 @@ import java.util.Optional;
         if(Objects.nonNull(getScheduledAppointment()))
         {
             // defaults to next appointment
-            Instant nextAppointment = getTimeStamp().plus(getScheduledAppointment().getPeriod());
+            Instant nextAppointment = getStartTimeStamp().plus(getScheduledAppointment().getPeriod());
             return Optional.of(nextAppointment);
         }
         return Optional.empty();
@@ -138,7 +137,19 @@ import java.util.Optional;
 
     @Override public @NotNull AppointmentEntryModel toModel()
     {
-        return new AppointmentEntryModel(getId(), getTimeStamp().getEpochSecond(), getDescription(), getHomework().orElse(""));
+        Long attachedScheduled = null;
+        if(Objects.nonNull(getScheduledAppointment()))
+        {
+            attachedScheduled = getScheduledAppointment().getId();
+        }
+
+        return new AppointmentEntryModel(getId(),
+                attachedScheduled,
+                getStartTimeStamp().toEpochMilli(),
+                getDuration().toMillis(),
+                getDescription(),
+                getHomework().orElse("")
+        );
     }
 
     @Contract(pure = true, value = "-> new")

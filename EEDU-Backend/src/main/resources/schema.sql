@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
     id                       BIGINT PRIMARY KEY,
-    time_stamp               BIGINT         NOT NULL,
+    start_time_stamp         BIGINT         NOT NULL,
     publish                  BIGINT         NOT NULL,
     duration                 BIGINT         NOT NULL,
     description              VARCHAR(255),
@@ -290,7 +290,7 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
        ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
 
 INSERT INTO scheduled_appointment_entity (course_id, start_time_stamp, end_time_stamp, duration, period) VALUES
-        (1, 1731779748, 1751989748, 90, 7),
+        (1, 1731779748, 1751989748, 2700, 7),
         (2, 1731778748, 1751999748, 4000, 6);
 
 INSERT INTO user_groups (group_id, user_id) VALUES

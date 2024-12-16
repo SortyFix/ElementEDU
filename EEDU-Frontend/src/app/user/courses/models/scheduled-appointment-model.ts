@@ -1,21 +1,20 @@
-import {DateInput, EventInput} from "@fullcalendar/core";
+import {EventInput} from "@fullcalendar/core";
 import {AppointmentEntryModel} from "./appointment-entry-model";
 import {RRule} from "rrule";
-import {ex} from "@fullcalendar/core/internal-common";
 
 export class ScheduledAppointmentModel {
 
     public constructor(
-        public readonly id: number, public readonly _start: number, public readonly _end: number, public readonly _duration: number, public readonly _period: number
-    ) {}
+        public readonly id: number, public readonly _start: number, public readonly _end: number, public readonly _duration: number, public readonly _period: number, public readonly _attachedEntries: AppointmentEntryModel[]) {}
 
-    public static fromObject(object: any): ScheduledAppointmentModel {
+    public static fromObject(object: any, attachedEntries: AppointmentEntryModel[]): ScheduledAppointmentModel {
         return new ScheduledAppointmentModel(
             object.id,
             object.start,
             object.end,
             object.duration,
-            object.period
+            object.period,
+            attachedEntries
         );
     }
 
@@ -45,22 +44,44 @@ export class ScheduledAppointmentModel {
         return delta % this._period === 0;
     }
 
-    public asEvent(name: string, entries: AppointmentEntryModel[]): EventInput {
+    public asEvent(name: string): EventInput {
+
+        const totalSeconds = Math.floor(this.duration / 1000); // Convert millis to seconds
+        const hours = Math.floor(totalSeconds / 3600); // Calculate hours
+        const minutes = Math.floor((totalSeconds % 3600) / 60); // Calculate minutes
+        const seconds = totalSeconds % 60; // Remaining seconds
+
+        // Format each component to ensure it's two digits
+        const formattedTime = [
+            hours.toString().padStart(2, '0'),
+            minutes.toString().padStart(2, '0'),
+            seconds.toString().padStart(2, '0')
+        ].join(':');
+
+        console.log(formattedTime);
+
         return {
             title: name,
-            start: this.start.toISOString(),
-            end: this.end.toISOString(),
+            start: this.start,
+            end: this.end,
+            duration: formattedTime,
             rrule: {
                 freq: RRule.MINUTELY,
                 interval: Number(this.period) / 60,
                 dtstart: this.start.toISOString(),
                 until: this.end.toISOString(),
             },
-            exdate: entries.map((entry: AppointmentEntryModel): string => this.toDate(entry.timeStamp).toISOString())
+            exdate: this._attachedEntries.map((entry: AppointmentEntryModel): string =>
+            {
+                return entry.start.toISOString();
+            })
         };
     }
 
     private toDate(timeStamp: number): Date {
         return new Date(timeStamp * 1000);
     }
+
+
+
 }

@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {CourseModel} from "../user/courses/models/course-model";
-import {Calendar, CalendarOptions, EventClickArg, EventInput} from "@fullcalendar/core";
+import {Calendar, CalendarOptions, EventClickArg} from "@fullcalendar/core";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
 import {MatDialog} from "@angular/material/dialog";
@@ -14,6 +14,7 @@ import timeGridDay from '@fullcalendar/timegrid';
 import rrulePlugin from '@fullcalendar/rrule'
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
+import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-model";
 
 @Component({
   selector: 'app-timetable',
@@ -68,7 +69,7 @@ export class TimetableComponent implements OnInit{
 
     private handleEventClick(info: EventClickArg): void {
 
-        const eventDescription = info.event.extendedProps['description'] || 'This is a test description for the event.';
+        const eventDescription: any = info.event.extendedProps['description'] || 'This is a test description for the event.';
 
         this.dialog.open(EventDialogComponent, {
             data: { description: eventDescription },
@@ -81,10 +82,13 @@ export class TimetableComponent implements OnInit{
         this.courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             const api: Calendar = this.calendarComponent!.getApi();
 
-            courses.forEach(({ name, entries, scheduledAppointments }: CourseModel): void =>
-                scheduledAppointments.forEach((entity: ScheduledAppointmentModel): void => {
-                    api.addEvent(entity.asEvent(name, entries));
-                })
+            courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void =>
+                {
+                    scheduledAppointments.forEach((entity: ScheduledAppointmentModel): void => {
+                        api.addEvent(entity.asEvent(name));
+                    });
+
+                }
             );
         });
     }

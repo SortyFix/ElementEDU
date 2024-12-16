@@ -23,7 +23,7 @@ public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Lon
 
     @Override public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException
     {
-        entity.setTimeStamp(Instant.ofEpochSecond(timeStamp()));
+        entity.setStartTimeStamp(Instant.ofEpochSecond(timeStamp()));
         entity.setDescription(description());
         entity.setHomework(homework());
         entity.setSubmitHomework(submitHomework());
