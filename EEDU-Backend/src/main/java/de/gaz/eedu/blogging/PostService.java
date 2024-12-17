@@ -125,11 +125,18 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
             System.out.println("User has correct privileges, proceeding...");
             if(Objects.nonNull(thumbnail))
             {
-                FileEntity thumbnailFile = new FileCreateModel("blog", createModel.editPrivileges(), createModel.tags()).toEntity(new FileEntity());
-                thumbnailFile.uploadBatch("", thumbnail);
-                fileService.getRepository().save(thumbnailFile);
-                return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
-                        thumbnailFile.getFilePath(), createModel.body(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
+                try {
+                    FileEntity thumbnailFile = new FileCreateModel("blog", createModel.editPrivileges(), createModel.tags()).toEntity(new FileEntity());
+                    fileService.getRepository().save(thumbnailFile);
+                    thumbnailFile.uploadBatch("", thumbnail);
+                    Set<PostCreateModel> postCreateModels = Set.of(new PostCreateModel(createModel.author(), createModel.title(),
+                            thumbnailFile.getFilePath(), createModel.body(), createModel.editPrivileges(), createModel.tags()));
+                    return createEntity(postCreateModels).getFirst().toModel();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
                     null, createModel.body(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -107,8 +108,9 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
 
     public @NotNull String encode() throws IOException
     {
-        if (thumbnailURL != null) {
-            byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL));
+        File[] files = new File(thumbnailURL).listFiles();
+        if (files != null) {
+            byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL + "/" + files[0].getName()));
             return Base64.getEncoder().encodeToString(fileContent);
         }
         return null;

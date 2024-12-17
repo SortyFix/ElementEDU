@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, Injectable, OnInit, ViewChild} fro
 import {HttpClient} from "@angular/common/http";
 import {PostModel} from "./post-model";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NewsService} from "./news.service";
 import {MatIcon} from "@angular/material/icon";
@@ -20,7 +20,8 @@ import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-
         NgForOf,
         MatIcon,
         MatFabButton,
-        FileUploadButtonComponent
+        FileUploadButtonComponent,
+        NgIf
     ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss'
@@ -70,6 +71,10 @@ export class NewsComponent implements AfterViewInit, OnInit {
         let dialogRef = this.dialog.open(ArticleCreationComponent, {
             width: "80%"
         })
+    }
+
+    public thumbnailBlobExists(post: PostModel): boolean {
+        return !!post.thumbnailBlob;
     }
 
     private calculateColumns(): void

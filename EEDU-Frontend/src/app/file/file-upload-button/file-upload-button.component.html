@@ -1,6 +1,6 @@
 <div class="upload-container">
     <p>Select image</p>
-    <input type="file" accept="image/*" hidden #fileInput />
+    <input type="file" (change)="onFileChange($event)" accept="image/*" hidden #fileInput />
     <button mat-flat-button (click)="fileInput.click()">Upload Image</button>
     <ul>
         <li *ngFor="let file of imageFiles">{{ file.name }}</li>

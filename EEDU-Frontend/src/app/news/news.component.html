@@ -1,15 +1,15 @@
 <div class="highlighted-article">
     <div class="highlighted-banner">
-        <img src="https://gaz-reichelsheim.de/wp-content/uploads/Begruessung-Gaeste-aus-Italien-2024-2048x1237.jpeg" alt="Headline Background Image">
+        <img [src]="newsService.articleList[0].thumbnailBlob" alt="Headline Background Image">
     </div>
     <div class="highlighted-overlay">
-        <h1 class="highlighted-title">Begrüßung der Gäste aus Italien</h1>
+        <h1 class="highlighted-title">{{ newsService.articleList[0].title }}</h1>
         <div class="highlighted-details">
             <div class="highlighted-author">
-                Raoul Giebenhain
+                {{ newsService.articleList[0].author }}
             </div>
             <div class="highlighted-date">
-                October 23, 2023
+                {{ this.getTimeString(newsService.articleList[0].timeOfCreation) }}
             </div>
         </div>
         <a href="#" class="highlighted-button">Read More</a>
@@ -20,8 +20,8 @@
     <mat-grid-list [cols]="columns" rowHeight="420px" width="100%" (window:resize)="onBoxResize()">
         <mat-grid-tile *ngFor="let x of newsService.articleList">
             <div class="news-card" (click)="openArticle(x.id)" style="cursor: pointer;">
-                <div class="news-thumbnail">
-                    <img src="https://via.placeholder.com/400x200" alt="Article Thumbnail">
+                <div class="news-thumbnail" *ngIf="thumbnailBlobExists(x)">
+                    <img [src]="x.thumbnailBlob" alt="">
                 </div>
                 <div class="news-content">
                     <h3 class="news-title">{{ x.title }}</h3>

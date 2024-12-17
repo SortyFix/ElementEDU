@@ -9,6 +9,7 @@ import {timestamp} from "rxjs";
 })
 export class NewsService implements OnInit {
     constructor(public router: Router, public http: HttpClient) {
+        console.log("Getting posts...")
         this.getAllPosts();
     }
 
@@ -24,6 +25,7 @@ export class NewsService implements OnInit {
             withCredentials: true
         }).subscribe((list) => {
             this.articleList = list;
+            this.stringsToImages();
         });
     }
 
@@ -36,6 +38,29 @@ export class NewsService implements OnInit {
         }
 
         return foundArticle;
+    }
+
+    public stringsToImages() {
+        this.articleList.forEach((postModel) => {
+            let base64: string = postModel.thumbnailBlob;
+            postModel.thumbnailBlob = `data:${this.getMimeType(base64)};base64,${base64}`;
+        });
+    }
+
+    public getMimeType(base64: string): string | null {
+        let indicator: string = base64.charAt(0);
+        switch (indicator) {
+            case '/':
+                return 'image/jpg'
+            case 'i':
+                return 'image/png'
+            case 'R':
+                return 'image/gif'
+            case 'U':
+                return 'image/webp'
+            default:
+                return null
+        }
     }
 
     ngOnInit(): void {

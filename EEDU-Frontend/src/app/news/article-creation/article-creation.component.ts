@@ -10,9 +10,8 @@ import {FileUploadButtonComponent} from "../../file/file-upload-button/file-uplo
 import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {NgForOf} from "@angular/common";
-import {PostCreateModel} from "./post-create-model";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {PostModel} from "../post-model";
+import {ArticleCreationService} from "./article-creation.service";
 
 @Injectable({
     providedIn: 'root'
@@ -44,7 +43,7 @@ import {PostModel} from "../post-model";
 })
 export class ArticleCreationComponent {
 
-    constructor(public http: HttpClient) {
+    constructor(public http: HttpClient, public articleCreationService: ArticleCreationService) {
     }
 
     private _formBuilder = inject(FormBuilder);
@@ -129,9 +128,6 @@ export class ArticleCreationComponent {
         let title = this.titleFormGroup.get('title')?.value;
         let author = this.authorFormGroup.get('author')?.value;
         let body = this.bodyFormGroup.get('body')?.value;
-        let multipartFile = this.imageFiles[0];
-        let editPrivileges = this.reactivePrivileges();
-        let tags = this.reactiveTags();
 
         if(!title || !author || !body)
         {
@@ -139,42 +135,13 @@ export class ArticleCreationComponent {
             return;
         }
 
-        const formData = new FormData();
-
-        const postCreateModel: PostCreateModel = {
-                title: title,
-                author: author,
-                body: body,
-                thumbnailURL: null,
-                editPrivileges: editPrivileges,
-                tags: tags
-        }
-
-        console.log(postCreateModel);
-
-        formData.append('createModel', new Blob([JSON.stringify(postCreateModel)], { type: 'application/json' }));
-
-        if(multipartFile)
-        {
-            formData.append('multipartFile', multipartFile);
-        }
-
-        this.sendPostCreationRequest(formData);
-    }
-
-    sendPostCreationRequest(formData: FormData) {
-        console.log(formData);
-        this.http
-            .post<PostModel>('http://localhost:8080/api/v1/blog/post', formData, {
-                withCredentials: true
-            })
-            .subscribe({
-                next: (response) => {
-                    console.log('Post created successfully:', response);
-                },
-                error: (error) => {
-                    console.error('Error creating post:', error);
-                }
-            });
+        this.articleCreationService.createArticle({
+            author: author,
+            title: title,
+            thumbnailURL: null,
+            body: body,
+            editPrivileges: this.reactivePrivileges(),
+            tags: this.reactiveTags()
+        });
     }
 }

@@ -38,7 +38,6 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
                 "burger king",
                 new String[]{"NONE"},
-                new String[]{"NONE"},
                 new String[]{"test"}
         );
 
@@ -69,7 +68,6 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 "10 Reasons for why",
                 Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
                 "burger king",
-                new String[]{"Read1", "Read2", "Read3"},
                 new String[]{"Edit1", "Edit2", "Edit3"},
                 new String[]{"Tag1", "Tag2", "Tag3"}
         ))).getFirst();

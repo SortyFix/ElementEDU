@@ -3,7 +3,7 @@ export class PostModel {
         public readonly id: bigint,
         public readonly author: string,
         public readonly title: string,
-        public readonly thumbnailBlob: Blob,
+        public thumbnailBlob: string,
         public readonly body: string,
         public readonly timeOfCreation: number,
         public readonly readPrivileges: string[],

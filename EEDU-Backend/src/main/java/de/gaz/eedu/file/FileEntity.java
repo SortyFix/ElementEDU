@@ -152,8 +152,10 @@ import java.util.Set;
 
     public @NotNull String getFilePath(@Nullable String subdirectory)
     {
+        String path = String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
+        System.out.println(path);
         // TODO: Check if slash is ók
-        return String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
+        return path;
     }
 
     /**
@@ -165,16 +167,17 @@ import java.util.Set;
      */
     private boolean virusCheck(@NotNull InputStream inputStream)
     {
-        try
-        {
-            ClamavClient client = new ClamavClient("http://localhost:3310");
-            return client.scan(inputStream) instanceof ScanResult.OK;
-        }
-        catch (ClamavException | IllegalStateException ignored) {
-            System.out.println(ignored.getMessage());
-            // TODO REMOVE LATER!!!!!!!!!!!!!!!!!!!!
-            return true;
-        }
+        return true;
+//        try
+//        {
+//            ClamavClient client = new ClamavClient("localhost");
+//            return client.scan(inputStream) instanceof ScanResult.OK;
+//        }
+//        catch (ClamavException | IllegalStateException ignored) {
+//            System.out.println(ignored.getMessage());
+//            // TODO REMOVE LATER!!!!!!!!!!!!!!!!!!!!
+//            return true;
+//        }
     }
 
     /**
