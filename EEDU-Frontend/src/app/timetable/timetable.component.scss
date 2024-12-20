@@ -1,3 +1,4 @@
+
 .calendar-container {
     display: flex;
     flex-direction: column;
@@ -5,15 +6,20 @@
     justify-content: center;
     align-items: center;
     margin: 0 5px 0 5px;
+    width: 100%;
 
     .calendar-info-wrapper {
         display: flex;
         flex-direction: row;
+        width: 100%;
+
+        @media (max-width: 1200px) {
+            flex-direction: column;
+        }
     }
 
     .calendar-wrapper {
         flex: 2;
-        overflow-x: auto;
     }
 
     .info-box {

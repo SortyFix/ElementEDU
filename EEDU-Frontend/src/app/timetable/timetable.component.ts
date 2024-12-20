@@ -1,35 +1,37 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
-import {CourseModel} from "../user/courses/models/course-model";
-import {Calendar, CalendarOptions, EventClickArg} from "@fullcalendar/core";
-import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
-import {FullCalendarComponent, FullCalendarModule} from "@fullcalendar/angular";
-import {MatDialog} from "@angular/material/dialog";
-import {EventDialogComponent} from "./event-dialog/event-dialog.component";
-import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {AccessibilityService} from "../accessibility.service";
-
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridDay from '@fullcalendar/timegrid';
-import rrulePlugin from '@fullcalendar/rrule'
-import interactionPlugin from '@fullcalendar/interaction';
-import listPlugin from '@fullcalendar/list';
+import {CalendarDayModule, CalendarEvent, CalendarMonthModule, CalendarWeekModule} from "angular-calendar";
+import {CourseModel} from "../user/courses/models/course-model";
+import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
+import {NgIf} from "@angular/common";
+import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-model";
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
     imports: [
-        FullCalendarModule,
+        CalendarMonthModule,
+        CalendarWeekModule,
+        CalendarDayModule,
+        NgIf,
         MatList,
         MatListItem,
         MatListItemTitle,
-        MatListItemLine,
+        MatListItemLine
     ],
   templateUrl: './timetable.component.html',
   styleUrl: './timetable.component.scss'
 })
-export class TimetableComponent implements OnInit{
+export class TimetableComponent implements OnInit {
+
+    viewDate: Date = new Date();
+    events: CalendarEvent[] = [];
+
+    onDayClicked(event: any): void {
+        console.log('Day clicked', event);
+    }
 
     protected readonly wrapSize: number = 1200;
 
@@ -37,71 +39,33 @@ export class TimetableComponent implements OnInit{
         return this._accessibilityService.dimensions.width;
     }
 
-    @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
-    private readonly _calendarOptions: CalendarOptions = {
-        plugins: [dayGridPlugin, timeGridDay, interactionPlugin, listPlugin, rrulePlugin],
-        initialView: 'timeGridWeek', // dayGridMonth,timeGridWeek,timeGridDay
-        firstDay: 1,
-        events: [], // to be altered when loaded
-        selectable: true,
-        eventClick: this.handleEventClick.bind(this),
-        headerToolbar: {
-            left: '',
-            center: 'title',
-            right: ''
-        },
-        footerToolbar: {
-            right: 'prev,next',
-        },
-        slotLabelFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        },
-        height: 'auto',
-        contentHeight: 'auto',
-        aspectRatio: 1.35,
-        eventTimeFormat: {
-            hour: '2-digit', minute: '2-digit', hour12: false
-        },
-        displayEventTime: false,
-        slotDuration: '01:00:00',
-        slotLabelInterval: '01:00:00',
-        slotMinTime: '04:00:00',
-        slotMaxTime: '23:00:00',
-        titleFormat: {
-            month: 'long',
-            year: 'numeric',
-        }
-    };
+    constructor(private _courseService: CourseService, private _accessibilityService: AccessibilityService) {}
 
-    private handleEventClick(info: EventClickArg): void {
-
-        const eventDescription: any = info.event.extendedProps['description'] || 'This is a test description for the event.';
-
-        this._dialog.open(EventDialogComponent, {
-            data: { description: eventDescription },
-        });
-    }
-
-    constructor(private _courseService: CourseService, private _dialog: MatDialog, private _accessibilityService: AccessibilityService) {}
-
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this._courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
-            const api: Calendar = this.calendarComponent!.getApi();
-
-            courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void =>
-                {
-                    scheduledAppointments.forEach((entity: ScheduledAppointmentModel): void => {
-                        api.addEvent(entity.asEvent(name));
-                    });
-
-                }
-            );
+            courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void => {
+                this.events.push(
+                    ...this.toEvents(name, scheduledAppointments),
+                    ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name))
+                );
+            });
         });
     }
 
-    protected get calendarOptions(): CalendarOptions {
-        return this._calendarOptions;
+    /**
+     * Converts an array of {@link ScheduledAppointmentModel} into an array of {@link CalendarEvent}.
+     *
+     * This method processes an array of {@link ScheduledAppointmentModel} instances and transforms each
+     * into one or more {@link CalendarEvent} objects. It achieves this by iterating over the array,
+     * invoking the #asEvent() method on each {@link ScheduledAppointmentModel}, and then using a
+     * flat-mapping operation to combine the results into a single array.
+     *
+     * @param name - A descriptive name for the operation or transformation process.
+     * @param scheduled - An array of {@link ScheduledAppointmentModel} instances to be converted.
+     * @returns An array of {@link CalendarEvent} instances derived from the input models.
+     * @private
+     */
+    private toEvents(name: string, scheduled: ScheduledAppointmentModel[]): CalendarEvent[] {
+        return scheduled.flatMap((entity: ScheduledAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
 }

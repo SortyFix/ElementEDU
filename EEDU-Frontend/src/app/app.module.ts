@@ -20,7 +20,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AbstractComponent } from './abstract/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {Authentication} from "./user/authentication/authentication.component";
-import {FullCalendarModule} from "@fullcalendar/angular";
+import {CalendarModule, DateAdapter} from "angular-calendar";
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 
 @NgModule({
     declarations: [
@@ -53,7 +54,10 @@ import {FullCalendarModule} from "@fullcalendar/angular";
         NgOptimizedImage,
         MatSidenavModule,
         Authentication,
-        FullCalendarModule
+        CalendarModule.forRoot({
+            provide: DateAdapter,
+            useFactory: adapterFactory,
+        }),
     ],
     providers: [
         provideHttpClient(withFetch())

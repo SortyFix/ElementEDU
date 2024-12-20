@@ -37,7 +37,7 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
                 getStartTimeStamp().toEpochMilli(),
                 getEndTimeStamp().toEpochMilli(),
                 getDuration().toMillis(),
-                getPeriodSeconds()
+                getPeriodMillis()
         );
     }
 
@@ -57,6 +57,10 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
         return (long) this.getPeriod().getDays() * 24 * 60 * 60;
     }
 
+    public long getPeriodMillis()
+    {
+        return getPeriodSeconds() * 1000;
+    }
 
     @Contract(pure = true)
     @Override public String toString()

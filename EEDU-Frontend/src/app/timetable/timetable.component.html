@@ -1,8 +1,14 @@
 <div class="calendar-container">
-    <div class="calendar-info-wrapper" [style.flex-direction]="screenWidth <= wrapSize ? 'column' : 'default'">
+    <div class="calendar-info-wrapper">
         <!-- FullCalendar Component -->
-        <div class="calendar-wrapper">
-            <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+        <div class="calendar-wrapper" >
+            <mwl-calendar-month-view *ngIf="events.length != 0"
+                                     [viewDate]="viewDate"
+                                     [events]="events"
+                                     [locale]="'en-GB'"
+                                     [weekStartsOn]="1"
+                                     (dayClicked)="onDayClicked($event)">
+            </mwl-calendar-month-view>
         </div>
 
         <!-- Info Box -->

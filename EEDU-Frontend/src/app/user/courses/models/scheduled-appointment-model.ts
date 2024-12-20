@@ -1,6 +1,5 @@
-import {EventInput} from "@fullcalendar/core";
 import {AppointmentEntryModel} from "./appointment-entry-model";
-import {RRule} from "rrule";
+import {CalendarEvent} from "angular-calendar";
 
 export class ScheduledAppointmentModel {
 
@@ -44,44 +43,38 @@ export class ScheduledAppointmentModel {
         return delta % this._period === 0;
     }
 
-    public asEvent(name: string): EventInput {
+    private computeDuration(start: number): Date {
+        return new Date(start + this.duration);
+    }
 
-        const totalSeconds = Math.floor(this.duration / 1000); // Convert millis to seconds
-        const hours = Math.floor(totalSeconds / 3600); // Calculate hours
-        const minutes = Math.floor((totalSeconds % 3600) / 60); // Calculate minutes
-        const seconds = totalSeconds % 60; // Remaining seconds
+    public asEvent(name: string): CalendarEvent[] {
 
-        // Format each component to ensure it's two digits
-        const formattedTime = [
-            hours.toString().padStart(2, '0'),
-            minutes.toString().padStart(2, '0'),
-            seconds.toString().padStart(2, '0')
-        ].join(':');
+        const events: CalendarEvent[] = [];
 
-        console.log(formattedTime);
+        for (let i: number = this._start; i <= this._end; i += this._period) {
 
-        return {
-            title: name,
-            start: this.start,
-            end: this.end,
-            duration: formattedTime,
-            rrule: {
-                freq: RRule.MINUTELY,
-                interval: Number(this.period) / 60,
-                dtstart: this.start.toISOString(),
-                until: this.end.toISOString(),
-            },
-            exdate: this._attachedEntries.map((entry: AppointmentEntryModel): string =>
-            {
-                return entry.start.toISOString();
-            })
-        };
+            if(this._attachedEntries.some((current: AppointmentEntryModel): boolean => current._start === i))
+            { // skip already created events
+                continue;
+            }
+
+            const startDate: Date = new Date(i);
+            events.push({
+                id: this.id,
+                title: name,
+                start: startDate,
+                end: this.computeDuration(i),
+                resizable: {
+                    beforeStart: false,
+                    afterEnd: false,
+                },
+                draggable: false
+            });
+        }
+        return events;
     }
 
     private toDate(timeStamp: number): Date {
         return new Date(timeStamp * 1000);
     }
-
-
-
 }

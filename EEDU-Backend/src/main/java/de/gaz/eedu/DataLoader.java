@@ -1,7 +1,6 @@
 package de.gaz.eedu;
 
 import de.gaz.eedu.course.CourseService;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -84,7 +83,7 @@ import java.util.stream.Stream;
         log.info("-".repeat(20));
 
         CourseService courseService = getUserService().getClassRoomService().getCourseService();
-        courseService.getAppointment(1731779748L + (7 * 24 * 60 * 60), 1L);
+        courseService.getAppointment(1731779748L + ((7 * 24 * 60 * 60) * 3), 1L);
 
         if (!development)
         {

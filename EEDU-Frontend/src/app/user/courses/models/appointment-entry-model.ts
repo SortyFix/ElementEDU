@@ -1,4 +1,4 @@
-import {EventInput} from "@fullcalendar/core";
+import {CalendarEvent} from "angular-calendar";
 
 export class AppointmentEntryModel {
 
@@ -21,6 +21,10 @@ export class AppointmentEntryModel {
         return this._duration;
     }
 
+    private get computeDuration(): Date {
+        return new Date(this._start + this.duration);
+    }
+
     public static fromObject(object: any): AppointmentEntryModel {
         return new AppointmentEntryModel(
             object.id,
@@ -32,12 +36,22 @@ export class AppointmentEntryModel {
         );
     }
 
-    public asEvent(name: string): EventInput
+    public asEvent(name: string): CalendarEvent
     {
         return {
+            id: this.id,
             title: name,
             start: this.start,
-            duration: this.duration,
+            end: this.computeDuration,
+            color: {
+                primary: '#cb6529',
+                secondary: '#f3e630'
+            },
+            resizable: {
+                beforeStart: false,
+                afterEnd: false
+            },
+            draggable: false,
         }
     }
 }
