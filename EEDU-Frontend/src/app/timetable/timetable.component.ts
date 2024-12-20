@@ -1,12 +1,19 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {AccessibilityService} from "../accessibility.service";
-import {CalendarDayModule, CalendarEvent, CalendarMonthModule, CalendarWeekModule} from "angular-calendar";
+import {
+    CalendarDateFormatter,
+    CalendarDayModule,
+    CalendarEvent,
+    CalendarMonthModule,
+    CalendarWeekModule, DateFormatterParams
+} from "angular-calendar";
 import {CourseModel} from "../user/courses/models/course-model";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
-import {NgIf} from "@angular/common";
+import {DOCUMENT, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-model";
+import {getISOWeek} from "date-fns";
 
 @Component({
   selector: 'app-timetable',
@@ -22,9 +29,9 @@ import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-mo
         MatListItemLine
     ],
   templateUrl: './timetable.component.html',
-  styleUrl: './timetable.component.scss'
+  styleUrls: ['./timetable.component.scss']
 })
-export class TimetableComponent implements OnInit {
+export class TimetableComponent implements OnInit, OnDestroy {
 
     viewDate: Date = new Date();
     events: CalendarEvent[] = [];
@@ -39,9 +46,10 @@ export class TimetableComponent implements OnInit {
         return this._accessibilityService.dimensions.width;
     }
 
-    constructor(private _courseService: CourseService, private _accessibilityService: AccessibilityService) {}
+    constructor(private _courseService: CourseService, private _accessibilityService: AccessibilityService, @Inject(DOCUMENT) private document: any) {}
 
     public ngOnInit(): void {
+        this.document.body.classList.add(this.darkThemeClass)
         this._courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void => {
                 this.events.push(
@@ -51,6 +59,12 @@ export class TimetableComponent implements OnInit {
             });
         });
     }
+    private readonly darkThemeClass = 'calendar-theme';
+
+    public ngOnDestroy(): void {
+        this.document.body.classList.remove(this.darkThemeClass)
+    }
+
 
     /**
      * Converts an array of {@link ScheduledAppointmentModel} into an array of {@link CalendarEvent}.
