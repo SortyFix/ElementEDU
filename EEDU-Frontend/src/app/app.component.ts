@@ -1,19 +1,28 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
-import {ThemeService} from "./theming/theme.service";
+import {AbstractComponent} from "./abstract/abstract.component";
+import {Authentication} from "./user/authentication/authentication.component";
+import {LoadComponent} from "./load/load.component";
+import {NgIf} from "@angular/common";
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    imports: [
+        AbstractComponent,
+        Authentication,
+        LoadComponent,
+        NgIf,
+    ],
     encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit
 {
     errorSignal: WritableSignal<string> = signal('')
 
-    constructor(public userService: UserService, public router: Router, public themeService: ThemeService)
+    constructor(public userService: UserService, public router: Router)
     {}
 
     ngOnInit(): void

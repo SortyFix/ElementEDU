@@ -2,18 +2,18 @@ import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {AccessibilityService} from "../accessibility.service";
 import {
-    CalendarDateFormatter,
     CalendarDayModule,
     CalendarEvent,
-    CalendarMonthModule,
-    CalendarWeekModule, DateFormatterParams
+    CalendarMonthModule, CalendarView,
+    CalendarWeekModule
 } from "angular-calendar";
 import {CourseModel} from "../user/courses/models/course-model";
 import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {DOCUMENT, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-model";
-import {getISOWeek} from "date-fns";
+import {FormsModule} from "@angular/forms";
+import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
 
 @Component({
   selector: 'app-timetable',
@@ -26,14 +26,15 @@ import {getISOWeek} from "date-fns";
         MatList,
         MatListItem,
         MatListItemTitle,
-        MatListItemLine
+        MatListItemLine,
+        FormsModule,
+        CalendarControlsComponent,
     ],
   templateUrl: './timetable.component.html',
   styleUrls: ['./timetable.component.scss']
 })
 export class TimetableComponent implements OnInit, OnDestroy {
 
-    viewDate: Date = new Date();
     events: CalendarEvent[] = [];
 
     onDayClicked(event: any): void {
@@ -82,4 +83,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private toEvents(name: string, scheduled: ScheduledAppointmentModel[]): CalendarEvent[] {
         return scheduled.flatMap((entity: ScheduledAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
+
+    protected readonly CalendarView = CalendarView;
 }

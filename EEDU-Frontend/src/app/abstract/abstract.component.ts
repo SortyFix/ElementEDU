@@ -1,11 +1,28 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
+import {Router, RouterLink, RouterOutlet} from "@angular/router";
 import {UserService} from "../user/user.service";
+import {MatIcon} from "@angular/material/icon";
+import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {NgForOf, NgIf, NgStyle} from "@angular/common";
 
 @Component({
-  selector: 'app-abstract',
-  templateUrl: './abstract.component.html',
-  styleUrls: ['./abstract.component.scss']
+    selector: 'app-abstract',
+    templateUrl: './abstract.component.html',
+    imports: [
+        MatIcon,
+        MatDrawer,
+        MatDrawerContainer,
+        MatButton,
+        MatIconButton,
+        NgForOf,
+        RouterOutlet,
+        NgStyle,
+        RouterLink,
+        NgIf,
+        MatDrawerContent
+    ],
+    styleUrls: ['./abstract.component.scss']
 })
 
 export class AbstractComponent implements OnInit {

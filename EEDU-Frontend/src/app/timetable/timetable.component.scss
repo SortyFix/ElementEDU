@@ -6,6 +6,7 @@
     align-items: center;
     margin: 0 5px 0 5px;
     border: var(--widget-color) solid 1px;
+    border-radius: 10px;
 
     .calendar-info-wrapper {
         display: flex;
@@ -19,9 +20,13 @@
 
     .calendar-wrapper {
         flex: 2;
-        height: 600px;
-        overflow-y: auto;
-        overflow-x: auto;
+
+
+        .scrollable-container {
+            height: 600px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
     }
 
     .info-box {
@@ -41,4 +46,12 @@
             color: var(--text-color);
         }
     }
+}
+
+.appointment-box {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 4px;
+    color: var(--text-color);
+    background-color: var(--widget-color);
 }

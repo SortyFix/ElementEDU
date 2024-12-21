@@ -1,6 +1,4 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {CommonModule} from "@angular/common";
+import { Routes } from '@angular/router';
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {CoursesComponent} from "./courses/courses.component";
 import {TimetableComponent} from "./timetable/timetable.component";
@@ -8,7 +6,7 @@ import {NewsComponent} from "./news/news.component";
 import {ChatComponent} from "./chat/chat.component";
 import {SettingsComponent} from "./settings/settings.component";
 
-const routes: Routes = [
+export const routes: Routes = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'courses', component: CoursesComponent},
     {path: 'timetable', component: TimetableComponent},
@@ -16,12 +14,3 @@ const routes: Routes = [
     {path: 'chat', component: ChatComponent},
     {path: 'settings', component: SettingsComponent}
 ];
-
-@NgModule({
-    imports: [CommonModule,
-              RouterModule.forRoot(routes)
-    ],
-    exports: [RouterModule]
-})
-export class AppRoutingModule {
-}

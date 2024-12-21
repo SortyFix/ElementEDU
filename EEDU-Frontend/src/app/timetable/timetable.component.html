@@ -2,13 +2,29 @@
     <div class="calendar-info-wrapper">
         <!-- FullCalendar Component -->
         <div class="calendar-wrapper">
-            <mwl-calendar-month-view *ngIf="events.length != 0"
-                                     [viewDate]="viewDate"
-                                     [events]="events"
-                                     [locale]="'en-GB'"
-                                     [weekStartsOn]="1"
-                                     (dayClicked)="onDayClicked($event)">
-            </mwl-calendar-month-view>
+
+            <app-calendar-controls #controls></app-calendar-controls>
+
+            <div class="scrollable-container">
+                <mwl-calendar-month-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Month"
+                                         [viewDate]="controls.viewDate"
+                                         [events]="events"
+                                         [locale]="'en-GB'"
+                                         [weekStartsOn]="1"
+                                         (dayClicked)="onDayClicked($event)">
+                </mwl-calendar-month-view>
+                <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
+                                        [viewDate]="controls.viewDate"
+                                        [events]="events"
+                                        [locale]="'en-GB'"
+                                        [weekStartsOn]="1">
+                </mwl-calendar-week-view>
+                <mwl-calendar-day-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Day"
+                                       [viewDate]="controls.viewDate"
+                                       [events]="events"
+                                       [locale]="'en-GB'">
+                </mwl-calendar-day-view>
+            </div>
         </div>
 
         <!-- Info Box -->
@@ -46,4 +62,8 @@
 
         </div>
     </div>
+</div>
+
+<div class="appointment-box">
+    Next Appointment:
 </div>
