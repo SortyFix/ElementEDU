@@ -9,7 +9,6 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subjects.SubjectService;
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -38,6 +37,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final SubjectService subjectService;
     private final UserRepository userRepository;
     private final ClassRoomRepository classRoomRepository;
+    @Getter(AccessLevel.PUBLIC)
     private final AppointmentEntryRepository appointmentEntryRepository;
     private final FileService fileService;
 
@@ -45,7 +45,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
     {
         Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
-        Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.timeStamp());
+        Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.start());
         return scheduledAppointments.stream().filter(event -> event.inPeriod(timeStamp)).map(event ->
         {
             entity.setDuration(event.getDuration());
@@ -126,7 +126,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     {
         CourseEntity courseEntity = loadEntityByIDSafe(courseId);
 
-        long id = generateId(entryCreateModel.timeStamp(), courseEntity);
+        long id = generateId(entryCreateModel.start(), courseEntity);
         if (Arrays.stream(courseEntity.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
         {
             throw new OccupiedException();

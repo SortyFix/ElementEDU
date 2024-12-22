@@ -11,7 +11,7 @@
                                          [events]="events"
                                          [locale]="'en-GB'"
                                          [weekStartsOn]="1"
-                                         (dayClicked)="onDayClicked($event)">
+                                         (dayClicked)="onDayClicked($event.day)">
                 </mwl-calendar-month-view>
                 <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
                                         [viewDate]="controls.viewDate"

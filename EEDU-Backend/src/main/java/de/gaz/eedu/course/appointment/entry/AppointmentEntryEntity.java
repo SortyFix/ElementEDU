@@ -2,7 +2,10 @@ package de.gaz.eedu.course.appointment.entry;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.CourseEntity;
+import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
+import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
 import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
@@ -19,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,15 +35,20 @@ import java.util.Optional;
     @Setter(AccessLevel.NONE) @Id private long id;
     private Instant startTimeStamp;
     private Duration duration;
-    private String description, homework;
-    private boolean submitHomework;
     private Instant publish;
+    private String description;
+
     // might be null, if submitHome is false, or it should be valid until next appointment
-    @Nullable private Instant submitUntil;
     @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
     private CourseEntity course;
     @Nullable @ManyToOne @JoinColumn(name = "scheduled_appointment_id") @JsonBackReference
     private ScheduledAppointmentEntity scheduledAppointment;
+
+    // must be set through extra method to validate integrity
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE)
+    @Nullable private String assignmentDescription;
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE)
+    @Nullable private Instant publishAssignment, submitAssignmentUntil;
 
     /**
      * This constructor creates a new instance of this entity.
@@ -63,71 +70,13 @@ import java.util.Optional;
     // bad request when
     public void uploadHomework(@NotNull UserEntity user, @NotNull MultipartFile... files) throws ResponseStatusException
     {
-        check(user);
+        // TODO check if user needs to
 
         String uploadPath = uploadPath(user);
         FileEntity fileEntity = getCourse().getRepository();
         fileEntity.uploadBatch(uploadPath, files);
 
         log.info("User {} has uploaded files to appointment entry {}", user.getId(), getId());
-    }
-
-    private void check(@NotNull UserEntity user) throws ResponseStatusException
-    {
-        // not required to submit
-        if (!isSubmitHomework())
-        {
-            String errorMessage = String.format("The resource %s does not allow uploading files.", getId());
-            IllegalStateException illegalStateException = new IllegalStateException(errorMessage);
-            throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, illegalStateException);
-        }
-
-        getSubmitUntil().ifPresent(submitUntil -> {
-            // has expired
-            if (Instant.now().isAfter(submitUntil))
-            {
-                String errorMessage = String.format("The resource %s no longer accepts uploading files.", getId());
-                throw new ResponseStatusException(HttpStatus.GONE, errorMessage);
-            }
-        });
-
-        // user not in course (warning)
-        if (!getCourse().getUsers().contains(user))
-        {
-            String warnMessage = "Uploading files from user {} to appointment entry {}. But {} is not a part of the course.";
-            log.warn(warnMessage, user.getId(), getId(), user.getId());
-        }
-    }
-
-    public @NotNull Optional<Instant> getSubmitUntil()
-    {
-        if(getHomework().isEmpty())
-        {
-            // mustn't submit
-            return Optional.empty();
-        }
-
-        if(Objects.nonNull(this.submitUntil)) {
-            return Optional.of(this.submitUntil);
-        }
-
-        if(Objects.nonNull(getScheduledAppointment()))
-        {
-            // defaults to next appointment
-            Instant nextAppointment = getStartTimeStamp().plus(getScheduledAppointment().getPeriod());
-            return Optional.of(nextAppointment);
-        }
-        return Optional.empty();
-    }
-
-    public @NotNull Optional<String> getHomework()
-    {
-        if(!isSubmitHomework())
-        {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(this.homework);
     }
 
     private @NotNull String uploadPath(@NotNull UserEntity user)
@@ -143,12 +92,14 @@ import java.util.Optional;
             attachedScheduled = getScheduledAppointment().getId();
         }
 
-        return new AppointmentEntryModel(getId(),
+        AssignmentModel assignment = getAssignment().orElse(null);
+        return new AppointmentEntryModel(
+                getId(),
                 attachedScheduled,
-                getStartTimeStamp().toEpochMilli(),
-                getDuration().toMillis(),
-                getDescription(),
-                getHomework().orElse("")
+                this.getStartTimeStamp().toEpochMilli(),
+                this.getDuration().toMillis(),
+                this.getDescription(),
+                assignment
         );
     }
 
@@ -170,5 +121,90 @@ import java.util.Optional;
     @Override public int hashCode()
     { // Automatically generated by IntelliJ
         return Objects.hashCode(id);
+    }
+
+    /**
+     * Validates an assignment, saves it to the entity, and persists the entity to the database, if applicable.
+     * <p>
+     * This method first validates and sets the assignment details by delegating to {@link #setAssignment(AssignmentCreateModel)}.
+     * If the assignment is valid and successfully set, the entity is saved to the database using the provided {@link CourseService}.
+     *
+     * @param courseService the {@link CourseService} instance used to persist the entity; must not be {@code null}.
+     * @param assignment    the {@link AssignmentCreateModel} containing the assignment details to validate and save, must not be {@code null}.
+     * @return {@code true} if the assignment passes validation, is successfully set, and the entity is persisted.{@code false} otherwise.
+     * @throws NullPointerException if either {@code courseService} or {@code assignment} is {@code null}.
+     */
+    public boolean setAssignment(@NotNull CourseService courseService, @NotNull AssignmentCreateModel assignment)
+    {
+        if (setAssignment(assignment))
+        {
+            courseService.getAppointmentEntryRepository().save(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Validates an assignment and saves it, if applicable.
+     * <p>
+     * This method checks the values inside the given {@code AssignmentCreateModel} by calling
+     * {@link AssignmentCreateModel#validate(long)}. If the values pass validation, they are used to set the new
+     * homework-related fields of this entity: {@code assignmentDescription}, {@code publishAssignment},
+     * and {@code submitAssignmentUntil}.
+     *
+     * @param assignment the {@link AssignmentCreateModel} containing the assignment details to validate and save, must not be {@code null}.
+     * @return {@code true} if the assignment passes validation and is successfully set, {@code false} otherwise.
+     */
+    public boolean setAssignment(@NotNull AssignmentCreateModel assignment)
+    {
+        if (!assignment.validate(getStartTimeStamp().toEpochMilli()))
+        {
+            return false;
+        }
+
+        this.assignmentDescription = assignment.description();
+        this.publishAssignment = assignment.publishInstant();
+        this.submitAssignmentUntil = assignment.submitUntilInstant();
+        return true;
+    }
+
+    /**
+     * Retrieves an {@link AssignmentModel} for the current entity, if applicable.
+     * <p>
+     * This method checks if an assignment can be created based on the following conditions:
+     * <ul>
+     *     <li>The assignment description must not be {@code null}.</li>
+     *     <li>The submission deadline ({@code submitAssignmentUntil}) must not be {@code null}.</li>
+     *     <li>The {@code publish} timestamp must not be earlier than the current time.</li>
+     * </ul>
+     * If any of these conditions are not met, the method returns {@link Optional#empty()}.
+     * Otherwise, an {@link AssignmentModel} is created and returned inside an {@link Optional}.
+     *
+     * @return an {@link Optional} containing an {@link AssignmentModel} if all conditions are satisfied,
+     * otherwise, an empty {@link Optional}.
+     * @throws NullPointerException if the {@code publish} timestamp is {@code null}, as it is directly dereferenced
+     *                              without a null check.
+     *                              Example usage:
+     *                              <pre>
+     *                              {@code
+     *                              Optional<AssignmentModel> assignment = entity.getAssignment();
+     *                              assignment.ifPresent(a -> {
+     *                                  System.out.println("Assignment Description: " + a.getDescription());
+     *                                  System.out.println("Submission Deadline: " + a.getSubmitUntil());
+     *                              });
+     *                              }
+     *                              </pre>
+     */
+    private @NotNull Optional<AssignmentModel> getAssignment()
+    {
+        Instant until = this.getSubmitAssignmentUntil();
+        String description = this.getAssignmentDescription();
+
+        if (Objects.isNull(description) || Objects.isNull(until) || this.publish.isBefore(Instant.now()))
+        {
+            return Optional.empty();
+        }
+
+        return Optional.of(new AssignmentModel(description, until));
     }
 }

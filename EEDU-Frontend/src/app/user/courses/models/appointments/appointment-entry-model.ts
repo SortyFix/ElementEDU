@@ -1,4 +1,5 @@
 import {CalendarEvent} from "angular-calendar";
+import {AssignmentModel} from "./assignment-model";
 
 export class AppointmentEntryModel {
 
@@ -6,8 +7,8 @@ export class AppointmentEntryModel {
                 public readonly _attachedScheduled: number,
                 public readonly _start: number,
                 private readonly _duration: number,
-                public readonly description: string,
-                public readonly homework: string) {}
+                private readonly _description: string,
+                public readonly assignment: AssignmentModel | undefined) {}
 
     public isPart(id: number): boolean {
         return this._attachedScheduled == id;
@@ -30,9 +31,9 @@ export class AppointmentEntryModel {
             object.id,
             object.attachedScheduled,
             object.start,
-            object.end,
+            object.duration,
             object.description,
-            object.homework
+            object.assignment && AssignmentModel.fromObject(object.assignment)
         );
     }
 

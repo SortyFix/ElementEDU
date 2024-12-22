@@ -17,14 +17,7 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/m
         MatIcon,
         FormsModule,
         MatIconButton,
-        MatButton,
-        MatFormField,
-        MatInput,
-        MatDatepickerInput,
-        MatDatepickerToggle,
-        MatDatepicker,
-        MatHint,
-        MatLabel
+        MatButton
     ],
   templateUrl: './calendar-controls.component.html',
   styleUrl: './calendar-controls.component.scss'
@@ -38,6 +31,16 @@ export class CalendarControlsComponent {
         this._viewType = value;
     }
 
+    public set dayClicked(date: Date)
+    {
+        if (this._viewType !== CalendarView.Month) {
+            return;
+        }
+
+        this.viewType = CalendarView.Day;
+        this.viewDate = date;
+    }
+
     public get viewType(): CalendarView {
         return this._viewType;
     }
@@ -45,7 +48,6 @@ export class CalendarControlsComponent {
     public get viewDate(): Date {
         return this._viewDate;
     }
-
 
     private set viewDate(value: Date) {
         this._viewDate = value;

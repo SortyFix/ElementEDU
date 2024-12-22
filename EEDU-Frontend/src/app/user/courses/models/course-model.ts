@@ -1,6 +1,6 @@
-import {AppointmentEntryModel} from "./appointment-entry-model";
-import {ScheduledAppointmentModel} from "./scheduled-appointment-model";
 import {SubjectModel} from "./subject-model";
+import {AppointmentEntryModel} from "./appointments/appointment-entry-model";
+import {ScheduledAppointmentModel} from "./appointments/scheduled-appointment-model";
 
 export class CourseModel {
 

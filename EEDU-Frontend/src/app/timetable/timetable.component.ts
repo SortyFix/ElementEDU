@@ -1,44 +1,52 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {AccessibilityService} from "../accessibility.service";
 import {
     CalendarDayModule,
     CalendarEvent,
-    CalendarMonthModule, CalendarView,
-    CalendarWeekModule
+    CalendarModule,
+    CalendarMonthModule, CalendarMonthViewDay,
+    CalendarView,
+    CalendarWeekModule,
 } from "angular-calendar";
 import {CourseModel} from "../user/courses/models/course-model";
-import {ScheduledAppointmentModel} from "../user/courses/models/scheduled-appointment-model";
 import {DOCUMENT, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
-import {AppointmentEntryModel} from "../user/courses/models/appointment-entry-model";
 import {FormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
+import {AppointmentEntryModel} from "../user/courses/models/appointments/appointment-entry-model";
+import {ScheduledAppointmentModel} from "../user/courses/models/appointments/scheduled-appointment-model";
+
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
-    imports: [
-        CalendarMonthModule,
-        CalendarWeekModule,
-        CalendarDayModule,
-        NgIf,
-        MatList,
-        MatListItem,
-        MatListItemTitle,
-        MatListItemLine,
-        FormsModule,
-        CalendarControlsComponent,
-    ],
+  imports: [
+      CalendarMonthModule,
+      CalendarWeekModule,
+      CalendarDayModule,
+      CalendarModule,
+      NgIf,
+      MatList,
+      MatListItem,
+      MatListItemTitle,
+      MatListItemLine,
+      FormsModule,
+      CalendarControlsComponent
+  ],
   templateUrl: './timetable.component.html',
   styleUrls: ['./timetable.component.scss']
 })
 export class TimetableComponent implements OnInit, OnDestroy {
 
+    @ViewChild('controls') controls!: CalendarControlsComponent;
     events: CalendarEvent[] = [];
 
-    onDayClicked(event: any): void {
-        console.log('Day clicked', event);
+    onDayClicked(event: CalendarMonthViewDay): void {
+        if(this.controls)
+        {
+            this.controls.dayClicked = event.date;
+        }
     }
 
     protected readonly wrapSize: number = 1200;
@@ -50,7 +58,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     constructor(private _courseService: CourseService, private _accessibilityService: AccessibilityService, @Inject(DOCUMENT) private document: any) {}
 
     public ngOnInit(): void {
-        this.document.body.classList.add(this.darkThemeClass)
+        this.document.body.classList.add(this.calendarThemeClass)
         this._courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
             courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void => {
                 this.events.push(
@@ -60,10 +68,10 @@ export class TimetableComponent implements OnInit, OnDestroy {
             });
         });
     }
-    private readonly darkThemeClass = 'calendar-theme';
+    private readonly calendarThemeClass: string = 'calendar-theme';
 
     public ngOnDestroy(): void {
-        this.document.body.classList.remove(this.darkThemeClass)
+        this.document.body.classList.remove(this.calendarThemeClass)
     }
 
 
@@ -84,5 +92,5 @@ export class TimetableComponent implements OnInit, OnDestroy {
         return scheduled.flatMap((entity: ScheduledAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
 
-    protected readonly CalendarView = CalendarView;
+    protected readonly CalendarView: typeof CalendarView = CalendarView;
 }
