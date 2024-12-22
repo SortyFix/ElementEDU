@@ -1,7 +1,8 @@
-import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Inject, model, ModelSignal, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {CourseService} from "../user/courses/course.service";
 import {AccessibilityService} from "../accessibility.service";
 import {
+    CalendarDateFormatter,
     CalendarDayModule,
     CalendarEvent,
     CalendarModule,
@@ -16,30 +17,44 @@ import {FormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
 import {AppointmentEntryModel} from "../user/courses/models/appointments/appointment-entry-model";
 import {ScheduledAppointmentModel} from "../user/courses/models/appointments/scheduled-appointment-model";
+import {MatCalendar} from "@angular/material/datepicker";
+import {MatDivider} from "@angular/material/divider";
+import {DateFormatter} from "./date-formatter";
+import {MatButton} from "@angular/material/button";
 
 
 @Component({
   selector: 'app-timetable',
   standalone: true,
-  imports: [
-      CalendarMonthModule,
-      CalendarWeekModule,
-      CalendarDayModule,
-      CalendarModule,
-      NgIf,
-      MatList,
-      MatListItem,
-      MatListItemTitle,
-      MatListItemLine,
-      FormsModule,
-      CalendarControlsComponent
-  ],
+    imports: [
+        CalendarMonthModule,
+        CalendarWeekModule,
+        CalendarDayModule,
+        CalendarModule,
+        NgIf,
+        MatList,
+        MatListItem,
+        MatListItemTitle,
+        MatListItemLine,
+        FormsModule,
+        CalendarControlsComponent,
+        MatCalendar,
+        MatDivider,
+        MatButton
+    ],
+    providers: [
+        {
+            provide: CalendarDateFormatter,
+            useClass: DateFormatter
+        }
+    ],
   templateUrl: './timetable.component.html',
-  styleUrls: ['./timetable.component.scss']
+  styleUrl: './timetable.component.scss'
 })
-export class TimetableComponent implements OnInit, OnDestroy {
+export class TimetableComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ViewChild('controls') controls!: CalendarControlsComponent;
+    selected: ModelSignal<Date | null> = model<Date | null>(null);
     events: CalendarEvent[] = [];
 
     onDayClicked(event: CalendarMonthViewDay): void {
@@ -68,6 +83,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
             });
         });
     }
+
+    ngAfterViewInit() {
+        this.selected.set(this.controls.viewDate)
+    }
+
     private readonly calendarThemeClass: string = 'calendar-theme';
 
     public ngOnDestroy(): void {

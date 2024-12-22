@@ -3,10 +3,7 @@ import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-to
 import {CalendarView} from "angular-calendar";
 import {MatIcon} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
-import {MatInput} from "@angular/material/input";
-import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
+import {MatIconButton} from "@angular/material/button";
 
 @Component({
   selector: 'app-calendar-controls',
@@ -17,7 +14,6 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/m
         MatIcon,
         FormsModule,
         MatIconButton,
-        MatButton
     ],
   templateUrl: './calendar-controls.component.html',
   styleUrl: './calendar-controls.component.scss'
@@ -38,7 +34,7 @@ export class CalendarControlsComponent {
         }
 
         this.viewType = CalendarView.Day;
-        this.viewDate = date;
+        this.viewDateExact = date;
     }
 
     public get viewType(): CalendarView {
@@ -49,7 +45,12 @@ export class CalendarControlsComponent {
         return this._viewDate;
     }
 
-    private set viewDate(value: Date) {
+    public set viewDate(value: Date) {
+        this._viewDate = value;
+    }
+
+
+private set viewDateExact(value: Date) {
         this._viewDate = value;
     }
 
@@ -65,13 +66,13 @@ export class CalendarControlsComponent {
         const currentDate: Date = this.viewDate;
         switch (this._viewType) {
             case CalendarView.Month:
-                this.viewDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + steps, 1);
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth() + steps, 1);
                 break;
             case CalendarView.Week:
-                this.viewDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (steps * 7));
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (steps * 7));
                 break;
             case CalendarView.Day:
-                this.viewDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + steps);
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + steps);
                 break;
         }
     }
@@ -79,10 +80,10 @@ export class CalendarControlsComponent {
     protected get title(): string {
         switch (this._viewType) {
             case CalendarView.Month:
-                return this.viewDate.toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
+                return this.viewDate.toLocaleDateString('de-DE', {month: 'long', year: 'numeric'});
 
             case CalendarView.Day:
-                return this.viewDate.toLocaleDateString('en-US', {
+                return this.viewDate.toLocaleDateString('de-DE', {
                     weekday: 'long',
                     month: 'long',
                     day: 'numeric',
@@ -98,14 +99,11 @@ export class CalendarControlsComponent {
                 startOfWeek.setDate(this.viewDate.getDate() + daysToMonday); // Go to Monday
                 endOfWeek.setDate(startOfWeek.getDate() + 6); // Go to Sunday (end of the week)
 
-                return `${startOfWeek.toLocaleDateString('en-US', {
+                return `${startOfWeek.toLocaleDateString('de-DE', {
                     month: 'short',
                     day: 'numeric'
-                })} – ${endOfWeek.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+                })} – ${endOfWeek.toLocaleDateString('de-DE', {month: 'short', day: 'numeric', year: 'numeric'})}`;
         }
-
-        return ''
-
     }
 
     protected readonly CalendarView: typeof CalendarView = CalendarView;

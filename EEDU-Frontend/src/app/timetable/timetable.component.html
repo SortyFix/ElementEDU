@@ -1,69 +1,102 @@
-<div class="calendar-container">
-    <div class="calendar-info-wrapper">
-        <!-- FullCalendar Component -->
-        <div class="calendar-wrapper">
+<div class="container">
+    <div class="calendar-container">
+        <div class="calendar-info-wrapper">
+            <!-- FullCalendar Component -->
+            <div class="calendar-wrapper">
+                <app-calendar-controls #controls></app-calendar-controls>
+                <div class="scrollable-container">
+                    <mwl-calendar-month-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Month"
+                                             [viewDate]="controls.viewDate"
+                                             [events]="events"
+                                             [locale]="'en-GB'"
+                                             [weekStartsOn]="1"
+                                             (dayClicked)="onDayClicked($event.day)">
+                    </mwl-calendar-month-view>
+                    <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
+                                            [viewDate]="controls.viewDate"
+                                            [events]="events"
+                                            [locale]="'en-GB'"
+                                            [weekStartsOn]="1">
+                    </mwl-calendar-week-view>
+                    <mwl-calendar-day-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Day"
+                                           [viewDate]="controls.viewDate"
+                                           [events]="events"
+                                           [locale]="'en-GB'">
+                    </mwl-calendar-day-view>
+                </div>
+                <div style="display: flex; justify-content: space-between">
+                    <button mat-button>Import into another Calendar</button>
+                    <button mat-button>Export to File</button>
+                </div>
+            </div>
 
-            <app-calendar-controls #controls></app-calendar-controls>
-
-            <div class="scrollable-container">
-                <mwl-calendar-month-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Month"
-                                         [viewDate]="controls.viewDate"
-                                         [events]="events"
-                                         [locale]="'en-GB'"
-                                         [weekStartsOn]="1"
-                                         (dayClicked)="onDayClicked($event.day)">
-                </mwl-calendar-month-view>
-                <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
-                                        [viewDate]="controls.viewDate"
-                                        [events]="events"
-                                        [locale]="'en-GB'"
-                                        [weekStartsOn]="1">
-                </mwl-calendar-week-view>
-                <mwl-calendar-day-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Day"
-                                       [viewDate]="controls.viewDate"
-                                       [events]="events"
-                                       [locale]="'en-GB'">
-                </mwl-calendar-day-view>
+            <div class="info-box"
+                 [style.margin-top]="screenWidth <= wrapSize ? '5px' : '0'"
+                 [style.margin-left]="screenWidth > wrapSize ? '5px' : '0'">
+                @if(screenWidth > wrapSize)
+                {
+                    <mat-calendar *ngIf="screenWidth > wrapSize" [(selected)]="controls.viewDate"></mat-calendar>
+                    <mat-divider></mat-divider>
+                }
+                <h4 class="mat-title" [style.text-align]="'center'">Upcoming Homeworks & Tests</h4>
+                <div class="upcoming-events-container">
+                    <mat-list>
+                        <mat-list-item>
+                            <span matListItemTitle>05.12.2024</span>
+                            <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <span matListItemTitle>15.11.2024</span><br>
+                            <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <span matListItemTitle>04.11.2024</span>
+                            <span matListItemLine>Chemistry: Organic Compounds Test</span>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <span matListItemTitle>25.12.2024</span>
+                            <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
             </div>
         </div>
-
-        <!-- Info Box -->
-        <div class="info-box"
-        [style.margin-top]="screenWidth <= 1200 ? '5px' : '0rem'"
-        [style.margin-left]="screenWidth > 1200 ? '5px' : '0rem'"
-        >
-            <h3 class="mat-title">Upcoming Homeworks & Tests</h3>
-            <mat-list>
-                <mat-list-item>
-                    <span matListItemTitle>05.12.2024</span>
-                    <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span matListItemTitle>15.11.2024</span><br>
-                    <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span matListItemTitle>04.11.2024</span>
-                    <span matListItemLine>Chemistry: Organic Compounds Test</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span matListItemTitle>06.12.2024</span>
-                    <span matListItemLine>Biology: Cell Division Homework</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span matListItemTitle>13.12.2024</span>
-                    <span matListItemLine>History: World War II Assessment</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span matListItemTitle>25.12.2024</span>
-                    <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
-                </mat-list-item>
-            </mat-list>
-
-        </div>
     </div>
+
+    <div class="appointment-box">
+        <h4 class="mat-title">Current Selected Appointment</h4>
+
+        <!--
+        <h3 class="mat-title">Upcoming Homeworks & Tests</h3>
+        <mat-list>
+            <mat-list-item>
+                <span matListItemTitle>05.12.2024</span>
+                <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>15.11.2024</span><br>
+                <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>04.11.2024</span>
+                <span matListItemLine>Chemistry: Organic Compounds Test</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>06.12.2024</span>
+                <span matListItemLine>Biology: Cell Division Homework</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>13.12.2024</span>
+                <span matListItemLine>History: World War II Assessment</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>25.12.2024</span>
+                <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
+            </mat-list-item>
+        </mat-list>
+
+    --></div>
+
 </div>
 
-<div class="appointment-box">
-    Next Appointment:
-</div>
+
