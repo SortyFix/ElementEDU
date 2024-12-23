@@ -143,5 +143,7 @@ export class ArticleCreationComponent {
             editPrivileges: this.reactivePrivileges(),
             tags: this.reactiveTags()
         });
+
+        window.location.reload();
     }
 }

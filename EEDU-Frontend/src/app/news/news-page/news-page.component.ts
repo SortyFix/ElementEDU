@@ -40,7 +40,9 @@ export class NewsPageComponent implements OnInit
         });
 
         const articleId = Number(this.route.snapshot.paramMap.get('id') ?? '0');
+        console.log(articleId);
         this.article = this.newsService.getArticle(articleId);
+        console.log(this.article);
         this.body = DOMPurify.sanitize(marked(this.article.body) as string);
     }
 

@@ -10,6 +10,8 @@ import {MatFabButton} from "@angular/material/button";
 import {Dialog} from "@angular/cdk/dialog";
 import {ArticleCreationComponent} from "./article-creation/article-creation.component";
 import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-button.component";
+import {UserService} from "../user/user.service";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
 
 @Component({
   selector: 'app-news',
@@ -21,7 +23,8 @@ import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-
         MatIcon,
         MatFabButton,
         FileUploadButtonComponent,
-        NgIf
+        NgIf,
+        MatPaginator
     ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss'
@@ -29,36 +32,64 @@ import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-
 @Injectable({
     providedIn: 'root', // Default dependency injection for the whole app
 })
-export class NewsComponent implements AfterViewInit, OnInit {
+export class NewsComponent implements OnInit {
+    pageIndex: number = 0;
 
-    ngAfterViewInit(): void {
-        this.calculateColumns();
+    constructor(public http: HttpClient,
+                public newsService: NewsService,
+                public userService: UserService,
+                public route: ActivatedRoute,
+                public router: Router,
+                public dialog: Dialog) {
     }
 
-    constructor(public http: HttpClient, public newsService: NewsService, public route: ActivatedRoute, public router: Router, public dialog: Dialog) {
-    }
-
-    columns!: number;
+    articleList: PostModel[] = [];
+    articleCount!: bigint;
 
     @ViewChild('container', {static: false}) container: ElementRef | undefined;
 
     ngOnInit(): void
     {
-        this.newsService.getAllPosts();
         this.route.params.subscribe((params) => {
-            if(params['id']) {
-                this.openArticle(BigInt(+params['id']));
-            }
+            const index = params['pageIndex'] ? +params['pageIndex'] : 0;
+            this.pageIndex = index;
+            this.loadCount();
+            this.loadArticles(index);
+        });
+    }
+
+    public loadArticles(pageIndex: number)
+    {
+        this.newsService.getPosts(pageIndex).subscribe(() => {
+            this.articleList = this.newsService.articleList;
+            setTimeout(() => this.calculateColumns());
+            this.route.params.subscribe((params) => {
+                if(params['id']) {
+                    this.openArticle(BigInt(+params['id']));
+                }
+            });
+        });
+    }
+
+    public loadCount() {
+        this.newsService.getCount().subscribe((articleCount) => {
+            this.articleCount = articleCount;
         })
     }
 
-    onBoxResize(): void {
-        this.calculateColumns()
+    public nextPage(pageEvent: PageEvent): void
+    {
+        const newPageIndex = pageEvent.pageIndex;
+        this.router.navigate([`/news/page/${newPageIndex}`]);
     }
 
     public getTimeString(timestamp: number): string
     {
         return new Date(Number(timestamp)).toDateString();
+    }
+
+    public hasPermission(): boolean {
+        return this.userService.getUserData.hasPrivilege("ADMIN");
     }
 
     public openArticle(articleId: bigint)
@@ -77,15 +108,17 @@ export class NewsComponent implements AfterViewInit, OnInit {
         return !!post.thumbnailBlob;
     }
 
-    private calculateColumns(): void
+    protected calculateColumns(): number
     {
         // Source: https://stackblitz.com/edit/angular-dynamic-grid-list-cols-alprdz?file=src%2Fapp%2Fapp.component.html
         if (this.container) {
             const containerWidth = this.container.nativeElement.clientWidth;
             let screenDivision = Math.floor(containerWidth / 350);
-            this.columns = (screenDivision > 0 ? screenDivision : 1);
+            return (screenDivision > 0 ? screenDivision : 1);
         } else {
-            this.columns = 1;
+            return 1;
         }
     }
+
+    protected readonly BigInt = BigInt;
 }

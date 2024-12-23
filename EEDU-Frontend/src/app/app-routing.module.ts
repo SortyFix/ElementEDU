@@ -15,6 +15,7 @@ const routes: Routes = [
     {path: 'timetable', component: TimetableComponent},
     {path: 'news', component: NewsComponent},
     {path: 'news/:id', component: NewsPageComponent},
+    {path: 'news/page/:pageIndex', component: NewsComponent},
     {path: 'chat', component: ChatComponent},
     {path: 'settings', component: SettingsComponent}
 ];

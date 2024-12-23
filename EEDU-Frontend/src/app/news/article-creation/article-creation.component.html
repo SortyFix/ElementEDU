@@ -8,7 +8,7 @@
         <ng-template matStepLabel><strong>Enter a title</strong></ng-template>
         <mat-form-field>
             <mat-label>Title</mat-label>
-            <input matInput formControlName="title" required>
+            <input matInput maxlength="40" formControlName="title" required>
         </mat-form-field>
         <button mat-flat-button matStepperNext>Set title</button>
     </mat-step>

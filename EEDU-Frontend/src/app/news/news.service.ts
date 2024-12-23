@@ -2,30 +2,45 @@ import {Injectable, OnInit} from '@angular/core';
 import {PostModel} from "./post-model";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
-import {timestamp} from "rxjs";
+import {Observable, tap, timestamp} from "rxjs";
+import {UserService} from "../user/user.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class NewsService implements OnInit {
-    constructor(public router: Router, public http: HttpClient) {
+    constructor(public router: Router, public http: HttpClient, public userService: UserService) {
         console.log("Getting posts...")
-        this.getAllPosts();
+        this.getPosts();
     }
 
-    articleList!: PostModel[];
+    articleList: PostModel[] = [];
 
     public getTimeString(timestamp: number): string
     {
         return new Date(Number(timestamp)).toDateString();
     }
 
-    public getAllPosts(): void {
-        this.http.get<PostModel[]>("http://localhost:8080/api/v1/blog/get/list", {
+    public getPosts(pageIndex?: number): Observable<PostModel[]> {
+        if(pageIndex == null)
+        {
+            pageIndex = 0;
+        }
+
+        return this.http.get<PostModel[]>(`http://localhost:8080/api/v1/blog/get/list?pageNumber=${pageIndex}`, {
             withCredentials: true
-        }).subscribe((list) => {
-            this.articleList = list;
-            this.stringsToImages();
+        }).pipe(
+            tap((list) => {
+                this.articleList = list;
+                this.stringsToImages();
+            })
+        );
+    }
+
+    public getCount(): Observable<bigint>
+    {
+        return this.http.get<bigint>('http://localhost:8080/api/v1/blog/get/length', {
+            withCredentials: true
         });
     }
 
@@ -64,6 +79,6 @@ export class NewsService implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getAllPosts();
+        this.getPosts();
     }
 }

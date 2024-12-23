@@ -20,14 +20,19 @@ import java.io.IOException;
     private final PostRepository postRepository;
     private final UserService userService;
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@NotNull @PathVariable Long postId)
     {
         return ResponseEntity.ok(postService.getModel(postId));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@AuthenticationPrincipal Long userId)
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/length") public ResponseEntity<Long> getLength()
     {
-        return ResponseEntity.ok(postService.getAllPosts());
+        return ResponseEntity.ok(postService.getLength());
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@NotNull @RequestParam Integer pageNumber)
+    {
+        return ResponseEntity.ok(postService.getPostList(pageNumber));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestPart("createModel") PostCreateModel createModel, @Nullable @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile)

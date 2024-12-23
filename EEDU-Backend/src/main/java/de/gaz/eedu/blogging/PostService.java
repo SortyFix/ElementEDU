@@ -15,6 +15,8 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,11 +64,16 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
         return getRepository().getReferenceById(postId).toModel();
     }
 
-    public @NotNull PostModel[] getAllPosts()
+    public @NotNull PostModel[] getPostList(@NotNull Integer pageNumber)
     {
-        PostModel[] posts = getRepository().findAll().stream().map(PostEntity::toModel).toArray(PostModel[]::new);
-        Arrays.sort(posts, Comparator.comparing(PostModel::timeOfCreation).reversed());
-        return posts;
+        return getRepository()
+                .findAll(PageRequest.of(pageNumber, 10, Sort.by("timeOfCreation").descending()))
+                .map(PostEntity::toModel).stream().toArray(PostModel[]::new);
+    }
+
+    public @NotNull Long getLength()
+    {
+        return getRepository().count();
     }
 
     /**
@@ -135,6 +142,7 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
                 }
                 catch (Exception e)
                 {
+                    System.out.println("createPost");
                     e.printStackTrace();
                 }
             }
