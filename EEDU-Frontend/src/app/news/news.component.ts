@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Injectable, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Injectable, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PostModel} from "./post-model";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
