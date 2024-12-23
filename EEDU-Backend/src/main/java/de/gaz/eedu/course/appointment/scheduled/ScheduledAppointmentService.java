@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
@@ -38,5 +39,10 @@ public class ScheduledAppointmentService extends EntityService<ScheduledAppointm
         //save courses
         getCourseService().saveEntity(editedCourses);
         return scheduledAppointmentEntities;
+    }
+
+    @Override public @NotNull Optional<ScheduledAppointmentModel> loadById(long id)
+    {
+        return super.loadById(id);
     }
 }

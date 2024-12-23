@@ -1,7 +1,7 @@
-package de.gaz.eedu.course.subjects;
+package de.gaz.eedu.course.subject;
 
-import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
-import de.gaz.eedu.course.subjects.model.SubjectModel;
+import de.gaz.eedu.course.subject.model.SubjectCreateModel;
+import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;

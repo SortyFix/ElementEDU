@@ -1,8 +1,8 @@
-package de.gaz.eedu.course.subjects;
+package de.gaz.eedu.course.subject;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.CourseEntity;
-import de.gaz.eedu.course.subjects.model.SubjectModel;
+import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
 import lombok.*;

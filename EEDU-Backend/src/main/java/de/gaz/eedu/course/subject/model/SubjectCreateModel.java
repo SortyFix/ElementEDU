@@ -1,6 +1,6 @@
-package de.gaz.eedu.course.subjects.model;
+package de.gaz.eedu.course.subject.model;
 
-import de.gaz.eedu.course.subjects.SubjectEntity;
+import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

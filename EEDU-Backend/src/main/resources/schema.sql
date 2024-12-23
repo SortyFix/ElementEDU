@@ -47,15 +47,23 @@ CREATE TABLE IF NOT EXISTS course_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
+CREATE TABLE IF NOT EXISTS room_entity
+(
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(20) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     course_id        BIGINT NOT NULL,
+    room_id          BIGINT NOT NULL,
     start_time_stamp BIGINT NOT NULL,
     end_time_stamp   BIGINT NOT NULL,
     duration         BIGINT NOT NULL,
     period           INT    NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES course_entity (id)
+    FOREIGN KEY (course_id) REFERENCES course_entity (id),
+    FOREIGN KEY (room_id) REFERENCES room_entity(id)
 );
 
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
@@ -68,8 +76,10 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
     assignment_description   VARCHAR(255)   NULL,
     publish_assignment       BIGINT         NULL,
     submit_assignment_until  BIGINT         NULL,
+    room_id                  BIGINT         NULL,
     course_appointment_id    BIGINT         NOT NULL,
     scheduled_appointment_id BIGINT         NULL,
+    FOREIGN KEY (room_id) REFERENCES room_entity (id),
     FOREIGN KEY (course_appointment_id) REFERENCES course_entity (id),
     FOREIGN KEY (scheduled_appointment_id) REFERENCES scheduled_appointment_entity (id)
 );
@@ -289,9 +299,11 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
        ('History 101', 3, 4, 3),  -- History, Room 103
        ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
 
-INSERT INTO scheduled_appointment_entity (course_id, start_time_stamp, end_time_stamp, duration, period) VALUES
-        (1, 1731779748, 1751989748, 2700, 7),
-        (2, 1731778748, 1751999748, 4000, 6);
+INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
+
+INSERT INTO scheduled_appointment_entity (course_id, room_id, start_time_stamp, end_time_stamp, duration, period) VALUES
+        (1, 1, 1731779748, 1751989748, 2700, 7),
+        (2, 2, 1731778748, 1751999748, 4000, 6);
 
 INSERT INTO user_groups (group_id, user_id) VALUES
        (1, 5),   -- Sara Müller (teacher)

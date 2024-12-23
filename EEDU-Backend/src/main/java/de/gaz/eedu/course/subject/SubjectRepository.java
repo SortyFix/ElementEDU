@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.subjects;
+package de.gaz.eedu.course.subject;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;

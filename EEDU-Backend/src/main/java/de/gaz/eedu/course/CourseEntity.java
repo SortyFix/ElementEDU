@@ -7,7 +7,7 @@ import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.SubjectEntity;
+import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
@@ -46,10 +46,10 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     private SubjectEntity subject;
 
     @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE)
-    private final Set<ScheduledAppointmentEntity> repeatingAppointments = new HashSet<>();
+    private final Set<ScheduledAppointmentEntity> scheduledAppointments = new HashSet<>();
 
     @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE)
-    private final Set<AppointmentEntryEntity> appointmentEntries = new HashSet<>();
+    private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
 
     @ManyToOne @JoinColumn(name = "repository_id", referencedColumnName = "id", unique = true)
     private FileEntity repository;
@@ -86,7 +86,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     public boolean scheduleRepeating(@NotNull ScheduledAppointmentEntity... scheduledAppointmentEntity)
     {
         Predicate<ScheduledAppointmentEntity> notPart = current -> !Objects.equals(this, current.getCourse());
-        return repeatingAppointments.addAll(Arrays.stream(scheduledAppointmentEntity).filter(notPart).toList());
+        return scheduledAppointments.addAll(Arrays.stream(scheduledAppointmentEntity).filter(notPart).toList());
     }
 
     public boolean unscheduleRepeating(@NotNull CourseService courseService, @NotNull Long... scheduledAppointmentEntity)
@@ -97,7 +97,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     public boolean unscheduleRepeating(@NotNull Long... scheduledAppointmentEntity)
     {
         Set<Long> toRemove = Set.of(scheduledAppointmentEntity);
-        return repeatingAppointments.removeIf(appointment -> toRemove.contains(appointment.getId()));
+        return scheduledAppointments.removeIf(appointment -> toRemove.contains(appointment.getId()));
     }
 
     public boolean setEntry(@NotNull CourseService service, @NotNull AppointmentEntryEntity entry)
@@ -112,12 +112,12 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
 
     public boolean setEntry(@NotNull AppointmentEntryEntity entry)
     {
-        return appointmentEntries.add(entry);
+        return appointments.add(entry);
     }
 
     public @NotNull AppointmentEntryEntity[] getEntries()
     {
-        return appointmentEntries.toArray(AppointmentEntryEntity[]::new);
+        return appointments.toArray(AppointmentEntryEntity[]::new);
     }
 
     /**
@@ -312,7 +312,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
 
     public @NotNull @Unmodifiable Set<ScheduledAppointmentEntity> getScheduledAppointments()
     {
-        return Collections.unmodifiableSet(repeatingAppointments);
+        return Collections.unmodifiableSet(scheduledAppointments);
     }
 
     /**

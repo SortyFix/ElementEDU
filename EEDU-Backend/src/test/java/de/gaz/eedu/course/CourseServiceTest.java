@@ -5,7 +5,7 @@ import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.model.SubjectModel;
+import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;

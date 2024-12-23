@@ -1,12 +1,18 @@
 package de.gaz.eedu.course.appointment.scheduled.model;
 
+import de.gaz.eedu.course.room.model.RoomModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record ScheduledAppointmentModel(@NotNull Long id, @NotNull Long start, @NotNull Long end, @NotNull Long duration, @NotNull Long period) implements EntityModel
+public record ScheduledAppointmentModel(@NotNull Long id,
+                                        @NotNull RoomModel room,
+                                        @NotNull Long start,
+                                        @NotNull Long end,
+                                        @NotNull Long duration,
+                                        @NotNull Long period) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()

@@ -7,7 +7,7 @@ import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.SubjectService;
+import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;

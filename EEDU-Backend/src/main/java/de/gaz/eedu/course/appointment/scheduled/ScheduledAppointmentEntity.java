@@ -2,9 +2,11 @@ package de.gaz.eedu.course.appointment.scheduled;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,9 +33,13 @@ public class ScheduledAppointmentEntity implements EntityModelRelation<Scheduled
     private Period period;
     @JsonBackReference @OneToMany(mappedBy = "scheduledAppointment") private Set<AppointmentEntryEntity> entries;
 
+    @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
+    private @NotNull RoomEntity room;
+
     @Override public @NotNull ScheduledAppointmentModel toModel()
     {
         return new ScheduledAppointmentModel(getId(),
+                getRoom().toModel(),
                 getStartTimeStamp().toEpochMilli(),
                 getEndTimeStamp().toEpochMilli(),
                 getDuration().toMillis(),
