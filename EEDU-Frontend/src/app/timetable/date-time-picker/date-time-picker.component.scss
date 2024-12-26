@@ -1,0 +1,15 @@
+.datetime-container {
+    @media (min-width: 1200px) {
+        display: flex;
+
+        .datepicker-input {
+            flex: 2;
+            margin-right: 5px;
+        }
+
+        .timepicker-input {
+            flex: 1;
+        }
+    }
+}
+

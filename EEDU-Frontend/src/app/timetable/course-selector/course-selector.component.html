@@ -1,0 +1,17 @@
+<mat-form-field appearance="outline">
+    <mat-label>{{ label() }}</mat-label>
+    <input
+        type="text"
+        matInput
+        [placeholder]="placeholder()"
+        [matAutocomplete]="auto"
+        [ngModel]="value"
+        (ngModelChange)="onInputChange($event)"
+        (blur)="onTouched()"
+    />
+    <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let course of filteredCourses | async" [value]="course.name">
+            {{ course.name }}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

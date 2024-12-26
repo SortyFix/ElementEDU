@@ -1,0 +1,18 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Create new Appointment</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <app-course-selector formControlName="course" [courses]="courses"></app-course-selector>
+            <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+            <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button mat-dialog-close mat-button type="button">Cancel</button>
+            <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">
+                Submit
+            </button>
+        </mat-card-actions>
+    </mat-card>
+</form>

@@ -1,9 +1,14 @@
-import {Component, Output} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {CalendarView} from "angular-calendar";
 import {MatIcon} from "@angular/material/icon";
 import {FormsModule} from "@angular/forms";
 import {MatIconButton} from "@angular/material/button";
+import {UserService} from "../../user/user.service";
+import {NgIf} from "@angular/common";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {CreateAppointmentComponent} from "../create-appointment/create-appointment.component";
+import {CourseModel} from "../../user/courses/models/course-model";
 
 @Component({
   selector: 'app-calendar-controls',
@@ -14,6 +19,7 @@ import {MatIconButton} from "@angular/material/button";
         MatIcon,
         FormsModule,
         MatIconButton,
+        NgIf,
     ],
   templateUrl: './calendar-controls.component.html',
   styleUrl: './calendar-controls.component.scss'
@@ -22,6 +28,12 @@ export class CalendarControlsComponent {
 
     private _viewDate: Date = new Date();
     private _viewType: CalendarView = CalendarView.Month;
+
+    constructor(private _userService: UserService, private _dialog: MatDialog) {}
+
+    protected get isTeacher(): boolean {
+        return this._userService.getUserData.inGroup('teacher');
+    }
 
     protected set viewType(value: CalendarView) {
         this._viewType = value;
@@ -50,7 +62,7 @@ export class CalendarControlsComponent {
     }
 
 
-private set viewDateExact(value: Date) {
+    private set viewDateExact(value: Date) {
         this._viewDate = value;
     }
 
@@ -104,6 +116,14 @@ private set viewDateExact(value: Date) {
                     day: 'numeric'
                 })} – ${endOfWeek.toLocaleDateString('de-DE', {month: 'short', day: 'numeric', year: 'numeric'})}`;
         }
+    }
+
+    protected createAppointment(): void
+    {
+        const dialogRef: MatDialogRef<CreateAppointmentComponent> = this._dialog.open(CreateAppointmentComponent, {
+            width: '600px',
+            disableClose: true,
+        })
     }
 
     protected readonly CalendarView: typeof CalendarView = CalendarView;

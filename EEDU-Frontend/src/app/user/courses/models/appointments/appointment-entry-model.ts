@@ -22,7 +22,8 @@ export class AppointmentEntryModel {
         return this._duration;
     }
 
-    private get computeDuration(): Date {
+    public get end(): Date
+    {
         return new Date(this._start + this.duration);
     }
 
@@ -43,7 +44,7 @@ export class AppointmentEntryModel {
             id: this.id,
             title: name,
             start: this.start,
-            end: this.computeDuration,
+            end: this.end,
             color: {
                 primary: '#cb6529',
                 secondary: '#f3e630'

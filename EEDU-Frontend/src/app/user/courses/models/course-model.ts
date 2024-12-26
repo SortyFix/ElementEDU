@@ -20,6 +20,15 @@ export class CourseModel {
         return new CourseModel(id, name, subject, appointmentEntries, scheduledAppointments);
     }
 
+    public get isActive(): boolean
+    {
+        const currentDate = new Date();
+        const futureAppointments: (entry: {end: Date}) => boolean
+            = (entry: { end: Date }): boolean => entry.end > currentDate;
+
+        return this.scheduledAppointments.some(futureAppointments) || this.appointmentEntries.some(futureAppointments);
+    }
+
     private static getEntries(obj: any): AppointmentEntryModel[]
     {
         return obj.map((entry: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(entry));
