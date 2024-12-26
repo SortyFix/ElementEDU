@@ -10,7 +10,7 @@ import {FileUploadButtonComponent} from "../../file/file-upload-button/file-uplo
 import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {NgForOf} from "@angular/common";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {ArticleCreationService} from "./article-creation.service";
 
 @Injectable({

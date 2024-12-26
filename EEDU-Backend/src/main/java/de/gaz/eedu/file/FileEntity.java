@@ -106,7 +106,6 @@ import java.util.Set;
         catch (IOException e)
         {
             System.out.println("uploadBatch");
-            e.printStackTrace();
             throw new MaliciousFileException(subdirectory, e);
         }
     }

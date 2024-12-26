@@ -1,8 +1,8 @@
-import {Injectable, model, OnInit} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {PostModel} from "./post-model";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
-import {Observable, tap, timestamp} from "rxjs";
+import {Observable, tap} from "rxjs";
 import {UserService} from "../user/user.service";
 
 @Injectable({
