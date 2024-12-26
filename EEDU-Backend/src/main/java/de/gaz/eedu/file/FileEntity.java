@@ -90,9 +90,12 @@ import java.util.Set;
     {
         try
         {
+            System.out.println("Starting upload");
             for(MultipartFile file : batch)
             {
+                System.out.println("Setting path...");
                 Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
+                System.out.println("Creating path...");
                 createDirectory(subdirectory);
                 if (virusCheck(file.getInputStream()))
                 {

@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {NewsComponent} from "../news.component";
 import {ActivatedRoute, Router} from "@angular/router";
 import {PostModel} from "../post-model";
 import {NewsService} from "../news.service";
@@ -26,7 +25,6 @@ import {FileUploadButtonComponent} from "../../file/file-upload-button/file-uplo
 })
 export class NewsPageComponent implements OnInit
 {
-
     article!: PostModel;
     body!: any;
 
@@ -41,9 +39,13 @@ export class NewsPageComponent implements OnInit
 
         const articleId = Number(this.route.snapshot.paramMap.get('id') ?? '0');
         console.log(articleId);
-        this.article = this.newsService.getArticle(articleId);
-        console.log(this.article);
-        this.body = DOMPurify.sanitize(marked(this.article.body) as string);
+        this.newsService.getArticle(articleId).subscribe(model => {
+            this.article = model;
+            this.article.thumbnailBlob =
+                `data:${this.newsService.getMimeType(this.article.thumbnailBlob)};base64,${this.article.thumbnailBlob}`;
+            console.log(this.article);
+            this.body = DOMPurify.sanitize(marked(this.article.body) as string);
+        });
     }
 
 }

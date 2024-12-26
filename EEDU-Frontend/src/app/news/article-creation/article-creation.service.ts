@@ -40,6 +40,8 @@ export class ArticleCreationService {
             formData.append('multipartFile', multipartFile);
         }
 
+        console.log(multipartFile);
+
         this.sendPostCreationRequest(formData);
     }
 
@@ -52,6 +54,7 @@ export class ArticleCreationService {
             .subscribe({
                 next: (response) => {
                     console.log('Post created successfully:', response);
+                    location.reload();
                 },
                 error: (error) => {
                     console.error('Error creating post:', error);

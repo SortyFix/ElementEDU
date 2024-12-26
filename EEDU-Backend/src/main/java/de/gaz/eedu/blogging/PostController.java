@@ -27,6 +27,7 @@ import java.io.IOException;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/length") public ResponseEntity<Long> getLength()
     {
+        System.out.println(postService.getLength());
         return ResponseEntity.ok(postService.getLength());
     }
 
@@ -37,6 +38,7 @@ import java.io.IOException;
 
     @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestPart("createModel") PostCreateModel createModel, @Nullable @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile)
     {
+        System.out.println("SOLKDJFHÖOSKRFHJÜOSIEHFRLIKSUE>");
         System.out.println(userService.loadEntityByIDSafe(userId).getAuthorities().toString());
         return ResponseEntity.ok(postService.createPost(userId, multipartFile, createModel));
     }

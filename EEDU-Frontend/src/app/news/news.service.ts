@@ -1,4 +1,4 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable, model, OnInit} from '@angular/core';
 import {PostModel} from "./post-model";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
@@ -44,15 +44,11 @@ export class NewsService implements OnInit {
         });
     }
 
-    public getArticle(index: number): PostModel
+    public getArticle(id: number): Observable<PostModel>
     {
-        const foundArticle: PostModel | undefined = this.articleList.find(article => Number(article.id) === index);
-
-        if(!foundArticle) {
-            throw new Error(`Article with id ${index} not found.`);
-        }
-
-        return foundArticle;
+        return this.http.get<PostModel>(`http://localhost:8080/api/v1/blog/get/${id}`, {
+            withCredentials: true
+        });
     }
 
     public stringsToImages() {
