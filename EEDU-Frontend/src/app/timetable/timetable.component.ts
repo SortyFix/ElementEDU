@@ -74,14 +74,24 @@ export class TimetableComponent implements OnInit, AfterViewInit, OnDestroy {
 
     public ngOnInit(): void {
         this.document.body.classList.add(this.calendarThemeClass)
-        this._courseService.fetchCourses().subscribe((courses: CourseModel[]): void => {
-            courses.forEach(({ name, appointmentEntries, scheduledAppointments }: CourseModel): void => {
-                this.events.push(
-                    ...this.toEvents(name, scheduledAppointments),
-                    ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name))
-                );
-            });
+        this._courseService.fetchCourses().subscribe((): void  => { this.events = this.coursesToEvents(); });
+    }
+
+    protected toString(date: Date): string {
+        return date.toLocaleDateString('de-DE', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric'
         });
+    }
+
+    private coursesToEvents(): CalendarEvent[] {
+        return this._courseService.courses.flatMap(
+            ({ name, appointmentEntries, scheduledAppointments }: CourseModel): CalendarEvent[] => [
+                ...this.toEvents(name, scheduledAppointments),
+                ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
+            ]
+        );
     }
 
     ngAfterViewInit() {

@@ -6,8 +6,9 @@ import {MatButton} from "@angular/material/button";
 import {CourseService} from "../../user/courses/course.service";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {CourseSelectorComponent} from "../course-selector/course-selector.component";
-import {MatDialogClose} from "@angular/material/dialog";
+import {MatDialogClose, MatDialogRef} from "@angular/material/dialog";
 import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-create-appointment',
@@ -35,7 +36,6 @@ export class CreateAppointmentComponent  {
     private readonly _courses: CourseModel[];
     private readonly _form: FormGroup;
 
-
     protected get currentDate(): Date {
         return this._currentDate;
     }
@@ -45,7 +45,7 @@ export class CreateAppointmentComponent  {
         return (course: CourseModel): string => course.name;
     }
 
-    constructor(private courseService: CourseService, formBuilder: FormBuilder) {
+    constructor(private _dialogRef: MatDialogRef<CreateAppointmentComponent>, private courseService: CourseService, formBuilder: FormBuilder) {
         this._courses = this.courseService.courses;
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
@@ -81,8 +81,13 @@ export class CreateAppointmentComponent  {
             }
             const appointment: AppointmentCreateModel = new AppointmentCreateModel(formValue.start, formValue.until);
             this.courseService.createAppointment(course.id, appointment).subscribe({
-                next: () => {
-                    console.log("done!")
+                next: (): void =>
+                {
+                    this.courseService.fetchCourses().subscribe({
+                        next: (): void => {
+                            this._dialogRef.close();
+                        }
+                    })
                 }
             })
 

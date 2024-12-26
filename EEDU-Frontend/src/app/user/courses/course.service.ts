@@ -29,7 +29,7 @@ export class CourseService {
     public createAppointment(course: number, appointment: AppointmentCreateModel)
     {
         const url = `${this.BACKEND_URL}/course/${course}/appointment/set`
-        return this.http.post<any>(url, {
+        return this.http.post<void>(url, {
 
             start: appointment.start,
             duration: appointment.duration,
