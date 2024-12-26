@@ -9,6 +9,7 @@ import {NgIf} from "@angular/common";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {CreateAppointmentComponent} from "../create-appointment/create-appointment.component";
 import {CourseModel} from "../../user/courses/models/course-model";
+import {MatChip, MatChipSet} from "@angular/material/chips";
 
 @Component({
   selector: 'app-calendar-controls',
@@ -20,6 +21,7 @@ import {CourseModel} from "../../user/courses/models/course-model";
         FormsModule,
         MatIconButton,
         NgIf,
+        MatChip,
     ],
   templateUrl: './calendar-controls.component.html',
   styleUrl: './calendar-controls.component.scss'

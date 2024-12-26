@@ -3,6 +3,7 @@ import {environment} from "../../../environment/environment";
 import {HttpClient} from "@angular/common/http";
 import {map, Observable} from "rxjs";
 import {CourseModel} from "./models/course-model";
+import {AppointmentCreateModel} from "./models/appointments/appointment-create-model";
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +25,22 @@ export class CourseService {
             });
         }));
     }
+
+    public createAppointment(course: number, appointment: AppointmentCreateModel)
+    {
+        const url = `${this.BACKEND_URL}/course/${course}/appointment/set`
+        return this.http.post<any>(url, {
+
+            start: appointment.start,
+            duration: appointment.duration,
+            description: appointment.description,
+            assignment: appointment.assignment,
+
+        }, { withCredentials: true });
+    }
+
+    /*@NotNull Long start, @Nullable Long duration, @Nullable String description,
+                                          @Nullable AssignmentCreateModel assignment*/
 
     public get courses(): CourseModel[] {
         if(this._courses.length === 0) {

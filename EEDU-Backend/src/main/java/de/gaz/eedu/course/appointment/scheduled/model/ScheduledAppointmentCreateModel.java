@@ -16,9 +16,9 @@ public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long
 
     @Override public @NotNull ScheduledAppointmentEntity toEntity(@NotNull ScheduledAppointmentEntity entity)
     {
-        entity.setStartTimeStamp(Instant.ofEpochSecond(start()));
-        entity.setEndTimeStamp(Instant.ofEpochSecond(end()));
-        entity.setDuration(Duration.ofSeconds(duration()));
+        entity.setStartTimeStamp(Instant.ofEpochMilli(start()));
+        entity.setEndTimeStamp(Instant.ofEpochMilli(end()));
+        entity.setDuration(Duration.ofMillis(duration()));
         entity.setPeriod(Period.ofDays(Math.toIntExact(periodAsDays())));
         return entity;
     }

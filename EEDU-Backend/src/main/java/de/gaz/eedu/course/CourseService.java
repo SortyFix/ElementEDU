@@ -159,7 +159,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             {
                 return attachScheduled(createModel, course, entryEntity);
             }
-            entryEntity.setDuration(Duration.ofSeconds(createModel.duration()));
+            entryEntity.setDuration(Duration.ofMillis(createModel.duration()));
             return entryEntity;
         }));
     }

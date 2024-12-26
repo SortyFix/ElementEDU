@@ -1,5 +1,6 @@
 package de.gaz.eedu.course;
 
+import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
@@ -36,6 +37,12 @@ public class CourseController extends EntityController<CourseService, CourseMode
         UserEntity[] entities = getService().getUserRepository().findAllById(Set.of(users)).toArray(UserEntity[]::new);
         boolean modified = getService().loadEntityByIDSafe(course).attachUsers(getService(), entities);
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+    }
+
+    @PostMapping("/{course}/appointment/set")
+    public @NotNull HttpStatus setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel createModel) {
+        getService().createAppointment(course, createModel);
+        return HttpStatus.OK;
     }
 
     @GetMapping("{course}/detach") public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)

@@ -1,6 +1,8 @@
 
 <div class="title">
-    <h3>{{ title }}</h3>
+    <mat-chip *ngIf="isTeacher">Teachers View</mat-chip>
+    <mat-chip *ngIf="!isTeacher">Students View</mat-chip>
+    <h3> {{ title }} </h3>
 </div>
 
 <div class="calendar-controls">

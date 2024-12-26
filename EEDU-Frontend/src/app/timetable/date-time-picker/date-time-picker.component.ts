@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, input, Input, InputSignal} from '@angular/core';
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
 import {MatInput} from "@angular/material/input";
@@ -33,6 +33,8 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/for
 })
 export class DateTimePickerComponent implements ControlValueAccessor {
     @Input() label: string = '';
+
+    public readonly minDate: InputSignal<Date | undefined> = input<Date>()
 
     private _date: Date | null = null;
     private _time: Date | null = null;

@@ -3,7 +3,6 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatInput} from "@angular/material/input";
 import {AsyncPipe, NgForOf} from "@angular/common";
-import {CourseModel} from "../../user/courses/models/course-model";
 import {map, Observable, startWith, Subscriber} from "rxjs";
 import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator} from "@angular/forms";
 
@@ -21,26 +20,26 @@ import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Val
 })
 export class CourseSelectorComponent implements ControlValueAccessor, Validator {
 
-    public label: InputSignal<string> = input<string>('Enter the Course this Appointment applies to');
-    public placeholder: InputSignal<string> = input<string>('Course...');
-    public courses: InputSignal<CourseModel[]> = input<CourseModel[]>([]);
+    public label: InputSignal<string> = input<string>('');
+    public placeholder: InputSignal<string> = input<string>('');
+    public values: InputSignal<{ name: string }[]> = input<{ name: string }[]>([]);
 
-    private readonly _filteredCourses!: Observable<CourseModel[]>;
+    private readonly _filteredValues!: Observable<{ name: string }[]>;
 
     private _value: string = '';
     private onChange: (value: string) => void = (): void => {};
     protected onTouched: () => void = (): void => {};
 
     constructor() {
-        this._filteredCourses = new Observable<string>((observer: Subscriber<string>): void =>
+        this._filteredValues = new Observable<string>((observer: Subscriber<string>): void =>
         {
             observer.next(this.value)
-        }).pipe(startWith(''), map((value: string): CourseModel[] => this.filterCourses(value)));
+        }).pipe(startWith(''), map((value: string): { name: string }[] => this.filterCourses(value)));
     }
 
-    private filterCourses(value: string): CourseModel[] {
+    private filterCourses(value: string): { name: string }[] {
         const filterValue: string = value.toLowerCase();
-        return this.courses().filter((course: CourseModel): boolean => course.name.toLowerCase().includes(filterValue));
+        return this.values().filter((value: { name: string }): boolean => value.name.toLowerCase().includes(filterValue));
     }
 
     public onInputChange(value: string): void {
@@ -61,7 +60,7 @@ export class CourseSelectorComponent implements ControlValueAccessor, Validator 
     }
 
     public validate(): { invalidCourse: boolean } | null {
-        const isValid: boolean = this.courses().some((course: CourseModel): boolean => course.isActive && course.name === this.value);
+        const isValid: boolean = this.values().some((course: { name: string }): boolean => course.name === this.value);
         return isValid ? null : {invalidCourse: true};
     }
 
@@ -70,8 +69,8 @@ export class CourseSelectorComponent implements ControlValueAccessor, Validator 
     }
 
 
-    protected get filteredCourses(): Observable<CourseModel[]> {
-        return this._filteredCourses;
+    protected get filteredValues(): Observable<{ name: string }[]> {
+        return this._filteredValues;
     }
 
     protected set value(value: string) {

@@ -4,10 +4,10 @@ import {ScheduledAppointmentModel} from "./appointments/scheduled-appointment-mo
 
 export class CourseModel {
 
-    constructor(public readonly id: bigint, public readonly name: string, public readonly subject: SubjectModel, public readonly appointmentEntries: AppointmentEntryModel[], public readonly scheduledAppointments: ScheduledAppointmentModel[]) {}
+    constructor(public readonly id: number, public readonly name: string, public readonly subject: SubjectModel, public readonly appointmentEntries: AppointmentEntryModel[], public readonly scheduledAppointments: ScheduledAppointmentModel[]) {}
 
     public static fromObject(object: any): CourseModel {
-        const id: bigint = BigInt(object.id);
+        const id: number = object.id;
         const name: string = object.name;
         const subject: SubjectModel = SubjectModel.fromObject(object.subject);
 

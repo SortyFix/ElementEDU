@@ -45,10 +45,6 @@ export class AppointmentEntryModel {
             title: name,
             start: this.start,
             end: this.end,
-            color: {
-                primary: '#cb6529',
-                secondary: '#f3e630'
-            },
             resizable: {
                 beforeStart: false,
                 afterEnd: false

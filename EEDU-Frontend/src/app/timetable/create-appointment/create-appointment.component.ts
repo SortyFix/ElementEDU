@@ -7,6 +7,7 @@ import {CourseService} from "../../user/courses/course.service";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {CourseSelectorComponent} from "../course-selector/course-selector.component";
 import {MatDialogClose} from "@angular/material/dialog";
+import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
 
 @Component({
   selector: 'app-create-appointment',
@@ -30,11 +31,22 @@ import {MatDialogClose} from "@angular/material/dialog";
 })
 export class CreateAppointmentComponent  {
 
+    private readonly _currentDate: Date = new Date();
     private readonly _courses: CourseModel[];
     private readonly _form: FormGroup;
 
-    constructor(courseService: CourseService, formBuilder: FormBuilder) {
-        this._courses = courseService.courses;
+
+    protected get currentDate(): Date {
+        return this._currentDate;
+    }
+
+    protected courseToString(): (course: CourseModel) => string
+    {
+        return (course: CourseModel): string => course.name;
+    }
+
+    constructor(private courseService: CourseService, formBuilder: FormBuilder) {
+        this._courses = this.courseService.courses;
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             start: [new Date(), Validators.required],
@@ -59,8 +71,23 @@ export class CreateAppointmentComponent  {
 
     protected onSubmit(): void {
         if (this._form.valid) {
-            const formValue = this._form.value;
-            console.log('Form Submitted', formValue);
+            const formValue: { course: string, start: Date, until: Date } = this._form.value;
+
+            const course: CourseModel | undefined = this.courseService.courses.find((course: CourseModel): boolean => course.name === formValue.course);
+            if(!course)
+            {
+                console.log("course invalid!"); //TODO REMOVE LATER
+                return;
+            }
+            const appointment: AppointmentCreateModel = new AppointmentCreateModel(formValue.start, formValue.until);
+            this.courseService.createAppointment(course.id, appointment).subscribe({
+                next: () => {
+                    console.log("done!")
+                }
+            })
+
         }
     }
+
+    protected readonly CourseModel = CourseModel;
 }
