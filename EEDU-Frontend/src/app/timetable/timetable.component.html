@@ -1,7 +1,8 @@
 <div class="container">
     <div class="calendar-container">
-        <div class="calendar-info-wrapper">
-            <!-- FullCalendar Component -->
+        <div class="calendar-info-wrapper" [style.flex-direction]="wrap ? 'column' : 'row'">
+
+            <!-- Calendar Component -->
             <div class="calendar-wrapper">
                 <app-calendar-controls #controls></app-calendar-controls>
                 <div class="scrollable-container">
@@ -33,15 +34,16 @@
                 </div>
             </div>
 
+            <!-- Mini Calendar and Events on-->
             <div class="info-box"
-                 [style.margin-top]="screenWidth <= wrapSize ? '5px' : '0'"
-                 [style.margin-left]="screenWidth > wrapSize ? '5px' : '0'">
-                @if(screenWidth > wrapSize)
+                 [style.margin-top]="wrap ? '5px' : '0'"
+                 [style.margin-left]="!wrap ? '5px' : '0'">
+                @if(!wrap)
                 {
-                    <mat-calendar *ngIf="screenWidth > wrapSize" [(selected)]="controls.viewDate"></mat-calendar>
+                    <mat-calendar [(selected)]="controls.viewDate"></mat-calendar>
                     <mat-divider></mat-divider>
                 }
-                <h4 class="mat-title" [style.text-align]="'center'">Events on {{ toString(controls.viewDate) }}</h4>
+                <h4 class="mat-title" [style.text-align]="'center'">Events on {{ dateToString(controls.viewDate) }}</h4>
                 <div class="upcoming-events-container">
                     <mat-list>
                         <mat-list-item>

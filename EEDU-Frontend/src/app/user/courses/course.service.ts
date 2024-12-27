@@ -10,10 +10,14 @@ import {AppointmentEntryModel} from "./models/appointments/appointment-entry-mod
     providedIn: 'root'
 })
 export class CourseService {
-    private readonly BACKEND_URL: string = environment.backendUrl;
-    private readonly _courseSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
-    constructor(private http: HttpClient) { }
+    private readonly BACKEND_URL: string = environment.backendUrl;
+
+    constructor(
+        private http: HttpClient,
+        private _fetched: boolean = false,
+        private readonly _courseSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([])
+    ) { }
 
     public fetchCourses(): Observable<CourseModel[]> {
         const url = `${this.BACKEND_URL}/course/get/courses/`;
@@ -21,6 +25,7 @@ export class CourseService {
             map((courses: any[]): CourseModel[] => {
                 const courseModels: CourseModel[] = courses.map((course: any): CourseModel => CourseModel.fromObject(course));
                 this._courseSubject.next(courseModels);
+                this.fetched = true;
                 return courseModels;
             })
         );
@@ -39,14 +44,35 @@ export class CourseService {
         }, { withCredentials: true }).pipe(tap({
             next: (appointment: any): void => {
                 const courses: CourseModel[] = this._courseSubject.value;
-                const targetCourse: CourseModel | undefined = courses.find((c: CourseModel): boolean => c.id === course);
+                const targetCourse: CourseModel | undefined = this.findCourse(courses, course)
 
                 if (targetCourse) {
-                    targetCourse.addAppointment(AppointmentEntryModel.fromObject(appointment));
+                    targetCourse.attachAppointment(AppointmentEntryModel.fromObject(appointment));
                     this._courseSubject.next([...courses]);
                 }
             }
         }));
+    }
+
+    public get fetched(): boolean {
+        return this._fetched;
+    }
+
+    private set fetched(value: boolean) {
+        this._fetched = value;
+    }
+
+    public findCourseLazily(id: number): CourseModel | undefined {
+        return this.findCourse(this._courseSubject.value, id);
+    }
+
+    public findCourse(courses: CourseModel[], id: number): CourseModel | undefined {
+        return courses.find((course: CourseModel): boolean => course.id === id);
+    }
+
+    public get courses(): CourseModel[]
+    {
+        return this._courseSubject.value;
     }
 
     public get courses$(): Observable<CourseModel[]> {

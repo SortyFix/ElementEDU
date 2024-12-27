@@ -20,14 +20,19 @@ export class CourseModel {
         return new CourseModel(id, name, subject, appointmentEntries, scheduledAppointments);
     }
 
-    public addAppointment(appointment: AppointmentEntryModel): void
+    private static getEntries(obj: any): AppointmentEntryModel[]
+    {
+        return obj.map((entry: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(entry));
+    }
+
+    public attachAppointment(appointment: AppointmentEntryModel): void
     {
         this.appointmentEntries.push(appointment);
     }
 
-    private static getEntries(obj: any): AppointmentEntryModel[]
+    public attachScheduledAppointment(scheduledAppointmentModel: ScheduledAppointmentModel): void
     {
-        return obj.map((entry: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(entry));
+        this.scheduledAppointments.push(scheduledAppointmentModel);
     }
 
     private static getScheduledAppointments(obj: any, entries: AppointmentEntryModel[]): ScheduledAppointmentModel[]
