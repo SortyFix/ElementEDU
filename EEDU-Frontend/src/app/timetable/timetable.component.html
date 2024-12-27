@@ -10,18 +10,21 @@
                                              [events]="events"
                                              [locale]="'en-GB'"
                                              [weekStartsOn]="1"
-                                             (dayClicked)="onDayClicked($event.day)">
+                                             (dayClicked)="onDayClicked($event.day)"
+                                             (eventClicked)="onEventClicked($event.event)">
                     </mwl-calendar-month-view>
                     <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
                                             [viewDate]="controls.viewDate"
                                             [events]="events"
                                             [locale]="'en-GB'"
-                                            [weekStartsOn]="1">
+                                            [weekStartsOn]="1"
+                                            (eventClicked)="onEventClicked($event.event)">
                     </mwl-calendar-week-view>
                     <mwl-calendar-day-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Day"
                                            [viewDate]="controls.viewDate"
                                            [events]="events"
-                                           [locale]="'en-GB'">
+                                           [locale]="'en-GB'"
+                                           (eventClicked)="onEventClicked($event.event)">
                     </mwl-calendar-day-view>
                 </div>
                 <div style="display: flex; justify-content: space-between">

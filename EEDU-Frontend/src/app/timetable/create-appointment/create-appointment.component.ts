@@ -33,7 +33,7 @@ import {Observable} from "rxjs";
 export class CreateAppointmentComponent  {
 
     private readonly _currentDate: Date = new Date();
-    private readonly _courses: CourseModel[];
+    private _courses!: CourseModel[];
     private readonly _form: FormGroup;
 
     protected get currentDate(): Date {
@@ -46,7 +46,7 @@ export class CreateAppointmentComponent  {
     }
 
     constructor(private _dialogRef: MatDialogRef<CreateAppointmentComponent>, private courseService: CourseService, formBuilder: FormBuilder) {
-        this._courses = this.courseService.courses;
+        this.courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             start: [new Date(), Validators.required],
@@ -73,23 +73,14 @@ export class CreateAppointmentComponent  {
         if (this._form.valid) {
             const formValue: { course: string, start: Date, until: Date } = this._form.value;
 
-            const course: CourseModel | undefined = this.courseService.courses.find((course: CourseModel): boolean => course.name === formValue.course);
+            const course: CourseModel | undefined = this.courses.find((course: CourseModel): boolean => course.name === formValue.course);
             if(!course)
             {
                 console.log("course invalid!"); //TODO REMOVE LATER
                 return;
             }
             const appointment: AppointmentCreateModel = new AppointmentCreateModel(formValue.start, formValue.until);
-            this.courseService.createAppointment(course.id, appointment).subscribe({
-                next: (): void =>
-                {
-                    this.courseService.fetchCourses().subscribe({
-                        next: (): void => {
-                            this._dialogRef.close();
-                        }
-                    })
-                }
-            })
+            this.courseService.createAppointment(course.id, appointment).subscribe({next: (): void => this._dialogRef.close()})
 
         }
     }

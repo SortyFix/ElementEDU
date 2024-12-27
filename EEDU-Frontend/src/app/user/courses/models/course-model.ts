@@ -20,13 +20,9 @@ export class CourseModel {
         return new CourseModel(id, name, subject, appointmentEntries, scheduledAppointments);
     }
 
-    public get isActive(): boolean
+    public addAppointment(appointment: AppointmentEntryModel): void
     {
-        const currentDate = new Date();
-        const futureAppointments: (entry: {end: Date}) => boolean
-            = (entry: { end: Date }): boolean => entry.end > currentDate;
-
-        return this.scheduledAppointments.some(futureAppointments) || this.appointmentEntries.some(futureAppointments);
+        this.appointmentEntries.push(appointment);
     }
 
     private static getEntries(obj: any): AppointmentEntryModel[]

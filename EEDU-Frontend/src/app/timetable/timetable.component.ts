@@ -57,11 +57,13 @@ export class TimetableComponent implements OnInit, AfterViewInit, OnDestroy {
     selected: ModelSignal<Date | null> = model<Date | null>(null);
     events: CalendarEvent[] = [];
 
-    onDayClicked(event: CalendarMonthViewDay): void {
-        if(this.controls)
-        {
-            this.controls.dayClicked = event.date;
-        }
+    protected onDayClicked(event: CalendarMonthViewDay): void {
+        this.controls.dayClicked = event.date;
+    }
+
+    protected onEventClicked(event: CalendarEvent): void
+    {
+
     }
 
     protected readonly wrapSize: number = 1200;
@@ -73,25 +75,27 @@ export class TimetableComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(private _courseService: CourseService, private _accessibilityService: AccessibilityService, @Inject(DOCUMENT) private document: any) {}
 
     public ngOnInit(): void {
-        this.document.body.classList.add(this.calendarThemeClass)
-        this._courseService.fetchCourses().subscribe((): void  => { this.events = this.coursesToEvents(); });
+        document.body.classList.add(this.calendarThemeClass);
+
+        this._courseService.courses$.subscribe((courses: CourseModel[]): void => {
+            this.events = this.coursesToEvents(courses);
+        });
+
+        this._courseService.fetchCourses().subscribe();
     }
 
+    private coursesToEvents(courses: CourseModel[]): CalendarEvent[] {
+        return courses.flatMap(({ name, appointmentEntries, scheduledAppointments }: CourseModel): CalendarEvent[] => [
+            ...this.toEvents(name, scheduledAppointments),
+            ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
+        ]);
+    }
     protected toString(date: Date): string {
         return date.toLocaleDateString('de-DE', {
             day: 'numeric',
             month: 'numeric',
             year: 'numeric'
         });
-    }
-
-    private coursesToEvents(): CalendarEvent[] {
-        return this._courseService.courses.flatMap(
-            ({ name, appointmentEntries, scheduledAppointments }: CourseModel): CalendarEvent[] => [
-                ...this.toEvents(name, scheduledAppointments),
-                ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
-            ]
-        );
     }
 
     ngAfterViewInit() {

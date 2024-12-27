@@ -3,6 +3,7 @@ package de.gaz.eedu.course;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
+import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
@@ -122,7 +123,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         });
     }
 
-    @Transactional public void createAppointment(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
+    @Transactional public @NotNull AppointmentEntryModel createAppointment(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
     {
         CourseEntity courseEntity = loadEntityByIDSafe(courseId);
 
@@ -133,7 +134,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         }
 
         // intentionally ignore return value
-        createAppointmentUnsafe(id, entryCreateModel, courseEntity);
+        return createAppointmentUnsafe(id, entryCreateModel, courseEntity).toModel();
     }
 
     /**
