@@ -57,12 +57,12 @@ export class TimetableComponent implements OnInit, OnDestroy {
     @ViewChild('controls') controls!: CalendarControlsComponent;
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
+    private _events: CalendarEvent[] = []
 
     constructor(
         private _courseService: CourseService,
         private _accessibilityService: AccessibilityService,
         @Inject(DOCUMENT) private document: any,
-        private _events: CalendarEvent[] = []
     ) {}
 
     /**
@@ -81,7 +81,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         const courses: Observable<CourseModel[]> = this.courseService.courses$;
         courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
 
-        if(this.courseService.fetched)
+        if(!this.courseService.fetched)
         {
             this.courseService.fetchCourses().subscribe();
         }

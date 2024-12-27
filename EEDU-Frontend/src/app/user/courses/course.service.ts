@@ -12,11 +12,11 @@ import {AppointmentEntryModel} from "./models/appointments/appointment-entry-mod
 export class CourseService {
 
     private readonly BACKEND_URL: string = environment.backendUrl;
+    private _fetched: boolean = false;
+    private readonly _courseSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
     constructor(
         private http: HttpClient,
-        private _fetched: boolean = false,
-        private readonly _courseSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([])
     ) { }
 
     public fetchCourses(): Observable<CourseModel[]> {
