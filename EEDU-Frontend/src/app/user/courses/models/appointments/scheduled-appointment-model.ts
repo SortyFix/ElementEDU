@@ -68,7 +68,10 @@ export class ScheduledAppointmentModel {
                     beforeStart: false,
                     afterEnd: false,
                 },
-                draggable: false
+                draggable: false,
+                meta: {
+                    description: "I love trees"
+                }
             });
         }
         return events;

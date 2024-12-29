@@ -1,22 +1,60 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>Create new Appointment</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <app-course-selector label="Enter the Course this Appointment applies to"
-                                 formControlName="course"
-                                 [values]="courses">
+<mat-card>
+    <mat-card-header style="display: flex; justify-content: space-between">
 
-            </app-course-selector>
-            <app-date-time-picker label="Start" formControlName="start" [minDate]="currentDate"></app-date-time-picker>
-            <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
-        </mat-card-content>
-        <mat-card-actions align="end">
-            <button mat-dialog-close mat-button type="button">Cancel</button>
-            <button mat-stroked-button color="primary" type="submit" [disabled]="form.invalid">
-                Submit
-            </button>
-        </mat-card-actions>
-    </mat-card>
-</form>
+        <mat-card-title>Create new Appointment</mat-card-title>
+        <button mat-icon-button mat-dialog-close>
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-stepper orientation="vertical">
+            <mat-step [stepControl]="firstForm">
+                <ng-template matStepLabel>Basic appointment date</ng-template>
+                <form [formGroup]="firstForm">
+
+                    <app-general-selection-input
+                        label="Enter the Course this Appointment applies to"
+                        formControlName="course"
+                        [values]="courses">
+                    </app-general-selection-input>
+
+                    <p>Should the Appointment repeat itself?</p>
+                    <mat-slide-toggle formControlName="scheduled" matSuffix
+                                      [checked]="firstForm.get('scheduled')?.value">
+                        Scheduled
+                    </mat-slide-toggle>
+
+                    <div>
+                        <button [disabled]="firstForm.invalid" mat-button matStepperNext>Next</button>
+                    </div>
+                </form>
+            </mat-step>
+
+            <mat-step [stepControl]="form" *ngIf="firstForm.get('scheduled')?.value">
+                <ng-template matStepLabel>Set appointment time</ng-template>
+                <form [formGroup]="form">
+                    <app-date-time-picker label="Start" formControlName="start"
+                                          ></app-date-time-picker>
+                    <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
+                    <div>
+                        <button mat-button matStepperPrevious>Back</button>
+                        <button mat-button matStepperNext>Next</button>
+                    </div>
+                </form>
+            </mat-step>
+
+            <mat-step [stepControl]="form" *ngIf="!firstForm.get('scheduled')?.value">
+                <ng-template matStepLabel>Set appointment time</ng-template>
+                <form [formGroup]="form">
+                    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+                    <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
+                    <app-duration-picker></app-duration-picker>
+                    <div>
+                        <button mat-button matStepperPrevious>Back</button>
+                        <button mat-button matStepperNext>Next</button>
+                    </div>
+                </form>
+            </mat-step>
+        </mat-stepper>
+    </mat-card-content>
+</mat-card>

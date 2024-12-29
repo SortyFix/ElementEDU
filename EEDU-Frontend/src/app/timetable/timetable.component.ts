@@ -21,7 +21,7 @@ import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
 import {MatButton} from "@angular/material/button";
-import {Observable, scheduled} from "rxjs";
+import {Observable} from "rxjs";
 
 
 @Component({
@@ -41,7 +41,7 @@ import {Observable, scheduled} from "rxjs";
         CalendarControlsComponent,
         MatCalendar,
         MatDivider,
-        MatButton
+        MatButton,
     ],
     providers: [
         {
@@ -87,6 +87,18 @@ export class TimetableComponent implements OnInit, OnDestroy {
         }
     }
 
+    protected get currentEvents(): CalendarEvent[] {
+        return this.events.filter((event: CalendarEvent): boolean => {
+
+            const viewDate: Date = this.controls?.viewDate;
+            const eventDate: Date = event.start;
+
+            return viewDate.getFullYear() === eventDate.getFullYear() &&
+                viewDate.getMonth() === eventDate.getMonth() &&
+                viewDate.getDate() === eventDate.getDate();
+        });
+    }
+
     /**
      * Removes the calendar theme from the document body.
      *
@@ -106,7 +118,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     protected onEventClicked(event: CalendarEvent): void
     {
-
+        console.log(event.title + " was clicked");
     }
 
     protected dateToString(date: Date): string {

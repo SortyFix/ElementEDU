@@ -1,14 +1,19 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {CourseModel} from "../../user/courses/models/course-model";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {CourseService} from "../../user/courses/course.service";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
-import {CourseSelectorComponent} from "../course-selector/course-selector.component";
+import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
 import {MatDialogClose, MatDialogRef} from "@angular/material/dialog";
 import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
-import {Observable} from "rxjs";
+import {MatStep, MatStepLabel, MatStepper, MatStepperNext, MatStepperPrevious} from "@angular/material/stepper";
+import {MatIcon} from "@angular/material/icon";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatSuffix} from "@angular/material/form-field";
+import {NgIf} from "@angular/common";
+import {DurationPickerComponent} from "../duration-picker/duration-picker.component";
 
 @Component({
   selector: 'app-create-appointment',
@@ -19,12 +24,22 @@ import {Observable} from "rxjs";
         MatCardContent,
         FormsModule,
         ReactiveFormsModule,
-        MatCardActions,
         MatButton,
         MatCardTitle,
         DateTimePickerComponent,
-        CourseSelectorComponent,
-        MatDialogClose
+        GeneralSelectionInput,
+        MatDialogClose,
+        MatStepper,
+        MatStep,
+        MatStepperNext,
+        MatIconButton,
+        MatIcon,
+        MatStepperPrevious,
+        MatStepLabel,
+        MatSlideToggle,
+        MatSuffix,
+        NgIf,
+        DurationPickerComponent
     ],
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss',
@@ -34,10 +49,16 @@ export class CreateAppointmentComponent  {
 
     private readonly _currentDate: Date = new Date();
     private _courses!: CourseModel[];
+    private readonly _firstForm: FormGroup;
     private readonly _form: FormGroup;
 
     protected get currentDate(): Date {
         return this._currentDate;
+    }
+
+
+    protected get firstForm(): FormGroup {
+        return this._firstForm;
     }
 
     protected courseToString(): (course: CourseModel) => string
@@ -47,6 +68,11 @@ export class CreateAppointmentComponent  {
 
     constructor(private _dialogRef: MatDialogRef<CreateAppointmentComponent>, private courseService: CourseService, formBuilder: FormBuilder) {
         this.courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
+        this._firstForm = formBuilder.group({
+            course: [undefined, Validators.required],
+            scheduled: [false, Validators.required]
+        });
+
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             start: [new Date(), Validators.required],

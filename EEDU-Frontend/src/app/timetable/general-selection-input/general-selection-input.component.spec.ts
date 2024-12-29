@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CourseSelectorComponent } from './course-selector.component';
+import { GeneralSelectionInput } from './general-selection-input.component';
 
 describe('CourseSelectorComponent', () => {
-  let component: CourseSelectorComponent;
-  let fixture: ComponentFixture<CourseSelectorComponent>;
+  let component: GeneralSelectionInput;
+  let fixture: ComponentFixture<GeneralSelectionInput>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CourseSelectorComponent]
+      imports: [GeneralSelectionInput]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CourseSelectorComponent);
+    fixture = TestBed.createComponent(GeneralSelectionInput);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

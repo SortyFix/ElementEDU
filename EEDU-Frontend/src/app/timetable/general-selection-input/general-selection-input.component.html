@@ -7,11 +7,17 @@
         [matAutocomplete]="auto"
         [ngModel]="value"
         (ngModelChange)="onInputChange($event)"
-        (blur)="onTouched()"
-    />
+        (blur)="onTouched()"/>
+
+    <ng-content></ng-content>
+
     <mat-autocomplete #auto="matAutocomplete">
-        <mat-option *ngFor="let course of filteredValues | async" [value]="course.name">
-            {{ course.name }}
+        <mat-option *ngFor="let object of filteredValues | async" [value]="object.name">
+            @if(value && value === object)
+            {
+                <mat-icon>checkmark</mat-icon>
+            }
+            {{ object.name }}
         </mat-option>
     </mat-autocomplete>
 </mat-form-field>
