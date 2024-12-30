@@ -5,7 +5,6 @@ import {MatInput} from "@angular/material/input";
 import {AsyncPipe, NgForOf} from "@angular/common";
 import {map, Observable, startWith, Subscriber} from "rxjs";
 import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator} from "@angular/forms";
-import {MatIcon} from "@angular/material/icon";
 
 const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSelectionInput => GeneralSelectionInput);
 
@@ -45,7 +44,6 @@ const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSele
     standalone: true,
     imports: [
         MatFormField,
-        MatIcon,
         MatAutocompleteTrigger,
         MatInput,
         MatAutocomplete,

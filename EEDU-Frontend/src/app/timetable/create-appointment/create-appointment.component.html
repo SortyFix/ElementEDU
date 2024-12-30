@@ -1,60 +1,37 @@
-<mat-card>
-    <mat-card-header style="display: flex; justify-content: space-between">
+<form [formGroup]="form">
+    <mat-card>
+        <mat-card-header style="display: flex; justify-content: space-between">
+            <mat-card-title>Create new Appointment</mat-card-title>
+            <button mat-icon-button mat-dialog-close>
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-card-header>
+        <mat-card-content>
+            <app-general-selection-input
+                label="Enter the Course this Appointment applies to"
+                formControlName="course"
+                [values]="courses">
+            </app-general-selection-input>
 
-        <mat-card-title>Create new Appointment</mat-card-title>
-        <button mat-icon-button mat-dialog-close>
-            <mat-icon>close</mat-icon>
-        </button>
-    </mat-card-header>
-    <mat-card-content>
-        <mat-stepper orientation="vertical">
-            <mat-step [stepControl]="firstForm">
-                <ng-template matStepLabel>Basic appointment date</ng-template>
-                <form [formGroup]="firstForm">
-
-                    <app-general-selection-input
-                        label="Enter the Course this Appointment applies to"
-                        formControlName="course"
-                        [values]="courses">
-                    </app-general-selection-input>
-
-                    <p>Should the Appointment repeat itself?</p>
-                    <mat-slide-toggle formControlName="scheduled" matSuffix
-                                      [checked]="firstForm.get('scheduled')?.value">
-                        Scheduled
-                    </mat-slide-toggle>
-
-                    <div>
-                        <button [disabled]="firstForm.invalid" mat-button matStepperNext>Next</button>
-                    </div>
-                </form>
-            </mat-step>
-
-            <mat-step [stepControl]="form" *ngIf="firstForm.get('scheduled')?.value">
-                <ng-template matStepLabel>Set appointment time</ng-template>
-                <form [formGroup]="form">
-                    <app-date-time-picker label="Start" formControlName="start"
-                                          ></app-date-time-picker>
-                    <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
-                    <div>
-                        <button mat-button matStepperPrevious>Back</button>
-                        <button mat-button matStepperNext>Next</button>
-                    </div>
-                </form>
-            </mat-step>
-
-            <mat-step [stepControl]="form" *ngIf="!firstForm.get('scheduled')?.value">
-                <ng-template matStepLabel>Set appointment time</ng-template>
-                <form [formGroup]="form">
+            <mat-tab-group class="test" mat-stretch-tabs="false" mat-align-tabs="start">
+                <mat-tab label="Appointment">
                     <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
-                    <app-date-time-picker label="Until" formControlName="until"></app-date-time-picker>
-                    <app-duration-picker></app-duration-picker>
-                    <div>
-                        <button mat-button matStepperPrevious>Back</button>
-                        <button mat-button matStepperNext>Next</button>
-                    </div>
-                </form>
-            </mat-step>
-        </mat-stepper>
-    </mat-card-content>
-</mat-card>
+                    <app-duration-picker [show]="[DurationType.MINUTES, DurationType.HOURS]"></app-duration-picker>
+                </mat-tab>
+                <mat-tab label="Repeating Appointment">
+                    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+
+                    <mat-form-field class="datepicker-input" appearance="outline">
+                        <mat-label>Until Date</mat-label>
+                        <input matInput [matDatepicker]="datepicker">
+                        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+                        <mat-datepicker #datepicker ></mat-datepicker>
+                    </mat-form-field>
+
+                    <p class="mat-caption">Please enter the period this Appointment should repeat itself at</p>
+                    <app-duration-picker [show]="[DurationType.DAYS]"></app-duration-picker>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card-content>
+    </mat-card>
+</form>

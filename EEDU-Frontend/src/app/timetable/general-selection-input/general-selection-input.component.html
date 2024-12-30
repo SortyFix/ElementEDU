@@ -5,7 +5,7 @@
         matInput
         [placeholder]="placeholder()"
         [matAutocomplete]="auto"
-        [ngModel]="value"
+        [ngModel]="value?.name"
         (ngModelChange)="onInputChange($event)"
         (blur)="onTouched()"/>
 
@@ -13,10 +13,6 @@
 
     <mat-autocomplete #auto="matAutocomplete">
         <mat-option *ngFor="let object of filteredValues | async" [value]="object.name">
-            @if(value && value === object)
-            {
-                <mat-icon>checkmark</mat-icon>
-            }
             {{ object.name }}
         </mat-option>
     </mat-autocomplete>

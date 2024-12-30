@@ -1,36 +1,36 @@
 <div class="duration-picker">
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.YEARS)">
         <mat-label>Years</mat-label>
-        <input matInput type="number" [(ngModel)]="years" min="0" max="2" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="years" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.MONTHS)">
         <mat-label>Months</mat-label>
-        <input matInput type="number" [(ngModel)]="months" min="0" max="11" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="months" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.WEEKS)">
         <mat-label>Weeks</mat-label>
-        <input matInput type="number" [(ngModel)]="weeks" min="0" max="3" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="weeks" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.DAYS)">
         <mat-label>Days</mat-label>
-        <input matInput type="number" [(ngModel)]="days" min="0" max="6" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="days" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.HOURS)">
         <mat-label>Hours</mat-label>
-        <input matInput type="number" [(ngModel)]="hours" min="0" max="23" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="hours" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.MINUTES)">
         <mat-label>Minutes</mat-label>
-        <input matInput type="number" [(ngModel)]="minutes" min="0" max="59" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="minutes" (blur)="onTouched()">
     </mat-form-field>
 
     <mat-form-field appearance="fill" *ngIf="show().includes(DurationType.SECONDS)">
         <mat-label>Seconds</mat-label>
-        <input matInput type="number" [(ngModel)]="seconds" min="0" max="59" (blur)="onTouched()">
+        <input matInput type="number" [(ngModel)]="seconds" (blur)="onTouched()">
     </mat-form-field>
 </div>
