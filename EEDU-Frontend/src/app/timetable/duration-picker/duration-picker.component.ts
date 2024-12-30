@@ -1,7 +1,14 @@
-import {Component, forwardRef, input, InputSignal} from '@angular/core';
-import {MatFormField, MatInput, MatLabel} from "@angular/material/input";
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {Component, forwardRef, input, InputSignal, Type} from '@angular/core';
+import {MatInput} from "@angular/material/input";
+import {
+    ControlValueAccessor,
+    FormsModule,
+    NG_VALIDATORS,
+    NG_VALUE_ACCESSOR,
+    Validator
+} from "@angular/forms";
 import {NgIf} from "@angular/common";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
 
 /**
  * Enum for different types of duration units
@@ -20,6 +27,8 @@ export enum DurationType {
     MINUTES,
     SECONDS
 }
+
+const type: Type<DurationPickerComponent> = forwardRef((): typeof DurationPickerComponent => DurationPickerComponent);
 
 /**
  * A component for selecting and displaying a duration of time
@@ -50,19 +59,17 @@ export enum DurationType {
         NgIf
     ],
     providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef((): typeof DurationPickerComponent => DurationPickerComponent),
-            multi: true
-        }
+        { provide: NG_VALUE_ACCESSOR, useExisting: type,  multi: true },
+        { provide: NG_VALIDATORS, useExisting: type, multi: true }
     ],
   templateUrl: './duration-picker.component.html',
   styleUrl: './duration-picker.component.scss'
 })
-export class DurationPickerComponent implements ControlValueAccessor {
+export class DurationPickerComponent implements ControlValueAccessor, Validator {
 
     protected readonly DurationType: typeof DurationType = DurationType;
-    public show: InputSignal<DurationType[]> = input<DurationType[]>([DurationType.HOURS, DurationType.MINUTES])
+    public show: InputSignal<DurationType[]> = input<DurationType[]>([DurationType.HOURS, DurationType.MINUTES]);
+    public allowNegative: InputSignal<boolean> = input<boolean>(false);
 
     protected onChange: (value: number) => void = (): void => {};
     protected onTouched: () => void = (): void => {};
@@ -137,19 +144,44 @@ export class DurationPickerComponent implements ControlValueAccessor {
         const millisecondsInMonth: number = millisecondsInDay * 30;
         const millisecondsInYear: number = millisecondsInDay * 365;
 
-        this._years = Math.floor(value / millisecondsInYear);
-        value %= millisecondsInYear;
-        this._months = Math.floor(value / millisecondsInMonth);
-        value %= millisecondsInMonth;
-        this._weeks = Math.floor(value / millisecondsInWeek);
-        value %= millisecondsInWeek;
-        this._days = Math.floor(value / millisecondsInDay);
-        value %= millisecondsInDay;
-        this._hours = Math.floor(value / millisecondsInHour);
-        value %= millisecondsInHour;
-        this._minutes = Math.floor(value / millisecondsInMinute);
-        value %= millisecondsInMinute;
-        this._seconds = Math.floor(value / millisecondsInSecond);
+        const show: DurationType[] = this.show();
+
+        // reset everything to 0
+        this.reset();
+
+        if (show.includes(DurationType.YEARS)) {
+            this._years = Math.floor(value / millisecondsInYear);
+            value %= millisecondsInYear;
+        }
+
+        if (show.includes(DurationType.MONTHS)) {
+            this._months = Math.floor(value / millisecondsInMonth);
+            value %= millisecondsInMonth;
+        }
+
+        if (show.includes(DurationType.WEEKS)) {
+            this._weeks = Math.floor(value / millisecondsInWeek);
+            value %= millisecondsInWeek;
+        }
+
+        if (show.includes(DurationType.DAYS)) {
+            this._days = Math.floor(value / millisecondsInDay);
+            value %= millisecondsInDay;
+        }
+
+        if (show.includes(DurationType.HOURS)) {
+            this._hours = Math.floor(value / millisecondsInHour);
+            value %= millisecondsInHour;
+        }
+
+        if (show.includes(DurationType.MINUTES)) {
+            this._minutes = Math.floor(value / millisecondsInMinute);
+            value %= millisecondsInMinute;
+        }
+
+        if (show.includes(DurationType.SECONDS)) {
+            this._seconds = Math.floor(value / millisecondsInSecond);
+        }
     }
 
     /**
@@ -434,5 +466,29 @@ export class DurationPickerComponent implements ControlValueAccessor {
     protected set seconds(value: number) {
         this._seconds = value;
         this.notifyChange();
+    }
+
+    public validate(): { invalidTime: boolean } | null {
+        if(this.allowNegative())
+        {
+            return null;
+        }
+
+        if // I hate everything in this class
+        (
+            this.years < 0 ||
+            this.months < 0 ||
+            this.weeks < 0 ||
+            this.months < 0 ||
+            this.weeks < 0 ||
+            this.days < 0 ||
+            this.hours < 0 ||
+            this.minutes < 0 ||
+            this.seconds < 0
+        )
+        {
+            return {invalidTime: true};
+        }
+        return null;
     }
 }

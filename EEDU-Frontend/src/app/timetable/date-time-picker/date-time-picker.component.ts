@@ -6,8 +6,8 @@ import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from "@angular/m
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 @Component({
-  selector: 'app-date-time-picker',
-  standalone: true,
+    selector: 'app-date-time-picker',
+    standalone: true,
     imports: [
         MatFormField,
         MatDatepicker,
@@ -28,13 +28,12 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/for
             multi: true
         }
     ],
-  templateUrl: './date-time-picker.component.html',
-  styleUrl: './date-time-picker.component.scss'
+    templateUrl: './date-time-picker.component.html',
+    styleUrl: './date-time-picker.component.scss'
 })
 export class DateTimePickerComponent implements ControlValueAccessor {
-    @Input() label: string = '';
-
-    public readonly minDate: InputSignal<Date | undefined> = input<Date>()
+    public readonly label: InputSignal<string> = input<string>('');
+    public readonly minDate: InputSignal<Date | null> = input<Date | null>(null);
 
     private _date: Date | null = null;
     private _time: Date | null = null;
@@ -47,19 +46,28 @@ export class DateTimePickerComponent implements ControlValueAccessor {
             const resultDate = new Date(this.date); // Copy date
             resultDate.setHours(this.time.getHours(), this.time.getMinutes()); // Set time
             this.onChange(resultDate);
-        } else {
-            this.onChange(null);
+            return;
         }
+
+        this.onChange(null);
     }
 
     public writeValue(value: Date | null): void {
-        if (value) {
-            this.date = new Date(value);
-            this.time = new Date(value);
-        } else {
-            this.date = null;
-            this.time = null;
+        if (!value) {
+            this.reset();
+            return;
         }
+
+        const date: Date = new Date(value);
+
+        this.date = date;
+        this.time = date;
+    }
+
+    public reset(): void
+    {
+        this.date = null;
+        this.time = null;
     }
 
     public registerOnChange(fn: any): void {
@@ -74,20 +82,20 @@ export class DateTimePickerComponent implements ControlValueAccessor {
         // Handle disabled state if needed
     }
 
-    get date(): Date | null {
+    protected get date(): Date | null {
         return this._date;
     }
 
-    set date(value: Date | null) {
+    protected set date(value: Date | null) {
         this._date = value;
         this.updateValue();
     }
 
-    get time(): Date | null {
+    protected get time(): Date | null {
         return this._time;
     }
 
-    set time(value: Date | null) {
+    protected set time(value: Date | null) {
         this._time = value;
         this.updateValue();
     }

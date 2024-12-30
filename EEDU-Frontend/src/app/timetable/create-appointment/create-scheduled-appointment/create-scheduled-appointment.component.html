@@ -1,0 +1,35 @@
+<form [formGroup]="form">
+    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+
+    <mat-form-field class="datepicker-input" appearance="outline">
+        <mat-label>Until Date</mat-label>
+        <input matInput formControlName="until" [matDatepicker]="datepicker">
+        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker></mat-datepicker>
+    </mat-form-field>
+
+    <div [style.display]="isMobile ? null : 'flex'" style="justify-content: space-between">
+        <div>
+            <p class="mat-h4">Duration
+                <mat-icon
+                    *ngIf="!isMobile"
+                    class="icon"
+                    matTooltip="Specify the duration for each appointment. For example, 30 minutes or 1 hour. This helps define how long each event will last.">
+                    help
+                </mat-icon>
+            </p>
+            <app-duration-picker formControlName="duration"></app-duration-picker>
+        </div>
+        <div>
+            <p class="mat-h4">Frequency
+                <mat-icon
+                    *ngIf="!isMobile"
+                    class="icon"
+                    matTooltip="Set the interval for the repeating appointments. For example, every 7 days for weekly appointments. This determines how frequently the appointment recurs.">
+                    help
+                </mat-icon>
+            </p>
+            <app-duration-picker formControlName="frequency" [show]="[DurationType.DAYS]"></app-duration-picker>
+        </div>
+    </div>
+</form>

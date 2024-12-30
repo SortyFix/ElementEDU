@@ -1,37 +1,38 @@
-<form [formGroup]="form">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
     <mat-card>
+        <mat-progress-bar class="loading-bar" mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+        <div class="overlay" *ngIf="loading"></div>
         <mat-card-header style="display: flex; justify-content: space-between">
             <mat-card-title>Create new Appointment</mat-card-title>
             <button mat-icon-button mat-dialog-close>
                 <mat-icon>close</mat-icon>
             </button>
         </mat-card-header>
-        <mat-card-content>
+        <mat-card-content class="content-wrapper">
             <app-general-selection-input
                 label="Enter the Course this Appointment applies to"
                 formControlName="course"
                 [values]="courses">
             </app-general-selection-input>
 
-            <mat-tab-group class="test" mat-stretch-tabs="false" mat-align-tabs="start">
+            <mat-tab-group animationDuration="200ms"
+                           [selectedIndex]="form.get('selected')?.value"
+                           (selectedIndexChange)="form.get('selected')?.setValue($event)">
                 <mat-tab label="Appointment">
-                    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
-                    <app-duration-picker [show]="[DurationType.MINUTES, DurationType.HOURS]"></app-duration-picker>
+                    <div class="appointment-content">
+                        <app-create-standalone-appointment #standalone></app-create-standalone-appointment>
+                    </div>
                 </mat-tab>
                 <mat-tab label="Repeating Appointment">
-                    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
-
-                    <mat-form-field class="datepicker-input" appearance="outline">
-                        <mat-label>Until Date</mat-label>
-                        <input matInput [matDatepicker]="datepicker">
-                        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
-                        <mat-datepicker #datepicker ></mat-datepicker>
-                    </mat-form-field>
-
-                    <p class="mat-caption">Please enter the period this Appointment should repeat itself at</p>
-                    <app-duration-picker [show]="[DurationType.DAYS]"></app-duration-picker>
+                    <div class="appointment-content">
+                        <app-create-scheduled-appointment #scheduled></app-create-scheduled-appointment>
+                    </div>
                 </mat-tab>
             </mat-tab-group>
         </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
+            <button [disabled]="!canSubmit()" mat-stroked-button type="submit">Select</button>
+        </mat-card-actions>
     </mat-card>
 </form>

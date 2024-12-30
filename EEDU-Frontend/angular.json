@@ -70,6 +70,9 @@
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "hmr": true
+                    },
                     "configurations": {
                         "production": {
                             "buildTarget": "EEDU-Frontend:build:production"

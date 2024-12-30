@@ -1,20 +1,15 @@
 export class AppointmentCreateModel
 {
     private readonly _start: number;
-    private readonly _duration: number;
 
-    public constructor(start: Date, end: Date, private _description?: string, private _assignment?: AppointmentCreateModel, /* TODO add assessment create model */ )
+    public constructor(start: Date, private _duration: number, private _description?: string, private _assignment?: AppointmentCreateModel, /* TODO add assessment create model */ )
     {
-        const startMillis: number = start.getTime();
-        const endMillis: number = end.getTime();
+        this._start = start.getTime();
+    }
 
-        if(startMillis > endMillis)
-        {
-            throw new Error("start millis must be smaller than end millis");
-        }
-
-        this._start = startMillis;
-        this._duration = endMillis - startMillis;
+    public static fromObject(obj: { start: Date, duration: number, description?: string, assignment?: AppointmentCreateModel }): AppointmentCreateModel
+    {
+        return new AppointmentCreateModel(obj.start, obj.duration, obj.description, obj.assignment);
     }
 
     public get start(): number {

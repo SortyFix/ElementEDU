@@ -1,0 +1,22 @@
+<form [formGroup]="form">
+    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+    <mat-tab-group animationDuration="200ms">
+        <mat-tab label="Duration">
+            <div class="duration-container">
+                <app-duration-picker
+                    formControlName="duration"
+                    [show]="[DurationType.MINUTES, DurationType.HOURS]">
+                </app-duration-picker>
+            </div>
+        </mat-tab>
+        <mat-tab label="End Date">
+            <div class="duration-container">
+                <app-date-time-picker
+                    label="Until"
+                    [minDate]="(form.get('start')?.value)"
+                    formControlName="end">
+                </app-date-time-picker>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</form>
