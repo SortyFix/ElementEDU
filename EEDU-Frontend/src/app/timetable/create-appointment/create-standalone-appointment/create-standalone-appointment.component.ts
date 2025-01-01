@@ -1,8 +1,8 @@
 import {Component} from '@angular/core';
-import {DateTimePickerComponent} from "../../date-time-picker/date-time-picker.component";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
-import {DurationPickerComponent, DurationType} from "../../duration-picker/duration-picker.component";
+import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
+import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
 
 @Component({
   selector: 'app-create-standalone-appointment',

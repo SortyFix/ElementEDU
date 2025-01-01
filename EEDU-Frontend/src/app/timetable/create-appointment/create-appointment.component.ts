@@ -4,7 +4,6 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} fr
 import {CourseModel} from "../../user/courses/models/course-model";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {CourseService} from "../../user/courses/course.service";
-import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
@@ -19,6 +18,8 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
 import {FrequentAppointmentCreateModel} from "../../user/courses/models/appointments/frequent-appointment-create-model";
+import {RoomModel} from "../../user/courses/room/room-model";
+import {GeneralSelectionInput} from "./general-selection-input/general-selection-input.component";
 
 @Component({
   selector: 'app-create-appointment',
@@ -95,18 +96,30 @@ export class CreateAppointmentComponent {
 
     private createStandalone(courseId: number): void
     {
-        const createModel: AppointmentCreateModel = AppointmentCreateModel.fromObject(this._standalone.form.value);
-        this._courseService.createAppointment(courseId, createModel).subscribe({
-            next: (): void => this.dialogReference.close(),
-        });
+        this._courseService.createAppointment(courseId,
+            [AppointmentCreateModel.fromObject(this._standalone.form.value)])
+            .subscribe({ next: (): void => this.dialogReference.close() });
     }
 
     private createFrequent(courseId: number): void
     {
-        const createModel: FrequentAppointmentCreateModel = FrequentAppointmentCreateModel.fromObject(this._frequent.form.value);
-        this._courseService.createFrequent(courseId, createModel).subscribe({
-            next: (): void => this.dialogReference.close()
-        });
+        // I must first transform the room model into the room id
+        const object: {
+            start: Date,
+            until: Date,
+            room: RoomModel | number,
+            duration: number,
+            frequency: number
+        } = this._frequent.form.value;
+        object.room = (object.room as RoomModel).id;
+
+        this._courseService.createFrequent(courseId, [FrequentAppointmentCreateModel.fromObject((object as {
+            start: Date,
+            until: Date,
+            room: number,
+            duration: number,
+            frequency: number
+        }))]).subscribe({ next: (): void => this.dialogReference.close() });
     }
 
     protected canSubmit(): boolean {

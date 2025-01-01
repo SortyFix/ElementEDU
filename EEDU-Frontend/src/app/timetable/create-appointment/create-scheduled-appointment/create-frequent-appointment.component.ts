@@ -1,17 +1,17 @@
 import { Component } from '@angular/core';
-import {DateTimePickerComponent} from "../../date-time-picker/date-time-picker.component";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
-import {DurationPickerComponent, DurationType} from "../../duration-picker/duration-picker.component";
 import {MatInput} from "@angular/material/input";
 import {MatIcon} from "@angular/material/icon";
 import {MatTooltip} from "@angular/material/tooltip";
 import {AccessibilityService} from "../../../accessibility.service";
 import {NgIf} from "@angular/common";
-import {GeneralSelectionInput} from "../../general-selection-input/general-selection-input.component";
 import {RoomService} from "../../../user/courses/room/room.service";
 import {RoomModel} from "../../../user/courses/room/room-model";
+import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
+import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
+import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
 
 @Component({
   selector: 'app-create-frequent-appointment',
