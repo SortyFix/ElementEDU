@@ -71,10 +71,9 @@ import java.util.Optional;
      *
      * @param id the generated id.
      */
-    public AppointmentEntryEntity(long id, @NotNull CourseEntity course)
+    public AppointmentEntryEntity(long id)
     {
         this.id = id;
-        this.course = course;
     }
 
     // method not allowed when submitHomework is false

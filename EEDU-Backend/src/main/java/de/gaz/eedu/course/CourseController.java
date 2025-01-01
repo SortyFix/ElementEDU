@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 //TODO manage access. Yes, I'll do it later
@@ -43,7 +44,9 @@ public class CourseController extends EntityController<CourseService, CourseMode
 
     @PostMapping("/appointment/{course}/create")
     public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
-        return ResponseEntity.ok(getService().createAppointment(course, Set.of(createModel)).toArray(AppointmentEntryModel[]::new));
+
+        List<AppointmentEntryModel> createdEntities = getService().createAppointment(course,  Set.of(createModel));
+        return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
     }
 
     @GetMapping("{course}/detach") public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)

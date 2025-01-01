@@ -115,63 +115,85 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         return saveEntity(courseEntities);
     }
 
+    /**
+     * Retrieves an {@link AppointmentEntryEntity} based on the given timestamp and course id.
+     * <p>
+     * This method attempts to find an appointment entry for the specified course and timestamp.
+     * If no entry exists, it creates a new one using the provided timestamp and saves it.
+     *
+     * @param timeStamp the timestamp of the desired appointment.
+     * @param courseId  the id of the course associated with the appointment.
+     * @return a non-null {@link AppointmentEntryEntity}, either retrieved or newly created.
+     */
     @Transactional public @NotNull AppointmentEntryEntity getAppointment(@NotNull Long timeStamp, @NotNull Long courseId)
     {
         CourseEntity course = loadEntityByIDSafe(courseId);
-        long id = generateId(courseId, course);
-
-        return Arrays.stream(course.getEntries()).filter(entry -> Objects.equals(entry.getId(), id)).findFirst().orElseGet(() -> {
-
+        return getInternalAppointment(course, timeStamp).orElseGet(() -> {
             AppointmentEntryCreateModel createModel = new AppointmentEntryCreateModel(timeStamp);
-            return createAppointmentUnsafe(id, createModel, course);
+            return getAppointmentRepository().save(createAppointmentUnsafe(course, Set.of(createModel)).getFirst());
         });
-    }
-
-    @Transactional public @NotNull List<AppointmentEntryModel> createAppointment(@NotNull Long courseId, @NotNull Set<AppointmentEntryCreateModel> entryCreateModel)
-    {
-        CourseEntity courseEntity = loadEntityByIDSafe(courseId);
-
-        Stream<AppointmentEntryEntity> entities = entryCreateModel.stream().map((entry) -> {
-
-            long id = generateId(entry.start(), courseEntity);
-            Stream<AppointmentEntryEntity> entries = Arrays.stream(courseEntity.getEntries());
-            if (entries.anyMatch(current -> Objects.equals(current.getId(), id)))
-            {
-                throw new OccupiedException();
-            }
-
-            return createAppointmentUnsafe(id, entry, courseEntity);
-        });
-
-        return getAppointmentRepository().saveAll(entities.toList()).stream().map(AppointmentEntryEntity::toModel).toList();
     }
 
     /**
-     * This method generates a new {@link AppointmentEntryEntity}.
+     * Creates and persists a list of {@link AppointmentEntryEntity} based on the provided course id and creation models.
      * <p>
-     * Generates a new {@link AppointmentEntryEntity} from a {@link AppointmentEntryCreateModel}. Unlike {@link #createAppointment(Long, AppointmentEntryCreateModel)}
-     * this method wont check whether it will override an exiting appointment entry.
-     *  TODO I'll improve the doc once I get home
+     * This method retrieves the course entity using the specified course id, generates appointment entries from the provided
+     * creation models, saves them in the repository, and converts the saved entities to their corresponding models.
      *
-     * @param id already computed before. Will be the id of the entity
-     * @param createModel entry blueprint
-     * @param course the course they are attached to.
-     * @return the newly created entity.
+     * @param courseId         the id of the course for which the appointments are to be created.
+     * @param entryCreateModel the set of models containing details for appointment creation.
+     * @return a list of {@link AppointmentEntryModel} representing the created and saved appointments.
      */
-    private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel createModel, @NotNull CourseEntity course)
+    @Transactional public @NotNull List<AppointmentEntryModel> createAppointment(@NotNull Long courseId, @NotNull Set<AppointmentEntryCreateModel> entryCreateModel)
     {
-        AppointmentEntryRepository entryRepository = getAppointmentRepository();
-
-        AppointmentEntryEntity entity = new AppointmentEntryEntity(id, course);
-        return createModel.toEntity(entity, entryEntity ->
-        {
-            if (Objects.isNull(createModel.duration()))
-            {
-                return attachScheduled(createModel, course, entryEntity);
-            }
-            entryEntity.setDuration(Duration.ofMillis(createModel.duration()));
-            return entryEntity;
-        });
+        CourseEntity courseEntity = loadEntityByIDSafe(courseId);
+        List<AppointmentEntryEntity> entities = createAppointmentUnsafe(courseEntity, entryCreateModel);
+        return getAppointmentRepository().saveAll(entities).stream().map(AppointmentEntryEntity::toModel).toList();
     }
 
+    /**
+     * Creates a list of {@link AppointmentEntryEntity} based on the given course and creation models.
+     * <p>
+     * This method maps the provided creation models to {@link AppointmentEntryEntity} instances,
+     * attaching them to the specified course. The entities are not saved in the repository.
+     * <p>
+     * Note! This method does not save the created objects.
+     * {@link #getAppointmentRepository()} can be used to save the created instances.
+     *
+     * @param course     the {@link CourseEntity} to which the appointments are attached.
+     * @param createModel the set of models containing details for appointment creation.
+     * @return a list of {@link AppointmentEntryEntity} created from the models.
+     */
+    private @NotNull List<AppointmentEntryEntity> createAppointmentUnsafe(CourseEntity course, @NotNull Set<AppointmentEntryCreateModel> createModel)
+    {
+        return createModel.stream().map((currentModel) -> {
+            long id = generateId(currentModel.start(), course);
+
+            return currentModel.toEntity(new AppointmentEntryEntity(id), (entity) -> {
+                if (Objects.isNull(currentModel.duration()))
+                {
+                    return attachScheduled(currentModel, course, entity);
+                }
+                entity.setDuration(Duration.ofMillis(currentModel.duration()));
+                entity.setCourse(course);
+                return entity;
+            });
+        }).toList();
+    }
+
+    /**
+     * Retrieves an {@link Optional} of {@link AppointmentEntryEntity} for the given course and timestamp.
+     * <p>
+     * This method searches the entries of the specified course to find an appointment with the given timestamp.
+     *
+     * @param course    the {@link CourseEntity} to search for the appointment.
+     * @param timeStamp the timestamp of the desired appointment.
+     * @return an {@link Optional} containing the {@link AppointmentEntryEntity} if found or an empty {@link Optional}.
+     */
+    private @NotNull Optional<AppointmentEntryEntity> getInternalAppointment(@NotNull CourseEntity course, long timeStamp)
+    {
+        long id = generateId(timeStamp, course);
+        Stream<AppointmentEntryEntity> entries = Arrays.stream(course.getEntries());
+        return entries.filter(entry -> Objects.equals(entry.getId(), id)).findFirst();
+    }
 }
