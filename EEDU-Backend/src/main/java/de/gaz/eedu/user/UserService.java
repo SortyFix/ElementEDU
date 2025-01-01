@@ -8,6 +8,7 @@ import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
@@ -134,5 +135,11 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     @Override public @NotNull @Unmodifiable Set<UserEntity> findAllEntities(@NotNull Predicate<UserEntity> predicate)
     {
         return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+    }
+
+    public @NotNull ReducedUserModel[] findAllAndReduce()
+    {
+        return userRepository.findAll().stream().map(UserEntity::toModel).map(UserModel::toReducedModel)
+                .toArray(ReducedUserModel[]::new);
     }
 }

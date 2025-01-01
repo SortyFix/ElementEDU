@@ -3,6 +3,7 @@ package de.gaz.eedu.livechat.chat;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,11 @@ public class ChatEntity implements EntityObject, EntityModelRelation<ChatModel>
     @CollectionTable(name = "chat_entity_messages", joinColumns = @JoinColumn(name = "chat_id"))
     private List<Long> messages;
 
+    // Do not use
     @Override
     public ChatModel toModel()
     {
-        return new ChatModel(chatId, timeOfCreation, users.toArray(Long[]::new),
+        return new ChatModel(chatId, "", timeOfCreation, users.toArray(Long[]::new),
                 messages.toArray(Long[]::new));
     }
 }

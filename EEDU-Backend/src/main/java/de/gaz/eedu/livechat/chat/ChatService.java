@@ -9,10 +9,14 @@ import de.gaz.eedu.livechat.message.MessageEntity;
 import de.gaz.eedu.livechat.message.MessageService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.verification.GeneratedToken;
+import de.gaz.eedu.user.verification.VerificationService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
 {
     private final ChatRepository chatRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final VerificationService verificationService;
     private final MessageService messageService;
     private final UserService userService;
     private final WSIdentifiers wsIdentifiers;
@@ -43,6 +49,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     @Override
     public @NotNull List<ChatEntity> createEntity(@NotNull Set<ChatCreateModel> model) throws CreationException
     {
+        System.out.println("Creating entity...");
         List<ChatEntity> empty = Collections.emptyList();
         List<ChatEntity> entities = model.stream()
                                          .map(chatCreateModel -> {
@@ -53,14 +60,18 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
                                                  throw new OccupiedException();
                                              }
                                              return chatCreateModel.toEntity(new ChatEntity());
-                                         })
-                                         .toList();
+                                         }).toList();
 
         return chatRepository.saveAll(entities);
     }
 
     public @NotNull Optional<List<ChatEntity>> loadEntityByUserIDs(@NotNull List<Long> userIDs){
+        System.out.println(chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size()));
         return chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size());
+    }
+
+    public @NotNull GeneratedToken generateWebsocketToken(long userId) {
+        return verificationService.websocketToken(userId);
     }
 
     /**
@@ -92,24 +103,44 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      */
 
     @Transactional
-    public @NotNull ChatModel createChat(@NotNull List<Long> users)
+    public @NotNull ChatModel createChat(@NotNull Long userId, @NotNull List<Long> users)
     {
         if(users.size() < 2)
         {
-            // Cannot use forbiddenThrowable as this class doesn't extend EntityController
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        boolean usersValid = users.stream().allMatch(user -> loadEntityById(user).isPresent());
+        Optional<List<ChatEntity>> chatMatches = loadEntityByUserIDs(users);
 
-        if(!(loadEntityByUserIDs(users).isEmpty() && usersValid))
+        boolean usersValid = users.stream().allMatch(user -> userService.loadEntityById(user).isPresent());
+        boolean noResults = chatMatches.isPresent() && chatMatches.get().isEmpty();
+
+        if(!(noResults && usersValid))
         {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
 
         ChatCreateModel chatCreateModel = new ChatCreateModel(users.toArray(new Long[0]), System.currentTimeMillis());
         ChatEntity chatEntity = createEntity(Set.of(chatCreateModel)).getFirst();
-        return chatEntity.toModel();
+
+        return getPersonalizedModel(chatEntity, userId);
+    }
+
+    public @NotNull String getChatTitle(@NotNull Long userId, @NotNull List<Long> users)
+    {
+        List<Long> userList = new ArrayList<>(users);
+        userList.remove(userId);
+        return userService.loadEntityById(userList.getFirst()).orElseThrow(EntityNotFoundException::new).getFullName();
+    }
+
+    public @NotNull ChatModel getPersonalizedModel(@NotNull ChatEntity chatEntity, @NotNull Long userId)
+    {
+        return new ChatModel(
+                chatEntity.getChatId(),
+                getChatTitle(userId, chatEntity.getUsers()),
+                chatEntity.getTimeOfCreation(),
+                chatEntity.getUsers().toArray(new Long[0]),
+                chatEntity.getMessages().toArray(new Long[0]));
     }
 
     /**
@@ -170,6 +201,13 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
         }).orElse(HttpStatus.UNAUTHORIZED);
     }
 
+    public String testMessage(@NotNull String string)
+    {
+        String addedStuff = "Message recieved: " + string;
+        System.out.println("Message recieved: " + string);
+        return addedStuff;
+    }
+
     /**
      * Retrives chat data of a chat room.
      *
@@ -208,6 +246,15 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
                     }
                     return HttpStatus.UNAUTHORIZED;
                 }).orElse(HttpStatus.NOT_FOUND);
+    }
+
+    public List<ChatModel> getChatsFromUser(@NotNull Long userId)
+    {
+        return getChatRepository()
+                .findByUsersContaining(userId)
+                .orElse(Collections.emptyList())
+                .stream().map(chatEntity -> getPersonalizedModel(chatEntity, userId))
+                .collect(Collectors.toList());
     }
 
 }

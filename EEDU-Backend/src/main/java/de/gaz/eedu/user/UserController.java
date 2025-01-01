@@ -3,6 +3,7 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verification.JwtTokenType;
@@ -49,6 +50,8 @@ public class UserController extends EntityController<UserService, UserModel, Use
 {
     @Getter(AccessLevel.PROTECTED) private final UserService service;
     @Value("${development}") private final boolean development = false;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     /**
      * Creates a new user utilizing the provided {@link UserCreateModel}.
@@ -202,8 +205,10 @@ public class UserController extends EntityController<UserService, UserModel, Use
     }
 
     @PreAuthorize("hasAnyAuthority('USER_OTHERS_GET')") @GetMapping("/all") @Override
-    public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
-    {
-        return super.fetchAll();
+    public @NotNull ResponseEntity<Set<UserModel>> fetchAll() { return super.fetchAll(); }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/all/reduced")
+    public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced() {
+        return ResponseEntity.ok(userService.findAllAndReduce());
     }
 }

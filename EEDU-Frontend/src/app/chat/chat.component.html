@@ -1,1 +1,12 @@
-<p>chat works!</p>
+<div class="container">
+    <strong>Chats</strong>
+    <mat-divider></mat-divider>
+    <div *ngFor="let x of chatList">
+        <button mat-flat-button class="button">
+            {{x.chatTitle}}
+            <mat-icon>person</mat-icon>
+        </button>
+        <mat-divider class="mat-divider"></mat-divider>
+    </div>
+    <button mat-flat-button style="margin-top: 10px; width: 100%;" (click)="openDialog()"><mat-icon>add</mat-icon>Create new chat</button>
+</div>
