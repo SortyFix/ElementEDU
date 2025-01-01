@@ -16,7 +16,7 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
 import {FormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
 import {AppointmentEntryModel} from "../user/courses/models/appointments/appointment-entry-model";
-import {ScheduledAppointmentModel} from "../user/courses/models/appointments/scheduled-appointment-model";
+import {FrequentAppointmentModel} from "../user/courses/models/appointments/frequent-appointment-model";
 import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
@@ -81,10 +81,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         const courses: Observable<CourseModel[]> = this.courseService.courses$;
         courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
 
-        if(!this.courseService.fetched)
-        {
-            this.courseService.fetchCourses().subscribe();
-        }
+        this.courseService.fetchCourses().subscribe();
     }
 
     protected get currentEvents(): CalendarEvent[] {
@@ -188,20 +185,20 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Converts an array of {@link ScheduledAppointmentModel} into an array of {@link CalendarEvent}.
+     * Converts an array of {@link FrequentAppointmentModel} into an array of {@link CalendarEvent}.
      *
-     * This method processes an array of {@link ScheduledAppointmentModel} instances and transforms each
+     * This method processes an array of {@link FrequentAppointmentModel} instances and transforms each
      * into one or more {@link CalendarEvent} objects. It achieves this by iterating over the array,
-     * invoking the #asEvent() method on each {@link ScheduledAppointmentModel}, and then using a
+     * invoking the #asEvent() method on each {@link FrequentAppointmentModel}, and then using a
      * flat-mapping operation to combine the results into a single array.
      *
      * @param name a descriptive name for the operation or transformation process.
-     * @param scheduled an array of {@link ScheduledAppointmentModel} instances to be converted.
+     * @param scheduled an array of {@link FrequentAppointmentModel} instances to be converted.
      * @returns an array of {@link CalendarEvent} instances derived from the input models.
      * @private
      */
-    private toEvents(name: string, scheduled: ScheduledAppointmentModel[]): CalendarEvent[] {
-        return scheduled.flatMap((entity: ScheduledAppointmentModel): CalendarEvent[] => entity.asEvent(name));
+    private toEvents(name: string, scheduled: FrequentAppointmentModel[]): CalendarEvent[] {
+        return scheduled.flatMap((entity: FrequentAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
 
     /**

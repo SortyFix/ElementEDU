@@ -8,6 +8,7 @@ import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
+import de.gaz.eedu.course.room.RoomService;
 import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
@@ -30,16 +31,19 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
 public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     private final CourseRepository repository;
     private final SubjectService subjectService;
+    @Getter(AccessLevel.PUBLIC)
+    private final RoomService roomService;
     private final UserRepository userRepository;
     private final ClassRoomRepository classRoomRepository;
     @Getter(AccessLevel.PUBLIC)
-    private final AppointmentEntryRepository appointmentEntryRepository;
+    private final AppointmentEntryRepository appointmentRepository;
     private final FileService fileService;
 
     @Contract(pure = true, value = "_,_,_ -> param3")
@@ -47,7 +51,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     {
         Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
         Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.start());
-        return scheduledAppointments.stream().filter(event -> event.inPeriod(timeStamp)).map(event ->
+        return scheduledAppointments.stream().filter(event -> event.inFrequency(timeStamp)).map(event ->
         {
             entity.setDuration(event.getDuration());
             entity.setScheduledAppointment(event);
@@ -123,18 +127,23 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         });
     }
 
-    @Transactional public @NotNull AppointmentEntryModel createAppointment(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
+    @Transactional public @NotNull List<AppointmentEntryModel> createAppointment(@NotNull Long courseId, @NotNull Set<AppointmentEntryCreateModel> entryCreateModel)
     {
         CourseEntity courseEntity = loadEntityByIDSafe(courseId);
 
-        long id = generateId(entryCreateModel.start(), courseEntity);
-        if (Arrays.stream(courseEntity.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
-        {
-            throw new OccupiedException();
-        }
+        Stream<AppointmentEntryEntity> entities = entryCreateModel.stream().map((entry) -> {
 
-        // intentionally ignore return value
-        return createAppointmentUnsafe(id, entryCreateModel, courseEntity).toModel();
+            long id = generateId(entry.start(), courseEntity);
+            Stream<AppointmentEntryEntity> entries = Arrays.stream(courseEntity.getEntries());
+            if (entries.anyMatch(current -> Objects.equals(current.getId(), id)))
+            {
+                throw new OccupiedException();
+            }
+
+            return createAppointmentUnsafe(id, entry, courseEntity);
+        });
+
+        return getAppointmentRepository().saveAll(entities.toList()).stream().map(AppointmentEntryEntity::toModel).toList();
     }
 
     /**
@@ -151,10 +160,10 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
      */
     private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel createModel, @NotNull CourseEntity course)
     {
-        AppointmentEntryRepository entryRepository = getAppointmentEntryRepository();
+        AppointmentEntryRepository entryRepository = getAppointmentRepository();
 
         AppointmentEntryEntity entity = new AppointmentEntryEntity(id, course);
-        return entryRepository.save(createModel.toEntity(entity, entryEntity ->
+        return createModel.toEntity(entity, entryEntity ->
         {
             if (Objects.isNull(createModel.duration()))
             {
@@ -162,7 +171,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             }
             entryEntity.setDuration(Duration.ofMillis(createModel.duration()));
             return entryEntity;
-        }));
+        });
     }
 
 }

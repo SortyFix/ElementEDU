@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 //TODO manage access
 
 @RestController
-@RequestMapping("/course/subject")
+@RequestMapping("/api/v1/course/subject")
 @RequiredArgsConstructor
 public class SubjectController extends EntityController<SubjectService, SubjectModel, SubjectCreateModel>
 {

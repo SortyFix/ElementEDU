@@ -1,18 +1,19 @@
 export class AppointmentCreateModel
 {
-    private readonly _start: number;
 
-    public constructor(start: Date, private _duration: number, private _description?: string, private _assignment?: AppointmentCreateModel, /* TODO add assessment create model */ )
-    {
-        this._start = start.getTime();
-    }
+    public constructor(
+        private readonly _start: Date,
+        private readonly _duration: number,
+        private readonly _description?: string,
+        private readonly _assignment?: AppointmentCreateModel, /* TODO add assessment create model */ )
+    {}
 
     public static fromObject(obj: { start: Date, duration: number, description?: string, assignment?: AppointmentCreateModel }): AppointmentCreateModel
     {
         return new AppointmentCreateModel(obj.start, obj.duration, obj.description, obj.assignment);
     }
 
-    public get start(): number {
+    public get start(): Date {
         return this._start;
     }
 
@@ -27,4 +28,10 @@ export class AppointmentCreateModel
     public get description(): string | undefined {
         return this._description;
     }
+
+    public get toPacket(): { start: number, duration: number, description?: string, assignment?: AppointmentCreateModel }
+    {
+        return { start: this.start.getTime(), duration: this.duration, description: this.description, assignment: this.assignment };
+    }
+
 }

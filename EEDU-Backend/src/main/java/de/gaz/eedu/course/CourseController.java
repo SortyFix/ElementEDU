@@ -2,6 +2,7 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
+import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentCreateModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
@@ -40,9 +41,9 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
-    @PostMapping("/{course}/appointment/set")
-    public @NotNull AppointmentEntryModel setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel createModel) {
-        return getService().createAppointment(course, createModel);
+    @PostMapping("/appointment/{course}/create")
+    public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
+        return ResponseEntity.ok(getService().createAppointment(course, Set.of(createModel)).toArray(AppointmentEntryModel[]::new));
     }
 
     @GetMapping("{course}/detach") public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)

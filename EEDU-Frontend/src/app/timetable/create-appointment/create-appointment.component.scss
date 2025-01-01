@@ -18,6 +18,9 @@
     .appointment-content {
         margin-top: 10px;
         min-height: 292px;
+        max-height: 400px;
+
+        overflow-y: auto;
 
         .appointment-duration-container {
             margin-top: 10px;

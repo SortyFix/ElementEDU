@@ -151,7 +151,7 @@ import java.util.Optional;
     {
         if (setAssignment(assignment))
         {
-            courseService.getAppointmentEntryRepository().save(this);
+            courseService.getAppointmentRepository().save(this);
             return true;
         }
         return false;

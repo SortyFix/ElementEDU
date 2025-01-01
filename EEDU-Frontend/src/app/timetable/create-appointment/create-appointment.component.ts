@@ -12,12 +12,13 @@ import {
     CreateStandaloneAppointmentComponent
 } from "./create-standalone-appointment/create-standalone-appointment.component";
 import {
-    CreateScheduledAppointmentComponent
-} from "./create-scheduled-appointment/create-scheduled-appointment.component";
+    CreateFrequentAppointmentComponent
+} from "./create-scheduled-appointment/create-frequent-appointment.component";
 import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
 import {DialogRef} from "@angular/cdk/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
+import {FrequentAppointmentCreateModel} from "../../user/courses/models/appointments/frequent-appointment-create-model";
 
 @Component({
   selector: 'app-create-appointment',
@@ -38,7 +39,7 @@ import {NgIf} from "@angular/common";
         MatCardActions,
         MatButton,
         CreateStandaloneAppointmentComponent,
-        CreateScheduledAppointmentComponent,
+        CreateFrequentAppointmentComponent,
         MatProgressBar,
         NgIf
     ],
@@ -49,7 +50,7 @@ import {NgIf} from "@angular/common";
 export class CreateAppointmentComponent {
 
     @ViewChild('standalone') private _standalone!: CreateStandaloneAppointmentComponent;
-    @ViewChild('scheduled') private _scheduled!: CreateScheduledAppointmentComponent;
+    @ViewChild('frequent') private _frequent!: CreateFrequentAppointmentComponent;
     private readonly _form: FormGroup;
     private _courses!: CourseModel[];
     private _loading: boolean = false;
@@ -86,8 +87,8 @@ export class CreateAppointmentComponent {
                     return
 
                 case 1:
-                    const scheduledDate: {start: Date, end: Date, frequency: number, duration: number} = this._standalone.form.value;
-                    break;
+                    this.createFrequent(course.id);
+                    return;
             }
         }
     }
@@ -100,8 +101,16 @@ export class CreateAppointmentComponent {
         });
     }
 
+    private createFrequent(courseId: number): void
+    {
+        const createModel: FrequentAppointmentCreateModel = FrequentAppointmentCreateModel.fromObject(this._frequent.form.value);
+        this._courseService.createFrequent(courseId, createModel).subscribe({
+            next: (): void => this.dialogReference.close()
+        });
+    }
+
     protected canSubmit(): boolean {
-        if(!this._standalone || !this._scheduled || this.form.invalid)
+        if(!this._standalone || !this._frequent || this.form.invalid)
         {
             return false;
         }
@@ -111,7 +120,7 @@ export class CreateAppointmentComponent {
             case 0:
                 return this._standalone.form.valid;
             case 1:
-                return this._scheduled.form.valid;
+                return this._frequent.form.valid;
         }
         return false;
     }

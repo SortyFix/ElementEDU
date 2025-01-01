@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
     course_id        BIGINT NOT NULL,
     room_id          BIGINT NOT NULL,
     start_time_stamp BIGINT NOT NULL,
-    end_time_stamp   BIGINT NOT NULL,
+    until_time_stamp   BIGINT NOT NULL,
     duration         BIGINT NOT NULL,
-    period           INT    NOT NULL,
+    frequency           INT    NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id),
     FOREIGN KEY (room_id) REFERENCES room_entity(id)
 );
@@ -301,7 +301,7 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
 
 INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
 
-INSERT INTO scheduled_appointment_entity (course_id, room_id, start_time_stamp, end_time_stamp, duration, period) VALUES
+INSERT INTO scheduled_appointment_entity (course_id, room_id, start_time_stamp, until_time_stamp, duration, frequency) VALUES
         (1, 1, 1731779748, 1751989748, 2700, 7),
         (2, 2, 1731778748, 1751999748, 4000, 6);
 

@@ -10,22 +10,20 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
-public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long end, @NotNull Long duration, @NotNull Long period,
-                                              @NotNull Long course) implements CreationModel<ScheduledAppointmentEntity>
+public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long until, @NotNull Long room, @NotNull Long duration, @NotNull Long frequency) implements CreationModel<ScheduledAppointmentEntity>
 {
-
     @Override public @NotNull ScheduledAppointmentEntity toEntity(@NotNull ScheduledAppointmentEntity entity)
     {
         entity.setStartTimeStamp(Instant.ofEpochMilli(start()));
-        entity.setEndTimeStamp(Instant.ofEpochMilli(end()));
+        entity.setUntilTimeStamp(Instant.ofEpochMilli(until()));
         entity.setDuration(Duration.ofMillis(duration()));
-        entity.setPeriod(Period.ofDays(Math.toIntExact(periodAsDays())));
+        entity.setFrequency(Period.ofDays(Math.toIntExact(computedFrequency())));
         return entity;
     }
 
-    public @NotNull Long periodAsDays()
+    public @NotNull Long computedFrequency()
     {
-        long days = (period() / 60 / 60 / 24);
+        long days = (frequency() / 86400000);
         if (days < 1)
         {
             throw new CreationException(HttpStatus.BAD_REQUEST);

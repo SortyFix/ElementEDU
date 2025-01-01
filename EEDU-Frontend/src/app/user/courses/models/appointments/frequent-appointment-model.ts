@@ -1,13 +1,13 @@
 import {AppointmentEntryModel} from "./appointment-entry-model";
 import {CalendarEvent} from "angular-calendar";
 
-export class ScheduledAppointmentModel {
+export class FrequentAppointmentModel {
 
     public constructor(
         public readonly id: number, public readonly _start: number, public readonly _end: number, public readonly _duration: number, public readonly _period: number, public readonly _attachedEntries: AppointmentEntryModel[]) {}
 
-    public static fromObject(object: any, attachedEntries: AppointmentEntryModel[]): ScheduledAppointmentModel {
-        return new ScheduledAppointmentModel(
+    public static fromObject(object: any, attachedEntries: AppointmentEntryModel[]): FrequentAppointmentModel {
+        return new FrequentAppointmentModel(
             object.id,
             object.start,
             object.end,
