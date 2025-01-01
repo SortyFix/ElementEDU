@@ -1,12 +1,14 @@
 package de.gaz.eedu.course;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
@@ -15,13 +17,27 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             "SELECT c FROM CourseEntity c " +
             "LEFT JOIN FETCH c.scheduledAppointments sA " +
             "LEFT JOIN FETCH c.appointments a " +
+            "LEFT JOIN FETCH c.classRoom r" +
             "LEFT JOIN FETCH c.subject s " +
             "LEFT JOIN FETCH c.users u " +
-            "LEFT JOIN FETCH c.classRoom cR " +
-            "LEFT JOIN FETCH c.repository r " +
+            "LEFT JOIN FETCH c.repository rE " +
             "WHERE c.id = :id"
     )
     @Override @NotNull Optional<CourseEntity> findById(@NotNull Long id);
+
+    @Query(
+            "SELECT c FROM CourseEntity c " +
+            "LEFT JOIN FETCH c.classRoom " +
+            "LEFT JOIN FETCH c.scheduledAppointments " +
+            "LEFT JOIN FETCH c.appointments " +
+            "LEFT JOIN FETCH c.subject " +
+            "LEFT JOIN FETCH c.users u " +
+            "LEFT JOIN FETCH c.repository rE " +
+            "LEFT JOIN FETCH rE.privilege " +
+            "LEFT JOIN FETCH rE.tags " +
+            "WHERE :userId IN (SELECT u.id FROM c.users u)"
+    )
+    @NotNull @Unmodifiable Set<CourseEntity> findAllByUserId(long userId);
 
     boolean existsByName(@NotNull String name);
 

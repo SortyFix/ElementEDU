@@ -3,7 +3,6 @@ package de.gaz.eedu.user;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -30,7 +29,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "LEFT JOIN FETCH g.privileges p " +
             "LEFT JOIN FETCH u.themeEntity t " +
             "WHERE u.id = :userId")
-    @NotNull Optional<UserEntity> findByIdEagerly(@Param("userId") long userId);
+    @NotNull Optional<UserEntity> findById(long userId);
 
 
     @Query("SELECT u FROM UserEntity u " +

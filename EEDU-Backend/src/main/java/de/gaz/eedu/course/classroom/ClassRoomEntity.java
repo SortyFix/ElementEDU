@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
+
     private String name;
 
     @OneToMany(mappedBy = "classRoom") @JsonManagedReference

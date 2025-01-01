@@ -61,8 +61,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
 
     public @NotNull CourseModel[] getCourses(long user)
     {
-        UserEntity userEntity = getUserRepository().findById(user).orElseThrow();
-        return userEntity.getCourses().stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
+        return getRepository().findAllByUserId(user).stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
     }
 
     @Contract(pure = true, value = "_, _ -> _")
