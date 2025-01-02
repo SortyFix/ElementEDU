@@ -35,6 +35,9 @@ public class SecurityConfig implements WebMvcConfigurer
         csrf.addFilterBefore(jwtFilter, clazz).authorizeHttpRequests(auth ->
         {
             String user = "/api/v1/user/%s";
+
+            auth.requestMatchers("/error").permitAll();
+
             String login = String.format(user, "login"), logout = String.format(user, "logout");
             auth.requestMatchers(login).anonymous().requestMatchers(logout).permitAll().anyRequest().authenticated();
         });
