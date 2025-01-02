@@ -30,15 +30,21 @@ import {FormTitleComponent} from "../common/form-title/form-title.component";
 export class LoginNameFormComponent extends AbstractLoginForm {
     constructor(formBuilder: FormBuilder, authenticationService: AuthenticationService) {
         super(formBuilder.group({
-            loginName: ['', Validators.required], rememberMe: [false]
+            loginName: [null, Validators.required], rememberMe: [false]
         }), authenticationService);
 
         this.registerField('loginName')
     }
 
     protected override onSubmit(): void {
-        const loginName = this.form.get('loginName')?.value;
-        const rememberMe = this.form.get('rememberMe')?.value;
+
+        if(this.form.invalid)
+        {
+            return;
+        }
+
+        const loginName: string = (this.form.get('loginName')?.value as string).trim();
+        const rememberMe: boolean = this.form.get('rememberMe')?.value;
 
         const loginRequest: LoginRequest = new LoginRequest(loginName, rememberMe);
         this.authenticationService.requestAuthorization(loginRequest).subscribe(this.exceptionHandler('loginName'));
