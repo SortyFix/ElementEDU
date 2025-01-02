@@ -12,7 +12,7 @@ import {
 } from "./create-standalone-appointment/create-standalone-appointment.component";
 import {
     CreateFrequentAppointmentComponent
-} from "./create-scheduled-appointment/create-frequent-appointment.component";
+} from "./create-frequent-appointment/create-frequent-appointment.component";
 import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
 import {DialogRef} from "@angular/cdk/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";

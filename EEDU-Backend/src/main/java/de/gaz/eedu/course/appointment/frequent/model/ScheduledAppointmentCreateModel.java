@@ -1,6 +1,6 @@
-package de.gaz.eedu.course.appointment.scheduled.model;
+package de.gaz.eedu.course.appointment.frequent.model;
 
-import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
+import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.exception.CreationException;
 import org.jetbrains.annotations.NotNull;
@@ -10,9 +10,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
-public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long until, @NotNull Long room, @NotNull Long duration, @NotNull Long frequency) implements CreationModel<ScheduledAppointmentEntity>
+public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long until, @NotNull Long room, @NotNull Long duration, @NotNull Long frequency) implements CreationModel<FrequentAppointmentEntity>
 {
-    @Override public @NotNull ScheduledAppointmentEntity toEntity(@NotNull ScheduledAppointmentEntity entity)
+    @Override public @NotNull FrequentAppointmentEntity toEntity(@NotNull FrequentAppointmentEntity entity)
     {
         entity.setStartTimeStamp(Instant.ofEpochMilli(start()));
         entity.setUntilTimeStamp(Instant.ofEpochMilli(until()));

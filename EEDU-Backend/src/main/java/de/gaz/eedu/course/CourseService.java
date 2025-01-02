@@ -4,7 +4,7 @@ import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
+import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
@@ -50,13 +50,13 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     @Contract(pure = true, value = "_,_,_ -> param3")
     private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
     {
-        Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
+        Set<FrequentAppointmentEntity> scheduledAppointments = course.getFrequentAppointments();
         Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.start());
         return scheduledAppointments.stream().filter(event -> event.inFrequency(timeStamp)).map(event ->
         {
             entity.setDuration(event.getDuration());
             entity.setRoom(event.getRoom());
-            entity.setScheduledAppointment(event);
+            entity.setFrequentAppointment(event);
             return entity;
         }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
     }

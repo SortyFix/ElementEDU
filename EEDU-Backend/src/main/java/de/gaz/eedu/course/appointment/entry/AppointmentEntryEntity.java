@@ -7,7 +7,7 @@ import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
-import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
+import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
@@ -40,8 +40,8 @@ import java.util.Optional;
     // might be null, if submitHome is false, or it should be valid until next appointment
     @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
     private CourseEntity course;
-    @ManyToOne @JoinColumn(name = "scheduled_appointment_id") @JsonBackReference
-    private @Nullable ScheduledAppointmentEntity scheduledAppointment;
+    @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
+    private @Nullable FrequentAppointmentEntity frequentAppointment;
 
     // must be set through extra method to validate integrity
     @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE)
@@ -54,10 +54,10 @@ import java.util.Optional;
 
     public @NotNull Optional<RoomEntity> getRoom()
     {
-        ScheduledAppointmentEntity scheduledAppointment = getScheduledAppointment();
-        if(Objects.nonNull(scheduledAppointment) && Objects.isNull(room))
+        FrequentAppointmentEntity frequentAppointment = getFrequentAppointment();
+        if(Objects.nonNull(frequentAppointment) && Objects.isNull(room))
         {
-            return Optional.of(scheduledAppointment.getRoom());
+            return Optional.of(frequentAppointment.getRoom());
         }
         return Optional.ofNullable(room);
     }
@@ -98,9 +98,9 @@ import java.util.Optional;
     @Override public @NotNull AppointmentEntryModel toModel()
     {
         Long attachedScheduled = null;
-        if(Objects.nonNull(getScheduledAppointment()))
+        if(Objects.nonNull(getFrequentAppointment()))
         {
-            attachedScheduled = getScheduledAppointment().getId();
+            attachedScheduled = getFrequentAppointment().getId();
         }
 
         AssignmentModel assignment = getAssignment().orElse(null);

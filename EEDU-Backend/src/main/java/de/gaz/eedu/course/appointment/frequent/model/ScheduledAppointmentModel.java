@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.appointment.scheduled.model;
+package de.gaz.eedu.course.appointment.frequent.model;
 
 import de.gaz.eedu.course.room.model.RoomModel;
 import de.gaz.eedu.entity.model.EntityModel;

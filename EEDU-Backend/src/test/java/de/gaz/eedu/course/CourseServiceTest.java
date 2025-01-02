@@ -2,7 +2,7 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;

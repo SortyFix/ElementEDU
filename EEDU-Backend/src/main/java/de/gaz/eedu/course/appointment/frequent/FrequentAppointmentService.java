@@ -1,9 +1,9 @@
-package de.gaz.eedu.course.appointment.scheduled;
+package de.gaz.eedu.course.appointment.frequent;
 
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
-import de.gaz.eedu.course.appointment.scheduled.model.InternalFrequentAppointmentCreateModel;
-import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.InternalFrequentAppointmentCreateModel;
+import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
@@ -20,18 +20,18 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class ScheduledAppointmentService extends EntityService<ScheduledAppointmentRepository, ScheduledAppointmentEntity, ScheduledAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class FrequentAppointmentService extends EntityService<FrequentAppointmentRepository, FrequentAppointmentEntity, ScheduledAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
-    private final ScheduledAppointmentRepository repository;
+    private final FrequentAppointmentRepository repository;
     private final CourseService courseService;
 
     @Transactional @Override
-    public @NotNull List<ScheduledAppointmentEntity> createEntity(@NotNull Set<InternalFrequentAppointmentCreateModel> model) throws CreationException
+    public @NotNull List<FrequentAppointmentEntity> createEntity(@NotNull Set<InternalFrequentAppointmentCreateModel> model) throws CreationException
     {
         return saveEntity(model.stream().map(current ->
         {
             CourseEntity courseEntity = getCourseService().loadEntityByIDSafe(current.courseId());
-            return current.toEntity(new ScheduledAppointmentEntity(), (entity) ->
+            return current.toEntity(new FrequentAppointmentEntity(), (entity) ->
             {
                 try {
                     RoomEntity room = getCourseService().getRoomService().loadEntityByIDSafe(current.data().room());

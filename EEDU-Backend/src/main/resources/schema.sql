@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS room_entity
     name VARCHAR(20) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
+CREATE TABLE IF NOT EXISTS frequent_appointment_entity
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     course_id        BIGINT NOT NULL,
@@ -78,10 +78,10 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
     submit_assignment_until  BIGINT         NULL,
     room_id                  BIGINT         NULL,
     course_appointment_id    BIGINT         NOT NULL,
-    scheduled_appointment_id BIGINT         NULL,
+    frequent_appointment_id BIGINT         NULL,
     FOREIGN KEY (room_id) REFERENCES room_entity (id),
     FOREIGN KEY (course_appointment_id) REFERENCES course_entity (id),
-    FOREIGN KEY (scheduled_appointment_id) REFERENCES scheduled_appointment_entity (id)
+    FOREIGN KEY (frequent_appointment_id) REFERENCES frequent_appointment_entity (id)
 );
 
 -- User --

@@ -2,7 +2,7 @@ package de.gaz.eedu.course.room;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
-import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
+import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.room.model.RoomModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
@@ -28,7 +28,7 @@ public class RoomEntity implements EntityModelRelation<RoomModel>
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
-    private final Set<ScheduledAppointmentEntity> scheduledAppointments = new HashSet<>();
+    private final Set<FrequentAppointmentEntity> scheduledAppointments = new HashSet<>();
 
     @Column(length = 20, nullable = false) @Basic(optional = false, fetch = FetchType.EAGER) private String name;
 

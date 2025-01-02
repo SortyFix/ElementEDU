@@ -47,7 +47,7 @@ export class CourseService {
      */
     public createAppointment(course: number, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]>
     {
-        const url = `${this.BACKEND_URL}/course/appointment/${course}/create`
+        const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/standalone`
         return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel):
         {
             start: number,
@@ -75,7 +75,7 @@ export class CourseService {
      * @public
      */
     public createFrequent(course: number, createModel: FrequentAppointmentCreateModel[]): Observable<FrequentAppointmentModel[]> {
-        const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule`;
+        const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/frequent`;
 
         return this.http.post<any[]>(url, createModel.map((current: FrequentAppointmentCreateModel):
         {
