@@ -29,8 +29,9 @@ export class CreateStandaloneAppointmentComponent {
     private readonly _form: FormGroup;
 
     constructor(private formBuilder: FormBuilder) {
+        const date: Date = new Date();
         this._form = this.formBuilder.group({
-            start: [new Date(), Validators.required],
+            start: [date, Validators.required],
             end: [null /* will be set below */, Validators.required],
             room: [null], // optional
             duration: [2700000, Validators.required],

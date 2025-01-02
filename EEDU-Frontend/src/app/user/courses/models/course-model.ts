@@ -4,7 +4,7 @@ import {FrequentAppointmentModel} from "./appointments/frequent-appointment-mode
 
 export class CourseModel {
 
-    constructor(public readonly id: number, public readonly name: string, public readonly subject: SubjectModel, public readonly appointmentEntries: AppointmentEntryModel[], public readonly scheduledAppointments: FrequentAppointmentModel[]) {}
+    constructor(public readonly id: number, public readonly name: string, public readonly subject: SubjectModel, public readonly appointmentEntries: AppointmentEntryModel[], public readonly frequentAppointments: FrequentAppointmentModel[]) {}
 
     public static fromObject(object: any): CourseModel {
         const id: number = object.id;
@@ -14,10 +14,10 @@ export class CourseModel {
         const entries: any = object.appointmentEntries;
         const appointmentEntries: AppointmentEntryModel[] = this.getEntries(entries);
 
-        const scheduled: any = object.scheduledAppointments;
-        const scheduledAppointments: FrequentAppointmentModel[] = this.getScheduledAppointments(scheduled, appointmentEntries);
+        const frequent: any = object.frequentAppointments;
+        const frequentAppointments: FrequentAppointmentModel[] = this.getFrequentAppointments(frequent, appointmentEntries);
 
-        return new CourseModel(id, name, subject, appointmentEntries, scheduledAppointments);
+        return new CourseModel(id, name, subject, appointmentEntries, frequentAppointments);
     }
 
     private static getEntries(obj: any): AppointmentEntryModel[]
@@ -28,14 +28,21 @@ export class CourseModel {
     public attachAppointment(appointment: AppointmentEntryModel): void
     {
         this.appointmentEntries.push(appointment);
+
+        if(appointment.hasAttached())
+        {
+            this.frequentAppointments.find(
+                (event: FrequentAppointmentModel): boolean => appointment.isPart(event.id)
+            )?.pushEvent(appointment);
+        }
     }
 
-    public attachFrequentAppointment(scheduledAppointmentModel: FrequentAppointmentModel): void
+    public attachFrequentAppointment(frequentAppointmentModel: FrequentAppointmentModel): void
     {
-        this.scheduledAppointments.push(scheduledAppointmentModel);
+        this.frequentAppointments.push(frequentAppointmentModel);
     }
 
-    private static getScheduledAppointments(obj: any, entries: AppointmentEntryModel[]): FrequentAppointmentModel[]
+    private static getFrequentAppointments(obj: any, entries: AppointmentEntryModel[]): FrequentAppointmentModel[]
     {
         return obj.map((entry: any): FrequentAppointmentModel =>
         {

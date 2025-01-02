@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectEntity;
@@ -66,8 +66,8 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
         AppointmentEntryModel[] entryArray = entryModels.toArray(AppointmentEntryModel[]::new);
 
         Stream<FrequentAppointmentEntity> scheduled = getFrequentAppointments().stream();
-        Stream<ScheduledAppointmentModel> scheduledModels = scheduled.map(FrequentAppointmentEntity::toModel);
-        ScheduledAppointmentModel[] scheduledArray = scheduledModels.toArray(ScheduledAppointmentModel[]::new);
+        Stream<FrequentAppointmentModel> scheduledModels = scheduled.map(FrequentAppointmentEntity::toModel);
+        FrequentAppointmentModel[] scheduledArray = scheduledModels.toArray(FrequentAppointmentModel[]::new);
 
         return new CourseModel(getId(), getName(), getSubject().toModel(), entryArray, scheduledArray);
     }

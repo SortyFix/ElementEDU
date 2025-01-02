@@ -1,5 +1,5 @@
 <form [formGroup]="form">
-    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+    <app-date-time-picker formControlName="start"></app-date-time-picker>
 
     <app-general-selection-input
         *ngIf="rooms().length > 0"

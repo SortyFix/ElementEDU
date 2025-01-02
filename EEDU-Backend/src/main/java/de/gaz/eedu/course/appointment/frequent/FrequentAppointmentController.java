@@ -2,8 +2,8 @@ package de.gaz.eedu.course.appointment.frequent;
 
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.frequent.model.InternalFrequentAppointmentCreateModel;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentCreateModel;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.entity.EntityController;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,13 +20,13 @@ import java.util.stream.Stream;
 
 @Slf4j @RestController @RequestMapping("/api/v1/course/appointment") @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class FrequentAppointmentController extends EntityController<FrequentAppointmentService, ScheduledAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class FrequentAppointmentController extends EntityController<FrequentAppointmentService, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
     // TODO ?? What is this class about?
     private final FrequentAppointmentService service;
 
 
-    @PostMapping("/{course}/schedule/frequent") public @NotNull ResponseEntity<ScheduledAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody ScheduledAppointmentCreateModel... appointments)
+    @PostMapping("/{course}/schedule/frequent") public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
     {
         log.info("Received incoming request for scheduling frequent appointment(s) {} in course {}.", appointments, course);
 
@@ -34,7 +34,7 @@ public class FrequentAppointmentController extends EntityController<FrequentAppo
             return new InternalFrequentAppointmentCreateModel(course, model);
         })).collect(Collectors.toSet())).stream();
 
-        return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(ScheduledAppointmentModel[]::new));
+        return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
     @PostMapping("/{course}/unschedule/frequent") public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
@@ -51,13 +51,13 @@ public class FrequentAppointmentController extends EntityController<FrequentAppo
         return super.delete(id);
     }
 
-    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<ScheduledAppointmentModel> getData(@PathVariable @NotNull Long id)
+    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<FrequentAppointmentModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }
 
     @GetMapping("/get/all")
-    @Override public @NotNull ResponseEntity<Set<ScheduledAppointmentModel>> fetchAll()
+    @Override public @NotNull ResponseEntity<Set<FrequentAppointmentModel>> fetchAll()
     {
         return super.fetchAll();
     }

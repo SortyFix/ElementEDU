@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
-public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long until, @NotNull Long room, @NotNull Long duration, @NotNull Long frequency) implements CreationModel<FrequentAppointmentEntity>
+public record FrequentAppointmentCreateModel(@NotNull Long start, @NotNull Long until, @NotNull Long room, @NotNull Long duration, @NotNull Long frequency) implements CreationModel<FrequentAppointmentEntity>
 {
     @Override public @NotNull FrequentAppointmentEntity toEntity(@NotNull FrequentAppointmentEntity entity)
     {

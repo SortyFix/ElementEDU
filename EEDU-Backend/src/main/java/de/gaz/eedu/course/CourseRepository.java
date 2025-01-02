@@ -15,7 +15,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
 
     @Query(
             "SELECT c FROM CourseEntity c " +
-            "LEFT JOIN FETCH c.scheduledAppointments sA " +
+            "LEFT JOIN FETCH c.frequentAppointments sA " +
             "LEFT JOIN FETCH c.appointments a " +
             "LEFT JOIN FETCH c.classRoom r" +
             "LEFT JOIN FETCH c.subject s " +
@@ -28,7 +28,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     @Query(
             "SELECT c FROM CourseEntity c " +
             "LEFT JOIN FETCH c.classRoom " +
-            "LEFT JOIN FETCH c.scheduledAppointments " +
+            "LEFT JOIN FETCH c.frequentAppointments " +
             "LEFT JOIN FETCH c.appointments " +
             "LEFT JOIN FETCH c.subject " +
             "LEFT JOIN FETCH c.users u " +

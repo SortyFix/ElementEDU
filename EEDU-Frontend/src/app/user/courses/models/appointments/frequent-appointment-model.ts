@@ -17,7 +17,6 @@ export class FrequentAppointmentModel {
         );
     }
 
-
     public get start(): Date {
         return this.toDate(this._start);
     }
@@ -43,6 +42,11 @@ export class FrequentAppointmentModel {
         return delta % this._period === 0;
     }
 
+    public pushEvent(event: AppointmentEntryModel)
+    {
+        this._attachedEntries.push(event);
+    }
+
     private computeDuration(start: number): Date {
         return new Date(start + this.duration);
     }
@@ -53,12 +57,12 @@ export class FrequentAppointmentModel {
 
         for (let i: number = this._start; i <= this._end; i += this._period) {
 
-            if(this._attachedEntries.some((current: AppointmentEntryModel): boolean => current._start === i))
+            const startDate: Date = new Date(i);
+            if(this._attachedEntries.some((current: AppointmentEntryModel): boolean => current.equalsStart(i)))
             { // skip already created events
                 continue;
             }
 
-            const startDate: Date = new Date(i);
             events.push({
                 id: this.id,
                 title: name,

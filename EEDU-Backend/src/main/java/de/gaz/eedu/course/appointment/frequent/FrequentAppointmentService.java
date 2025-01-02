@@ -3,7 +3,7 @@ package de.gaz.eedu.course.appointment.frequent;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.frequent.model.InternalFrequentAppointmentCreateModel;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class FrequentAppointmentService extends EntityService<FrequentAppointmentRepository, FrequentAppointmentEntity, ScheduledAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class FrequentAppointmentService extends EntityService<FrequentAppointmentRepository, FrequentAppointmentEntity, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
     private final FrequentAppointmentRepository repository;
     private final CourseService courseService;
@@ -49,7 +49,7 @@ public class FrequentAppointmentService extends EntityService<FrequentAppointmen
     }
 
 
-    @Override public @NotNull Optional<ScheduledAppointmentModel> loadById(long id)
+    @Override public @NotNull Optional<FrequentAppointmentModel> loadById(long id)
     {
         return super.loadById(id);
     }

@@ -114,7 +114,7 @@ export class CreateAppointmentComponent {
             until: Date,
             room: RoomModel | number,
             duration: number,
-        } = this._frequent.form.value;
+        } = this._standalone.form.value;
         object.room = (object.room as RoomModel)?.id;
 
         this._courseService.createAppointment(courseId, [AppointmentCreateModel.fromObject(object as {

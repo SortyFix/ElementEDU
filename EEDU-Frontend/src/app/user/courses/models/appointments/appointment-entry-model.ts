@@ -4,11 +4,20 @@ import {AssignmentModel} from "./assignment-model";
 export class AppointmentEntryModel {
 
     constructor(public readonly id: number,
-                public readonly _attachedScheduled: number,
-                public readonly _start: number,
+                private readonly _attachedScheduled: number | null,
+                private readonly _start: number,
                 private readonly _duration: number,
                 private readonly _description: string,
-                public readonly assignment: AssignmentModel | undefined) {}
+                public readonly assignment: AssignmentModel | null) {}
+
+    public equalsStart(time: number): boolean {
+        return this._start === time;
+    }
+
+    public hasAttached(): boolean
+    {
+        return !!this._attachedScheduled;
+    }
 
     public isPart(id: number): boolean {
         return this._attachedScheduled == id;
@@ -48,6 +57,10 @@ export class AppointmentEntryModel {
             resizable: {
                 beforeStart: false,
                 afterEnd: false
+            },
+            color: {
+                primary: '#f00',
+                secondary: '#0f0',
             },
             draggable: false,
         }

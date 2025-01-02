@@ -178,8 +178,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
      * @private
      */
     private courseEvents(courses: CourseModel[]): CalendarEvent[] {
-        return courses.flatMap(({ name, appointmentEntries, scheduledAppointments }: CourseModel): CalendarEvent[] => [
-            ...this.toEvents(name, scheduledAppointments),
+        return courses.flatMap(({ name, appointmentEntries, frequentAppointments }: CourseModel): CalendarEvent[] => [
+            ...this.toEvents(name, frequentAppointments),
             ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
         ]);
     }

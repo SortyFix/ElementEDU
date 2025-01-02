@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import jakarta.persistence.*;
@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Setter @Entity @Getter @NoArgsConstructor
-public class FrequentAppointmentEntity implements EntityModelRelation<ScheduledAppointmentModel>
+public class FrequentAppointmentEntity implements EntityModelRelation<FrequentAppointmentModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private long id;
     @JsonBackReference @ManyToOne(optional = false) @JoinColumn(name = "course_id", referencedColumnName = "id")
@@ -36,9 +36,9 @@ public class FrequentAppointmentEntity implements EntityModelRelation<ScheduledA
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
     private @NotNull RoomEntity room;
 
-    @Override public @NotNull ScheduledAppointmentModel toModel()
+    @Override public @NotNull FrequentAppointmentModel toModel()
     {
-        return new ScheduledAppointmentModel(getId(),
+        return new FrequentAppointmentModel(getId(),
                 getRoom().toModel(),
                 getStartTimeStamp().toEpochMilli(),
                 getUntilTimeStamp().toEpochMilli(),

@@ -47,20 +47,6 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final AppointmentEntryRepository appointmentRepository;
     private final FileService fileService;
 
-    @Contract(pure = true, value = "_,_,_ -> param3")
-    private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
-    {
-        Set<FrequentAppointmentEntity> scheduledAppointments = course.getFrequentAppointments();
-        Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.start());
-        return scheduledAppointments.stream().filter(event -> event.inFrequency(timeStamp)).map(event ->
-        {
-            entity.setDuration(event.getDuration());
-            entity.setRoom(event.getRoom());
-            entity.setFrequentAppointment(event);
-            return entity;
-        }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
-    }
-
     public @NotNull CourseModel[] getCourses(long user)
     {
         return getRepository().findAllByUserId(user).stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
@@ -171,12 +157,32 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             long id = generateId(currentModel.start(), course);
 
             return currentModel.toEntity(new AppointmentEntryEntity(id), (entity) -> {
-                if (Objects.isNull(currentModel.duration()))
+
+                Instant time = Instant.ofEpochMilli(currentModel.start());
+                for(FrequentAppointmentEntity frequentAppointment : course.getFrequentAppointments())
                 {
-                    return attachScheduled(currentModel, course, entity);
+                    if(frequentAppointment.inFrequency(time))
+                    {
+                        entity.setFrequentAppointment(frequentAppointment);
+
+                        // these two below might get overridden by custom values
+                        entity.setDuration(frequentAppointment.getDuration());
+                        entity.setRoom(frequentAppointment.getRoom());
+
+                        break;
+                    }
                 }
-                entity.setDuration(Duration.ofMillis(currentModel.duration()));
-                entity.setCourse(course);
+
+                if(Objects.nonNull(currentModel.duration()))
+                {
+                    entity.setDuration(Duration.ofMillis(currentModel.duration()));
+                }
+
+                if(Objects.isNull(entity.getDuration()))
+                {
+                    // duration MUST be set here already
+                    throw new CreationException(HttpStatus.BAD_REQUEST);
+                }
 
                 if(Objects.nonNull(currentModel.room()))
                 {
@@ -184,6 +190,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
                     entity.setRoom(room);
                 }
 
+                entity.setCourse(course);
                 return entity;
             });
         }).toList();

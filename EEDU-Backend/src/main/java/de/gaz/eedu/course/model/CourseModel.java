@@ -1,7 +1,7 @@
 package de.gaz.eedu.course.model;
 
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.frequent.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record CourseModel(@NotNull Long id, @NotNull String name, @NotNull SubjectModel subject, @NotNull AppointmentEntryModel[] appointmentEntries, @NotNull ScheduledAppointmentModel[] scheduledAppointments) implements EntityModel
+public record CourseModel(@NotNull Long id, @NotNull String name, @NotNull SubjectModel subject, @NotNull AppointmentEntryModel[] appointmentEntries, @NotNull FrequentAppointmentModel[] frequentAppointments) implements EntityModel
 {
 
     @Override public @NotNull String toString()
@@ -19,7 +19,7 @@ public record CourseModel(@NotNull Long id, @NotNull String name, @NotNull Subje
                 ", name='" + name + '\'' +
                 ", subject=" + subject +
                 ", entries=" + Arrays.toString(appointmentEntries) +
-                ", appointments=" + Arrays.toString(scheduledAppointments) +
+                ", appointments=" + Arrays.toString(frequentAppointments) +
                 '}';
     }
 

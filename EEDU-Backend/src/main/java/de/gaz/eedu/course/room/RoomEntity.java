@@ -28,7 +28,7 @@ public class RoomEntity implements EntityModelRelation<RoomModel>
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
-    private final Set<FrequentAppointmentEntity> scheduledAppointments = new HashSet<>();
+    private final Set<FrequentAppointmentEntity> frequentAppointments = new HashSet<>();
 
     @Column(length = 20, nullable = false) @Basic(optional = false, fetch = FetchType.EAGER) private String name;
 
