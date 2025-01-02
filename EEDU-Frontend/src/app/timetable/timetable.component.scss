@@ -24,6 +24,7 @@
             mwl-calendar-day-view {
                 display: inline-block;
                 min-width: 700px;
+                max-height: 570px;
                 width: 100%;
             }
         }
@@ -49,5 +50,4 @@
     padding: 10px;
     border-radius: 4px;
     color: var(--text-color);
-    background-color: var(--widget-color);
 }

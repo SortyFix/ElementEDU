@@ -301,10 +301,6 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
 
 INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
 
-INSERT INTO scheduled_appointment_entity (course_id, room_id, start_time_stamp, until_time_stamp, duration, frequency) VALUES
-        (1, 1, 1731779748, 1751989748, 2700, 7),
-        (2, 2, 1731778748, 1751999748, 4000, 6);
-
 INSERT INTO user_groups (group_id, user_id) VALUES
        (1, 5),   -- Sara Müller (teacher)
        (1, 6),   -- Tom Bauer (teacher)

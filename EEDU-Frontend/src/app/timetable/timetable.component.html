@@ -5,7 +5,7 @@
             <div class="calendar-wrapper">
                 <app-calendar-controls #controls></app-calendar-controls>
                 <div class="scrollable-container">
-                    <mwl-calendar-month-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Month"
+                    <mwl-calendar-month-view *ngIf="controls.viewType === CalendarView.Month"
                                              [viewDate]="controls.viewDate"
                                              [events]="events"
                                              [locale]="'en-GB'"
@@ -13,14 +13,14 @@
                                              (dayClicked)="onDayClicked($event.day)"
                                              (eventClicked)="onEventClicked($event.event)">
                     </mwl-calendar-month-view>
-                    <mwl-calendar-week-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Week"
+                    <mwl-calendar-week-view *ngIf="controls.viewType === CalendarView.Week"
                                             [viewDate]="controls.viewDate"
                                             [events]="events"
                                             [locale]="'en-GB'"
                                             [weekStartsOn]="1"
                                             (eventClicked)="onEventClicked($event.event)">
                     </mwl-calendar-week-view>
-                    <mwl-calendar-day-view *ngIf="events.length != 0 && controls.viewType === CalendarView.Day"
+                    <mwl-calendar-day-view *ngIf="controls.viewType === CalendarView.Day"
                                            [viewDate]="controls.viewDate"
                                            [events]="events"
                                            [locale]="'en-GB'"
@@ -36,7 +36,9 @@
             <!-- Mini Calendar and Events on-->
             <div class="info-box"
                  [style.margin-top]="wrap ? '5px' : '0'"
-                 [style.margin-left]="!wrap ? '5px' : '0'">
+                 [style.margin-left]="!wrap ? '5px' : '0'"
+                 [style.max-width]="wrap ? null : '350px'"
+            >
                 @if(!wrap)
                 {
                     <mat-calendar [(selected)]="controls.viewDate"></mat-calendar>
