@@ -11,7 +11,7 @@ import {
     CalendarWeekModule,
 } from "angular-calendar";
 import {CourseModel} from "../user/courses/models/course-model";
-import {DOCUMENT, NgIf} from "@angular/common";
+import {DOCUMENT, NgForOf, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {FormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
@@ -42,6 +42,7 @@ import {Observable} from "rxjs";
         MatCalendar,
         MatDivider,
         MatButton,
+        NgForOf,
     ],
     providers: [
         {
@@ -58,6 +59,13 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
     private _events: CalendarEvent[] = []
+
+    private _selectedEvent?: CalendarEvent;
+
+
+    protected get selectedEvent(): CalendarEvent | undefined {
+        return this._selectedEvent;
+    }
 
     constructor(
         private _courseService: CourseService,
@@ -84,16 +92,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
         this.courseService.fetchCourses().subscribe();
     }
 
-    protected get currentEvents(): CalendarEvent[] {
-        return this.events.filter((event: CalendarEvent): boolean => {
-
-            const viewDate: Date = this.controls?.viewDate;
-            const eventDate: Date = event.start;
-
-            return viewDate.getFullYear() === eventDate.getFullYear() &&
-                viewDate.getMonth() === eventDate.getMonth() &&
-                viewDate.getDate() === eventDate.getDate();
-        });
+    protected get nextEvents(): CalendarEvent[] {
+        const refDate: Date = new Date();
+        return this.events.filter((event: CalendarEvent): boolean => event.start > refDate)
+            .sort((a: CalendarEvent, b: CalendarEvent): number => a.start.getTime() - b.start.getTime())
+            .slice(0, 3);
     }
 
     /**
@@ -115,7 +118,12 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     protected onEventClicked(event: CalendarEvent): void
     {
-        console.log(event.title + " was clicked");
+        this.selectedEvent = event;
+    }
+
+
+    private set selectedEvent(value: CalendarEvent) {
+        this._selectedEvent = value;
     }
 
     protected dateToString(date: Date): string {
@@ -213,4 +221,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private get courseService(): CourseService {
         return this._courseService;
     }
+
+    protected readonly AppointmentEntryModel = AppointmentEntryModel;
 }

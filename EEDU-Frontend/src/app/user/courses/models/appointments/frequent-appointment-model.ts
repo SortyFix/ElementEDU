@@ -1,10 +1,18 @@
 import {AppointmentEntryModel} from "./appointment-entry-model";
 import {CalendarEvent} from "angular-calendar";
+import {RoomModel} from "../../room/room-model";
 
 export class FrequentAppointmentModel {
 
     public constructor(
-        public readonly id: number, public readonly _start: number, public readonly _end: number, public readonly _duration: number, public readonly _period: number, public readonly _attachedEntries: AppointmentEntryModel[]) {}
+        public readonly id: number,
+        public readonly _start: number,
+        public readonly _end: number,
+        public readonly _duration: number,
+        public readonly _period: number,
+        public readonly _attachedEntries: AppointmentEntryModel[],
+        private readonly _room?: RoomModel,
+    ) {}
 
     public static fromObject(object: any, attachedEntries: AppointmentEntryModel[]): FrequentAppointmentModel {
         return new FrequentAppointmentModel(
@@ -13,7 +21,8 @@ export class FrequentAppointmentModel {
             object.end,
             object.duration,
             object.period,
-            attachedEntries
+            attachedEntries,
+            object.room,
         );
     }
 
@@ -74,7 +83,8 @@ export class FrequentAppointmentModel {
                 },
                 draggable: false,
                 meta: {
-                    description: "I love trees"
+                    type: FrequentAppointmentModel,
+                    eventData: this
                 }
             });
         }

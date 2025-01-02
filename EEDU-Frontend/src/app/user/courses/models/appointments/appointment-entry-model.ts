@@ -1,14 +1,16 @@
 import {CalendarEvent} from "angular-calendar";
 import {AssignmentModel} from "./assignment-model";
+import {RoomModel} from "../../room/room-model";
 
 export class AppointmentEntryModel {
 
     constructor(public readonly id: number,
-                private readonly _attachedScheduled: number | null,
                 private readonly _start: number,
                 private readonly _duration: number,
                 private readonly _description: string,
-                public readonly assignment: AssignmentModel | null) {}
+                private readonly _attachedScheduled?: number,
+                private readonly _room?: RoomModel,
+                public readonly assignment?: AssignmentModel) {}
 
     public equalsStart(time: number): boolean {
         return this._start === time;
@@ -39,10 +41,11 @@ export class AppointmentEntryModel {
     public static fromObject(object: any): AppointmentEntryModel {
         return new AppointmentEntryModel(
             object.id,
-            object.attachedScheduled,
             object.start,
             object.duration,
             object.description,
+            object.attachedScheduled,
+            object.room && RoomModel.fromObject(object.room),
             object.assignment && AssignmentModel.fromObject(object.assignment)
         );
     }
@@ -63,6 +66,10 @@ export class AppointmentEntryModel {
                 secondary: '#0f0',
             },
             draggable: false,
+            meta: {
+                type: AppointmentEntryModel,
+                eventData: this
+            }
         }
     }
 }

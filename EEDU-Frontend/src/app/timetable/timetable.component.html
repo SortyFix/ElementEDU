@@ -44,24 +44,12 @@
                     <mat-calendar [(selected)]="controls.viewDate"></mat-calendar>
                     <mat-divider></mat-divider>
                 }
-                <h4 class="mat-title" [style.text-align]="'center'">Events on {{ dateToString(controls.viewDate) }}</h4>
+                <h4 class="mat-title" [style.text-align]="'center'">Upcoming homework & tests</h4>
                 <div class="upcoming-events-container">
-                    <mat-list>
+                    <mat-list *ngFor="let event of nextEvents">
                         <mat-list-item>
-                            <span matListItemTitle>05.12.2024</span>
-                            <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
-                        </mat-list-item>
-                        <mat-list-item>
-                            <span matListItemTitle>15.11.2024</span><br>
-                            <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
-                        </mat-list-item>
-                        <mat-list-item>
-                            <span matListItemTitle>04.11.2024</span>
-                            <span matListItemLine>Chemistry: Organic Compounds Test</span>
-                        </mat-list-item>
-                        <mat-list-item>
-                            <span matListItemTitle>25.12.2024</span>
-                            <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
+                            <span matListItemTitle>{{ dateToString(event.start) }}</span>
+                            <span matListItemLine>{{ event.title }}</span>
                         </mat-list-item>
                     </mat-list>
                 </div>
@@ -70,38 +58,13 @@
     </div>
 
     <div class="appointment-box">
-        <h4 class="mat-title">Current Selected Appointment</h4>
+        <h4 class="mat-title" style="text-align: center">Current Selected Appointment</h4>
 
-        <!--
-        <h3 class="mat-title">Upcoming Homeworks & Tests</h3>
-        <mat-list>
-            <mat-list-item>
-                <span matListItemTitle>05.12.2024</span>
-                <span matListItemLine>Mathematics: Algebra and Geometry Test</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>15.11.2024</span><br>
-                <span matListItemLine>Physics: Mechanics & Kinematics Assessment</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>04.11.2024</span>
-                <span matListItemLine>Chemistry: Organic Compounds Test</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>06.12.2024</span>
-                <span matListItemLine>Biology: Cell Division Homework</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>13.12.2024</span>
-                <span matListItemLine>History: World War II Assessment</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>25.12.2024</span>
-                <span matListItemLine>Literature: Shakespeare’s Macbeth Quiz</span>
-            </mat-list-item>
-        </mat-list>
+        @if(selectedEvent?.meta.type === AppointmentEntryModel)
+        {
 
-    --></div>
+        }
+    </div>
 
 </div>
 
