@@ -4,19 +4,18 @@
     text-align: center;
     padding: 20px;
     border-radius: 20px;
-    max-height: 80vh;  /* Set max height for the dialog */
+    max-height: 80vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;  /* Hide overflow from dialog content */
-}
+    overflow: hidden;
 
 .user-list {
-    width: 100%;  /* Take up the full width of the dialog */
+    width: 100%;
     flex-grow: 1;
-    overflow-y: auto;  /* Make the list scrollable */
-    max-height: 500px;  /* Set a fixed height for the scrollable list */
-    margin-top: 10px;  /* Optional: Add some spacing above the list */
+    overflow-y: auto;
+    max-height: 500px;
+    margin-top: 10px;
 }
 
 .buttons {
@@ -38,4 +37,4 @@
 
 .mat-divider {
     margin: 0;
-}
+}}

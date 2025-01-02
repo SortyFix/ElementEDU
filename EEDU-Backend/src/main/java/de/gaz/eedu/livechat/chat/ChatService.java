@@ -1,11 +1,17 @@
 package de.gaz.eedu.livechat.chat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
+import de.gaz.eedu.livechat.DTO.WebsocketChatEdit;
+import de.gaz.eedu.livechat.DTO.WebsocketMessageCreation;
 import de.gaz.eedu.livechat.WSIdentifiers;
 import de.gaz.eedu.livechat.message.MessageCreateModel;
 import de.gaz.eedu.livechat.message.MessageEntity;
+import de.gaz.eedu.livechat.message.MessageModel;
 import de.gaz.eedu.livechat.message.MessageService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -171,21 +177,22 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      *         or {@link HttpStatus#BAD_REQUEST} if there's an issue with the chat size.
      */
     @Transactional
-    public @NotNull HttpStatus sendMessage(@NotNull Long authorId, @NotNull @DestinationVariable Long chatId, @NotNull @RequestBody String body)
+    public @NotNull HttpStatus sendMessage(@NotNull String json) throws JsonProcessingException
     {
-        UserEntity author = userService.loadEntityById(authorId).orElse(null);
+        WebsocketMessageCreation message = deserializeJSON(json, WebsocketMessageCreation.class);
+        UserEntity author = userService.loadEntityById(message.authorId()).orElse(null);
 
-        return loadEntityById(chatId).map(chatEntity -> {
+        return loadEntityById(message.chatId()).map(chatEntity -> {
             MessageCreateModel messageCreateModel = null;
 
-            if (!(chatEntity.getUsers().contains(authorId) && Objects.nonNull(author)))
+            if (!(chatEntity.getUsers().contains(message.authorId()) && Objects.nonNull(author)))
             {
                 return HttpStatus.UNAUTHORIZED;
             }
 
             if(chatEntity.getUsers().size() >= 2)
             {
-                messageCreateModel = new MessageCreateModel(authorId, body, System.currentTimeMillis());
+                messageCreateModel = new MessageCreateModel(message.authorId(), message.body(), System.currentTimeMillis());
             }
             
             if(Objects.isNull(messageCreateModel))
@@ -195,10 +202,18 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
 
             MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
             chatEntity.getMessages().add(messageEntity.getMessageId());
-            messagingTemplate.convertAndSend(wsIdentifiers.getBroker() + "/" + chatId, messageEntity.toModel());
+            System.out.println(chatEntity.getMessages());
+            messagingTemplate.
+                    convertAndSend(wsIdentifiers.getBroker() + "/" + message.chatId(), messageEntity.toModel());
 
             return HttpStatus.OK;
         }).orElse(HttpStatus.UNAUTHORIZED);
+    }
+
+    public <T> T deserializeJSON(@NotNull String json, @NotNull Class<T> dto) throws JsonProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(json, dto);
     }
 
     public String testMessage(@NotNull String string)
@@ -222,16 +237,34 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * @throws ResponseStatusException with NOT_FOUND if the requested chat could not be found, and UNAUTHORIZED if the given user is not found inside the {@code users} attribute of the ChatEntity.
      */
     @Transactional
-    public ResponseEntity<ChatModel> getChatData(@NotNull Long userId, @NotNull @DestinationVariable Long chatId)
+    public ChatModel getChatData(@NotNull String json) throws JsonProcessingException
     {
-        return loadEntityById(chatId).map(chatEntity -> {
-            if(chatEntity.getUsers().contains(userId))
+        WebsocketChatEdit dto = deserializeJSON(json, WebsocketChatEdit.class);
+        return loadEntityById(dto.chatId()).map(chatEntity -> {
+            if(chatEntity.getUsers().contains(dto.userId()))
             {
-                return ResponseEntity.ok(chatEntity.toModel());
+                return chatEntity.toModel();
             }
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
+
+    @Transactional
+    public @NotNull Optional<MessageModel[]> getMessages(@NotNull Long userId, @NotNull Long chatId)
+    {
+        ChatEntity chatEntity = loadEntityById(chatId).orElseThrow(() -> new EntityUnknownException(chatId));
+        return userService.loadEntityById(userId).map(userEntity -> {
+            if(chatEntity.getUsers().contains(userEntity.getId()))
+            {
+                System.out.println("Returning...");
+                return chatEntity.getMessages().stream().map(id ->
+                        messageService.loadEntityById(id).orElseThrow(() -> new EntityUnknownException(chatId)).toModel()).toArray(MessageModel[]::new);
+            }
+            System.out.println("Throw U");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        });
+    }
+
 
     public HttpStatus holdMessage(@NotNull Long userId, @NotNull @DestinationVariable Long chatId)
     {

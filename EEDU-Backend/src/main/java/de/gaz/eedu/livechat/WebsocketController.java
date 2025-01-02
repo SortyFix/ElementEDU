@@ -1,7 +1,11 @@
 package de.gaz.eedu.livechat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import de.gaz.eedu.livechat.DTO.WebsocketChatEdit;
 import de.gaz.eedu.livechat.chat.ChatModel;
 import de.gaz.eedu.livechat.chat.ChatService;
+import de.gaz.eedu.livechat.message.MessageModel;
+import de.gaz.eedu.livechat.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,7 @@ import java.util.List;
 public class WebsocketController
 {
     private final ChatService chatService;
+    private final MessageService messageService;
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
@@ -42,16 +47,28 @@ public class WebsocketController
         return ResponseEntity.ok(chatService.generateWebsocketToken(userId).jwt());
     }
 
-    @MessageMapping("/{chatId}/send")
-    public HttpStatus sendMessage(@AuthenticationPrincipal Long authorId, @NotNull @DestinationVariable Long chatId, @NotNull @RequestBody String body)
+    @MessageMapping("/send")
+    public HttpStatus sendMessage(@NotNull String json)
     {
-        return chatService.sendMessage(authorId, chatId, body);
+        try {
+            return chatService.sendMessage(json);
+        } catch (JsonProcessingException e) {
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 
-    @MessageMapping("{chatId}/get")
-    public ResponseEntity<ChatModel> getChatData(@AuthenticationPrincipal Long userId, @NotNull @DestinationVariable Long chatId)
+    @PostMapping("/get/chat")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MessageModel[]> getMessages(@AuthenticationPrincipal Long userId, @NotNull @RequestBody Long chatId)
     {
-        return chatService.getChatData(userId, chatId);
+        return ResponseEntity.ok(chatService.getMessages(userId, chatId).orElse(new MessageModel[]{}));
+    }
+
+    @GetMapping("/get")
+    @PreAuthorize("isAuthenticated()")
+    public ChatModel getChatData(@NotNull String json) throws JsonProcessingException
+    {
+        return chatService.getChatData(json);
     }
 
     @MessageMapping("/hold/{messageId]}")

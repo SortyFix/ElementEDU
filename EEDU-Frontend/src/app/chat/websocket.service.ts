@@ -1,16 +1,22 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {Stomp} from "@stomp/stompjs";
 import {AuthenticationService} from "../user/authentication/authentication.service";
 import {UserService} from "../user/user.service";
 import {HttpClient} from "@angular/common/http";
+import {merge, Observable} from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
-export class WebsocketService {
+export class WebsocketService implements OnInit {
     private stompClient: any;
 
     constructor(protected userService: UserService, protected authenticationService: AuthenticationService, protected http: HttpClient) {
+        this.connect();
+    }
+
+    ngOnInit(): void {
+        // idk if i need this
         this.connect();
     }
 
@@ -26,10 +32,23 @@ export class WebsocketService {
         })
     }
 
-    public listen(topic: string) {
-        return this.stompClient.subscribe(`/topic/${topic}`,(message: any) => {
-            console.log('Backend says: ', message.body);
-        });
+    public listen<T>(topic: string): Observable<T> {
+        return new Observable<T>(observer => {
+            const subscription = this.stompClient.subscribe(`/topic/${topic}`,(message: any) => {
+                console.log('Backend says: ', message.body);
+                const parsedMessage: T = JSON.parse(message.body);
+                observer.next(parsedMessage);
+            });
+
+            return () => {
+                subscription.unsubscribe();
+            }
+        })
+    }
+
+    public multiListen<T>(topics: string[]): Observable<T> {
+        const observables = topics.map(topic => this.listen<T>(topic));
+        return merge(...observables);
     }
 
     private authenticateWebsocket() {

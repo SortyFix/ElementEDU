@@ -10,7 +10,7 @@ import {MatIcon} from "@angular/material/icon";
 import {NgForOf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {UserService} from "../../user/user.service";
-import {ChatModel} from "../chat-model";
+import {ChatModel} from "../models/chat-model";
 
 @Component({
   selector: 'app-chat-creation',
