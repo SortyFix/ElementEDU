@@ -9,10 +9,10 @@
             <mat-datepicker #datepicker></mat-datepicker>
         </mat-form-field>
         <app-general-selection-input
-            *ngIf="rooms.length > 0"
+            *ngIf="rooms().length > 0"
             label="Room"
             formControlName="room"
-            [values]="rooms" style="flex: 1">
+            [values]="rooms()" style="flex: 1">
         </app-general-selection-input>
     </div>
 

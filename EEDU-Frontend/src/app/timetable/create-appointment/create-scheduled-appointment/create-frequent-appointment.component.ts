@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
@@ -37,10 +37,10 @@ import {GeneralSelectionInput} from "../general-selection-input/general-selectio
 })
 export class CreateFrequentAppointmentComponent {
 
+    public readonly rooms: InputSignal<RoomModel[]> = input<RoomModel[]>([]);
     protected readonly DurationType: typeof DurationType = DurationType;
     private readonly _form: FormGroup;
     private readonly _date: Date;
-    private _rooms: RoomModel[] = [];
 
     constructor(private readonly _accessibilityService: AccessibilityService, private readonly _roomService: RoomService, formBuilder: FormBuilder) {
         this._date = new Date();
@@ -53,11 +53,6 @@ export class CreateFrequentAppointmentComponent {
             frequency: [604800000, Validators.required],
         });
 
-        this._roomService.fetchRooms().subscribe(((rooms: RoomModel[]): void => { this._rooms = rooms; }));
-    }
-
-    protected get rooms(): RoomModel[] {
-        return this._rooms;
     }
 
     public get form(): FormGroup {

@@ -1,5 +1,15 @@
 <form [formGroup]="form">
     <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+
+    <app-general-selection-input
+        *ngIf="rooms().length > 0"
+        label="Room (Optional)"
+        formControlName="room"
+        [values]="rooms()"
+        [allowNull]="true"
+    >
+    </app-general-selection-input>
+
     <mat-tab-group animationDuration="200ms">
         <mat-tab label="Duration">
             <div class="duration-container">

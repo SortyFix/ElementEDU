@@ -20,6 +20,7 @@ import {NgIf} from "@angular/common";
 import {FrequentAppointmentCreateModel} from "../../user/courses/models/appointments/frequent-appointment-create-model";
 import {RoomModel} from "../../user/courses/room/room-model";
 import {GeneralSelectionInput} from "./general-selection-input/general-selection-input.component";
+import {RoomService} from "../../user/courses/room/room.service";
 
 @Component({
   selector: 'app-create-appointment',
@@ -54,7 +55,8 @@ export class CreateAppointmentComponent {
     @ViewChild('frequent') private _frequent!: CreateFrequentAppointmentComponent;
     private readonly _form: FormGroup;
     private _courses!: CourseModel[];
-    private _loading: boolean = false;
+    private _loading: boolean = true;
+    private _rooms: RoomModel[] = [];
 
     protected get loading(): boolean {
         return this._loading;
@@ -64,12 +66,22 @@ export class CreateAppointmentComponent {
         this._loading = value;
     }
 
-    constructor(private dialogReference: DialogRef, private _courseService: CourseService, formBuilder: FormBuilder) {
+    constructor(private dialogReference: DialogRef, private readonly _roomService: RoomService, private readonly _courseService: CourseService, formBuilder: FormBuilder) {
         this._courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             selected: [0, Validators.required],
         });
+
+        this._roomService.fetchRooms().subscribe((value: RoomModel[]): void => {
+            this._rooms = value;
+            this.loading = false;
+        })
+    }
+
+
+    protected get rooms(): RoomModel[] {
+        return this._rooms;
     }
 
     protected get courses(): CourseModel[] {
@@ -96,9 +108,21 @@ export class CreateAppointmentComponent {
 
     private createStandalone(courseId: number): void
     {
-        this._courseService.createAppointment(courseId,
-            [AppointmentCreateModel.fromObject(this._standalone.form.value)])
-            .subscribe({ next: (): void => this.dialogReference.close() });
+        // I must first transform the room model into the room id
+        const object: {
+            start: Date,
+            until: Date,
+            room: RoomModel | number,
+            duration: number,
+        } = this._frequent.form.value;
+        object.room = (object.room as RoomModel)?.id;
+
+        this._courseService.createAppointment(courseId, [AppointmentCreateModel.fromObject(object as {
+            start: Date,
+            until: Date,
+            room: number,
+            duration: number,
+        })]).subscribe({ next: (): void => this.dialogReference.close() });
     }
 
     private createFrequent(courseId: number): void
@@ -130,12 +154,10 @@ export class CreateAppointmentComponent {
 
         switch (this.form.get('selected')?.value)
         {
-            case 0:
-                return this._standalone.form.valid;
-            case 1:
-                return this._frequent.form.valid;
+            case 0: return this._standalone.form.valid;
+            case 1: return this._frequent.form.valid;
+            default: return false;
         }
-        return false;
     }
 
     protected get form(): FormGroup {

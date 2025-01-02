@@ -1,8 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
+import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
+import {RoomModel} from "../../../user/courses/room/room-model";
+import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-create-standalone-appointment',
@@ -12,13 +15,16 @@ import {DurationPickerComponent, DurationType} from "../duration-picker/duration
         ReactiveFormsModule,
         MatTabGroup,
         MatTab,
-        DurationPickerComponent
+        DurationPickerComponent,
+        GeneralSelectionInput,
+        NgIf
     ],
   templateUrl: './create-standalone-appointment.component.html',
   styleUrl: './create-standalone-appointment.component.scss'
 })
 export class CreateStandaloneAppointmentComponent {
 
+    public readonly rooms: InputSignal<RoomModel[]> = input<RoomModel[]>([]);
     protected readonly DurationType: typeof DurationType = DurationType;
     private readonly _form: FormGroup;
 
@@ -26,6 +32,7 @@ export class CreateStandaloneAppointmentComponent {
         this._form = this.formBuilder.group({
             start: [new Date(), Validators.required],
             end: [null /* will be set below */, Validators.required],
+            room: [null], // optional
             duration: [2700000, Validators.required],
         });
 

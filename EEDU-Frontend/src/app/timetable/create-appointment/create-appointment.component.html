@@ -20,12 +20,18 @@
                            (selectedIndexChange)="form.get('selected')?.setValue($event)">
                 <mat-tab label="Appointment">
                     <div class="appointment-content">
-                        <app-create-standalone-appointment #standalone></app-create-standalone-appointment>
+                        <app-create-standalone-appointment
+                            [rooms]="rooms"
+                            #standalone>
+                        </app-create-standalone-appointment>
                     </div>
                 </mat-tab>
                 <mat-tab label="Repeating Appointment">
                     <div class="appointment-content">
-                        <app-create-frequent-appointment #frequent></app-create-frequent-appointment>
+                        <app-create-frequent-appointment
+                            [rooms]="rooms"
+                            #frequent>
+                        </app-create-frequent-appointment>
                     </div>
                 </mat-tab>
             </mat-tab-group>

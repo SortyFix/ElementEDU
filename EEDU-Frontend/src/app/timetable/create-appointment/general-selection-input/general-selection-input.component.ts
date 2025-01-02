@@ -65,6 +65,7 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
     public label: InputSignal<string> = input<string>('');
     public placeholder: InputSignal<string> = input<string>('');
     public values: InputSignal<T[]> = input<T[]>([]);
+    public allowNull: InputSignal<boolean> = input<boolean>(false);
 
     private readonly _filteredValues!: Observable<T[]>;
 
@@ -170,6 +171,12 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      * @public
      */
     public validate(): { invalidCourse: boolean } | null {
+
+        if(this.allowNull() && !this._value)
+        {
+            return null;
+        }
+
         const isValid: boolean = this.values().some((item: T): boolean => item.name === this._value?.name);
         return isValid ? null : { invalidCourse: true };
     }

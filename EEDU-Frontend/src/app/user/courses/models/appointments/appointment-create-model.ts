@@ -4,13 +4,14 @@ export class AppointmentCreateModel
     public constructor(
         private readonly _start: Date,
         private readonly _duration: number,
+        private readonly _room?: number,
         private readonly _description?: string,
         private readonly _assignment?: AppointmentCreateModel, /* TODO add assessment create model */ )
     {}
 
-    public static fromObject(obj: { start: Date, duration: number, description?: string, assignment?: AppointmentCreateModel }): AppointmentCreateModel
+    public static fromObject(obj: { start: Date, duration: number, room?: number, description?: string, assignment?: AppointmentCreateModel }): AppointmentCreateModel
     {
-        return new AppointmentCreateModel(obj.start, obj.duration, obj.description, obj.assignment);
+        return new AppointmentCreateModel(obj.start, obj.duration, obj.room, obj.description, obj.assignment);
     }
 
     public get start(): Date {

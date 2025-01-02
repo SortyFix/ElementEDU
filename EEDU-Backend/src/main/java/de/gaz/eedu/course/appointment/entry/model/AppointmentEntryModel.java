@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 public record AppointmentEntryModel(@NotNull Long id,
                                     @Nullable Long attachedScheduled, // must not have one
-                                    @Nullable RoomModel room,
+                                    @Nullable RoomModel room, // must not have one
                                     @NotNull Long start,
                                     @NotNull Long duration,
                                     @NotNull String description,

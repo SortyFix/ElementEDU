@@ -11,13 +11,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
-public record AppointmentEntryCreateModel(@NotNull Long start, @Nullable Long duration, @Nullable String description,
+public record AppointmentEntryCreateModel(@NotNull Long start, @Nullable Long duration, @Nullable Long room, @Nullable String description,
                                           @Nullable AssignmentCreateModel assignment) implements CreationModel<AppointmentEntryEntity>
 {
 
     public AppointmentEntryCreateModel(@NotNull Long timeStamp)
     {
-        this(timeStamp, null, null, null);
+        this(timeStamp, null, null, null, null);
     }
 
     @Override public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException

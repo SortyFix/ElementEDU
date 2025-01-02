@@ -8,6 +8,7 @@ import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
+import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.course.room.RoomService;
 import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
@@ -54,6 +55,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         return scheduledAppointments.stream().filter(event -> event.inFrequency(timeStamp)).map(event ->
         {
             entity.setDuration(event.getDuration());
+            entity.setRoom(event.getRoom());
             entity.setScheduledAppointment(event);
             return entity;
         }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
@@ -175,6 +177,13 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
                 }
                 entity.setDuration(Duration.ofMillis(currentModel.duration()));
                 entity.setCourse(course);
+
+                if(Objects.nonNull(currentModel.room()))
+                {
+                    RoomEntity room = getRoomService().loadEntityByIDSafe(currentModel.room());
+                    entity.setRoom(room);
+                }
+
                 return entity;
             });
         }).toList();
