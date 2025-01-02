@@ -310,12 +310,14 @@ public class VerificationService
     }
 
     @Contract(pure = true, value = "_ -> new")
-    public @NotNull Cookie authCookie(@Nullable String token)
+    public @NotNull Cookie authCookie(@Nullable GeneratedToken token)
     {
-        Cookie cookie = new Cookie("token", token);
+        boolean isToken = Objects.nonNull(token);
+
+        Cookie cookie = new Cookie("token", isToken ? token.jwt() : null);
         cookie.setPath("/");
         cookie.setDomain("localhost");
-        cookie.setMaxAge(3600);
+        cookie.setMaxAge(isToken ? 1209600 : 0); // two weeks (aka longest token)
         cookie.setHttpOnly(true);
         cookie.setSecure(!development);
         return cookie;
