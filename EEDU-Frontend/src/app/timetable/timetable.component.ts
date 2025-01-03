@@ -22,6 +22,10 @@ import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
 import {MatButton} from "@angular/material/button";
 import {Observable} from "rxjs";
+import {UserService} from "../user/user.service";
+import {DialogRef} from "@angular/cdk/dialog";
+import {MatDialog} from "@angular/material/dialog";
+import {CreateCourseComponent} from "./create-course/create-course.component";
 
 
 @Component({
@@ -68,8 +72,10 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     constructor(
-        private _courseService: CourseService,
-        private _accessibilityService: AccessibilityService,
+        private readonly _dialogRef: MatDialog,
+        private readonly _courseService: CourseService,
+        private readonly _accessibilityService: AccessibilityService,
+        private readonly _userService: UserService,
         @Inject(DOCUMENT) private document: any,
     ) {}
 
@@ -97,6 +103,14 @@ export class TimetableComponent implements OnInit, OnDestroy {
         return this.events.filter((event: CalendarEvent): boolean => event.start > refDate)
             .sort((a: CalendarEvent, b: CalendarEvent): number => a.start.getTime() - b.start.getTime())
             .slice(0, 3);
+    }
+
+    protected createCourse()
+    {
+        this._dialogRef.open(CreateCourseComponent, {
+            width: '600px',
+            disableClose: true
+        })
     }
 
     /**

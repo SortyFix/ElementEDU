@@ -59,7 +59,7 @@
 
     <div class="appointment-box">
         <h4 class="mat-title" style="text-align: center">Current Selected Appointment</h4>
-
+        <button (click)="createCourse()">Create course</button>
         @if(selectedEvent?.meta.type === AppointmentEntryModel)
         {
 

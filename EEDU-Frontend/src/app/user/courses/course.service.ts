@@ -7,6 +7,7 @@ import {AppointmentCreateModel} from "./models/appointments/appointment-create-m
 import {AppointmentEntryModel} from "./models/appointments/appointment-entry-model";
 import {FrequentAppointmentCreateModel} from "./models/appointments/frequent-appointment-create-model";
 import {FrequentAppointmentModel} from "./models/appointments/frequent-appointment-model";
+import {CourseCreateModel} from "./models/course-create-model";
 
 @Injectable({
     providedIn: 'root'
@@ -31,6 +32,23 @@ export class CourseService {
                 return courseModels;
             })
         );
+    }
+
+    public createCourse(course: CourseCreateModel[]): Observable<CourseModel[]>
+    {
+        const url = `${this.BACKEND_URL}/course/create`;
+        return this.http.post<any[]>(url, course.map((current: CourseCreateModel):
+        {
+            name: string;
+            subjectId: number,
+            classId?: number,
+            users: number[]
+        } => current.toPacket), { withCredentials: true }).pipe(
+            map((response: any[]): CourseModel[] =>
+                response.map((item: any): CourseModel => CourseModel.fromObject(item))
+            ),
+            tap(((response: CourseModel[]): void => { this._courseSubject.next([...this.courses, ...response]) }))
+        )
     }
 
     /**

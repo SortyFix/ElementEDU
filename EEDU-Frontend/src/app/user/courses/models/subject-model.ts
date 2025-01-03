@@ -1,10 +1,18 @@
 export class SubjectModel {
     constructor(
-        public readonly id: bigint,
-        public readonly name: string
+        private readonly _id: number,
+        private readonly _name: string
     ) {}
 
     public static fromObject(object: any): SubjectModel {
-        return new SubjectModel(BigInt(object.id), object.name);
+        return new SubjectModel(object.id, object.name);
+    }
+
+    public get id(): number {
+        return this._id;
+    }
+
+    public get name(): string {
+        return this._name;
     }
 }
