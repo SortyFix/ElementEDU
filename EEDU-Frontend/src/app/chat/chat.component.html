@@ -44,7 +44,7 @@
                 <h1 style="align-self: center; margin-bottom: 16px;">Contacts</h1>
                 <mat-divider></mat-divider>
                 <div *ngFor="let x of chatList" style="width: 100%;">
-                    <button mat-flat-button (click)="openChat(x.id)" style="width: 100%; text-align: left; padding-left: 8px; margin-bottom: 0;">
+                    <button mat-flat-button (click)="openChat(x.id); drawer.toggle()" style="width: 100%; text-align: left; padding-left: 8px; margin-bottom: 0;">
                         <mat-icon>person</mat-icon>{{x.chatTitle}}
                     </button>
                     <mat-divider style="margin-top: 0;"></mat-divider>
