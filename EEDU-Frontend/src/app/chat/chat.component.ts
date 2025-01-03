@@ -14,6 +14,13 @@ import {FormsModule} from "@angular/forms";
 import {UserService} from "../user/user.service";
 import {MessageModel} from "./models/message-model";
 import {Subscription} from "rxjs";
+import {
+    MatDrawer,
+    MatDrawerContainer,
+    MatDrawerContent,
+    MatSidenav,
+    MatSidenavContainer
+} from "@angular/material/sidenav";
 
 @Component({
   selector: 'app-chat',
@@ -30,7 +37,12 @@ import {Subscription} from "rxjs";
         MatFormField,
         FormsModule,
         MatIconButton,
-        DatePipe
+        DatePipe,
+        MatSidenav,
+        MatSidenavContainer,
+        MatDrawerContainer,
+        MatDrawerContent,
+        MatDrawer
     ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
@@ -76,6 +88,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
         console.log(JSON.stringify(json));
         this.websocketService.send(`/app/send`, JSON.stringify(json));
+        this.messageContent = "";
     }
 
     public openChat(chatId: bigint)
@@ -116,6 +129,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         {
             this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
         }
+    }
+
+    public isMobile(): boolean {
+        return window.innerWidth <= 768;
     }
 
     protected readonly Number = Number;

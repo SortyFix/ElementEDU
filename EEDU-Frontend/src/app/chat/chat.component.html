@@ -1,53 +1,58 @@
-<div class="main-container" style="display: flex; gap: 16px; padding: 10px;">
-    <!-- Chats Container -->
-    <div class="container" style="flex: 1; max-width: 300px;">
-        <strong>Chats</strong>
-        <mat-divider></mat-divider>
-        <div *ngFor="let x of chatList">
-            <button mat-flat-button (click)="openChat(x.id)" class="button">
-                {{x.chatTitle}}
-                <mat-icon>person</mat-icon>
-            </button>
-            <mat-divider class="mat-divider"></mat-divider>
-        </div>
-        <button mat-flat-button style="margin-top: 10px; width: 100%;" (click)="openDialog()">
-            <mat-icon>add</mat-icon>Create new chat
-        </button>
-    </div>
+<div class="main-container" style="display: flex; gap: 16px; height: 90vh; padding: 10px; bottom: 40px; margin-left: -18px; margin-top: -10px; border-radius: 15px">
 
-    <div *ngIf="!currentChat" class="details-container" style="flex: 2; padding: 16px; background-color: white; border-radius: 8px; display: flex; flex-direction: column;">
-        <h3 style="margin-top: 2px; margin-left: 10px"><strong>Open new chat</strong></h3>
-        <mat-divider></mat-divider>
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 16px; gap: 16px;">
-            <mat-icon>chat</mat-icon>
-            <span><strong>Select</strong> a chat or <strong>create</strong> a new chat <br> room to start chatting!</span>
-        </div>
-    </div>
-
-    <div *ngIf="currentChat" class="details-container" style="flex: 2; padding: 16px; background-color: white; border-radius: 8px; display: flex; flex-direction: column;">
-        <h3 style="margin-top: 2px; margin-left: 10px">
-            <strong>{{ getChatTitle(currentChat) }}</strong>
-        </h3>
-        <mat-divider></mat-divider>
-
-        <div #chatContainer style="max-height: 75vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 8px;">
-            <div *ngFor="let x of currentChatHistory" class="{{me(x) ? 'message-bubble-me' : 'message-bubble'}}">
-                <span class="message-text">{{x.body}}</span>
-                <span class="message-timestamp">{{Number(x.timeStamp) | date:'short'}}</span>
+    <mat-drawer-container style="flex: 1; border-radius: 15px">
+        <div *ngIf="!currentChat" class="details-container" style="flex: 1; height: 95%; padding: 16px; background-color: white; border-radius: 8px; display: flex; flex-direction: column;">
+            <h3 style="margin-top: 2px; margin-left: 10px"><strong>Open new chat</strong></h3>
+            <mat-icon (click)="drawer.toggle()" style="cursor: pointer; margin-bottom: 15px; margin-top: -45px; align-self: flex-end">menu</mat-icon>
+            <mat-divider></mat-divider>
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 16px; gap: 16px;">
+                <mat-icon>chat</mat-icon>
+                <span><strong>Select</strong> a chat or <strong>create</strong> a new chat <br> room to start chatting!</span>
             </div>
         </div>
 
-        <!-- Text Field at the Bottom -->
-        <div style="display: flex; align-items: center; margin-top: auto; margin-bottom: -20px">
-            <mat-form-field appearance="fill" style="flex-grow: 1;">
-                <mat-label>Type a message</mat-label>
-                <input matInput placeholder="Enter your message" [(ngModel)]="messageContent">
-            </mat-form-field>
+        <div *ngIf="currentChat" class="details-container" style="flex: 2; padding: 16px; background-color: white; border-radius: 8px; height: 96%; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin-top: 2px; margin-left: 10px">
+                    <strong>{{ getChatTitle(currentChat) }}</strong>
+                </h3>
+                <mat-icon (click)="drawer.toggle()" style="cursor: pointer; margin-bottom: 15px">menu</mat-icon>
+            </div>
+            <mat-divider></mat-divider>
 
-            <!-- Button aligned to the right -->
-            <button mat-icon-button (click)="sendMessage()" style="margin-bottom: 5px">
-                <mat-icon>send</mat-icon>
-            </button>
+            <div #chatContainer style="max-height: 75vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 8px;">
+                <div *ngFor="let x of currentChatHistory" class="{{me(x) ? 'message-bubble-me' : 'message-bubble'}}" style="{{isMobile() ? 'width: 60vw' : 'width: 25vw'}}">
+                    <span class="message-text">{{x.body}}</span>
+                    <span class="message-timestamp">{{Number(x.timeStamp) | date:'short'}}</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; margin-top: auto; margin-bottom: -20px">
+                <mat-form-field appearance="fill" style="flex-grow: 1;">
+                    <mat-label>Type a message</mat-label>
+                    <input matInput placeholder="Enter your message" (keydown.enter)="sendMessage()" [(ngModel)]="messageContent">
+                </mat-form-field>
+
+                <button mat-icon-button (click)="sendMessage()" style="margin-bottom: 5px">
+                    <mat-icon>send</mat-icon>
+                </button>
+            </div>
         </div>
-    </div>
+        <mat-drawer #drawer mode="over" opened="true" position="end" style="{{isMobile() ? 'width: 100%' : 'width: 20%'}}">
+            <div style="display: flex; flex-direction: column; height: 100%; padding: 16px 8px;">
+                <mat-icon style="align-self: end; cursor:pointer" (click)="drawer.toggle()">close</mat-icon>
+                <h1 style="align-self: center; margin-bottom: 16px;">Contacts</h1>
+                <mat-divider></mat-divider>
+                <div *ngFor="let x of chatList" style="width: 100%;">
+                    <button mat-flat-button (click)="openChat(x.id)" style="width: 100%; text-align: left; padding-left: 8px; margin-bottom: 0;">
+                        <mat-icon>person</mat-icon>{{x.chatTitle}}
+                    </button>
+                    <mat-divider style="margin-top: 0;"></mat-divider>
+                </div>
+                <button mat-flat-button (click)="openDialog()" style="width: 100%; text-align: left; padding-left: 8px; margin-bottom: 0;">
+                    <mat-icon style="margin-top: 2px">add</mat-icon> Add new contact
+                </button>
+            </div>
+        </mat-drawer>
+    </mat-drawer-container>
 </div>

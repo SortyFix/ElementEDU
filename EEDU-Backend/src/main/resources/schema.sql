@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS message_entity
 (
     message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     author_id  BIGINT       NOT NULL,
-    body       VARCHAR(255) NOT NULL,
+    body       VARCHAR(1500) NOT NULL,
     timestamp  BIGINT       NOT NULL,
     status     TINYINT,
     FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
