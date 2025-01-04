@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
+import de.gaz.eedu.course.appointment.AppointmentService;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
@@ -141,16 +142,16 @@ import java.util.Optional;
      * This method first validates and sets the assignment details by delegating to {@link #setAssignment(AssignmentCreateModel)}.
      * If the assignment is valid and successfully set, the entity is saved to the database using the provided {@link CourseService}.
      *
-     * @param courseService the {@link CourseService} instance used to persist the entity; must not be {@code null}.
+     * @param appointmentService the {@link AppointmentService} instance used to persist the entity; must not be {@code null}.
      * @param assignment    the {@link AssignmentCreateModel} containing the assignment details to validate and save, must not be {@code null}.
      * @return {@code true} if the assignment passes validation, is successfully set, and the entity is persisted.{@code false} otherwise.
      * @throws NullPointerException if either {@code courseService} or {@code assignment} is {@code null}.
      */
-    public boolean setAssignment(@NotNull CourseService courseService, @NotNull AssignmentCreateModel assignment)
+    public boolean setAssignment(@NotNull AppointmentService appointmentService, @NotNull AssignmentCreateModel assignment)
     {
         if (setAssignment(assignment))
         {
-            courseService.getAppointmentRepository().save(this);
+            appointmentService.getEntryRepository().save(this);
             return true;
         }
         return false;

@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 //TODO manage access
 
 @RestController
@@ -46,5 +48,11 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
     public @NotNull ResponseEntity<SubjectModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/all")
+    @Override public @NotNull ResponseEntity<Set<SubjectModel>> fetchAll()
+    {
+        return super.fetchAll();
     }
 }

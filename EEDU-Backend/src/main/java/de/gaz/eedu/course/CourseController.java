@@ -1,7 +1,5 @@
 package de.gaz.eedu.course;
 
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
@@ -16,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 //TODO manage access. Yes, I'll do it later
@@ -39,13 +36,6 @@ public class CourseController extends EntityController<CourseService, CourseMode
         UserEntity[] entities = getService().getUserRepository().findAllById(Set.of(users)).toArray(UserEntity[]::new);
         boolean modified = getService().loadEntityByIDSafe(course).attachUsers(getService(), entities);
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
-    }
-
-    @PostMapping("/appointment/{course}/schedule/standalone")
-    public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
-
-        List<AppointmentEntryModel> createdEntities = getService().createAppointment(course,  Set.of(createModel));
-        return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
     }
 
     @GetMapping("{course}/detach") public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
@@ -77,7 +67,7 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return ResponseEntity.ok(getService().getCourses(user));
     }
 
-    @GetMapping("/get/courses/")
+    @GetMapping("/get/all")
     public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
     {
         return getCourses(user);

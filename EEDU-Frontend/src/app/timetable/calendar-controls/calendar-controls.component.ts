@@ -1,4 +1,4 @@
-import {Component, input, InputSignal} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatButtonToggle, MatButtonToggleGroup} from "@angular/material/button-toggle";
 import {CalendarView} from "angular-calendar";
 import {MatIcon} from "@angular/material/icon";
@@ -6,10 +6,9 @@ import {FormsModule} from "@angular/forms";
 import {MatIconButton} from "@angular/material/button";
 import {UserService} from "../../user/user.service";
 import {NgIf} from "@angular/common";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatDialog} from "@angular/material/dialog";
 import {CreateAppointmentComponent} from "../create-appointment/create-appointment.component";
-import {CourseModel} from "../../user/courses/models/course-model";
-import {MatChip, MatChipSet} from "@angular/material/chips";
+import {MatChip} from "@angular/material/chips";
 
 @Component({
   selector: 'app-calendar-controls',
@@ -122,7 +121,7 @@ export class CalendarControlsComponent {
 
     protected createAppointment(): void
     {
-        const dialogRef: MatDialogRef<CreateAppointmentComponent> = this._dialog.open(CreateAppointmentComponent, {
+        this._dialog.open(CreateAppointmentComponent, {
             width: '600px',
             disableClose: true,
         })

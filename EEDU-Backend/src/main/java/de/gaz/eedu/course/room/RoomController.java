@@ -3,14 +3,13 @@ package de.gaz.eedu.course.room;
 import de.gaz.eedu.course.room.model.RoomCreateModel;
 import de.gaz.eedu.course.room.model.RoomModel;
 import de.gaz.eedu.entity.EntityController;
+import de.gaz.eedu.exception.CreationException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -21,7 +20,13 @@ public class RoomController extends EntityController<RoomService, RoomModel, Roo
 {
     private final RoomService service;
 
-    @GetMapping("/all")
+    @PostMapping("/create") @Override
+    public @NotNull ResponseEntity<RoomModel[]> create(@NotNull @RequestBody RoomCreateModel[] model) throws CreationException
+    {
+        return super.create(model);
+    }
+
+    @GetMapping("/get/all")
     @Override public @NotNull ResponseEntity<Set<RoomModel>> fetchAll()
     {
         return super.fetchAll();

@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
-import {CourseModel} from "../../user/courses/models/course-model";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {CourseService} from "../../user/courses/course.service";
 import {MatDialogClose} from "@angular/material/dialog";
@@ -13,14 +12,18 @@ import {
 import {
     CreateFrequentAppointmentComponent
 } from "./create-frequent-appointment/create-frequent-appointment.component";
-import {AppointmentCreateModel} from "../../user/courses/models/appointments/appointment-create-model";
 import {DialogRef} from "@angular/cdk/dialog";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
-import {FrequentAppointmentCreateModel} from "../../user/courses/models/appointments/frequent-appointment-create-model";
 import {RoomModel} from "../../user/courses/room/room-model";
 import {GeneralSelectionInput} from "./general-selection-input/general-selection-input.component";
 import {RoomService} from "../../user/courses/room/room.service";
+import {AppointmentService} from "../../user/courses/appointment/appointment.service";
+import {CourseModel} from "../../user/courses/course-model";
+import {AppointmentCreateModel} from "../../user/courses/appointment/entry/appointment-create-model";
+import {
+    FrequentAppointmentCreateModel
+} from "../../user/courses/appointment/frequent/frequent-appointment-create-model";
 
 @Component({
   selector: 'app-create-appointment',
@@ -58,16 +61,13 @@ export class CreateAppointmentComponent {
     private _loading: boolean = true;
     private _rooms: RoomModel[] = [];
 
-    protected get loading(): boolean {
-        return this._loading;
-    }
-
-    private set loading(value: boolean) {
-        this._loading = value;
-    }
-
-    constructor(private dialogReference: DialogRef, private readonly _roomService: RoomService, private readonly _courseService: CourseService, formBuilder: FormBuilder) {
-        this._courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
+    constructor(
+        private dialogReference: DialogRef,
+        private readonly _roomService: RoomService,
+        private readonly _appointmentService: AppointmentService,
+        courseService: CourseService,
+        formBuilder: FormBuilder) {
+        courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             selected: [0, Validators.required],
@@ -77,15 +77,6 @@ export class CreateAppointmentComponent {
             this._rooms = value;
             this.loading = false;
         })
-    }
-
-
-    protected get rooms(): RoomModel[] {
-        return this._rooms;
-    }
-
-    protected get courses(): CourseModel[] {
-        return this._courses;
     }
 
     protected onSubmit(): void {
@@ -106,6 +97,48 @@ export class CreateAppointmentComponent {
         }
     }
 
+    protected canSubmit(): boolean {
+        if(!this._standalone || !this._frequent || this.form.invalid)
+        {
+            return false;
+        }
+
+        switch (this.form.get('selected')?.value)
+        {
+            case 0: return this._standalone.form.valid;
+            case 1: return this._frequent.form.valid;
+            default: return false;
+        }
+    }
+
+    protected get loading(): boolean {
+        return this._loading;
+    }
+
+    protected get roomService(): RoomService {
+        return this._roomService;
+    }
+
+    protected get appointmentService(): AppointmentService {
+        return this._appointmentService;
+    }
+
+    protected get rooms(): RoomModel[] {
+        return this._rooms;
+    }
+
+    protected get courses(): CourseModel[] {
+        return this._courses;
+    }
+
+    protected get form(): FormGroup {
+        return this._form;
+    }
+
+    private set loading(value: boolean) {
+        this._loading = value;
+    }
+
     private createStandalone(courseId: number): void
     {
         // I must first transform the room model into the room id
@@ -117,7 +150,7 @@ export class CreateAppointmentComponent {
         } = this._standalone.form.value;
         object.room = (object.room as RoomModel)?.id;
 
-        this._courseService.createAppointment(courseId, [AppointmentCreateModel.fromObject(object as {
+        this.appointmentService.createAppointment(courseId, [AppointmentCreateModel.fromObject(object as {
             start: Date,
             until: Date,
             room: number,
@@ -137,30 +170,12 @@ export class CreateAppointmentComponent {
         } = this._frequent.form.value;
         object.room = (object.room as RoomModel).id;
 
-        this._courseService.createFrequent(courseId, [FrequentAppointmentCreateModel.fromObject((object as {
+        this.appointmentService.createFrequent(courseId, [FrequentAppointmentCreateModel.fromObject((object as {
             start: Date,
             until: Date,
             room: number,
             duration: number,
             frequency: number
         }))]).subscribe({ next: (): void => this.dialogReference.close() });
-    }
-
-    protected canSubmit(): boolean {
-        if(!this._standalone || !this._frequent || this.form.invalid)
-        {
-            return false;
-        }
-
-        switch (this.form.get('selected')?.value)
-        {
-            case 0: return this._standalone.form.valid;
-            case 1: return this._frequent.form.valid;
-            default: return false;
-        }
-    }
-
-    protected get form(): FormGroup {
-        return this._form;
     }
 }

@@ -10,22 +10,23 @@ import {
     CalendarView,
     CalendarWeekModule,
 } from "angular-calendar";
-import {CourseModel} from "../user/courses/models/course-model";
 import {DOCUMENT, NgForOf, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {FormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
-import {AppointmentEntryModel} from "../user/courses/models/appointments/appointment-entry-model";
-import {FrequentAppointmentModel} from "../user/courses/models/appointments/frequent-appointment-model";
 import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
 import {MatButton} from "@angular/material/button";
 import {Observable} from "rxjs";
 import {UserService} from "../user/user.service";
-import {DialogRef} from "@angular/cdk/dialog";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateCourseComponent} from "./create-course/create-course.component";
+import {CourseModel} from "../user/courses/course-model";
+import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
+import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/frequent-appointment-model";
+import {CreateRoomComponent} from "./create-room/create-room.component";
+import {CreateSubjectComponent} from "./create-subject/create-subject.component";
 
 
 @Component({
@@ -108,6 +109,22 @@ export class TimetableComponent implements OnInit, OnDestroy {
     protected createCourse()
     {
         this._dialogRef.open(CreateCourseComponent, {
+            width: '600px',
+            disableClose: true
+        })
+    }
+
+    protected createSubject()
+    {
+        this._dialogRef.open(CreateSubjectComponent, {
+            width: '600px',
+            disableClose: true
+        })
+    }
+
+    protected createRoom()
+    {
+        this._dialogRef.open(CreateRoomComponent, {
             width: '600px',
             disableClose: true
         })

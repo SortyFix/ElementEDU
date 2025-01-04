@@ -1,9 +1,11 @@
-package de.gaz.eedu.course.appointment.frequent;
+package de.gaz.eedu.course.appointment;
 
-import de.gaz.eedu.course.CourseEntity;
-import de.gaz.eedu.course.appointment.frequent.model.InternalFrequentAppointmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
+import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
+import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.InternalFrequentAppointmentCreateModel;
 import de.gaz.eedu.entity.EntityController;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,17 +16,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Slf4j @RestController @RequestMapping("/api/v1/course/appointment") @RequiredArgsConstructor
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/course/appointment")
+@RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class FrequentAppointmentController extends EntityController<FrequentAppointmentService, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class AppointmentController extends EntityController<AppointmentService, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
-    // TODO ?? What is this class about?
-    private final FrequentAppointmentService service;
-
+    private final AppointmentService service;
 
     @PostMapping("/{course}/schedule/frequent") public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
     {
@@ -40,23 +44,28 @@ public class FrequentAppointmentController extends EntityController<FrequentAppo
     @PostMapping("/{course}/unschedule/frequent") public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
     {
         log.info("Received incoming request for unscheduling frequent appointment(s) {} from course {}.", appointments, course);
-
-        CourseEntity courseEntity = getService().getCourseService().loadEntityByIDSafe(course);
-        boolean modified = courseEntity.unscheduleFrequent(getService().getCourseService(), appointments);
+        boolean modified = getService().unscheduleFrequent(course, appointments);
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @PostMapping("/{course}/schedule/standalone")
+    public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
+
+        List<AppointmentEntryModel> createdEntities = getService().createAppointment(course,  Set.of(createModel));
+        return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
+    }
+
+    @DeleteMapping("/frequent/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<FrequentAppointmentModel> getData(@PathVariable @NotNull Long id)
+    @GetMapping("/frequent/get/{id}") @Override public @NotNull ResponseEntity<FrequentAppointmentModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }
 
-    @GetMapping("/get/all")
+    @GetMapping("/frequent/get/all")
     @Override public @NotNull ResponseEntity<Set<FrequentAppointmentModel>> fetchAll()
     {
         return super.fetchAll();

@@ -60,6 +60,8 @@
     <div class="appointment-box">
         <h4 class="mat-title" style="text-align: center">Current Selected Appointment</h4>
         <button (click)="createCourse()">Create course</button>
+        <button (click)="createSubject()">Create subject</button>
+        <button (click)="createRoom()">Create room</button>
         @if(selectedEvent?.meta.type === AppointmentEntryModel)
         {
 

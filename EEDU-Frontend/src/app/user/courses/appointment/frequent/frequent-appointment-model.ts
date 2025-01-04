@@ -1,6 +1,6 @@
-import {AppointmentEntryModel} from "./appointment-entry-model";
 import {CalendarEvent} from "angular-calendar";
 import {RoomModel} from "../../room/room-model";
+import {AppointmentEntryModel} from "../entry/appointment-entry-model";
 
 export class FrequentAppointmentModel {
 

@@ -1,12 +1,4 @@
-<mat-card>
-    <mat-progress-bar class="loading-bar" mode="indeterminate" *ngIf="loading"></mat-progress-bar>
-    <div class="overlay" *ngIf="loading"></div>
-    <mat-card-header style="display: flex; justify-content: space-between">
-        <mat-card-title>Create new Course</mat-card-title>
-        <button mat-icon-button mat-dialog-close>
-            <mat-icon>close</mat-icon>
-        </button>
-    </mat-card-header>
+<app-general-create title="Create new Course">
     <mat-card-content class="content-wrapper">
 
         <mat-form-field appearance="outline">
@@ -14,5 +6,17 @@
             <input type="text" matInput/>
         </mat-form-field>
 
+        <app-general-selection-input label="Subject"></app-general-selection-input>
+
+        <!--public constructor(-->
+        <!--private readonly _name: string,-->
+        <!--private readonly _subjectId: number,-->
+        <!--private readonly _classId?: number,-->
+        <!--private readonly _users: number[] = []-->
+        <!--) {}-->
     </mat-card-content>
-</mat-card>
+    <mat-card-actions align="end">
+        <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
+        <button mat-stroked-button type="submit">Submit</button>
+    </mat-card-actions>
+</app-general-create>
