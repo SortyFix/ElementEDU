@@ -7,7 +7,7 @@ import {HttpClient} from "@angular/common/http";
 @Injectable({
   providedIn: 'root'
 })
-export class SubjectServiceService {
+export class SubjectService {
 
     private readonly BACKEND_URL: string = environment.backendUrl;
     private readonly _subjectSubject: BehaviorSubject<SubjectModel[]> = new BehaviorSubject<SubjectModel[]>([]);
@@ -15,7 +15,7 @@ export class SubjectServiceService {
     constructor(private readonly _http: HttpClient,) { }
 
     public fetchSubjects(): Observable<SubjectModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/subjects/get/all`;
+        const url: string = `${this.BACKEND_URL}/course/subject/get/all`;
         return this.http.get<any[]>(url, { withCredentials: true }).pipe(
             map((subject: any[]): SubjectModel[] =>
                 subject.map((item: any): SubjectModel => SubjectModel.fromObject(item))
@@ -26,7 +26,7 @@ export class SubjectServiceService {
 
     public createSubject(subject: { name: string }[]): Observable<SubjectModel[]>
     {
-        const url: string = `${this.BACKEND_URL}/course/subject/create/`;
+        const url: string = `${this.BACKEND_URL}/course/subject/create`;
         return this.http.post<any[]>(url, subject, { withCredentials: true }).pipe(
             map((response: any[]): SubjectModel[] =>
                 response.map((item: any): SubjectModel => SubjectModel.fromObject(item))

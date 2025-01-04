@@ -15,7 +15,7 @@ export class CourseService {
     constructor(private http: HttpClient) { }
 
     public fetchCourses(): Observable<CourseModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/get/all/`;
+        const url: string = `${this.BACKEND_URL}/course/get/all`;
         return this.http.get<any[]>(url, { withCredentials: true }).pipe(
             map((courses: any[]): CourseModel[] => courses.map((item: any): CourseModel => CourseModel.fromObject(item))),
             tap((courses: CourseModel[]): void => { this._courseSubject.next(courses); }),

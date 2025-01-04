@@ -24,7 +24,7 @@ export class RoomService {
 
     public createRoom(room: { name: string }[]): Observable<RoomModel[]>
     {
-        const url: string = `${this.BACKEND_URL}/course/room/create/`;
+        const url: string = `${this.BACKEND_URL}/course/room/create`;
         return this.http.post<any[]>(url, room, { withCredentials: true }).pipe(
             map((response: any[]): RoomModel[] =>
                 response.map((item: any): RoomModel => RoomModel.fromObject(item))
