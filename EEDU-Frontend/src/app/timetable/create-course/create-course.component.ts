@@ -31,15 +31,15 @@ export class CreateCourseComponent {
     private _loading: boolean = false;
     private readonly _subjects: SubjectModel[] = [];
 
-
     public constructor(private _subjectService: SubjectService) {
-        this._subjectService.fetchSubjects().subscribe();
+        this._subjectService.fetchSubjects().subscribe({
+            next: (subjects: SubjectModel[]): void => { this._subjects.push(...subjects); },
+        });
         this._subjectService.subjects$.subscribe((subjects: SubjectModel[]): void => {
             this._subjects.length = 0;
             this._subjects.push(...subjects);
         });
     }
-
 
     protected get subjects(): SubjectModel[] {
         return this._subjects;

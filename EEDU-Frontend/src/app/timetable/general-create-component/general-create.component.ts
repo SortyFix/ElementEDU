@@ -25,6 +25,6 @@ import {NgIf} from "@angular/common";
 export class GeneralCreateComponent {
 
     public readonly title: InputSignal<string> = input<string>('');
-    public loading: boolean = false;
+    public readonly loading: InputSignal<boolean> = input<boolean>(true);
 
 }

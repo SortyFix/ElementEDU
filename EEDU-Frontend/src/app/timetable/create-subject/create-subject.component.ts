@@ -31,10 +31,20 @@ export class CreateSubjectComponent {
 
     private readonly _form: FormGroup;
 
+    private _loading: boolean = true;
+
     public constructor(private _subjectService: SubjectService, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
         this._form = formBuilder.group({ name: [null, Validators.required] });
+        this._subjectService.fetchSubjects().subscribe((subjects: SubjectModel[]): void => { this.loading = false; })
     }
 
+    protected get loading(): boolean {
+        return this._loading;
+    }
+
+    private set loading(value: boolean) {
+        this._loading = value;
+    }
 
     private get dialogRef(): DialogRef {
         return this._dialogRef;

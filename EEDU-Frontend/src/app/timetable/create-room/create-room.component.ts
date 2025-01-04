@@ -30,9 +30,19 @@ import {SubjectModel} from "../../user/courses/subject/subject-model";
 export class CreateRoomComponent {
 
     private readonly _form: FormGroup;
+    private _loading: boolean = true;
 
     public constructor(private _roomService: RoomService, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
         this._form = formBuilder.group({ name: [null, Validators.required] });
+        this.roomService.fetchRooms().subscribe((): void => { this.loading = false; })
+    }
+
+    protected get loading(): boolean {
+        return this._loading;
+    }
+
+    private set loading(value: boolean) {
+        this._loading = value;
     }
 
     private get dialogRef(): DialogRef {

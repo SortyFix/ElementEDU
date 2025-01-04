@@ -24,29 +24,24 @@ import {AppointmentCreateModel} from "../../user/courses/appointment/entry/appoi
 import {
     FrequentAppointmentCreateModel
 } from "../../user/courses/appointment/frequent/frequent-appointment-create-model";
+import {GeneralCreateComponent} from "../general-create-component/general-create.component";
 
 @Component({
   selector: 'app-create-appointment',
   standalone: true,
     imports: [
-        MatCard,
-        MatCardHeader,
         MatCardContent,
         FormsModule,
         ReactiveFormsModule,
-        MatCardTitle,
         GeneralSelectionInput,
         MatDialogClose,
-        MatIconButton,
-        MatIcon,
         MatTabGroup,
         MatTab,
         MatCardActions,
         MatButton,
         CreateStandaloneAppointmentComponent,
         CreateFrequentAppointmentComponent,
-        MatProgressBar,
-        NgIf
+        GeneralCreateComponent
     ],
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss',

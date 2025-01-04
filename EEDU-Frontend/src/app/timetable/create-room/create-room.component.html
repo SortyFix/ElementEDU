@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <app-general-create title="Create Room">
+    <app-general-create title="Create Room" [loading]="loading">
         <mat-card-content>
 
             <mat-form-field appearance="outline">

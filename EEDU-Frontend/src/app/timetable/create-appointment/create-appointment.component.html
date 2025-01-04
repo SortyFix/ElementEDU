@@ -1,13 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-card>
-        <mat-progress-bar class="loading-bar" mode="indeterminate" *ngIf="loading"></mat-progress-bar>
-        <div class="overlay" *ngIf="loading"></div>
-        <mat-card-header style="display: flex; justify-content: space-between">
-            <mat-card-title>Create new Appointment</mat-card-title>
-            <button mat-icon-button mat-dialog-close>
-                <mat-icon>close</mat-icon>
-            </button>
-        </mat-card-header>
+    <app-general-create title="Create new Appointment" [loading]="loading">
         <mat-card-content class="content-wrapper">
             <app-general-selection-input
                 label="Enter the Course this Appointment applies to"
@@ -40,5 +32,5 @@
             <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
             <button [disabled]="!canSubmit()" mat-stroked-button type="submit">Submit</button>
         </mat-card-actions>
-    </mat-card>
+    </app-general-create>
 </form>
