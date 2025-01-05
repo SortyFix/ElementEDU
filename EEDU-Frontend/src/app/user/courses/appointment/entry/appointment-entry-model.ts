@@ -4,13 +4,13 @@ import {RoomModel} from "../../room/room-model";
 
 export class AppointmentEntryModel {
 
-    constructor(public readonly id: number,
+    constructor(private readonly _id: number,
                 private readonly _start: number,
                 private readonly _duration: number,
-                private readonly _description: string,
+                private readonly _description: string = "No description has been set",
                 private readonly _attachedScheduled?: number,
                 private readonly _room?: RoomModel,
-                public readonly assignment?: AssignmentModel) {}
+                public readonly _assignment?: AssignmentModel) {}
 
     public equalsStart(time: number): boolean {
         return this._start === time;
@@ -23,6 +23,14 @@ export class AppointmentEntryModel {
 
     public isPart(id: number): boolean {
         return this._attachedScheduled == id;
+    }
+
+    public get id(): number {
+        return this._id;
+    }
+
+    public get description(): string {
+        return this._description;
     }
 
     public get start(): Date {
@@ -53,7 +61,7 @@ export class AppointmentEntryModel {
     public asEvent(name: string): CalendarEvent
     {
         return {
-            id: this.id,
+            id: this._id,
             title: name,
             start: this.start,
             end: this.end,

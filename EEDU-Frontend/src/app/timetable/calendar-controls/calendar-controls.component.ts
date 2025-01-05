@@ -7,8 +7,10 @@ import {MatIconButton} from "@angular/material/button";
 import {UserService} from "../../user/user.service";
 import {NgIf} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
-import {CreateAppointmentComponent} from "../create-appointment/create-appointment.component";
 import {MatChip} from "@angular/material/chips";
+import {
+    CreateAppointmentComponent
+} from "../../user/courses/appointment/create-appointment/create-appointment.component";
 
 @Component({
   selector: 'app-calendar-controls',

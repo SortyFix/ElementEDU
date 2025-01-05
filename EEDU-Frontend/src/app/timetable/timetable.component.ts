@@ -21,12 +21,13 @@ import {MatButton} from "@angular/material/button";
 import {Observable} from "rxjs";
 import {UserService} from "../user/user.service";
 import {MatDialog} from "@angular/material/dialog";
-import {CreateCourseComponent} from "./create-course/create-course.component";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/frequent-appointment-model";
-import {CreateRoomComponent} from "./create-room/create-room.component";
-import {CreateSubjectComponent} from "./create-subject/create-subject.component";
+import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
+import {CreateCourseComponent} from "../user/courses/create-course/create-course.component";
+import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
+import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
 
 
 @Component({
@@ -48,6 +49,11 @@ import {CreateSubjectComponent} from "./create-subject/create-subject.component"
         MatDivider,
         MatButton,
         NgForOf,
+        MatCard,
+        MatCardHeader,
+        MatCardContent,
+        MatCardTitle,
+        MatCardSubtitle
     ],
     providers: [
         {

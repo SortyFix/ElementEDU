@@ -1,40 +1,41 @@
 import { Component } from '@angular/core';
-import {GeneralCreateComponent} from "../general-create-component/general-create.component";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {RoomService} from "../../user/courses/room/room.service";
-import {DialogRef} from "@angular/cdk/dialog";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {SubjectModel} from "../../user/courses/subject/subject-model";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {DialogRef} from "@angular/cdk/dialog";
+import {SubjectModel} from "../subject-model";
+import {SubjectService} from "../subject.service";
+import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 
 @Component({
-  selector: 'app-create-room',
+  selector: 'app-create-subject',
   standalone: true,
     imports: [
-        GeneralCreateComponent,
         MatCardContent,
         MatCardActions,
         MatButton,
         MatDialogClose,
         MatLabel,
         MatFormField,
+        MatInput,
         ReactiveFormsModule,
-        MatInput
+        GeneralCreateComponent
     ],
-  templateUrl: './create-room.component.html',
-  styleUrl: './create-room.component.scss'
+  templateUrl: './create-subject.component.html',
+  styleUrl: './create-subject.component.scss'
 })
-export class CreateRoomComponent {
+export class CreateSubjectComponent {
 
     private readonly _form: FormGroup;
+
     private _loading: boolean = true;
 
-    public constructor(private _roomService: RoomService, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
+    public constructor(private _subjectService: SubjectService, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
         this._form = formBuilder.group({ name: [null, Validators.required] });
-        this.roomService.fetchRooms().subscribe((): void => { this.loading = false; })
+        this._subjectService.fetchSubjects().subscribe((subjects: SubjectModel[]): void => { this.loading = false; })
     }
 
     protected get loading(): boolean {
@@ -49,8 +50,8 @@ export class CreateRoomComponent {
         return this._dialogRef;
     }
 
-    private get roomService(): RoomService {
-        return this._roomService;
+    private get subjectService(): SubjectService {
+        return this._subjectService;
     }
 
     protected get form(): FormGroup {
@@ -64,7 +65,9 @@ export class CreateRoomComponent {
             return;
         }
 
-        this.roomService.createRoom([this.form.value]).subscribe((): void => { this.dialogRef.close(); })
+        this.subjectService.createSubject([this.form.value]).subscribe({
+            next: (result: SubjectModel[]): void => { this.dialogRef.close(); },
+        })
     }
 
     protected get canSubmit(): boolean

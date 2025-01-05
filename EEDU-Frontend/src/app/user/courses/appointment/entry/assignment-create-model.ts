@@ -10,7 +10,6 @@ export class AssignmentCreateModel
         //TODO validate millis
     }
 
-
     public get submitUntil(): number {
         return this._submitUntil;
     }

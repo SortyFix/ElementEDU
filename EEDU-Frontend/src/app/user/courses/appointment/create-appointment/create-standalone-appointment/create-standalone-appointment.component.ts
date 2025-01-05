@@ -3,9 +3,11 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
-import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
-import {RoomModel} from "../../../user/courses/room/room-model";
 import {NgIf} from "@angular/common";
+import {
+    GeneralSelectionInput
+} from "../../../../../timetable/general-selection-input/general-selection-input.component";
+import {RoomModel} from "../../../room/room-model";
 
 @Component({
   selector: 'app-create-standalone-appointment',
