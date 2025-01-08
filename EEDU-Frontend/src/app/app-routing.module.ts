@@ -10,6 +10,7 @@ import {SettingsComponent} from "./settings/settings.component";
 import {NewsPageComponent} from "./news/news-page/news-page.component";
 
 const routes: Routes = [
+    {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
     {path: 'dashboard', component: DashboardComponent},
     {path: 'courses', component: CoursesComponent},
     {path: 'timetable', component: TimetableComponent},
