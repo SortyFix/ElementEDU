@@ -9,9 +9,8 @@ import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
-import {UserService} from "../user/user.service";
+import {ThemeService} from "../theming/theme.service";
 import {UserModel} from "../user/user-model";
-import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
   selector: 'app-settings',
@@ -31,8 +30,7 @@ import {UserListComponent} from "../user/user-list/user-list.component";
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent implements OnInit {
-
-    constructor(public userService: UserService, public http: HttpClient) {
+    constructor(public userService: UserService, public http: HttpClient, public themeService: ThemeService, public fileService: FileService) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;

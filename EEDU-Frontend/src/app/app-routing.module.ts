@@ -7,12 +7,15 @@ import {TimetableComponent} from "./timetable/timetable.component";
 import {NewsComponent} from "./news/news.component";
 import {ChatComponent} from "./chat/chat.component";
 import {SettingsComponent} from "./settings/settings.component";
+import {NewsPageComponent} from "./news/news-page/news-page.component";
 
 const routes: Routes = [
     {path: 'dashboard', component: DashboardComponent},
     {path: 'courses', component: CoursesComponent},
     {path: 'timetable', component: TimetableComponent},
     {path: 'news', component: NewsComponent},
+    {path: 'news/:id', component: NewsPageComponent},
+    {path: 'news/page/:pageIndex', component: NewsComponent},
     {path: 'chat', component: ChatComponent},
     {path: 'settings', component: SettingsComponent}
 ];

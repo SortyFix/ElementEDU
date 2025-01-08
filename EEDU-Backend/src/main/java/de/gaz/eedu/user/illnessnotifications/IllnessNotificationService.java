@@ -42,11 +42,10 @@ import java.util.Set;
     public boolean excuse(@NotNull Long userId, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
     {
         // TODO: Add logic if current day is an exam day
-        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
-                file.getName(),
-                new String[] { "Management" },
+        FileEntity fileEntity = fileService.createEntity(new FileCreateModel(
                 "illness_notifications",
-                new String[] { "illness_notification" }))).getFirst();
+                new String[] { "Management" },
+                new String[] { "illness_notification" }));
 
         try
         {
