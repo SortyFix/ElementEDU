@@ -11,6 +11,9 @@ import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {ThemeService} from "../theming/theme.service";
 import {UserModel} from "../user/user-model";
+import {FileService} from "../file/file.service";
+import {UserService} from "../user/user.service";
+import {UserListComponent} from "../user/user-list/user-list.component";
 
 @Component({
   selector: 'app-settings',

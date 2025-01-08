@@ -1,6 +1,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {UserService} from "../user/user.service";
+import {WebsocketService} from "../chat/websocket.service";
 
 @Component({
   selector: 'app-abstract',
@@ -12,7 +13,8 @@ export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
     private _portrait: boolean = false;
 
-    constructor(public router: Router, public userService: UserService) { }
+    constructor(public websocketService: WebsocketService, public router: Router, public userService: UserService) {
+    }
 
     sidebar_buttons = [
         {title:'Dashboard', icon_name: 'dashboard', route:'dashboard'},

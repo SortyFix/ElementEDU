@@ -203,8 +203,11 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
             MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
             chatEntity.getMessages().add(messageEntity.getMessageId());
             System.out.println(chatEntity.getMessages());
+
             messagingTemplate.
                     convertAndSend(wsIdentifiers.getBroker() + "/" + message.chatId(), messageEntity.toModel());
+            String username = getUserService().loadByIdSafe(message.authorId()).loginName();
+            messagingTemplate.convertAndSend(wsIdentifiers.getBroker() + "/" + username, message.chatId());
 
             return HttpStatus.OK;
         }).orElse(HttpStatus.UNAUTHORIZED);

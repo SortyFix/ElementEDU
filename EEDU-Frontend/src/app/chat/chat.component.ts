@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {WebsocketService} from "./websocket.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
@@ -54,13 +54,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     currentChat!: number;
     currentSubscription!: Subscription;
     currentChatHistory!: MessageModel[];
+    notificationList: bigint[] = [];
     messageContent!: string;
 
-    constructor(public dialog: Dialog, public websocketService: WebsocketService, public http: HttpClient, public userService: UserService) {
+    constructor(public dialog: Dialog, public websocketService: WebsocketService, public http: HttpClient, public userService: UserService, private cdr: ChangeDetectorRef) {
     }
 
     public ngOnInit() {
         this.getAllChats();
+        this.websocketService.onConnected().then(() => {
+        })
     }
 
     public openDialog() {
@@ -96,6 +99,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.currentSubscription?.unsubscribe();
         this.currentChat = Number(chatId);
         this.getChat(this.currentChat);
+        this.notificationList = this.notificationList.filter(id => id != chatId);
         this.currentSubscription = this.websocketService.listen<MessageModel>(`${chatId}`).subscribe(model => {
             this.currentChatHistory.push(model);
         });
