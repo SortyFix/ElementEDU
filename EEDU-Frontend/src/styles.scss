@@ -4,6 +4,7 @@
     --text-color: black;
     --background-color: black;
     --widget-color: black;
+    --mat-sidenav-content-background-color: transparent;
 }
 
 html, body {
@@ -78,6 +79,10 @@ html, body {
 }
 
 .mat-input-placeholder {
+    color: var(--text-color) !important;
+}
+
+.mdc-list-item__primary-text {
     color: var(--text-color) !important;
 }
 
