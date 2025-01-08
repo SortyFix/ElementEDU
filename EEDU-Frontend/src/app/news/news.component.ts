@@ -89,7 +89,7 @@ export class NewsComponent implements OnInit {
     }
 
     public hasPermission(): boolean {
-        return this.userService.getUserData.hasPrivilege("ADMIN");
+        return this.userService.getUserData.hasPrivilege("GROUP_DELETE");
     }
 
     public openArticle(articleId: bigint)

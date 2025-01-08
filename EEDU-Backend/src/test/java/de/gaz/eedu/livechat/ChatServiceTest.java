@@ -11,7 +11,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
 public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatModel, ChatCreateModel>
@@ -24,11 +23,12 @@ public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatMo
         Long[] emptyArr = new Long[0];
         Long currentTime = System.currentTimeMillis();
         ChatCreateModel chatCreateModel = new ChatCreateModel(emptyArr, currentTime);
-        ChatModel chatModel = new ChatModel(5L, currentTime, emptyArr, emptyArr);
+        ChatModel chatModel = new ChatModel(5L, "Bauer, Maxi" ,currentTime, emptyArr, emptyArr);
         return Eval.eval(chatCreateModel, chatModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.timeOfCreation(), result.timeOfCreation());
+            Assertions.assertEquals(expect.chatTitle(), result.chatTitle());
             Assertions.assertArrayEquals(expect.users(), result.users());
             Assertions.assertArrayEquals(expect.chatHistory(), result.chatHistory());
         });
