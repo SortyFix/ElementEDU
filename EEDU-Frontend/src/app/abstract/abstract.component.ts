@@ -28,8 +28,8 @@ export class AbstractComponent implements OnInit {
     responsiveContent() {
         return {
             'padding-left': this.mobile ? '20px' : '20px',
-            'width': this.portrait ? '' : 'calc(100% - 100px)',
-            'margin-left': this.portrait ? '' : '40px'
+            'width': this.mobile ? 'calc(100% - 50px)' : 'calc(100% - 100px)',
+            'margin-left': this.mobile ? '' : '20px'
         };
     }
 

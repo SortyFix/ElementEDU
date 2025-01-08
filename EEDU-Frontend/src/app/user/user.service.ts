@@ -65,8 +65,17 @@ export class UserService
 
         const url: string = `${this.BACKEND_URL}/user/logout`;
         return this.http.get<any>(url, {withCredentials: true}).pipe(tap<any>({
-            next: (): void => localStorage.removeItem("userData")
+            next: () => {
+                localStorage.removeItem("userData");
+                this.resetDeepAngularStyles();
+            }
         }));
+    }
+
+    public resetDeepAngularStyles(): void{
+        document.documentElement.style.setProperty('--text-color', 'rgb(0, 0, 0)');
+        document.documentElement.style.setProperty('--background-color', 'rgb(255, 255, 255)');
+        document.documentElement.style.setProperty('--widget-color', 'rgb(230, 230, 230)');
     }
 
     public get isLoggedIn(): boolean
@@ -94,26 +103,4 @@ export class UserService
     {
         localStorage.setItem("userData", userData)
     }
-
-/*    private toUser(json: string): UserModel
-    {
-        const parsedJson: any = JSON.parse(json);
-        const theme: any = parsedJson.theme;
-
-        const themeEntity: ThemeEntity = new ThemeEntity(
-            theme.id,
-            theme.name,
-            theme.backgroundColor_r,
-            theme.backgroundColor_g,
-            theme.backgroundColor_b,
-            theme.widgetColor_r,
-            theme.widgetColor_g,
-            theme.widgetColor_b
-        );
-        themeEntity.updateDeepAngularStyles();
-
-
-
-        return new UserModel(BigInt(parsedJson.id), parsedJson.firstName, parsedJson.lastName, parsedJson.loginName, parsedJson.userStatus, groups, themeEntity);
-    }*/
 }

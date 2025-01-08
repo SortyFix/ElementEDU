@@ -14,8 +14,14 @@
 </mat-form-field> <br>
 <button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
 
-@if (this.userList.length != 0) {
-    <app-user-list [userList]="userList"></app-user-list>
-}
-<button mat-button [style.color]="themeService.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
-<input type="file" id="file_input" (change)="this.fileService.selectFiles($event)" multiple style="display: block;" class="uploadField" />
+<p>
+    @if (this.userList.length != 0) {
+        <h3 [style.color]="user.theme.getTextColor('background', false)">User management</h3>
+        <p [style.color]="user.theme.getTextColor('background', false)">
+            Manage specific user privileges and states and view the information of all users.
+        </p>
+        <div class="background">
+            <app-user-list [userList]="userList"></app-user-list>
+        </div>
+    }
+</p>

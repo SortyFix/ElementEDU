@@ -1,8 +1,9 @@
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
 :root {
-    --floating-label-color: black;
+    --text-color: black;
     --background-color: black;
+    --widget-color: black;
 }
 
 html, body {
@@ -25,11 +26,59 @@ html, body {
 }
 
 .mdc-floating-label, .mat-mdc-select, .mat-mdc-option  {
-    color: var(--floating-label-color) !important;
+    color: var(--text-color) !important;
 }
 
 .mat-mdc-select-panel {
     background-color: var(--background-color) !important;
+}
+
+.mdc-label {
+    color: var(--text-color) !important;
+}
+
+.mat-expansion-panel-header{
+    background-color: var(--background-color) !important;
+}
+
+// symbol color
+.mat-ligature-font {
+    color: var(--text-color) !important;
+}
+
+// mat-checkbox color
+.mdc-checkbox__background {
+    border-color: var(--text-color) !important;
+}
+
+// tag font color
+.mdc-evolution-chip__text-label {
+    color: var(--text-color) !important;
+}
+
+.mat-expansion-panel-body {
+    color: var(--text-color) !important;
+}
+
+// tag background color
+.mat-mdc-standard-chip {
+    --mdc-chip-elevated-container-color: var(--widget-color) !important;
+}
+
+.mat-expansion-panel-content {
+    background-color: var(--background-color) !important;
+}
+
+.mat-expansion-panel {
+    background: var(--background-color) !important;
+}
+
+.mdc-text-field__input {
+    color: var(--text-color) !important;
+}
+
+.mat-input-placeholder {
+    color: var(--text-color) !important;
 }
 
 // This is a temporary solution

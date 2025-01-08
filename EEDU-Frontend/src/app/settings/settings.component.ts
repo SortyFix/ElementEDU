@@ -32,6 +32,7 @@ import {UserListComponent} from "../user/user-list/user-list.component";
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
+
 export class SettingsComponent implements OnInit {
     constructor(public userService: UserService, public http: HttpClient, public themeService: ThemeService, public fileService: FileService) {
     }

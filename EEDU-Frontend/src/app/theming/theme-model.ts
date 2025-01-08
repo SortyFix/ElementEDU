@@ -93,14 +93,15 @@ export class ThemeModel {
      * Updates the global CSS variables that control deep Angular styling configurations.
      *
      * These CSS variables are defined in the global styles (':root' in the styles.scss) and can be accessed
-     * by CSS rules that use `var(--floating-label-color)` and `var(--background-color)`.
+     * by CSS rules that use `var(--text-color)`, `var(--widget-color)` and `var(--background-color)`.
      *
      * @see getTextColor
      * @see getBackgroundColor
      */
     public updateDeepAngularStyles(): void
     {
-        document.documentElement.style.setProperty('--floating-label-color', this.getTextColor("background", false));
+        document.documentElement.style.setProperty('--text-color', this.getTextColor("background", false));
         document.documentElement.style.setProperty('--background-color', this.getBackgroundColor);
+        document.documentElement.style.setProperty('--widget-color', this.getWidgetColor);
     }
 }

@@ -18,14 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -51,7 +49,6 @@ public class UserController extends EntityController<UserService, UserModel, Use
     @Getter(AccessLevel.PROTECTED) private final UserService service;
     @Value("${development}") private final boolean development = false;
     private final UserService userService;
-    private final UserRepository userRepository;
 
     /**
      * Creates a new user utilizing the provided {@link UserCreateModel}.
