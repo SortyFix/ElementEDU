@@ -11,6 +11,6 @@
 <div class="card-container">
     <div *ngFor="let card of cards" class="card">
         <h3>{{ card.title }}</h3>
-        <p>{{ card.content }}</p>
+        <p><ng-container *ngComponentOutlet="card.component"></ng-container></p>
     </div>
 </div>
