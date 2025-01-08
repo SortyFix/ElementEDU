@@ -1,1 +1,16 @@
-<p [style.color]="user.theme.getTextColor('background', false)">dashboard works! my life is beautiful and everything works exactly as I expected things to be.</p>
+<div class="title-container">
+    <div class="title">
+        <h3>My Dashboard</h3>
+    </div>
+    <div class="settings-button">
+        <button class="settings-icon">
+            <mat-icon>settings</mat-icon>
+        </button>
+    </div>
+</div>
+<div class="card-container">
+    <div *ngFor="let card of cards" class="card">
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.content }}</p>
+    </div>
+</div>

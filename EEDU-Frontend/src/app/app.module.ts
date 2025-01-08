@@ -20,6 +20,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AbstractComponent } from './abstract/abstract.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {Authentication} from "./user/authentication/authentication.component";
+import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
 
 @NgModule({
     declarations: [
@@ -51,7 +52,9 @@ import {Authentication} from "./user/authentication/authentication.component";
         LoadComponent,
         NgOptimizedImage,
         MatSidenavModule,
-        Authentication
+        Authentication,
+        CdkDropList,
+        CdkDrag
     ],
     providers: [
         provideHttpClient(withFetch())
