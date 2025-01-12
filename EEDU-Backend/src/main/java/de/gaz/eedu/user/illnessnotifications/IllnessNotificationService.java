@@ -58,7 +58,6 @@ import java.util.Set;
             return null;
         }
 
-        // TODO: Add logic if current day is an exam day
         FileEntity fileEntity = fileService.createEntity(new FileCreateModel(
                 "illness_notifications",
                 new String[] { "Management" },
