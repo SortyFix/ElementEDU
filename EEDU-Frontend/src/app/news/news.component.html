@@ -51,7 +51,8 @@
                [pageSize]="10"
                [pageIndex]="this.pageIndex"
                [length]="this.articleCount"
-               (page)="nextPage($event)">
+               (page)="nextPage($event)"
+                style="background-color: var(--widget-color); color: var(--text-color)">
 </mat-paginator>
 
 <button mat-fab class="add-article-button" *ngIf="hasPermission()" (click)="openArticleCreation()">

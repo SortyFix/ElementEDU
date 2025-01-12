@@ -3,13 +3,14 @@ package de.gaz.eedu.user.illnessnotifications;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.file.FileModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public record IllnessNotificationModel(@NotNull Long id, @NotNull Long userId,
                                        @NotNull IllnessNotificationStatus status, @NotNull String reason,
                                        @NotNull Long timestamp, @NotNull Long expirationTime,
-                                       @NotNull FileModel fileModel) implements EntityModel
+                                       @Nullable FileModel fileModel) implements EntityModel
 {
     @Override public boolean equals(Object o)
     {

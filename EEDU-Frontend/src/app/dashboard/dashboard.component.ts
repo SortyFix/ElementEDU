@@ -7,6 +7,7 @@ import {HomeworkCardComponent} from "./homework-card/homework-card.component";
 import {NewsComponent} from "../news/news.component";
 import {NewsCardComponent} from "./news-card/news-card.component";
 import {ChatCardComponent} from "./chat-card/chat-card.component";
+import {RGBAColor} from "angularx-qrcode";
 
 @Component({
   selector: 'app-dashboard',

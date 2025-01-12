@@ -127,7 +127,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel createPost(@NotNull Long userId, @Nullable MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
-        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ADMIN"))
+        System.out.println(userEntity.getAuthorities());
+        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ROLE_ADMINISTRATOR"))
         {
             System.out.println("User has correct privileges, proceeding...");
             if(Objects.nonNull(thumbnail))

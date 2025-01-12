@@ -2,19 +2,19 @@
     max-width: 800px;
     margin: 40px auto;
     padding: 20px;
-    background: #fff;
+    background: var(--widget-color);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 
     .article-title {
         font-size: 2.5rem;
         margin-bottom: 20px;
-        color: #333;
+        color: var(--text-color);
     }
 
     .article-meta {
         font-size: 0.9rem;
-        color: #777;
+        color: var(--text-color);
         margin-bottom: 20px;
         border-bottom: 1px solid #ddd;
         padding-bottom: 10px;
@@ -30,7 +30,7 @@
     .article-content {
         font-size: 1rem;
         line-height: 1.8;
-        color: #444;
+        color: var(--text-color);
     }
 }
 

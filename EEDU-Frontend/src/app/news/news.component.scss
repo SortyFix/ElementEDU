@@ -107,8 +107,8 @@ body {
 }
 
 .news-card {
-    background-color: #ffffff;
-    border: 1px solid #eaeaea;
+    background-color: var(--widget-color);
+    color: var(--text-color);
     border-radius: 10px;
     max-width: 350px;
     width: 100%;
@@ -144,17 +144,18 @@ body {
 
 .news-content {
     padding: 15px;
+    color: var(--text-color);
 }
 
 .news-title {
     font-size: 1.4rem;
-    color: #333333;
     margin-bottom: 15px;
+    color: var(--text-color);
 }
 
 .news-footer {
     padding: 15px 0;
-    border-top: 1px solid #eaeaea;
+    border-top: 1px solid var(--text-color);
     margin-top: 10px;
 }
 
@@ -164,7 +165,7 @@ body {
     align-items: center;
     gap: 5px;
     font-size: 0.9rem;
-    color: #555555;
+    color: var(--text-color);
 }
 
 .news-author, .news-date {

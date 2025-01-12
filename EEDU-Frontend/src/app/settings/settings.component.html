@@ -12,7 +12,9 @@
         </mat-option>
     </mat-select>
 </mat-form-field> <br>
-<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button> <br> <br>
+
+<mat-divider></mat-divider>
 
 <p>
     @if (this.userList.length != 0) {
@@ -24,4 +26,17 @@
             <app-user-list [userList]="userList"></app-user-list>
         </div>
     }
+</p> <br>
+
+<mat-divider></mat-divider>
+
+<h3 [style.color]="user.theme.getTextColor('background', false)">Feedback</h3>
+<p [style.color]="user.theme.getTextColor('background', false)">
+    Is there something on your mind? Do you have some feature ideas or have discovered bugs? <br>
+    Tell us about it!
 </p>
+<mat-form-field>
+    <mat-label>Feedback</mat-label>
+    <textarea matInput [(ngModel)]="feedbackText"></textarea>
+</mat-form-field>
+<button mat-flat-button class="feedback-button" (click)="openEmail(feedbackText)">Send feedback...</button> <br> <br> <br>

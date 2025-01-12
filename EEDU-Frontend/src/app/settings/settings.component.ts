@@ -3,7 +3,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
 import {forkJoin, Observable} from "rxjs";
-import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
 import {AsyncPipe, NgForOf} from "@angular/common";
@@ -14,6 +14,8 @@ import {UserModel} from "../user/user-model";
 import {FileService} from "../file/file.service";
 import {UserService} from "../user/user.service";
 import {UserListComponent} from "../user/user-list/user-list.component";
+import {MatInputModule} from "@angular/material/input";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-settings',
@@ -21,13 +23,16 @@ import {UserListComponent} from "../user/user-list/user-list.component";
     imports: [
         UserListComponent,
         MatFormField,
+        MatInputModule,
         ReactiveFormsModule,
         MatOption,
         MatSelect,
         MatLabel,
         AsyncPipe,
         NgForOf,
-        MatButton
+        MatButton,
+        FormsModule,
+        MatDivider
     ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
@@ -41,6 +46,7 @@ export class SettingsComponent implements OnInit {
     public selectedTheme!: bigint;
     public currentThemeName: string = this.getUserData().theme.name;
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
+    public feedbackText = "";
 
     public THEME_URL: string = "api/v1/user";
 
@@ -145,5 +151,14 @@ export class SettingsComponent implements OnInit {
 
     protected get userList(): UserModel[] {
         return this._userList;
+    }
+
+    public openEmail(body: string) {
+        const email = 'yonasnieder@gmail.com';
+        const subject = 'Feedback';
+        if(this.feedbackText != "")
+        {
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
     }
 }
