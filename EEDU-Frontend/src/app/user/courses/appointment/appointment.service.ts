@@ -7,6 +7,7 @@ import {AppointmentCreateModel} from "./entry/appointment-create-model";
 import {AppointmentEntryModel} from "./entry/appointment-entry-model";
 import {FrequentAppointmentCreateModel} from "./frequent/frequent-appointment-create-model";
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
+import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 
 @Injectable({
     providedIn: 'root'
@@ -52,6 +53,14 @@ export class AppointmentService {
                 response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))
             ),
             tap({ next: (response: AppointmentEntryModel[]): void => this.pushAppointment(course, response)})
+        );
+    }
+
+    public updateAppointment(appointment: number, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel>
+    {
+        const url = `${this.BACKEND_URL}/course/appointment/update/standalone/${appointment}`
+        return this.http.post<any>(url, updateModel.toPacket, { withCredentials: true }).pipe(
+            map((response: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(response))
         );
     }
 

@@ -126,7 +126,7 @@ import java.util.stream.Stream;
         return getThemeService().createEntity(Set.of(defaultDark, defaultLight)).stream().filter(theme ->
         {
             // Dark will be set as default
-            return Objects.equals(theme.getName(), "defaultDark");
+            return Objects.equals(theme.getName(), "defaultLight");
         }).findFirst().orElseThrow();
     }
 

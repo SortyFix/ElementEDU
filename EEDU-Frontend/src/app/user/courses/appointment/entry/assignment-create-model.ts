@@ -10,6 +10,14 @@ export class AssignmentCreateModel
         //TODO validate millis
     }
 
+    public toPacket(): { description: string, submitUntil: number, publish: number } {
+        return {
+            description: this.description,
+            submitUntil: this.submitUntil,
+            publish: this.publish
+        };
+    }
+
     public get submitUntil(): number {
         return this._submitUntil;
     }

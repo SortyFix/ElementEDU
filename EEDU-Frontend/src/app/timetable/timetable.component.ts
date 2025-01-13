@@ -12,14 +12,13 @@ import {
 } from "angular-calendar";
 import {DOCUMENT, NgForOf, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
-import {FormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.component";
 import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {Observable} from "rxjs";
-import {UserService} from "../user/user.service";
 import {MatDialog} from "@angular/material/dialog";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
@@ -28,6 +27,15 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} f
 import {CreateCourseComponent} from "../user/courses/create-course/create-course.component";
 import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
 import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
+import {MatIcon} from "@angular/material/icon";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
+import {
+    DateTimePickerComponent
+} from "../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
+import {AppointmentUpdateModel} from "../user/courses/appointment/entry/appointment-update-model";
+import {AppointmentService} from "../user/courses/appointment/appointment.service";
+import {AssignmentCreateModel} from "../user/courses/appointment/entry/assignment-create-model";
 
 
 @Component({
@@ -53,7 +61,14 @@ import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.
         MatCardHeader,
         MatCardContent,
         MatCardTitle,
-        MatCardSubtitle
+        MatCardSubtitle,
+        MatIconButton,
+        MatIcon,
+        MatLabel,
+        MatFormField,
+        MatInput,
+        ReactiveFormsModule,
+        DateTimePickerComponent
     ],
     providers: [
         {
@@ -69,10 +84,20 @@ export class TimetableComponent implements OnInit, OnDestroy {
     @ViewChild('controls') controls!: CalendarControlsComponent;
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
-    private _events: CalendarEvent[] = []
+    private _events: CalendarEvent[] = [];
 
+    private readonly _updateForm: FormGroup;
+
+    private _editMode: boolean = false;
     private _selectedEvent?: CalendarEvent;
 
+    protected get editMode(): boolean {
+        return this._editMode;
+    }
+
+    protected switchEditMode(): void {
+        this._editMode = !this._editMode;
+    }
 
     protected get selectedEvent(): CalendarEvent | undefined {
         return this._selectedEvent;
@@ -82,9 +107,22 @@ export class TimetableComponent implements OnInit, OnDestroy {
         private readonly _dialogRef: MatDialog,
         private readonly _courseService: CourseService,
         private readonly _accessibilityService: AccessibilityService,
-        private readonly _userService: UserService,
+        private readonly _appointmentService: AppointmentService,
         @Inject(DOCUMENT) private document: any,
-    ) {}
+        readonly formBuilder: FormBuilder,
+    ) {
+        this._updateForm = formBuilder.group({
+            description: [null],
+            assignment: [null],
+            assignmentPublish: [new Date()],
+            assignmentDeadline: [new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7)]
+        });
+    }
+
+
+    protected get updateForm(): FormGroup {
+        return this._updateForm;
+    }
 
     /**
      * Initializes the component and sets up the calendar theme and event subscriptions.
@@ -260,4 +298,25 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     protected readonly AppointmentEntryModel = AppointmentEntryModel;
+
+    protected onSubmit(): void {
+
+        const eventId: string | number | undefined = this.selectedEvent?.id;
+        if(typeof eventId !== 'number')
+        {
+            // TODO add exception handling
+            return;
+        }
+
+        const updateModel: AppointmentUpdateModel = AppointmentUpdateModel.fromObject({
+            description: this._updateForm.get('description')?.value,
+            assignment: new AssignmentCreateModel(
+                this._updateForm.get("assignment")?.value,
+                this._updateForm.get('assignmentPublish')?.value,
+                this.updateForm.get('assignmentDeadline')?.value
+            )
+        });
+        this._appointmentService.updateAppointment(eventId, updateModel).subscribe()
+
+    }
 }

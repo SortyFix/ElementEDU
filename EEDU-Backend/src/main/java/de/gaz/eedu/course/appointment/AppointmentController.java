@@ -2,6 +2,7 @@ package de.gaz.eedu.course.appointment;
 
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
+import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -39,6 +40,12 @@ public class AppointmentController extends EntityController<AppointmentService, 
         })).collect(Collectors.toSet())).stream();
 
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
+    }
+
+    @PostMapping("/update/standalone/{appointment}") public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
+    {
+        log.info("Received incoming request for updating the appointment {} with the updated data {}.", appointment, updateModel);
+        return ResponseEntity.ok(getService().update(appointment, updateModel));
     }
 
     @PostMapping("/{course}/unschedule/frequent") public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)

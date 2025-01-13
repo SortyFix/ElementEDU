@@ -6,6 +6,7 @@ import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
+import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentRepository;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Service
@@ -44,6 +46,53 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
     private static long generateId(@NotNull Long timeStamp, @NotNull CourseEntity entity)
     {
         return Objects.hash(entity.getId(), timeStamp);
+    }
+
+    public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
+    {
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(appointmentId));
+
+        System.out.println(updateModel);
+
+        boolean mustUpdate = false;
+
+        // doesn't the id match the room id, or is the room id not null
+        Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
+        if(entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
+        {
+            if(Objects.isNull(updateModel.room()))
+            {
+                entity.setRoom(null);
+            }
+            else
+            {
+                entity.setRoom(roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(updateModel.room())));
+            }
+            mustUpdate = true;
+        }
+
+        if(!Objects.equals(entity.getDescription(), updateModel.description()))
+        {
+            entity.setDescription(updateModel.description());
+            mustUpdate = true;
+        }
+
+        if(Objects.isNull(updateModel.assignment()))
+        {
+            mustUpdate = mustUpdate || entity.unsetAssignment();
+        }
+        else
+        {
+            mustUpdate = mustUpdate || entity.setAssignment(updateModel.assignment());
+        }
+
+        if(mustUpdate)
+        {
+            System.out.println("save " + entity);
+            getEntryRepository().save(entity);
+        }
+        
+        return entity.toModel();
     }
 
     public boolean unscheduleFrequent(long courseId, @NotNull Long... entities)

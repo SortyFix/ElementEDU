@@ -136,6 +136,11 @@ import java.util.Optional;
         return Objects.hashCode(id);
     }
 
+    public boolean hasAssignment()
+    {
+        return getAssignment().isPresent();
+    }
+
     /**
      * Validates an assignment, saves it to the entity, and persists the entity to the database, if applicable.
      * <p>
@@ -157,6 +162,18 @@ import java.util.Optional;
         return false;
     }
 
+    public boolean unsetAssignment()
+    {
+        if(!this.hasAssignment())
+        {
+            return false;
+        }
+        this.assignmentDescription = null;
+        this.publishAssignment = null;
+        this.submitAssignmentUntil = null;
+        return true;
+    }
+
     /**
      * Validates an assignment and saves it, if applicable.
      * <p>
@@ -175,10 +192,18 @@ import java.util.Optional;
             return false;
         }
 
+        var hash = new Object() {
+            private int generateHash()
+            {
+                return Objects.hash(assignmentDescription, publishAssignment, submitAssignmentUntil);
+            }
+        };
+
+        int hashCode = hash.generateHash();
         this.assignmentDescription = assignment.description();
         this.publishAssignment = assignment.publishInstant();
         this.submitAssignmentUntil = assignment.submitUntilInstant();
-        return true;
+        return Objects.equals(hash.generateHash(), hashCode);
     }
 
     /**
@@ -208,12 +233,14 @@ import java.util.Optional;
      *                              }
      *                              </pre>
      */
-    private @NotNull Optional<AssignmentModel> getAssignment()
+    public @NotNull Optional<AssignmentModel> getAssignment()
     {
         Instant until = this.getSubmitAssignmentUntil();
         String description = this.getAssignmentDescription();
 
-        if (Objects.isNull(description) || Objects.isNull(until) || this.publish.isBefore(Instant.now()))
+        // TODO implement this
+        this.publish.isBefore(Instant.now());
+        if (Objects.isNull(description) || Objects.isNull(until))
         {
             return Optional.empty();
         }
