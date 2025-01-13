@@ -18,7 +18,6 @@ export class AppointmentService {
 
     constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService) { }
 
-
     protected get http(): HttpClient {
         return this._http;
     }

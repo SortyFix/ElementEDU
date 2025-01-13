@@ -76,27 +76,7 @@
                 <mat-card-content>
                     @if(editMode)
                     {
-                        <form [formGroup]="updateForm" (ngSubmit)="onSubmit()">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Set Description</mat-label>
-                                <input type="text" matInput formControlName="description">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline">
-                                <mat-label>Set Assignment</mat-label>
-                                <textarea type="text" matInput formControlName="assignment"></textarea>
-                            </mat-form-field>
-
-                            @if(updateForm.get('assignment')?.value)
-                            {
-                                <app-date-time-picker formControlName="assignmentPublish">
-                                </app-date-time-picker>
-                                <app-date-time-picker formControlName="assignmentDeadline">
-                                </app-date-time-picker>
-                            }
-
-                            <button mat-raised-button type="submit">Submit</button>
-                        </form>
+                        <app-update-event [event]="selectedEvent"></app-update-event>
                     }
 
                     <p>You forgot your homeworks!</p>
