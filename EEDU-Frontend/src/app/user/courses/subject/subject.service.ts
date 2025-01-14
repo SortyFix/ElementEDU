@@ -47,9 +47,4 @@ export class SubjectService {
     protected get http(): HttpClient {
         return this._http;
     }
-
-    public update(): void
-    {
-        this._subjectSubject.next([...this.subjects]);
-    }
 }

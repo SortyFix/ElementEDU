@@ -72,20 +72,13 @@ import {UpdateEventComponent} from "./update-event/update-event.component";
 export class TimetableComponent implements OnInit, OnDestroy {
 
     @ViewChild('controls') controls!: CalendarControlsComponent;
+    @ViewChild('eventComponent') eventComponent!: UpdateEventComponent;
+
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
     private _events: CalendarEvent[] = [];
 
-    private _editMode: boolean = false;
     private _selectedEvent?: CalendarEvent;
-
-    protected get editMode(): boolean {
-        return this._editMode;
-    }
-
-    protected switchEditMode(): void {
-        this._editMode = !this._editMode;
-    }
 
     protected get selectedEvent(): CalendarEvent | undefined {
         return this._selectedEvent;
@@ -254,7 +247,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
      * @returns an array of {@link CalendarEvent} instances derived from the input models.
      * @private
      */
-    private toEvents(name: string, scheduled: FrequentAppointmentModel[]): CalendarEvent[] {
+    private toEvents(name: string, scheduled: readonly FrequentAppointmentModel[]): CalendarEvent[] {
         return scheduled.flatMap((entity: FrequentAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
 

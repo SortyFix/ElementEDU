@@ -17,8 +17,11 @@ import {RoomModel} from "../../room/room-model";
 import {RoomService} from "../../room/room.service";
 import {AppointmentService} from "../appointment.service";
 import {CourseService} from "../../course.service";
-import {AppointmentCreateModel} from "../entry/appointment-create-model";
-import {FrequentAppointmentCreateModel} from "../frequent/frequent-appointment-create-model";
+import {AppointmentCreateModel, GenericAppointmentCreateModel} from "../entry/appointment-create-model";
+import {
+    FrequentAppointmentCreateModel,
+    GenericFrequentAppointmentCreateModel
+} from "../frequent/frequent-appointment-create-model";
 import {GeneralSelectionInput} from "../../../../timetable/general-selection-input/general-selection-input.component";
 
 /**
@@ -256,7 +259,7 @@ export class CreateAppointmentComponent {
      * @param courseId the id of the course for which the standalone appointment is being created.
      * @private
      */
-    private createStandalone(courseId: number): void
+    private createStandalone(courseId: bigint): void
     {
         // I must first transform the room model into the room id
         const object: {
@@ -267,12 +270,9 @@ export class CreateAppointmentComponent {
         } = this._standalone.form.value;
         object.room = (object.room as RoomModel)?.id;
 
-        this.appointmentService.createAppointment(courseId, [AppointmentCreateModel.fromObject(object as {
-            start: Date,
-            until: Date,
-            room: number,
-            duration: number,
-        })]).subscribe({ next: (): void => this.dialogReference.close() });
+        this.appointmentService.createAppointment(courseId,
+            [AppointmentCreateModel.fromObject(object as GenericAppointmentCreateModel)]
+        ).subscribe({ next: (): void => this.dialogReference.close() });
     }
 
     /**
@@ -289,7 +289,7 @@ export class CreateAppointmentComponent {
      * @param courseId the id of the course for which the frequent appointment is being created.
      * @private
      */
-    private createFrequent(courseId: number): void
+    private createFrequent(courseId: bigint): void
     {
         // I must first transform the room model into the room id
         const object: {
@@ -299,14 +299,10 @@ export class CreateAppointmentComponent {
             duration: number,
             frequency: number
         } = this._frequent.form.value;
-        object.room = (object.room as RoomModel).id;
+        object.room = Number((object.room as RoomModel).id);
 
-        this.appointmentService.createFrequent(courseId, [FrequentAppointmentCreateModel.fromObject((object as {
-            start: Date,
-            until: Date,
-            room: number,
-            duration: number,
-            frequency: number
-        }))]).subscribe({ next: (): void => this.dialogReference.close() });
+        this.appointmentService.createFrequent(courseId,
+            [FrequentAppointmentCreateModel.fromObject((object as GenericFrequentAppointmentCreateModel))]
+        ).subscribe({ next: (): void => this.dialogReference.close() });
     }
 }

@@ -7,13 +7,16 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 
-public record AppointmentEntryCreateModel(@NotNull Long start, @Nullable Long duration, @Nullable Long room, @Nullable String description,
-                                          @Nullable AssignmentCreateModel assignment) implements CreationModel<AppointmentEntryEntity>
-{
+public record AppointmentEntryCreateModel(
+        @NotNull Long start,
+        @Nullable Long duration,
+        @Nullable Long room,
+        @Nullable String description,
+        @Nullable AssignmentCreateModel assignment
+) implements CreationModel<AppointmentEntryEntity> {
 
     public AppointmentEntryCreateModel(@NotNull Long timeStamp)
     {
@@ -22,7 +25,6 @@ public record AppointmentEntryCreateModel(@NotNull Long start, @Nullable Long du
 
     @Override public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException
     {
-        entity.setStartTimeStamp(Instant.ofEpochMilli(start()));
         // Duration is set inside the service
 
         entity.setDescription(description());

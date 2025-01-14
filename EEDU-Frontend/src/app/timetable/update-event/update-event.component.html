@@ -1,21 +1,55 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="outline">
-        <mat-label>Set Description</mat-label>
-        <input type="text" matInput formControlName="description">
-    </mat-form-field>
+@if (editMode) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+            <mat-label>Set Description</mat-label>
+            <input type="text" matInput formControlName="description">
+        </mat-form-field>
 
-    <mat-form-field appearance="outline">
-        <mat-label>Set Assignment</mat-label>
-        <textarea type="text" matInput formControlName="assignment"></textarea>
-    </mat-form-field>
+        <app-general-selection-input label="Room" [values]="rooms"></app-general-selection-input>
 
-    @if(form.get('assignment')?.value)
-    {
-        <app-date-time-picker formControlName="assignmentPublish">
-        </app-date-time-picker>
-        <app-date-time-picker formControlName="assignmentDeadline">
-        </app-date-time-picker>
-    }
+        <mat-form-field appearance="outline">
+            <mat-label>Set Assignment</mat-label>
+            <textarea type="text" matInput formControlName="assignment"></textarea>
+        </mat-form-field>
 
-    <button mat-raised-button type="submit">Submit</button>
-</form>
+        @if(form.get('assignment')?.value)
+        {
+            <app-date-time-picker formControlName="assignmentPublish">
+            </app-date-time-picker>
+            <app-date-time-picker formControlName="assignmentDeadline">
+            </app-date-time-picker>
+        }
+
+        <button mat-raised-button type="submit">Submit</button>
+    </form>
+} @else {
+
+    <div>
+        <mat-list>
+            <mat-list-item>
+                <span matListItemTitle>Description:</span>
+                <span matListItemLine>{{ form.get('description')?.value }}</span>
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>Room:</span>
+                <span matListItemLine>test</span> <!-- Assuming you calculate or get the room name -->
+            </mat-list-item>
+            <mat-list-item>
+                <span matListItemTitle>Assignment:</span>
+                <span matListItemLine>{{ form.get('assignment')?.value }}</span>
+            </mat-list-item>
+            @if(form.get('assignment')?.value)
+            {
+                <mat-list-item>
+                    <span matListItemTitle>Assignment Publish:</span>
+                    <span matListItemLine>{{ form.get('assignmentPublish')?.value }}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <span>Assignment Deadline:</span>
+                    <span>{{ form.get('assignmentDeadline')?.value }}</span>
+                </mat-list-item>
+            }
+        </mat-list>
+    </div>
+
+}

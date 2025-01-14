@@ -1,20 +1,38 @@
-import {PrivilegeModel} from "./privilege-model";
-import {model} from "@angular/core";
+import {GenericPrivilege, PrivilegeModel} from "./privilege-model";
+
+export interface GenericGroupModel
+{
+    id: bigint;
+    name: string;
+    privileges: GenericPrivilege[];
+}
 
 export class GroupModel
 {
-    constructor(public readonly id: bigint,
-                public readonly name: string,
-                public readonly privileges: PrivilegeModel[]) { }
+    constructor(
+        private readonly _id: bigint,
+        private readonly _name: string,
+        private readonly _privileges: PrivilegeModel[]
+    ) { }
 
-    public static fromObject(obj: any): GroupModel
+    public static fromObject(obj: GenericGroupModel): GroupModel
     {
-        const models: PrivilegeModel[] = obj.privileges.map((privilege: any): PrivilegeModel =>
+        return new GroupModel(BigInt(obj.id), obj.name, obj.privileges.map((privilege: any): PrivilegeModel =>
         {
             return PrivilegeModel.fromObject(privilege);
-        });
+        }));
+    }
 
-        return new GroupModel(BigInt(obj.id), obj.name, models);
+    public get id(): bigint {
+        return this._id;
+    }
+
+    public get name(): string {
+        return this._name;
+    }
+
+    public get privileges(): PrivilegeModel[] {
+        return this._privileges;
     }
 
     public hasPrivilege(privilege: string): boolean {

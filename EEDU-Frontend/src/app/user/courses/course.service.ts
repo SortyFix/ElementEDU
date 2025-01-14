@@ -22,11 +22,11 @@ export class CourseService {
         );
     }
 
-    public findCourseLazily(id: number): CourseModel | undefined {
+    public findCourseLazily(id: bigint): CourseModel | undefined {
         return this.findCourse(this.courses, id);
     }
 
-    public findCourse(courses: CourseModel[], id: number): CourseModel | undefined {
+    public findCourse(courses: CourseModel[], id: bigint): CourseModel | undefined {
         return courses.find((course: CourseModel): boolean => course.id === id);
     }
 

@@ -43,16 +43,26 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
     private final RoomRepository roomRepository;
 
     @Contract(pure = true, value = "_, _ -> _")
-    private static long generateId(@NotNull Long timeStamp, @NotNull CourseEntity entity)
+    private static long generateId(@NotNull CourseEntity entity, @NotNull Long timeStamp)
     {
-        return Objects.hash(entity.getId(), timeStamp);
+        // okay so, this is a bit complex, so I'll break it down
+        // Firstly, I bitshift the courseId into the lower 16 bits, because a long is 64 bits in total and
+        // the id is never as high as the timestamp.
+        // That means 65535 courses can be created, before the system breaks apart.
+
+        // Secondly, I shift the timestamp into the 48 remaining bits as it is also a long value
+        // The value 0xFFFFFFFFFFFFL is a 48-bit mask in hexadecimal format
+
+        // The 0x indicates it's a hexadecimal number, where each F are 4 bits (there are 12),
+        // making up a total of 48 bits. The L suffix defines that the value is of type Long
+
+        // This allows me to encode both the course id and the timestamp into a single id
+        return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
     }
 
     public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
     {
         AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(appointmentId));
-
-        System.out.println(updateModel);
 
         boolean mustUpdate = false;
 
@@ -171,51 +181,49 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
      * @param createModel the set of models containing details for appointment creation.
      * @return a list of {@link AppointmentEntryEntity} created from the models.
      */
-    private @NotNull List<AppointmentEntryEntity> createAppointmentUnsafe(CourseEntity course, @NotNull Set<AppointmentEntryCreateModel> createModel)
+    private @NotNull List<AppointmentEntryEntity> createAppointmentUnsafe(@NotNull CourseEntity course, @NotNull Set<AppointmentEntryCreateModel> createModel)
     {
         return createModel.stream().map((currentModel) ->
         {
-            long id = generateId(currentModel.start(), course);
+            long id = generateId(course, currentModel.start());
 
-            return currentModel.toEntity(
-                    new AppointmentEntryEntity(id), (entity) ->
+            return currentModel.toEntity(new AppointmentEntryEntity(id), (entity) ->
+            {
+                Instant time = Instant.ofEpochMilli(currentModel.start());
+                for (FrequentAppointmentEntity frequentAppointment : course.getFrequentAppointments())
+                {
+                    if (frequentAppointment.inFrequency(time))
                     {
+                        entity.setFrequentAppointment(frequentAppointment);
 
-                        Instant time = Instant.ofEpochMilli(currentModel.start());
-                        for (FrequentAppointmentEntity frequentAppointment : course.getFrequentAppointments())
-                        {
-                            if (frequentAppointment.inFrequency(time))
-                            {
-                                entity.setFrequentAppointment(frequentAppointment);
+                        // these two below might get overridden by custom values
+                        entity.setDuration(frequentAppointment.getDuration());
+                        entity.setRoom(frequentAppointment.getRoom());
 
-                                // these two below might get overridden by custom values
-                                entity.setDuration(frequentAppointment.getDuration());
-                                entity.setRoom(frequentAppointment.getRoom());
+                        break;
+                    }
+                }
 
-                                break;
-                            }
-                        }
+                if (Objects.nonNull(currentModel.duration()))
+                {
+                    entity.setDuration(Duration.ofMillis(currentModel.duration()));
+                }
 
-                        if (Objects.nonNull(currentModel.duration()))
-                        {
-                            entity.setDuration(Duration.ofMillis(currentModel.duration()));
-                        }
+                if (Objects.isNull(entity.getDuration()))
+                {
+                    // duration MUST be set here already
+                    throw new CreationException(HttpStatus.BAD_REQUEST);
+                }
 
-                        if (Objects.isNull(entity.getDuration()))
-                        {
-                            // duration MUST be set here already
-                            throw new CreationException(HttpStatus.BAD_REQUEST);
-                        }
+                if (Objects.nonNull(currentModel.room()))
+                {
+                    RoomEntity room = getRoom(currentModel.room());
+                    entity.setRoom(room);
+                }
 
-                        if (Objects.nonNull(currentModel.room()))
-                        {
-                            RoomEntity room = getRoom(currentModel.room());
-                            entity.setRoom(room);
-                        }
-
-                        entity.setCourse(course);
-                        return entity;
-                    });
+                entity.setCourse(course);
+                return entity;
+            });
         }).toList();
     }
 
@@ -230,7 +238,7 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
      */
     private @NotNull Optional<AppointmentEntryEntity> getInternalAppointment(@NotNull CourseEntity course, long timeStamp)
     {
-        long id = generateId(timeStamp, course);
+        long id = generateId(course, timeStamp);
         Stream<AppointmentEntryEntity> entries = Arrays.stream(course.getEntries());
         return entries.filter(entry -> Objects.equals(entry.getId(), id)).findFirst();
     }

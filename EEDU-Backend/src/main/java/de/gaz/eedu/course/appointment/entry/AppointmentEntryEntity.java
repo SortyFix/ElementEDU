@@ -33,7 +33,6 @@ import java.util.Optional;
 @Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityModelRelation<AppointmentEntryModel>
 {
     @Setter(AccessLevel.NONE) @Id private long id;
-    private Instant startTimeStamp;
     private Duration duration;
     private Instant publish;
     private String description;
@@ -109,7 +108,6 @@ import java.util.Optional;
                 getId(),
                 attachedScheduled,
                 getRoom().map(RoomEntity::toModel).orElse(null),
-                this.getStartTimeStamp().toEpochMilli(),
                 this.getDuration().toMillis(),
                 this.getDescription(),
                 assignment
@@ -187,7 +185,7 @@ import java.util.Optional;
      */
     public boolean setAssignment(@NotNull AssignmentCreateModel assignment)
     {
-        if (!assignment.validate(getStartTimeStamp().toEpochMilli()))
+        if (!assignment.validate(getTimeStamp()))
         {
             return false;
         }
@@ -204,6 +202,11 @@ import java.util.Optional;
         this.publishAssignment = assignment.publishInstant();
         this.submitAssignmentUntil = assignment.submitUntilInstant();
         return Objects.equals(hash.generateHash(), hashCode);
+    }
+
+    protected long getTimeStamp()
+    {
+        return getId() & 0xFFFFFFFFFFFFL;
     }
 
     /**

@@ -1,8 +1,19 @@
+
+export interface GenericRoom {
+    id: number;
+    name: string;
+}
+
 export class RoomModel {
 
-    constructor(private _id: number, private _name: string) {}
+    constructor(
+        private readonly _id: number,
+        // this can be saved as number as it won't ever exceed 1.7976931348623157e+308, unless there have a massive
+        // house, but in that case it most likely is not a school
+        private readonly _name: string
+    ) {}
 
-    public static fromObject(obj: { id: number; name: string; }): RoomModel
+    public static fromObject(obj: GenericRoom): RoomModel
     {
         return new RoomModel(obj.id, obj.name);
     }
@@ -11,15 +22,7 @@ export class RoomModel {
         return this._id;
     }
 
-    public set id(value: number) {
-        this._id = value;
-    }
-
     public get name(): string {
         return this._name;
-    }
-
-    public set name(value: string) {
-        this._name = value;
     }
 }

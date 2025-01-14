@@ -1,28 +1,40 @@
 import {CalendarEvent} from "angular-calendar";
-import {RoomModel} from "../../room/room-model";
+import {GenericRoom, RoomModel} from "../../room/room-model";
 import {AppointmentEntryModel} from "../entry/appointment-entry-model";
+
+export interface GenericFrequentAppointment {
+    id: bigint,
+    start: number,
+    end: number,
+    duration: number,
+    period: number,
+    room: GenericRoom,
+}
 
 export class FrequentAppointmentModel {
 
     public constructor(
-        public readonly id: number,
+        public readonly id: bigint,
         public readonly _start: number,
         public readonly _end: number,
         public readonly _duration: number,
         public readonly _period: number,
         public readonly _attachedEntries: AppointmentEntryModel[],
-        private readonly _room?: RoomModel,
+        private readonly _room: RoomModel,
     ) {}
 
-    public static fromObject(object: any, attachedEntries: AppointmentEntryModel[]): FrequentAppointmentModel {
+    public static fromObject(
+        object: GenericFrequentAppointment,
+        attachedEntries: AppointmentEntryModel[]
+    ): FrequentAppointmentModel {
         return new FrequentAppointmentModel(
-            object.id,
+            BigInt(object.id),
             object.start,
             object.end,
             object.duration,
             object.period,
             attachedEntries,
-            object.room,
+            RoomModel.fromObject(object.room),
         );
     }
 
@@ -38,8 +50,12 @@ export class FrequentAppointmentModel {
         return this._duration;
     }
 
-    get period(): number {
+    public get period(): number {
         return this._period;
+    }
+
+    public get room(): RoomModel {
+        return this._room;
     }
 
     public inPeriod(timeStamp: number): boolean {
@@ -67,13 +83,14 @@ export class FrequentAppointmentModel {
         for (let i: number = this._start; i <= this._end; i += this._period) {
 
             const startDate: Date = new Date(i);
-            if(this._attachedEntries.some((current: AppointmentEntryModel): boolean => current.equalsStart(i)))
+            const start: bigint = BigInt(i);
+
+            if(this._attachedEntries.some((current: AppointmentEntryModel): boolean => current.equalsStart(start)))
             { // skip already created events
                 continue;
             }
 
             events.push({
-                id: this.id,
                 title: name,
                 start: startDate,
                 end: this.computeDuration(i),
@@ -83,6 +100,7 @@ export class FrequentAppointmentModel {
                 },
                 draggable: false,
                 meta: {
+                    id: this.id,
                     type: FrequentAppointmentModel,
                     eventData: this
                 }

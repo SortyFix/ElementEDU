@@ -40,11 +40,11 @@ export class RoomService {
 
     public get rooms$(): Observable<RoomModel[]>
     {
-        return this._roomSubject.asObservable();
-    }
+        if(this.rooms.length === 0)
+        {
+            this.fetchRooms().subscribe();
+        }
 
-    public update(): void
-    {
-        this._roomSubject.next([...this.rooms]);
+        return this._roomSubject.asObservable();
     }
 }

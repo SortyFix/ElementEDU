@@ -1,3 +1,15 @@
+export interface GenericAssignmentCreateModel {
+    description: string;
+    submitUntil: Date;
+    publish: Date,
+}
+
+export interface AssignmentCreatePacket {
+    description: string;
+    submitUntil: number;
+    publish: number
+}
+
 export class AssignmentCreateModel
 {
     private readonly _submitUntil: number;
@@ -10,7 +22,15 @@ export class AssignmentCreateModel
         //TODO validate millis
     }
 
-    public toPacket(): { description: string, submitUntil: number, publish: number } {
+    public static fromObject(obj: GenericAssignmentCreateModel): AssignmentCreateModel {
+        return new AssignmentCreateModel(
+            obj.description,
+            obj.submitUntil,
+            obj.publish
+        );
+    }
+
+    public toPacket(): AssignmentCreatePacket {
         return {
             description: this.description,
             submitUntil: this.submitUntil,

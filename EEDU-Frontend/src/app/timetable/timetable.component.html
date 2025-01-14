@@ -69,17 +69,13 @@
                         <mat-card-title> {{ selectedEvent?.title }} </mat-card-title>
                         <mat-card-subtitle>{{ selectedEvent?.start }}</mat-card-subtitle>
                     </div>
-                    <button mat-icon-button class="edit-button" (click)="switchEditMode()" *ngIf="!editMode">
+                    <button mat-icon-button class="edit-button" (click)="eventComponent.switchEditMode()">
                         <mat-icon>edit</mat-icon>
                     </button>
                 </mat-card-header>
                 <mat-card-content>
-                    @if(editMode)
-                    {
-                        <app-update-event [event]="selectedEvent"></app-update-event>
-                    }
+                    <app-update-event [event]="selectedEvent" #eventComponent></app-update-event>
 
-                    <p>You forgot your homeworks!</p>
                 </mat-card-content>
             </mat-card>
         }

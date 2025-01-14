@@ -5,7 +5,10 @@ import {CourseService} from "../course.service";
 import {map, Observable, tap} from "rxjs";
 import {AppointmentCreateModel} from "./entry/appointment-create-model";
 import {AppointmentEntryModel} from "./entry/appointment-entry-model";
-import {FrequentAppointmentCreateModel} from "./frequent/frequent-appointment-create-model";
+import {
+    FrequentAppointmentCreateModel,
+    FrequentAppointmentCreatePacket
+} from "./frequent/frequent-appointment-create-model";
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 
@@ -38,7 +41,7 @@ export class AppointmentService {
      * @returns an observable that emits an array of {@link AppointmentEntryModel} instances created by the backend.
      * @public
      */
-    public createAppointment(course: number, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]>
+    public createAppointment(course: bigint, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]>
     {
         const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/standalone`
         return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel):
@@ -51,15 +54,19 @@ export class AppointmentService {
             map((response: any[]): AppointmentEntryModel[] =>
                 response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))
             ),
-            tap({ next: (response: AppointmentEntryModel[]): void => this.pushAppointment(course, response)})
+            tap({ next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)})
         );
     }
 
-    public updateAppointment(appointment: number, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel>
+    public updateAppointment(appointment: bigint, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel>
     {
         const url = `${this.BACKEND_URL}/course/appointment/update/standalone/${appointment}`
         return this.http.post<any>(url, updateModel.toPacket, { withCredentials: true }).pipe(
-            map((response: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(response))
+            map((response: any): AppointmentEntryModel => {
+                const updated: AppointmentEntryModel = AppointmentEntryModel.fromObject(response);
+                this.pushAppointment([updated])
+                return updated;
+            })
         );
     }
 
@@ -75,34 +82,33 @@ export class AppointmentService {
      * @returns an observable that emits an array of {@link FrequentAppointmentModel} instances created by the backend.
      * @public
      */
-    public createFrequent(course: number, createModel: FrequentAppointmentCreateModel[]): Observable<FrequentAppointmentModel[]> {
+    public createFrequent(course: bigint, createModel: FrequentAppointmentCreateModel[]): Observable<FrequentAppointmentModel[]> {
         const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/frequent`;
 
-        return this.http.post<any[]>(url, createModel.map((current: FrequentAppointmentCreateModel):
-        {
-            start: number;
-            until: number;
-            room: number;
-            duration: number;
-            frequency: number
-        } => current.toPacket), { withCredentials: true }).pipe(
+        return this.http.post<any[]>(url,
+            createModel.map((current: FrequentAppointmentCreateModel): FrequentAppointmentCreatePacket => current.toPacket),
+            { withCredentials: true }
+        ).pipe(
             map((response: any[]): FrequentAppointmentModel[] =>
-                response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, []))
-            ),
-            tap({ next: (appointments: FrequentAppointmentModel[]): void => this.pushFrequent(course, appointments) })
+            {
+                return response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, []))
+            }),
+            tap({ next: (appointments: FrequentAppointmentModel[]): void => {
+                this.pushFrequent(course, appointments)
+            }})
         );
     }
 
-    private pushAppointment(course: number, objects: AppointmentEntryModel[])
+    private pushAppointment(objects: AppointmentEntryModel[]): void
     {
         for(const appointment of objects) {
-            this.courseService.findCourseLazily(course)?.attachAppointment(appointment);
+            this.courseService.findCourseLazily(appointment.course)?.attachAppointment(appointment);
         }
 
         this.courseService.update();
     }
 
-    private pushFrequent(course: number, objects: FrequentAppointmentModel[])
+    private pushFrequent(course: bigint, objects: FrequentAppointmentModel[])
     {
         for (const appointment of objects) {
             this.courseService.findCourseLazily(course)?.attachFrequentAppointment(appointment);

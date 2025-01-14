@@ -1,8 +1,14 @@
+export interface GenericAssignment
+{
+    description: string;
+    submitUntil: number;
+}
+
 export class AssignmentModel {
 
     constructor(private _description: string, private _submitUntil: number) {}
 
-    public static fromObject(obj: any): AssignmentModel
+    public static fromObject(obj: GenericAssignment): AssignmentModel
     {
         return new AssignmentModel(obj.description, obj.submitUntil);
     }

@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS frequent_appointment_entity
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
     id                       BIGINT PRIMARY KEY,
-    start_time_stamp         BIGINT         NOT NULL,
     duration                 BIGINT         NOT NULL,
     publish                  BIGINT         NOT NULL,
     description              VARCHAR(255)   NULL,

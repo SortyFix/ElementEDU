@@ -1,4 +1,16 @@
-import {AssignmentCreateModel} from "./assignment-create-model";
+import {AssignmentCreateModel, AssignmentCreatePacket, GenericAssignmentCreateModel} from "./assignment-create-model";
+
+export interface GenericAppointmentUpdate {
+    description: string;
+    room?: number;
+    assignment: GenericAssignmentCreateModel;
+}
+
+export interface AppointmentUpdatePacket {
+    description?: string,
+    room?: number,
+    assignment?: AssignmentCreatePacket
+}
 
 export class AppointmentUpdateModel {
 
@@ -8,17 +20,17 @@ export class AppointmentUpdateModel {
         private readonly _assignment?: AssignmentCreateModel
     ) {}
 
-    public static fromObject(obj: {
-        description: string,
-        room?: number,
-        assignment: AssignmentCreateModel
+    public static fromObject(obj: GenericAppointmentUpdate): AppointmentUpdateModel {
+        return new AppointmentUpdateModel(obj.description, obj.room, AssignmentCreateModel.fromObject(obj.assignment));
     }
-    ): AppointmentUpdateModel {
-        return new AppointmentUpdateModel(
-            obj.description,
-            obj.room,
-            obj.assignment
-        );
+
+    public get toPacket(): AppointmentUpdatePacket
+    {
+        return {
+            description: this.description,
+            room: this.room,
+            assignment: this.assignment?.toPacket(),
+        }
     }
 
     public get description(): string | undefined {
@@ -31,18 +43,5 @@ export class AppointmentUpdateModel {
 
     public get room(): number | undefined {
         return this._room;
-    }
-
-    public get toPacket(): {
-        description?: string,
-        room?: number,
-        assignment?: { description: string, submitUntil: number, publish: number },
-    }
-    {
-        return {
-            description: this.description,
-            room: this.room,
-            assignment: this.assignment?.toPacket(),
-        }
     }
 }
