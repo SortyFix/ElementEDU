@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -64,41 +65,34 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
     {
         AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(appointmentId));
 
-        boolean mustUpdate = false;
+        int hash = entity.hashCode();
+        entity.setDescription(updateModel.description());
 
         // doesn't the id match the room id, or is the room id not null
         Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
         if(entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
         {
-            if(Objects.isNull(updateModel.room()))
-            {
-                entity.setRoom(null);
-            }
-            else
-            {
-                entity.setRoom(roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(updateModel.room())));
-            }
-            mustUpdate = true;
+            entity.setRoom(
+                    Objects.isNull(updateModel.room()) ?
+                    null :
+                    roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(updateModel.room()))
+            );
         }
 
-        if(!Objects.equals(entity.getDescription(), updateModel.description()))
+        if(Objects.nonNull(updateModel.assignment()))
         {
-            entity.setDescription(updateModel.description());
-            mustUpdate = true;
-        }
-
-        if(Objects.isNull(updateModel.assignment()))
-        {
-            mustUpdate = mustUpdate || entity.unsetAssignment();
+            if(!entity.setAssignment(updateModel.assignment()))
+            {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Assignment could not be set.");
+            }
         }
         else
         {
-            mustUpdate = mustUpdate || entity.setAssignment(updateModel.assignment());
+            entity.unsetAssignment();
         }
 
-        if(mustUpdate)
+        if(Objects.equals(hash, entity.hashCode()))
         {
-            System.out.println("save " + entity);
             getEntryRepository().save(entity);
         }
         

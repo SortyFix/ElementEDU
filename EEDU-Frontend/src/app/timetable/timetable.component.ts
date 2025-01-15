@@ -17,17 +17,15 @@ import {CalendarControlsComponent} from "./calendar-controls/calendar-controls.c
 import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatButton} from "@angular/material/button";
 import {Observable} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/frequent-appointment-model";
-import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 import {CreateCourseComponent} from "../user/courses/create-course/create-course.component";
 import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
 import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
-import {MatIcon} from "@angular/material/icon";
 import {UpdateEventComponent} from "./update-event/update-event.component";
 
 
@@ -50,13 +48,6 @@ import {UpdateEventComponent} from "./update-event/update-event.component";
         MatDivider,
         MatButton,
         NgForOf,
-        MatCard,
-        MatCardHeader,
-        MatCardContent,
-        MatCardTitle,
-        MatCardSubtitle,
-        MatIconButton,
-        MatIcon,
         ReactiveFormsModule,
         UpdateEventComponent
     ],
@@ -78,10 +69,14 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private readonly _CalendarView: typeof CalendarView = CalendarView;
     private _events: CalendarEvent[] = [];
 
-    private _selectedEvent?: CalendarEvent;
+    private _selectedEvent!: CalendarEvent;
 
-    protected get selectedEvent(): CalendarEvent | undefined {
+    protected get selectedEvent(): CalendarEvent {
         return this._selectedEvent;
+    }
+
+    protected get selectedAppointment(): AppointmentEntryModel {
+        return this.selectedEvent.meta.eventData;
     }
 
     constructor(
@@ -177,7 +172,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Determines if wrapping is enabled based on the accesibility service's width.
+     * Determines if wrapping is enabled based on the accessibility service's width.
      *
      * This accessor checks the width of the {@link AccessibilityService}'s dimensions and returns true if the width
      * is less than or equal to {@code 1200}. This is typically used for adjusting layout or UI behavior for smaller screens.

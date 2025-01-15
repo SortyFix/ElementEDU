@@ -17,7 +17,7 @@ export class AssignmentModel {
         return this._description;
     }
 
-    public get submitUntil(): number {
-        return this._submitUntil;
+    public get submitUntil(): Date {
+        return new Date(this._submitUntil);
     }
 }

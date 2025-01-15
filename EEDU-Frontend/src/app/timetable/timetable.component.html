@@ -52,32 +52,23 @@
                             <span matListItemLine>{{ event.title }}</span>
                         </mat-list-item>
                     </mat-list>
+
+                    <button (click)="createCourse()">Create course</button>
+                    <button (click)="createSubject()">Create subject</button>
+                    <button (click)="createRoom()">Create room</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="appointment-box">
-        <button (click)="createCourse()">Create course</button>
-        <button (click)="createSubject()">Create subject</button>
-        <button (click)="createRoom()">Create room</button>
-        @if(selectedEvent?.meta.type === AppointmentEntryModel)
+        @if(selectedEvent && selectedEvent.meta.type === AppointmentEntryModel)
         {
-            <mat-card>
-                <mat-card-header>
-                    <div>
-                        <mat-card-title> {{ selectedEvent?.title }} </mat-card-title>
-                        <mat-card-subtitle>{{ selectedEvent?.start }}</mat-card-subtitle>
-                    </div>
-                    <button mat-icon-button class="edit-button" (click)="eventComponent.switchEditMode()">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                </mat-card-header>
-                <mat-card-content>
-                    <app-update-event [event]="selectedEvent" #eventComponent></app-update-event>
-
-                </mat-card-content>
-            </mat-card>
+            <app-update-event
+                [title]="selectedEvent.title"
+                [subtitle]="dateToString(selectedEvent.start)"
+                [appointment]="selectedAppointment" #eventComponent
+            ></app-update-event>
         }
     </div>
 

@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
     id                       BIGINT PRIMARY KEY,
     duration                 BIGINT         NOT NULL,
     publish                  BIGINT         NOT NULL,
-    description              VARCHAR(255)   NULL,
+    description              VARCHAR(1000)   NULL,
     assignment_description   VARCHAR(255)   NULL,
     publish_assignment       BIGINT         NULL,
     submit_assignment_until  BIGINT         NULL,

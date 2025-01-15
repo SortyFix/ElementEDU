@@ -35,6 +35,7 @@ import java.util.Optional;
     @Setter(AccessLevel.NONE) @Id private long id;
     private Duration duration;
     private Instant publish;
+    @Column(name = "description", length = 1000)
     private String description;
 
     // might be null, if submitHome is false, or it should be valid until next appointment
@@ -201,7 +202,7 @@ import java.util.Optional;
         this.assignmentDescription = assignment.description();
         this.publishAssignment = assignment.publishInstant();
         this.submitAssignmentUntil = assignment.submitUntilInstant();
-        return Objects.equals(hash.generateHash(), hashCode);
+        return !Objects.equals(hash.generateHash(), hashCode);
     }
 
     protected long getTimeStamp()

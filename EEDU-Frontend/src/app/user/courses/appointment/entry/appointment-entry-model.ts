@@ -26,8 +26,8 @@ export class AppointmentEntryModel {
             object.duration,
             object.description,
             object.attachedScheduled,
-            object.room && RoomModel.fromObject(object.room),
-            object.assignment && AssignmentModel.fromObject(object.assignment)
+            object.room ? RoomModel.fromObject(object.room) : undefined,
+            object.assignment ? AssignmentModel.fromObject(object.assignment) : undefined,
         );
     }
 
@@ -47,6 +47,7 @@ export class AppointmentEntryModel {
             },
             draggable: false,
             meta: {
+                id: this.id,
                 type: AppointmentEntryModel,
                 eventData: this
             }

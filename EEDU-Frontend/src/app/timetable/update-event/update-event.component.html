@@ -1,55 +1,77 @@
-@if (editMode) {
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline">
-            <mat-label>Set Description</mat-label>
-            <input type="text" matInput formControlName="description">
-        </mat-form-field>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>{{ title() }}</mat-card-title>
+            <mat-card-subtitle>{{ subtitle() }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="data-container">
+                <mat-grid-list cols="4" rowHeight="150px" gutterSize="10px">
 
-        <app-general-selection-input label="Room" [values]="rooms"></app-general-selection-input>
+                    <!-- Description -->
+                    <mat-grid-tile rowspan="2" colspan="2">
+                        <mat-card>
+                            <mat-card-header class="container-header">
+                                <mat-card-subtitle>Description</mat-card-subtitle>
+                                <button mat-icon-button type="button" (click)="switchEdit = 'description'">
+                                    <mat-icon>{{ isEditing('description') ? 'check' : 'edit' }}</mat-icon>
+                                </button>
+                            </mat-card-header>
+                            <mat-card-content [style.overflow]="enableScroll">
+                                @if (isEditing('description')) {
+                                    <mat-form-field class="edit-description-form-field" appearance="outline">
+                                        <textarea
+                                            matInput
+                                            style="height: 160px;"
+                                            formControlName="description"
+                                            maxlength="1000"
+                                            #descriptionInput></textarea>
+                                        <mat-hint align="end">{{descriptionInput.textLength }}/1000</mat-hint>
+                                    </mat-form-field>
+                                } @else {
+                                    <div class="description-content">
+                                        {{ this.form.get('description')?.value }}
+                                    </div>
+                                }
+                            </mat-card-content>
+                        </mat-card>
+                    </mat-grid-tile>
 
-        <mat-form-field appearance="outline">
-            <mat-label>Set Assignment</mat-label>
-            <textarea type="text" matInput formControlName="assignment"></textarea>
-        </mat-form-field>
+                    <!-- Assignments -->
+                    <mat-grid-tile rowspan="1" colspan="2">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-subtitle>Assignment</mat-card-subtitle>
+                                <button mat-icon-button type="button" (click)="switchEdit = 'assignment'">
+                                    <mat-icon>{{ isEditing('assignment') ? 'check' : 'edit' }}</mat-icon>
+                                </button>
+                            </mat-card-header>
+                            <mat-card-content>
+                                {{ form.get('assignment')?.value || 'No assignment given' }}
+                            </mat-card-content>
+                        </mat-card>
+                    </mat-grid-tile>
 
-        @if(form.get('assignment')?.value)
-        {
-            <app-date-time-picker formControlName="assignmentPublish">
-            </app-date-time-picker>
-            <app-date-time-picker formControlName="assignmentDeadline">
-            </app-date-time-picker>
-        }
+                    <!-- Room -->
+                    <mat-grid-tile rowspan="1" colspan="2">
+                        <mat-card>
+                        <mat-card-header>
+                            <mat-card-subtitle>Room</mat-card-subtitle>
+                            <button mat-icon-button type="button" (click)="switchEdit = 'room'">
+                                <mat-icon>{{ isEditing('room') ? 'check' : 'edit' }}</mat-icon>
+                            </button>
+                        </mat-card-header>
+                        <mat-card-content>
+                            {{ this.form.get('room')?.value || 'No room specified' }}
+                        </mat-card-content>
+                    </mat-card>
+                    </mat-grid-tile>
+                </mat-grid-list>
+            </div>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="hasEdited">
+            <button mat-flat-button type="submit" [disabled]="isCurrentlyEditing">Save Changes</button>
+        </mat-card-actions>
+    </mat-card>
+</form>
 
-        <button mat-raised-button type="submit">Submit</button>
-    </form>
-} @else {
-
-    <div>
-        <mat-list>
-            <mat-list-item>
-                <span matListItemTitle>Description:</span>
-                <span matListItemLine>{{ form.get('description')?.value }}</span>
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>Room:</span>
-                <span matListItemLine>test</span> <!-- Assuming you calculate or get the room name -->
-            </mat-list-item>
-            <mat-list-item>
-                <span matListItemTitle>Assignment:</span>
-                <span matListItemLine>{{ form.get('assignment')?.value }}</span>
-            </mat-list-item>
-            @if(form.get('assignment')?.value)
-            {
-                <mat-list-item>
-                    <span matListItemTitle>Assignment Publish:</span>
-                    <span matListItemLine>{{ form.get('assignmentPublish')?.value }}</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <span>Assignment Deadline:</span>
-                    <span>{{ form.get('assignmentDeadline')?.value }}</span>
-                </mat-list-item>
-            }
-        </mat-list>
-    </div>
-
-}
