@@ -19,6 +19,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
+import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
 
 @Component({
   selector: 'app-update-event',
@@ -41,6 +42,7 @@ import {MatInput} from "@angular/material/input";
         MatInput,
         MatCardActions,
         MatButton,
+        GeneralSelectionInput,
     ],
   templateUrl: './update-event.component.html',
   styleUrl: './update-event.component.scss'
@@ -59,6 +61,11 @@ export class UpdateEventComponent {
         room: boolean,
         assignment: boolean
     } = { description: false, room: false, assignment: false }
+
+    protected get formRoom(): RoomModel | undefined
+    {
+        return this.form.get('room')?.value;
+    }
 
     public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService)
     {
@@ -147,4 +154,5 @@ export class UpdateEventComponent {
     }*/
 
     protected readonly frameElement = frameElement;
+    protected readonly RoomModel = RoomModel;
 }

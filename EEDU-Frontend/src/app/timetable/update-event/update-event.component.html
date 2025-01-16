@@ -6,10 +6,10 @@
         </mat-card-header>
         <mat-card-content>
             <div class="data-container">
-                <mat-grid-list cols="4" rowHeight="150px" gutterSize="10px">
+                <mat-grid-list cols="6" rowHeight="150px" gutterSize="5px">
 
                     <!-- Description -->
-                    <mat-grid-tile rowspan="2" colspan="2">
+                    <mat-grid-tile rowspan="2" colspan="3">
                         <mat-card>
                             <mat-card-header class="container-header">
                                 <mat-card-subtitle>Description</mat-card-subtitle>
@@ -22,7 +22,7 @@
                                     <mat-form-field class="edit-description-form-field" appearance="outline">
                                         <textarea
                                             matInput
-                                            style="height: 160px;"
+                                            style="height: 180px;"
                                             formControlName="description"
                                             maxlength="1000"
                                             #descriptionInput></textarea>
@@ -38,7 +38,7 @@
                     </mat-grid-tile>
 
                     <!-- Assignments -->
-                    <mat-grid-tile rowspan="1" colspan="2">
+                    <mat-grid-tile rowspan="2" colspan="3">
                         <mat-card>
                             <mat-card-header>
                                 <mat-card-subtitle>Assignment</mat-card-subtitle>
@@ -52,19 +52,39 @@
                         </mat-card>
                     </mat-grid-tile>
 
-                    <!-- Room -->
-                    <mat-grid-tile rowspan="1" colspan="2">
+                    <mat-grid-tile rowspan="1" colspan="3">
                         <mat-card>
-                        <mat-card-header>
-                            <mat-card-subtitle>Room</mat-card-subtitle>
-                            <button mat-icon-button type="button" (click)="switchEdit = 'room'">
-                                <mat-icon>{{ isEditing('room') ? 'check' : 'edit' }}</mat-icon>
-                            </button>
-                        </mat-card-header>
-                        <mat-card-content>
-                            {{ this.form.get('room')?.value || 'No room specified' }}
-                        </mat-card-content>
-                    </mat-card>
+                            <mat-card-header>
+                                <mat-card-subtitle>Resources</mat-card-subtitle>
+                            </mat-card-header>
+                            <mat-card-content>
+                                Drag and drop files here to upload, or click to browse
+                            </mat-card-content>
+                        </mat-card>
+                    </mat-grid-tile>
+
+                    <!-- Room -->
+                    <mat-grid-tile rowspan="1" colspan="3">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-subtitle>Room</mat-card-subtitle>
+                                <button mat-icon-button type="button" (click)="switchEdit = 'room'">
+                                    <mat-icon>{{ isEditing('room') ? 'check' : 'edit' }}</mat-icon>
+                                </button>
+                            </mat-card-header>
+                            <mat-card-content>
+                                @if(isEditing('room'))
+                                {
+                                    <app-general-selection-input
+                                        placeholder="Enter the room you wish to set this to"
+                                        [values]="rooms" formControlName="room">
+                                    </app-general-selection-input>
+                                }
+                                @else {
+                                    {{ formRoom?.name || 'No room specified' }}
+                                }
+                            </mat-card-content>
+                        </mat-card>
                     </mat-grid-tile>
                 </mat-grid-list>
             </div>
