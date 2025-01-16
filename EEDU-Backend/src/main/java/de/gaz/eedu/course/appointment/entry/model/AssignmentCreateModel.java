@@ -2,12 +2,13 @@ package de.gaz.eedu.course.appointment.entry.model;
 
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
-public record AssignmentCreateModel(@NotNull String description, @NotNull Long submitUntil, @NotNull Long publish)
+// if description is null, this is treated as a delete model
+public record AssignmentCreateModel(@Nullable String description, @NotNull Long submitUntil, @NotNull Long publish)
 {
-
     public boolean assignValues(@NotNull AppointmentEntryEntity entity)
     {
         return entity.setAssignment(this);
@@ -29,4 +30,5 @@ public record AssignmentCreateModel(@NotNull String description, @NotNull Long s
     {
         return Instant.ofEpochMilli(publish);
     }
+
 }

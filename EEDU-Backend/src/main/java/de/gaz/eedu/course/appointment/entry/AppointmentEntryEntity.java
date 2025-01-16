@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -239,16 +242,23 @@ import java.util.Optional;
      */
     public @NotNull Optional<AssignmentModel> getAssignment()
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isStudent = authentication.getAuthorities().stream().anyMatch(authority ->
+        {
+            String authorityName = authority.getAuthority();
+            return authority instanceof SimpleGrantedAuthority && Objects.equals(authorityName, "ROLE_STUDENT");
+        });
+
         Instant until = this.getSubmitAssignmentUntil();
+        Instant publish = this.getPublishAssignment();
         String description = this.getAssignmentDescription();
 
-        // TODO implement this
-        this.publish.isBefore(Instant.now());
-        if (Objects.isNull(description) || Objects.isNull(until))
+        boolean invalid = Objects.isNull(description) || Objects.isNull(publish) || Objects.isNull(until);
+        if(invalid || (publish.isBefore(Instant.now()) && isStudent))
         {
             return Optional.empty();
         }
 
-        return Optional.of(new AssignmentModel(description, until));
+        return Optional.of(new AssignmentModel(description, isStudent ? null : publish, until));
     }
 }

@@ -7,6 +7,7 @@ import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
+import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentRepository;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -22,6 +23,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -61,6 +63,22 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
         return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
     }
 
+    @Contract(pure = true)
+    private static boolean setAssignment(@NotNull AppointmentEntryEntity entity, @Nullable AssignmentCreateModel assignment)
+    {
+        if (Objects.isNull(assignment))
+        {
+            return true;
+        }
+
+        if (Objects.isNull(assignment.description()))
+        {
+            return entity.unsetAssignment();
+        }
+
+        return entity.setAssignment(assignment);
+    }
+
     public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
     {
         AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(appointmentId));
@@ -73,29 +91,21 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
         if(entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
         {
             entity.setRoom(
-                    Objects.isNull(updateModel.room()) ?
-                    null :
+                    Objects.isNull(updateModel.room()) ? null :
                     roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(updateModel.room()))
             );
         }
 
-        if(Objects.nonNull(updateModel.assignment()))
+        if (!setAssignment(entity, updateModel.assignment()))
         {
-            if(!entity.setAssignment(updateModel.assignment()))
-            {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Assignment could not be set.");
-            }
-        }
-        else
-        {
-            entity.unsetAssignment();
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Assignment could not be updated");
         }
 
         if(Objects.equals(hash, entity.hashCode()))
         {
             getEntryRepository().save(entity);
         }
-        
+
         return entity.toModel();
     }
 

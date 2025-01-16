@@ -20,6 +20,12 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
+import {
+    DateTimePickerComponent
+} from "../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
+import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
+import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment-create-model";
+import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 
 @Component({
   selector: 'app-update-event',
@@ -43,6 +49,11 @@ import {GeneralSelectionInput} from "../general-selection-input/general-selectio
         MatCardActions,
         MatButton,
         GeneralSelectionInput,
+        DateTimePickerComponent,
+        MatList,
+        MatListItem,
+        MatListItemTitle,
+        MatListItemLine
     ],
   templateUrl: './update-event.component.html',
   styleUrl: './update-event.component.scss'
@@ -62,11 +73,6 @@ export class UpdateEventComponent {
         assignment: boolean
     } = { description: false, room: false, assignment: false }
 
-    protected get formRoom(): RoomModel | undefined
-    {
-        return this.form.get('room')?.value;
-    }
-
     public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService)
     {
         // automatically fetches the rooms
@@ -79,7 +85,7 @@ export class UpdateEventComponent {
             description: [null],
             room: [null],
             assignment: [null],
-            assignmentPublish: [null],
+            publish: [null],
             submitUntil: [null]
         });
     }
@@ -89,18 +95,50 @@ export class UpdateEventComponent {
 
         this.form.get('description')?.setValue(this.event.description);
         this.form.get('room')?.setValue(this.event.room);
-        this.form.get('assignment')?.setValue(this.event.assignment?.description);
-        this.form.get('submitUntil')?.setValue(this.event.assignment?.submitUntil);
+
+        if(value.assignment)
+        {
+            const assignment: AssignmentModel = value.assignment;
+            this.form.get('assignment')?.setValue(assignment.description);
+            this.form.get('publish')?.setValue(assignment.publish);
+            this.form.get('submitUntil')?.setValue(assignment.submitUntil);
+            return;
+        }
+
+        // Default values when creating a new assignment
+        this.form.get('publish')?.setValue(new Date());
+
+        // TODO next appointment
+        this.form.get('submitUntil')?.setValue(new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)));
+
     }
 
     protected get isCurrentlyEditing(): boolean {
         return this.isEditing('description') || this.isEditing('room') || this.isEditing('assignment');
     }
 
-    protected get hasEdited(): boolean {
-        return this.form.get('description')?.value !== this.event.description
-        || this.form.get('room')?.value !== this.event.room
-        || this.form.get('assignment')?.value !== this.event.assignment;
+    protected hasEdited(field: 'description' | 'room' | 'assignment'): boolean
+    {
+        switch (field)
+        {
+            case 'description': return this.form.get('description')?.value !== this.event.description;
+            case 'room': return this.form.get('room')?.value !== this.event.room;
+            case 'assignment':
+                const assignment: AssignmentModel | undefined = this.event.assignment;
+                if(!assignment)
+                {
+                    return !!this.form.get('assignment')?.value;
+                }
+
+                const assignmentEdited: boolean = this.form.get('assignment')?.value !== this.event.assignment;
+                const publishEdited: boolean = this.form.get('publish')?.value !== assignment.publish;
+                const submitUntilEdited: boolean = this.form.get('submitUntil')?.value !== assignment.submitUntil;
+                return assignmentEdited || publishEdited || submitUntilEdited;
+        }
+    }
+
+    protected get anyEdit(): boolean {
+        return this.hasEdited('description') || this.hasEdited('room') || this.hasEdited('assignment')
     }
 
     protected get enableScroll(): 'scroll' | null
@@ -113,19 +151,18 @@ export class UpdateEventComponent {
         this._edit[current] = !this._edit[current];
     }
 
+    protected get formRoom(): RoomModel | undefined
+    {
+        return this.form.get('room')?.value;
+    }
+
     protected onSubmit(): void
     {
-        let roomId: number | undefined = undefined;
-        const room: RoomModel | undefined = this.form.get('room')?.value;
-        if(room)
-        {
-            roomId = room.id;
-        }
-
         this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
             description: this.form.get('description')?.value,
-            room: roomId,
-            assignment: undefined
+            room: this.form.get('room')?.value?.id,
+            // undefined means not updating  !!!
+            assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
         })).subscribe((response: AppointmentEntryModel): void => { this.appointment = response;  });
     }
 
@@ -145,14 +182,12 @@ export class UpdateEventComponent {
         return this._form;
     }
 
-/*    private get assignmentCreateModel(): GenericAssignmentCreateModel {
+    private get assignmentCreateModel(): GenericAssignmentCreateModel {
         return {
             description: this.form.get("assignment")?.value,
-            publish: (this.form.get('assignmentPublish')?.value as Date),
+            // if the 'assignment' field is undefined, these will be ignored
+            publish: (this.form.get('publish')?.value as Date),
             submitUntil: (this.form.get('submitUntil')?.value as Date)
         }
-    }*/
-
-    protected readonly frameElement = frameElement;
-    protected readonly RoomModel = RoomModel;
+    }
 }
