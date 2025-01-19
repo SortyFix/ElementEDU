@@ -19,7 +19,7 @@
                             </mat-card-header>
                             <mat-card-content [style.overflow]="enableScroll">
                                 @if (isEditing('description')) {
-                                    <mat-form-field class="edit-description-form-field" appearance="outline">
+                                    <mat-form-field class="form-field" appearance="outline">
                                         <textarea
                                             matInput
                                             style="height: 180px;"
@@ -48,8 +48,8 @@
                             </mat-card-header>
                             <mat-card-content>
                                 @if (isEditing('assignment')) {
-                                    <mat-form-field appearance="outline">
-                                        <textarea matInput style="height: 200px;" formControlName="assignment"></textarea>
+                                    <mat-form-field appearance="outline" class="form-field">
+                                        <textarea matInput style="height: 120px;" formControlName="assignment"></textarea>
                                     </mat-form-field>
                                     @if (this.form.get('assignment')?.value) {
                                         <app-date-time-picker label="publish" formControlName="publish"></app-date-time-picker>
@@ -65,7 +65,18 @@
                                                 <span matListItemTitle>Deadline:</span>
                                                 <span matListItemLine>{{ form.get('submitUntil')?.value }}</span>
                                             </mat-list-item>
+                                            <mat-list-item>
+                                                <span matListItemTitle>Submitted:</span>
+                                                <span matListItemLine>not yet</span>
+                                            </mat-list-item>
                                         </mat-list>
+                                        <div class="assignment-drop">
+                                            <input type="file" #fileDropRef multiple>
+                                            <mat-icon>upload</mat-icon>
+                                            <h3>Drag and drop file here</h3>
+                                            <h3>or</h3>
+                                            <label [for]="fileDropRef">Browse for file</label>
+                                        </div>
                                     }
                                 }
 
@@ -74,7 +85,7 @@
                     </mat-grid-tile>
 
                     <!-- Room -->
-                    <mat-grid-tile rowspan="1" colspan="1">
+                    <mat-grid-tile rowspan="1" colspan="2">
                         <mat-card>
                             <mat-card-header>
                                 <mat-card-subtitle>Room</mat-card-subtitle>
@@ -86,8 +97,11 @@
                                 @if(isEditing('room'))
                                 {
                                     <app-general-selection-input
+                                        class="form-field"
+                                        [label]="null"
                                         placeholder="Enter the room you wish to set this to"
-                                        [values]="rooms" formControlName="room">
+                                        [values]="rooms"
+                                        formControlName="room">
                                     </app-general-selection-input>
                                 }
                                 @else {
@@ -97,13 +111,13 @@
                         </mat-card>
                     </mat-grid-tile>
 
-                    <mat-grid-tile rowspan="1" colspan="2">
+                    <mat-grid-tile rowspan="1" colspan="1">
                         <mat-card>
                             <mat-card-header>
                                 <mat-card-subtitle>Resources</mat-card-subtitle>
                             </mat-card-header>
                             <mat-card-content style="text-align: center">
-                                <mat-icon style="color: black">upload_file</mat-icon>
+                                <mat-icon>upload_file</mat-icon>
                             </mat-card-content>
                         </mat-card>
                     </mat-grid-tile>

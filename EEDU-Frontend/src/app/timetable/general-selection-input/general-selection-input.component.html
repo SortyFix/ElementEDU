@@ -1,5 +1,5 @@
 <mat-form-field appearance="outline">
-    <mat-label>{{ label() }}</mat-label>
+    <mat-label *ngIf="label()">{{ label() }}</mat-label>
     <input
         type="text"
         matInput

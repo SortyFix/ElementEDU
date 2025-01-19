@@ -2,7 +2,7 @@ import {Component, forwardRef, input, InputSignal, Type} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatInput} from "@angular/material/input";
-import {AsyncPipe, NgForOf} from "@angular/common";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {map, Observable, startWith, Subscriber} from "rxjs";
 import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator} from "@angular/forms";
 
@@ -51,7 +51,8 @@ const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSele
         NgForOf,
         FormsModule,
         AsyncPipe,
-        MatLabel
+        MatLabel,
+        NgIf
     ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true },
@@ -62,7 +63,7 @@ const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSele
 })
 export class GeneralSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
 
-    public label: InputSignal<string> = input<string>('');
+    public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
     public values: InputSignal<T[]> = input<T[]>([]);
     public allowNull: InputSignal<boolean> = input<boolean>(false);
