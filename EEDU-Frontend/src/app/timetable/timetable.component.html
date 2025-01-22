@@ -70,6 +70,10 @@
                 [appointment]="selectedAppointment" #eventComponent
             ></app-update-event>
         }
+        @else if (selectedEvent && selectedEvent.meta.type == FrequentAppointmentModel)
+        {
+            <button mat-raised-button (click)="createEvent()">Edit data</button>
+        }
     </div>
 
 </div>

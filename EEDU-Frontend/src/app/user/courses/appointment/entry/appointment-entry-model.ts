@@ -34,6 +34,7 @@ export class AppointmentEntryModel {
     public asEvent(name: string): CalendarEvent
     {
         return {
+            id: Number(this.id),
             title: name,
             start: this.start,
             end: this.end,

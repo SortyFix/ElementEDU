@@ -27,6 +27,8 @@ import {CreateCourseComponent} from "../user/courses/create-course/create-course
 import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
 import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
 import {UpdateEventComponent} from "./update-event/update-event.component";
+import {AppointmentService} from "../user/courses/appointment/appointment.service";
+import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointment-create-model";
 
 
 @Component({
@@ -69,19 +71,41 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private readonly _CalendarView: typeof CalendarView = CalendarView;
     private _events: CalendarEvent[] = [];
 
-    private _selectedEvent!: CalendarEvent;
+    private _selectedEvent?: CalendarEvent;
 
-    protected get selectedEvent(): CalendarEvent {
+    protected get selectedEvent(): CalendarEvent | undefined {
         return this._selectedEvent;
     }
 
     protected get selectedAppointment(): AppointmentEntryModel {
-        return this.selectedEvent.meta.eventData;
+        return this.selectedEvent?.meta.eventData;
+    }
+
+    protected createEvent(): void
+    {
+        if(!this.selectedEvent)
+        {
+            return;
+        }
+
+        const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
+        this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
+            start: this.selectedEvent.start,
+            room: frequentData.room.id,
+            duration: frequentData.duration,
+        })]).subscribe((createdEvent: AppointmentEntryModel[]): void =>
+        {
+            this.selectedEvent = this.events.find((current: CalendarEvent): boolean =>
+            {
+                return typeof current.id === 'number' && BigInt(current.id) === createdEvent[0].id;
+            });
+        });
     }
 
     constructor(
         private readonly _dialogRef: MatDialog,
         private readonly _courseService: CourseService,
+        private readonly _appointmentService: AppointmentService,
         private readonly _accessibilityService: AccessibilityService,
         @Inject(DOCUMENT) private document: any,
     ) {}
@@ -159,7 +183,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
 
-    private set selectedEvent(value: CalendarEvent) {
+    private set selectedEvent(value: CalendarEvent | undefined) {
         this._selectedEvent = value;
     }
 
@@ -260,4 +284,5 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     protected readonly AppointmentEntryModel = AppointmentEntryModel;
+    protected readonly FrequentAppointmentModel = FrequentAppointmentModel;
 }

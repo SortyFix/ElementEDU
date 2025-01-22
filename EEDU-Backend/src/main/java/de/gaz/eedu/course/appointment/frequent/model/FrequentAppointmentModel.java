@@ -12,7 +12,7 @@ public record FrequentAppointmentModel(@NotNull Long id,
                                        @NotNull Long start,
                                        @NotNull Long end,
                                        @NotNull Long duration,
-                                       @NotNull Long period) implements EntityModel
+                                       @NotNull Long frequency) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()
@@ -21,7 +21,7 @@ public record FrequentAppointmentModel(@NotNull Long id,
                 "id=" + id +
                 ", start=" + start +
                 ", duration=" + duration +
-                ", period=" + period +
+                ", frequency=" + frequency +
                 '}';
     }
 

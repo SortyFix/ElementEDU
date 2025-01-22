@@ -11,6 +11,7 @@ import {
 } from "./frequent/frequent-appointment-create-model";
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
+import {CourseModel} from "../course-model";
 
 @Injectable({
     providedIn: 'root'
@@ -91,7 +92,9 @@ export class AppointmentService {
         ).pipe(
             map((response: any[]): FrequentAppointmentModel[] =>
             {
-                return response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, []))
+                return response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, (): CourseModel => {
+                    return <CourseModel>this.courseService.findCourseLazily(course);
+                }))
             }),
             tap({ next: (appointments: FrequentAppointmentModel[]): void => {
                 this.pushFrequent(course, appointments)

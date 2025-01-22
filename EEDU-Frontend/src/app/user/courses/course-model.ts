@@ -19,19 +19,28 @@ export class CourseModel {
         private _appointmentEntries: readonly AppointmentEntryModel[],
         private _frequentAppointments: readonly FrequentAppointmentModel[]) {}
 
-    private static getEntries(obj: GenericAppointmentEntry[]): AppointmentEntryModel[] {
+    private static getEntries(obj: GenericAppointmentEntry[]): AppointmentEntryModel[]
+    {
         return obj.map((entry: GenericAppointmentEntry): AppointmentEntryModel => AppointmentEntryModel.fromObject(entry));
     }
 
-    public static fromObject(object: GenericCourse): CourseModel {
-        const appointmentEntries: AppointmentEntryModel[] = this.getEntries(object.appointmentEntries);
-        return new CourseModel(
+    public static fromObject(object: GenericCourse): CourseModel
+    {
+        const course: CourseModel = new CourseModel(
             BigInt(object.id),
             object.name,
             SubjectModel.fromObject(object.subject),
-            appointmentEntries,
-            this.getFrequentAppointments(object.frequentAppointments, appointmentEntries)
+            this.getEntries(object.appointmentEntries),
+            object.frequentAppointments.map((entry: any): FrequentAppointmentModel =>
+            {
+                // when this method is called,
+                // the course will already be created
+                // and can therefore safely be returned here
+
+                return FrequentAppointmentModel.fromObject(entry, (): CourseModel => course);
+            })
         );
+        return course;
     }
 
     public attachAppointment(appointment: AppointmentEntryModel): void
@@ -41,22 +50,15 @@ export class CourseModel {
             if (item.id !== appointment.id) {
                 return item;
             }
-            console.log("replace")
             replaced = true;
             return appointment;
         });
 
-        if (!replaced) {
-            console.log("set")
-            this._appointmentEntries = [...this._appointmentEntries, appointment]
+        if (replaced) {
+            return;
         }
 
-        if(appointment.hasAttached())
-        {
-            this.frequentAppointments.find(
-                (event: FrequentAppointmentModel): boolean => appointment.isPart(event.id)
-            )?.pushEvent(appointment);
-        }
+        this._appointmentEntries = [...this._appointmentEntries, appointment]
     }
 
     public attachFrequentAppointment(frequentAppointmentModel: FrequentAppointmentModel): void
@@ -93,18 +95,5 @@ export class CourseModel {
 
     public get frequentAppointments(): readonly FrequentAppointmentModel[] {
         return this._frequentAppointments;
-    }
-
-    private static getFrequentAppointments(obj: any, entries: AppointmentEntryModel[]): FrequentAppointmentModel[]
-    {
-        return obj.map((entry: any): FrequentAppointmentModel =>
-        {
-            const filtered: AppointmentEntryModel[] = entries.filter((current: AppointmentEntryModel): boolean =>
-            {
-                return current.isPart(entry.id);
-            });
-
-            return FrequentAppointmentModel.fromObject(entry, filtered)
-        });
     }
 }
