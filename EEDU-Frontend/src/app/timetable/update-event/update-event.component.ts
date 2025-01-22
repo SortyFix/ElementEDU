@@ -20,12 +20,12 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
+import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
+import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment-create-model";
+import {AssignmentTabComponent} from "./assignment-tab/assignment-tab.component";
 import {
     DateTimePickerComponent
 } from "../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
-import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
-import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment-create-model";
-import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 
 @Component({
   selector: 'app-update-event',
@@ -49,11 +49,8 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
         MatCardActions,
         MatButton,
         GeneralSelectionInput,
-        DateTimePickerComponent,
-        MatList,
-        MatListItem,
-        MatListItemTitle,
-        MatListItemLine
+        AssignmentTabComponent,
+        DateTimePickerComponent
     ],
   templateUrl: './update-event.component.html',
   styleUrl: './update-event.component.scss'
@@ -130,9 +127,10 @@ export class UpdateEventComponent {
                     return !!this.form.get('assignment')?.value;
                 }
 
-                const assignmentEdited: boolean = this.form.get('assignment')?.value !== this.event.assignment;
-                const publishEdited: boolean = this.form.get('publish')?.value !== assignment.publish;
-                const submitUntilEdited: boolean = this.form.get('submitUntil')?.value !== assignment.submitUntil;
+                const assignmentEdited: boolean = this.form.get('assignment')?.value !== assignment.description;
+                const publishEdited: boolean = (this.form.get('publish')?.value as Date).getTime() !== assignment.publish.getTime();
+                const submitUntilEdited: boolean = (this.form.get('submitUntil')?.value as Date).getTime() !== assignment.submitUntil.getTime();
+
                 return assignmentEdited || publishEdited || submitUntilEdited;
         }
     }
@@ -189,5 +187,13 @@ export class UpdateEventComponent {
             publish: (this.form.get('publish')?.value as Date),
             submitUntil: (this.form.get('submitUntil')?.value as Date)
         }
+    }
+
+    protected get assignmentModel(): AssignmentModel {
+        return AssignmentModel.fromObject({
+            description: this.form.get('assignment')?.value,
+            publish: this.form.get('publish')?.value,
+            submitUntil: this.form.get('submitUntil')?.value
+        });
     }
 }

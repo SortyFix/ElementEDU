@@ -47,38 +47,16 @@
                                 </button>
                             </mat-card-header>
                             <mat-card-content>
-                                @if (isEditing('assignment')) {
+
+                                <app-assignment-tab [editing]="isEditing('assignment')" [assignment]="assignmentModel">
                                     <mat-form-field appearance="outline" class="form-field">
                                         <textarea matInput style="height: 120px;" formControlName="assignment"></textarea>
                                     </mat-form-field>
-                                    @if (this.form.get('assignment')?.value) {
+                                    <div *ngIf="form.get('assignment')?.value">
                                         <app-date-time-picker label="publish" formControlName="publish"></app-date-time-picker>
                                         <app-date-time-picker label="deadline" formControlName="submitUntil"></app-date-time-picker>
-                                    }
-                                } @else {
-                                    {{ form.get('assignment')?.value || 'No assignment given' }}
-
-                                    @if (form.get('assignment')?.value)
-                                    {
-                                        <mat-list>
-                                            <mat-list-item>
-                                                <span matListItemTitle>Deadline:</span>
-                                                <span matListItemLine>{{ form.get('submitUntil')?.value }}</span>
-                                            </mat-list-item>
-                                            <mat-list-item>
-                                                <span matListItemTitle>Submitted:</span>
-                                                <span matListItemLine>not yet</span>
-                                            </mat-list-item>
-                                        </mat-list>
-                                        <div class="assignment-drop">
-                                            <input type="file" #fileDropRef multiple>
-                                            <mat-icon>upload</mat-icon>
-                                            <h3>Drag and drop file here</h3>
-                                            <h3>or</h3>
-                                            <label [for]="fileDropRef">Browse for file</label>
-                                        </div>
-                                    }
-                                }
+                                    </div>
+                                </app-assignment-tab>
 
                             </mat-card-content>
                         </mat-card>

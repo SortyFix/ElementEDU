@@ -1,0 +1,42 @@
+@if (editing())
+{
+    <ng-content></ng-content>
+}
+@else
+{
+    {{ assignment()?.description || 'No assignment given' }}
+
+    <div *ngIf="assignment()?.description">
+        <mat-list>
+            <mat-list-item>
+                <span matListItemTitle>Deadline:</span>
+                <span matListItemLine>{{ assignment()?.submitUntil }}</span>
+            </mat-list-item>
+        </mat-list>
+        <div
+            class="assignment-drop"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            [class.dragging]="isDragging"
+        >
+            <input
+                type="file"
+                #fileDropRef
+                multiple
+                (change)="onFileSelected($event)"
+                hidden
+            />
+            <h3>Drag and drop file here</h3>
+            <h3>or</h3>
+            <label (click)="browseFiles(fileDropRef)">Browse for file</label>
+        </div>
+
+        <div class="file-list">
+            <h4>Uploaded Files:</h4>
+            <ul>
+                <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+            </ul>
+        </div>
+    </div>
+}
