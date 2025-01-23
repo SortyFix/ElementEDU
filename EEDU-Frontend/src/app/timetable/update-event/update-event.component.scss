@@ -5,23 +5,11 @@
     mat-grid-tile {
         overflow: visible;
 
-        mat-card {
+        app-event-tile-content {
             width: 100%;
             height: 100%;
             overflow: visible;
             margin: 5px;
-
-            mat-card-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 10px;
-
-                button {
-                    position: absolute;
-                    top: 5px;
-                    right: 5px;
-                }
-            }
         }
     }
 }

@@ -1,3 +1,16 @@
+.placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 350px;
+
+    mat-icon {
+        transform: scale(4);
+        -webkit-text-fill-color: var(--widget-color);
+    }
+}
+
 .assignment-drop {
     width: 450px;
     height: 150px;

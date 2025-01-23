@@ -16,7 +16,7 @@ import {
 } from "@angular/material/card";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {MatIcon} from "@angular/material/icon";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
@@ -26,6 +26,8 @@ import {AssignmentTabComponent} from "./assignment-tab/assignment-tab.component"
 import {
     DateTimePickerComponent
 } from "../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
+import {EventTileContentComponent} from "./event-tile-content/event-tile-content.component";
+import {RoomTabComponent} from "./room-tab/room-tab.component";
 
 @Component({
   selector: 'app-update-event',
@@ -42,7 +44,6 @@ import {
         MatGridList,
         MatGridTile,
         MatIcon,
-        MatIconButton,
         MatIcon,
         MatFormField,
         MatInput,
@@ -50,7 +51,9 @@ import {
         MatButton,
         GeneralSelectionInput,
         AssignmentTabComponent,
-        DateTimePickerComponent
+        DateTimePickerComponent,
+        EventTileContentComponent,
+        RoomTabComponent
     ],
   templateUrl: './update-event.component.html',
   styleUrl: './update-event.component.scss'
@@ -63,12 +66,6 @@ export class UpdateEventComponent {
     private _event!: AppointmentEntryModel;
     private readonly _form: FormGroup;
     private readonly _rooms: RoomModel[] = [];
-
-    private readonly _edit: {
-        description: boolean,
-        room: boolean,
-        assignment: boolean
-    } = { description: false, room: false, assignment: false }
 
     public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService)
     {
@@ -110,10 +107,6 @@ export class UpdateEventComponent {
 
     }
 
-    protected get isCurrentlyEditing(): boolean {
-        return this.isEditing('description') || this.isEditing('room') || this.isEditing('assignment');
-    }
-
     protected hasEdited(field: 'description' | 'room' | 'assignment'): boolean
     {
         switch (field)
@@ -139,21 +132,6 @@ export class UpdateEventComponent {
         return this.hasEdited('description') || this.hasEdited('room') || this.hasEdited('assignment')
     }
 
-    protected get enableScroll(): 'scroll' | null
-    {
-        return this.isEditing('description') ? null : 'scroll'
-    }
-
-    protected set switchEdit(current: 'description' | 'room' | 'assignment')
-    {
-        this._edit[current] = !this._edit[current];
-    }
-
-    protected get formRoom(): RoomModel | undefined
-    {
-        return this.form.get('room')?.value;
-    }
-
     protected onSubmit(): void
     {
         this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
@@ -162,10 +140,6 @@ export class UpdateEventComponent {
             // undefined means not updating  !!!
             assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
         })).subscribe((response: AppointmentEntryModel): void => { this.appointment = response;  });
-    }
-
-    protected isEditing(current: 'description' | 'room' | 'assignment'): boolean {
-        return this._edit[current];
     }
 
     protected get event(): AppointmentEntryModel {

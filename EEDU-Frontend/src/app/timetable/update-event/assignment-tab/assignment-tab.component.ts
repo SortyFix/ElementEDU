@@ -3,6 +3,7 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AssignmentModel} from "../../../user/courses/appointment/entry/assignment-model";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-assignment-tab',
@@ -16,6 +17,7 @@ import {AssignmentModel} from "../../../user/courses/appointment/entry/assignmen
         MatList,
         ReactiveFormsModule,
         NgIf,
+        MatIcon,
     ],
   templateUrl: './assignment-tab.component.html',
   styleUrl: './assignment-tab.component.scss'

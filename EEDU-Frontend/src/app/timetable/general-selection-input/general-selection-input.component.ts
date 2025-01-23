@@ -1,9 +1,9 @@
-import {Component, forwardRef, input, InputSignal, Type} from '@angular/core';
+import {Component, forwardRef, input, InputSignal, OnChanges, Type} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material/autocomplete";
 import {MatInput} from "@angular/material/input";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
-import {map, Observable, startWith, Subscriber} from "rxjs";
+import {BehaviorSubject, combineLatest, map, Observable} from "rxjs";
 import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator} from "@angular/forms";
 
 const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSelectionInput => GeneralSelectionInput);
@@ -61,13 +61,15 @@ const type: Type<GeneralSelectionInput<any>> = forwardRef((): typeof GeneralSele
     templateUrl: './general-selection-input.component.html',
     styleUrl: './general-selection-input.component.scss'
 })
-export class GeneralSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
+export class GeneralSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator, OnChanges {
 
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
     public values: InputSignal<T[]> = input<T[]>([]);
     public allowNull: InputSignal<boolean> = input<boolean>(false);
 
+    private inputSubject: BehaviorSubject<string> = new BehaviorSubject<string>(''); // Track user input
+    private valuesSubject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]); // Track available values
     private readonly _filteredValues!: Observable<T[]>;
 
     private _value!: T | null;
@@ -83,12 +85,19 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      * @public
      */
     constructor() {
-        this._filteredValues = new Observable<string>((observer: Subscriber<string>): void => {
-            observer.next(this._value?.name || '');
-        }).pipe(
-            startWith(''),
-            map((inputValue: string): T[] => this.filterValues(inputValue))
+        this._filteredValues = combineLatest([
+            this.inputSubject.asObservable(),
+            this.valuesSubject.asObservable()
+        ]).pipe(
+            map(([inputValue, values]) => this.filterValues(inputValue, values))
         );
+    }
+
+    /**
+     * Updates the values when the input changes
+     */
+    public ngOnChanges(): void {
+        this.valuesSubject.next(this.values());
     }
 
     /**
@@ -98,12 +107,13 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      * It performs a case-insensitive match and returns an array of values that include the input string.
      *
      * @param inputValue the input string to filter values against.
+     * @param values the available values which can be set.
      * @returns an array of values of type T that match the filter criteria.
      * @private
      */
-    private filterValues(inputValue: string): T[] {
+    private filterValues(inputValue: string, values: T[]): T[] {
         const filterValue: string = inputValue.toLowerCase();
-        return this.values().filter((value: T): boolean => value.name.toLowerCase().includes(filterValue));
+        return values.filter((value: T) => value.name.toLowerCase().includes(filterValue));
     }
 
     /**
@@ -117,6 +127,8 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      * @public
      */
     public onInputChange(value: string): void {
+        this.inputSubject.next(value);
+
         const matchedValue: T | null = this.values().find((item: T) => item.name === value) || null;
         this._value = matchedValue;
         this._onChange(matchedValue);
@@ -133,6 +145,7 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      */
     public writeValue(value: T | null): void {
         this._value = value;
+        this.inputSubject.next(value?.name || ''); // Sync input value
     }
 
     /**
@@ -172,13 +185,11 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      * @public
      */
     public validate(): { invalidCourse: boolean } | null {
-
-        if(this.allowNull() && !this._value)
-        {
+        if (this.allowNull() && !this._value) {
             return null;
         }
 
-        const isValid: boolean = this.values().some((item: T): boolean => item.name === this._value?.name);
+        const isValid = this.values().some((item: T) => item.name === this._value?.name);
         return isValid ? null : { invalidCourse: true };
     }
 
