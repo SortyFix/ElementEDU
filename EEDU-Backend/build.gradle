@@ -104,7 +104,7 @@ tasks.register('generateDockerfile', Dockerfile) {
 tasks.register('syncJarFile', Copy) {
     dependsOn assemble
     from jar.destinationDirectory
-    into "$buildDir/docker"
+    into "$layout/docker"
 }
 
 
