@@ -22,6 +22,7 @@ export class AbstractComponent implements OnInit {
         {title:'Timetable', icon_name:'calendar_view_week', route: 'timetable'},
         {title:'News', icon_name: 'newspaper', route: 'news'},
         {title:'Chat', icon_name: 'forum', route: 'chat'},
+        {title:'Issue sick note', icon_name: 'disabled_by_default', route: 'illness-notification'},
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
 
