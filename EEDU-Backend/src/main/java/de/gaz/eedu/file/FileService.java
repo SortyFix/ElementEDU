@@ -91,10 +91,11 @@ import java.util.zip.ZipOutputStream;
 
             System.out.println(files[0].getName() + " " + headers);
 
-            ResponseEntity<ByteArrayResource> responseEntity = ResponseEntity.ok()
-                                                                             .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
-                                                                             .headers(headers)
-                                                                             .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
+            ResponseEntity<ByteArrayResource> responseEntity =
+                    ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
+                            .headers(headers)
+                            .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
             System.out.println(responseEntity);
             return responseEntity;
         }
@@ -110,7 +111,6 @@ import java.util.zip.ZipOutputStream;
                              .headers(headers)
                              .body(zipBatch(files));
     }
-
 
     public ByteArrayResource zipBatch(File @NotNull ... files)
     {
