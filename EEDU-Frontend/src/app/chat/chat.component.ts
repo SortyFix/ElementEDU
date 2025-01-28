@@ -17,9 +17,6 @@ import {Subscription} from "rxjs";
 import {
     MatDrawer,
     MatDrawerContainer,
-    MatDrawerContent,
-    MatSidenav,
-    MatSidenavContainer
 } from "@angular/material/sidenav";
 
 @Component({
@@ -32,16 +29,12 @@ import {
         MatIcon,
         MatLabel,
         MatInput,
-        ChatCreationComponent,
         NgIf,
         MatFormField,
         FormsModule,
         MatIconButton,
         DatePipe,
-        MatSidenav,
-        MatSidenavContainer,
         MatDrawerContainer,
-        MatDrawerContent,
         MatDrawer
     ],
   templateUrl: './chat.component.html',

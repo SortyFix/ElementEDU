@@ -3,14 +3,11 @@ import {UserModel, UserStatus} from "../user-model";
 import {
     MatList,
     MatListItem,
-    MatListItemLine,
-    MatListItemMeta,
     MatListItemTitle,
-    MatNavList
 } from "@angular/material/list";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
-import {MatChip, MatChipRow, MatChipSet} from "@angular/material/chips";
+import {MatChip, MatChipSet} from "@angular/material/chips";
 import {
     MatAccordion,
     MatExpansionPanel,
@@ -21,39 +18,28 @@ import {
 import {MatCheckbox} from "@angular/material/checkbox";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {NgForOf, NgIf, NgStyle} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
-import {MatDivider} from "@angular/material/divider";
 import {MatLine} from "@angular/material/core";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {GroupDialogComponent} from "../group/group-dialog/group-dialog.component";
-import {MatCard, MatCardTitle} from "@angular/material/card";
-import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {AccessibilityService} from "../../accessibility.service";
 import {GroupSelectionList} from "../group/group-list/group-selection-list.component";
-import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
     imports: [
-        MatNavList,
         MatListItem,
         MatListItemTitle,
-        MatIconButton,
         MatIcon,
-        MatChipRow,
         MatChipSet,
         MatChip,
-        MatListItemMeta,
         MatExpansionPanel,
         MatAccordion,
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
         MatExpansionPanelHeader,
         MatCheckbox,
-        MatListItemLine,
         MatFormField,
         MatInput,
         MatLabel,
@@ -62,16 +48,9 @@ import {MatRadioButton, MatRadioGroup} from "@angular/material/radio";
         FormsModule,
         NgForOf,
         MatTooltip,
-        NgStyle,
-        MatDivider,
         MatList,
         MatLine,
-        MatCard,
-        MatCardTitle,
-        MatSlideToggle,
         GroupSelectionList,
-        MatRadioGroup,
-        MatRadioButton
     ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
@@ -83,7 +62,7 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService, protected dialog: MatDialog) {}
+    constructor(protected accessibilityService: AccessibilityService) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS

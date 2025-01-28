@@ -2,9 +2,9 @@ plugins {
     id "com.github.node-gradle.node" version "7.0.1"
 }
 
-def nodejs = "23.1.0"
-def npm = "10.9.0"
-def angularVersion = "18.2.10"
+final String nodejs = "23.6.1"
+final String npm = "11.0.0"
+final String angularVersion = "19.1.4"
 
 node {
     version = nodejs

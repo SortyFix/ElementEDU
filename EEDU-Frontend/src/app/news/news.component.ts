@@ -9,7 +9,6 @@ import {MatIcon} from "@angular/material/icon";
 import {MatFabButton} from "@angular/material/button";
 import {Dialog} from "@angular/cdk/dialog";
 import {ArticleCreationComponent} from "./article-creation/article-creation.component";
-import {FileUploadButtonComponent} from "../file/file-upload-button/file-upload-button.component";
 import {UserService} from "../user/user.service";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 
@@ -22,7 +21,6 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
         NgForOf,
         MatIcon,
         MatFabButton,
-        FileUploadButtonComponent,
         NgIf,
         MatPaginator
     ],
