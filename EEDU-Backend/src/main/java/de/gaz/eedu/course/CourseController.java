@@ -4,6 +4,7 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.UserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 //TODO manage access. Yes, I'll do it later
 
@@ -65,6 +67,13 @@ public class CourseController extends EntityController<CourseService, CourseMode
     public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
     {
         return ResponseEntity.ok(getService().getCourses(user));
+    }
+
+    @GetMapping("/get/users/{course}")
+    public @NotNull ResponseEntity<UserModel[]> getUsers(@PathVariable long course)
+    {
+        Stream<UserModel> models = getService().loadEntityByIDSafe(course).getUsers().stream().map(UserEntity::toModel);
+        return ResponseEntity.ok(models.toArray(UserModel[]::new));
     }
 
     @GetMapping("/get/all")

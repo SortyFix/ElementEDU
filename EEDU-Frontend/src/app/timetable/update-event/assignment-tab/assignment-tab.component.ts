@@ -4,6 +4,8 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AssignmentModel} from "../../../user/courses/appointment/entry/assignment-model";
 import {MatIcon} from "@angular/material/icon";
+import {UserService} from "../../../user/user.service";
+import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignment-teacher-view.component";
 
 @Component({
   selector: 'app-assignment-tab',
@@ -18,6 +20,7 @@ import {MatIcon} from "@angular/material/icon";
         ReactiveFormsModule,
         NgIf,
         MatIcon,
+        AssignmentTeacherViewComponent,
     ],
   templateUrl: './assignment-tab.component.html',
   styleUrl: './assignment-tab.component.scss'
@@ -26,10 +29,20 @@ export class AssignmentTabComponent {
 
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
     public readonly assignment: InputSignal<AssignmentModel | undefined> = input<AssignmentModel | undefined>();
-    isDragging: boolean = false;
-    uploadedFiles: File[] = [];
+    protected isDragging: boolean = false;
+    protected uploadedFiles: File[] = [];
 
-    readonly MAX_FILES = 3;
+    private readonly MAX_FILES: 3 = 3;
+
+    constructor(private _userService: UserService) {}
+
+    protected get isTeacher(): boolean {
+        return this._userService.getUserData.inGroup('teacher');
+    }
+
+    protected get isStudent(): boolean {
+        return this._userService.getUserData.inGroup('student');
+    }
 
     protected onDragOver(event: DragEvent): void {
         event.preventDefault();

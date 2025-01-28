@@ -17,7 +17,8 @@ export class CourseModel {
         private readonly _name: string,
         private readonly _subject: SubjectModel,
         private _appointmentEntries: readonly AppointmentEntryModel[],
-        private _frequentAppointments: readonly FrequentAppointmentModel[]) {}
+        private _frequentAppointments: readonly FrequentAppointmentModel[]
+    ) {}
 
     private static getEntries(obj: GenericAppointmentEntry[]): AppointmentEntryModel[]
     {

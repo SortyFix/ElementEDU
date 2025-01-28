@@ -4,10 +4,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseRepository;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.model.*;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentRepository;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -17,6 +14,7 @@ import de.gaz.eedu.course.room.RoomRepository;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
+import de.gaz.eedu.user.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -61,6 +59,18 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
 
         // This allows me to encode both the course id and the timestamp into a single id
         return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
+    }
+
+    public @NotNull List<AssignmentInsightModel> getInsight(@NotNull AppointmentEntryEntity entry)
+    {
+        Set<AssignmentInsightModel> assignmentInsights = new HashSet<>();
+
+        CourseEntity course = entry.getCourse();
+        for (UserEntity user : course.getUsers())
+        {
+            //assignmentInsights.add(new AssignmentInsightModel(user.getLoginName(), ))
+        }
+        return List.copyOf(assignmentInsights);
     }
 
     @Contract(pure = true)

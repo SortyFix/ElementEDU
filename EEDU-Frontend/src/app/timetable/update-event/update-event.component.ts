@@ -15,7 +15,6 @@ import {
     MatCardTitle
 } from "@angular/material/card";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {MatIcon} from "@angular/material/icon";
 import {MatButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
@@ -43,8 +42,6 @@ import {RoomTabComponent} from "./room-tab/room-tab.component";
         MatHint,
         MatGridList,
         MatGridTile,
-        MatIcon,
-        MatIcon,
         MatFormField,
         MatInput,
         MatCardActions,

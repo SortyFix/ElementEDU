@@ -3,6 +3,7 @@ import {environment} from "../../../environment/environment";
 import {HttpClient} from "@angular/common/http";
 import {BehaviorSubject, map, Observable, tap} from "rxjs";
 import {CourseModel} from "./course-model";
+import {UserModel} from "../user-model";
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +20,14 @@ export class CourseService {
         return this.http.get<any[]>(url, { withCredentials: true }).pipe(
             map((courses: any[]): CourseModel[] => courses.map((item: any): CourseModel => CourseModel.fromObject(item))),
             tap((courses: CourseModel[]): void => { this._courseSubject.next(courses); }),
+        );
+    }
+
+    public fetchUsers(course: bigint): Observable<UserModel[]>
+    {
+        const url: string = `${this.BACKEND_URL}/get/users/${course}`;
+        return this.http.get<UserModel[]>(url).pipe(
+            map((user: any[]): UserModel[] => user.map((item: any): UserModel => UserModel.fromObject(item)))
         );
     }
 

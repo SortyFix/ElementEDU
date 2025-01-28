@@ -12,9 +12,7 @@ export class UserService
     private readonly BACKEND_URL: string = environment.backendUrl;
     private _loaded: boolean = false;
 
-    constructor(private http: HttpClient)
-    {
-    }
+    constructor(private http: HttpClient) {}
 
     public loadData(): Observable<void>
     {

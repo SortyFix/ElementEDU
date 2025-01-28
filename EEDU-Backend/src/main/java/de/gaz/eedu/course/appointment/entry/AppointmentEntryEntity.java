@@ -94,6 +94,18 @@ import java.util.Optional;
         log.info("User {} has uploaded files to appointment entry {}", user.getId(), getId());
     }
 
+    public boolean hasSubmitted(@NotNull UserEntity user)
+    {
+        if(!getCourse().getUsers().contains(user))
+        {
+            return false;
+        }
+
+
+        // TODO check if was uploaded (e.g wait for yonas)
+        return false;
+    }
+
     private @NotNull String uploadPath(@NotNull UserEntity user)
     {
         return String.format("%s/%s", getId(), user.getId());

@@ -49,7 +49,7 @@
                     </mat-grid-tile>
 
                     <!-- Room -->
-                    <mat-grid-tile rowspan="1" colspan="2" >
+                    <mat-grid-tile rowspan="1" colspan="3" >
                         <app-event-tile-content title="Room" #room>
                             <app-room-tab [editing]="room.editing" [room]="form.get('room')?.value">
                                 <app-general-selection-input
@@ -62,8 +62,8 @@
                             </app-room-tab>
                         </app-event-tile-content>
                     </mat-grid-tile>
-
-                    <mat-grid-tile rowspan="1" colspan="1">
+<!--
+                    <mat-grid-tile rowspan="1" colspan="2">
                         <mat-card>
                             <mat-card-header>
                                 <mat-card-subtitle>Resources</mat-card-subtitle>
@@ -72,7 +72,7 @@
                                 <mat-icon>upload_file</mat-icon>
                             </mat-card-content>
                         </mat-card>
-                    </mat-grid-tile>
+                    </mat-grid-tile>-->
                 </mat-grid-list>
             </div>
         </mat-card-content>
