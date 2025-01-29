@@ -8,7 +8,7 @@ export enum UserStatus
 
 export class UserModel
 {
-    constructor(public readonly id: number,
+    constructor(public readonly id: bigint,
                 public readonly firstName: string,
                 public readonly lastName: string,
                 public readonly loginName: string,
