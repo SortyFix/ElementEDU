@@ -7,6 +7,9 @@ import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 @AllArgsConstructor @NoArgsConstructor @Getter @Setter @Entity @Builder @Table(name="illness_notification_entity")
 public class IllnessNotificationEntity implements EntityObject, EntityModelRelation<IllnessNotificationModel>
@@ -17,7 +20,7 @@ public class IllnessNotificationEntity implements EntityObject, EntityModelRelat
     private String reason;
     private Long timeStamp;
     private Long expirationTime;
-    @OneToOne @JoinColumn(name = "file_entity_id", unique = true) private FileEntity fileEntity;
+    @OneToOne @JoinColumn(name = "file_entity_id", unique = true, nullable = true) @Nullable private FileEntity fileEntity;
 
     @Override
     public IllnessNotificationModel toModel()
@@ -28,6 +31,6 @@ public class IllnessNotificationEntity implements EntityObject, EntityModelRelat
                 reason,
                 getTimeStamp(),
                 getExpirationTime(),
-                fileEntity.toModel());
+                Objects.nonNull(fileEntity) ? fileEntity.toModel() : null);
     }
 }

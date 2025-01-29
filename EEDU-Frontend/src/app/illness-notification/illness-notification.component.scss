@@ -1,0 +1,81 @@
+.text {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.full-width-field {
+    width: 100%;
+}
+
+.reason-textarea textarea {
+    min-height: 150px;
+}
+
+.file-upload-container {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: var(--background-color);
+    transition: border-color 0.3s ease;
+}
+
+.file-upload-container:hover {
+    border-color: rebeccapurple;
+}
+
+.file-upload-label {
+    cursor: pointer;
+    display: block;
+    text-align: center;
+}
+
+.file-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+}
+
+.selected-file {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.submit-button {
+    background-color: rebeccapurple;
+    color: white;
+    padding: 12px 24px;
+    font-size: 1rem;
+}
+
+.info-container {
+    background-color: var(--widget-color);
+    color: var(--text-color);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.info-container h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.info-container ul {
+    padding-left: 1.25rem;
+    margin: 0;
+    list-style-type: disc;
+}
+
+.info-container li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}

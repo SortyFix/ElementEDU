@@ -1,7 +1,7 @@
 <!-- TODO: Shorten style attributes by outsourcing them into the ts file -->
 <mat-drawer-container class="example-container">
     <!-- SIDEBAR/DRAWER -->
-    <mat-drawer #drawer mode="over" opened class="drawer" [style.background-color]="user.theme.getWidgetColor" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
+    <mat-drawer #drawer mode="over" class="drawer" [style.background-color]="user.theme.getWidgetColor" style="{{ mobile ? 'width: 100%;' : 'width: 300px'}}">
         <div class="toggle-button">
             <button mat-icon-button [style.color]="user.theme.getTextColor('background', false)" (click)="drawer.toggle()">
                 <mat-icon>close</mat-icon>

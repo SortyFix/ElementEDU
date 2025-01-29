@@ -16,11 +16,13 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.sqm.TemporalUnit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 
@@ -62,7 +65,7 @@ public class VerificationService
      * <p>
      * Users will always be granted a token with a {@link JwtTokenType} attached.
      * <p>
-     * This method can be used within {@link org.springframework.security.access.prepost.PreAuthorize} by referencing this service
+     * This method can be used within {@link PreAuthorize} by referencing this service
      *
      * <pre>
      * {@code
@@ -189,6 +192,14 @@ public class VerificationService
         }
     }
 
+    public @NotNull GeneratedToken websocketToken(long userId)
+    {
+        TokenData token = new TokenData(
+                null, userId, false, Collections.emptySet(), Collections.emptyMap()
+        );
+        return generateKey(JwtTokenType.WEBSOCKET, getExpiry(Duration.ofMinutes(10)), token);
+    }
+
     public @NotNull GeneratedToken authorizeToken(@NotNull TokenData tokenData)
     {
         JwtTokenType type = tokenData.advanced() ? JwtTokenType.ADVANCED_AUTHORIZATION : JwtTokenType.AUTHORIZED;
@@ -298,7 +309,7 @@ public class VerificationService
                 }
                 yield authorities;
             }
-            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING ->
+            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING, WEBSOCKET ->
                     Collections.singleton(jwtTokenType.getAuthority());
         };
     }

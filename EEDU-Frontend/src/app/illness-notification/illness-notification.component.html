@@ -1,0 +1,48 @@
+<div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between;">
+    <div style="flex: 1; min-width: 300px;">
+        <h1 class="text">Issue a sick note</h1>
+
+        <p class="text">
+            Fill in the fields below to send an illness notification request to your school's management.<br>
+            You will see the status of your request once it is sent. Please adhere to your school's sickness policy.
+        </p>
+
+        <div class="form-container">
+            <mat-form-field appearance="outline" class="full-width-field">
+                <mat-label>Reason</mat-label>
+                <textarea matInput class="reason-textarea"></textarea>
+            </mat-form-field>
+
+            <div class="file-upload-container">
+                <input type="file" id="fileInput" hidden (change)="onFileSelected($event)">
+                <label for="fileInput" class="file-upload-label">
+                    <div class="file-upload-content">
+                        <mat-icon>upload</mat-icon>
+                        <div class="upload-text">
+                            <p>Click to upload medical document</p>
+                            <small>Maximum file size: 25MB</small>
+                        </div>
+                    </div>
+                </label>
+                <div class="selected-file" *ngIf="selectedFile">
+                    {{ selectedFile?.name }}
+                </div>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width-field">
+                <mat-label>End date of sick leave</mat-label>
+                <input matInput [matDatepicker]="picker">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <button mat-flat-button class="submit-button">
+                Send Request
+            </button>
+        </div>
+    </div>
+
+    <div class="info-container">
+        <h2>Your last sick note</h2>
+    </div>
+</div>

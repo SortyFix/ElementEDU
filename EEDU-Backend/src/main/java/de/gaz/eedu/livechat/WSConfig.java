@@ -1,8 +1,10 @@
 package de.gaz.eedu.livechat;
 
+import de.gaz.eedu.user.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,14 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Getter
 public class WSConfig implements WebSocketMessageBrokerConfigurer
 {
+    private final UserService userService;
     private WSIdentifiers wsIdentifiers;
+
+    @Bean
+    WSInterceptor wsInterceptor()
+    {
+        return new WSInterceptor(userService);
+    }
 
     /**
      * Configures the message broker for WebSocket communication in the application.
@@ -53,6 +62,8 @@ public class WSConfig implements WebSocketMessageBrokerConfigurer
      */
     @Override
     public void registerStompEndpoints(@NotNull StompEndpointRegistry registry){
-        registry.addEndpoint(wsIdentifiers.getEndpoint()).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint(wsIdentifiers.getEndpoint())
+                .addInterceptors(wsInterceptor())
+                .setAllowedOrigins("http://localhost:4200");
     }
 }

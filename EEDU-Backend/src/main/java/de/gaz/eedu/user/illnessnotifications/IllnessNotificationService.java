@@ -11,6 +11,7 @@ import de.gaz.eedu.user.UserStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,31 +40,38 @@ import java.util.Set;
     }
 
     @Transactional
-    public boolean excuse(@NotNull Long userId, @NotNull String reason, @NotNull Long expirationTime, @NotNull MultipartFile file)
+    public boolean excuse(@NotNull Long userId, @NotNull String reason, @NotNull Long expirationTime, @Nullable MultipartFile file)
     {
-        // TODO: Add logic if current day is an exam day
-        FileEntity fileEntity = fileService.createEntity(Set.of(new FileCreateModel(userId,
-                file.getName(),
-                new String[] { "Management" },
+        @Nullable Long fileId = uploadNotification(file);
+        createEntity(Set.of(new IllnessNotificationCreateModel(userId,
+                reason,
+                LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(),
+                expirationTime,
+                fileId)));
+
+        return true;
+    }
+
+    public @Nullable Long uploadNotification(@Nullable MultipartFile file){
+        if(!(file != null && !file.isEmpty()))
+        {
+            return null;
+        }
+
+        FileEntity fileEntity = fileService.createEntity(new FileCreateModel(
                 "illness_notifications",
-                new String[] { "illness_notification" }))).getFirst();
+                new String[] { "Management" },
+                new String[] { "illness_notification" }));
 
         try
         {
             fileEntity.uploadBatch("", file);
+            return fileEntity.getId();
         }
         catch (MaliciousFileException e)
         {
             throw new RuntimeException(e);
         }
-
-        createEntity(Set.of(new IllnessNotificationCreateModel(userId,
-                reason,
-                LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(),
-                expirationTime,
-                fileEntity.getId())));
-
-        return true;
     }
 
     public ResponseEntity<Boolean> respondToNotification(@NotNull IllnessNotificationEntity entity, @NotNull IllnessNotificationStatus status)

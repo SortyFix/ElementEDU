@@ -8,12 +8,12 @@ import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupRepository;
 import de.gaz.eedu.user.model.LoginModel;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.VerificationService;
-import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.security.SignatureException;
@@ -134,5 +134,15 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
     @Override public @NotNull @Unmodifiable Set<UserEntity> findAllEntities(@NotNull Predicate<UserEntity> predicate)
     {
         return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+    }
+
+    public @NotNull Optional<ReducedUserModel> findReduced(long id)
+    {
+        return getRepository().findReducedById(id);
+    }
+
+    public @NotNull @Unmodifiable Set<ReducedUserModel> findAllReduced()
+    {
+        return getRepository().findAllReduced();
     }
 }

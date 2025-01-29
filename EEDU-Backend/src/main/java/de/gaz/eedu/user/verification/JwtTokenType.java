@@ -11,6 +11,7 @@ public enum JwtTokenType
     CREDENTIAL_REQUIRED,
     CREDENTIAL_CREATION_PENDING,
     ADVANCED_AUTHORIZATION, // authorities from actual user and advanced
+    WEBSOCKET,
     AUTHORIZED; // authorities from actual user
 
     @Contract(pure = true) @Override public @NotNull String toString()

@@ -26,12 +26,10 @@ public class FileServiceTest
     @Transactional
     public void testCreateEntity()
     {
-        FileCreateModel fileCreateModel = new FileCreateModel(3L, "roblox.exe", new String[]{"PRIVILEGE_ALL"}, "other", new String[]{"mathe"});
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
 
         assertNotNull(fileEntity.getId());
-        assertEquals(fileCreateModel.authorId(), fileEntity.getAuthorId());
-        assertEquals(fileCreateModel.fileName(), fileEntity.getFileName());
         assertEquals(fileCreateModel.dataDirectory(), fileEntity.getDataDirectory());
         assertTrue(setsContainSameData(fileCreateModel.privilege(), fileEntity.getPrivilege()));
         assertTrue(setsContainSameData(fileCreateModel.tags(), fileEntity.getTags()));
@@ -47,8 +45,8 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
-        FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertDoesNotThrow(() -> fileEntity.uploadBatch("", batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
     }
@@ -63,8 +61,8 @@ public class FileServiceTest
                 new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
                 new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
-        FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertDoesNotThrow(() -> fileEntity.uploadBatch(subdirectory, batch));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(subdirectory), mockMultipartFile.getOriginalFilename()))));
     }
@@ -73,8 +71,8 @@ public class FileServiceTest
     @Transactional
     public void testDelete()
     {
-        FileCreateModel fileCreateModel = new FileCreateModel(1L, "Yonas Homework", new String[]{"PRIVILEGE_ALL"}, "batchTest", new String[]{"miau"});
-        FileEntity fileEntity = fileService.createEntity(Set.of(fileCreateModel)).getFirst();
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
+        FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }
 

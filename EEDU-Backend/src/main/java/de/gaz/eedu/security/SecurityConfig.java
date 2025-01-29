@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -60,7 +61,8 @@ public class SecurityConfig implements WebMvcConfigurer
                 .allowedOrigins("http://localhost:4200") // Ensure no trailing slash
                 .allowCredentials(true)
                 .allowedMethods(methods)
-                .exposedHeaders(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaders.SET_COOKIE)
+                .allowedHeaders(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_DISPOSITION, HttpHeaders.AUTHORIZATION)
+                .exposedHeaders(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaders.SET_COOKIE, HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_DISPOSITION)
                 .maxAge(3600);
     }
 

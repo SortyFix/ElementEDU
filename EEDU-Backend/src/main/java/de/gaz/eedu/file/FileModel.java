@@ -9,8 +9,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public record FileModel(@NotNull Long id,
-                        @NotNull String fileName,
-                        @NotNull Long authorId,
                         @NotNull String dataDirectory,
                         @NotNull String[] privileges,
                         String[] tags) implements EntityModel
@@ -21,8 +19,6 @@ public record FileModel(@NotNull Long id,
     {
         return "FileModel{" +
                 "id=" + id +
-                ", fileName='" + fileName + '\'' +
-                ", authorId=" + authorId +
                 ", privileges=" + Arrays.toString(privileges) +
                 ", tags=" + Arrays.toString(tags) +
                 '}';
@@ -44,10 +40,8 @@ public record FileModel(@NotNull Long id,
 
     public FileEntity toEntity(@NotNull FileEntity fileEntity)
     {
-        fileEntity.setFileName(fileName);
         fileEntity.setTags(Arrays.stream(tags()).collect(Collectors.toSet()));
         fileEntity.setPrivilege(Arrays.stream(privileges()).collect(Collectors.toSet()));
-        fileEntity.setAuthorId(authorId());
         fileEntity.setDataDirectory(dataDirectory());
         return fileEntity;
     }

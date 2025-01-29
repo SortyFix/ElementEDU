@@ -9,8 +9,8 @@ import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {NgIf} from "@angular/common";
-import {QRCodeModule} from "angularx-qrcode";
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
+import {QRCodeComponent} from "angularx-qrcode";
 
 @Component({
   selector: 'app-credential-totp-setup-form',
@@ -23,9 +23,9 @@ import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-butt
         MatLabel,
         MatProgressBar,
         NgIf,
-        QRCodeModule,
         ReactiveFormsModule,
         FooterButtonsComponent,
+        QRCodeComponent,
     ],
   templateUrl: './credential-totp-setup-form.component.html',
   styleUrl: './credential-totp-setup-form.component.scss'

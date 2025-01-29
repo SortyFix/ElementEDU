@@ -4,6 +4,7 @@
     --text-color: black;
     --background-color: black;
     --widget-color: black;
+    --mat-sidenav-content-background-color: transparent;
 }
 
 html, body {
@@ -81,6 +82,10 @@ html, body {
     color: var(--text-color) !important;
 }
 
+.mdc-list-item__primary-text {
+    color: var(--text-color) !important;
+}
+
 // This is a temporary solution
 // ok
 mat-form-field
@@ -88,3 +93,12 @@ mat-form-field
     width: 100%;
     margin-top: 5px;
 }
+
+mat-mdc-paginator {
+    background-color: rgba(255, 255, 255, .1);
+}
+
+textarea::placeholder {
+    color: var(--text-color);
+}
+

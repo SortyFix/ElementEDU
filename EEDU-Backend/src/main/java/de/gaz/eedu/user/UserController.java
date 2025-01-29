@@ -3,12 +3,12 @@ package de.gaz.eedu.user;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.OccupiedException;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
-import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -18,14 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -91,8 +89,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     /**
      * Retrieves user data for the specified user id.
      * <p>
-     * This method retrieves user data based on the provided user {@code id}. Access is restricted to authenticated users
-     * who either have the "<i>privilege.user.get</i>" authority or are accessing their own data.
+     * This method retrieves user data based on the provided user {@code id}.
      * <p>
      * The invoking user must have the "<i>privilege.user.get</i>" privilege, as configured in the application's properties,
      * or must be the owner of the data being requested to perform this action.
@@ -107,6 +104,22 @@ public class UserController extends EntityController<UserService, UserModel, Use
     }
 
     /**
+     * Retrieves reduced user data for the specified user id.
+     * <p>
+     * This method retrieves reduced user data based on the provided user {@code id}.
+     *
+     * @param id the unique identifier of the user whose reduced data is being retrieved.
+     * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
+     *
+     * //TODO discuss privileges
+     */
+    @GetMapping("/get/{id}/reduced")
+    public @NotNull ResponseEntity<ReducedUserModel> getReducedData(@PathVariable @NotNull Long id)
+    {
+        return getService().findReduced(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Retrieves data for the currently authenticated user.
      * <p>
      * This method retrieves user data for the authenticated user making the request. Access is restricted to
@@ -114,7 +127,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * The invoking user must be the owner of the data being accessed to perform this action.
      *
-     * @param userId the currently authenticated user, provided automatically.
+     * @param user the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
@@ -193,6 +206,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
         cookie.setHttpOnly(true);
         cookie.setSecure(!development);
         response.addCookie(cookie);
+
         if (Objects.isNull(user))
         {
             log.info("An unidentified user has been logged out, likely due to token expiration.");
@@ -205,5 +219,11 @@ public class UserController extends EntityController<UserService, UserModel, Use
     public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
         return super.fetchAll();
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/all/reduced")
+    public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced()
+    {
+        return ResponseEntity.ok(getService().findAllReduced().toArray(new ReducedUserModel[0]));
     }
 }
