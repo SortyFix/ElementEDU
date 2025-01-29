@@ -176,9 +176,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      */
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
-
-
-
         List<GroupEntity> entities = Arrays.asList(groupEntities);
 
         if(inGroup("teacher") && containsGroup(entities, "student"))
