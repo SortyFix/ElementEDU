@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {map, Observable} from "rxjs";
+import {map, Observable, OperatorFunction} from "rxjs";
 import {CourseModel} from "./course-model";
 import {UserModel} from "../user-model";
 import {AbstractSimpleCourseService} from "./abstract-simple-course-service";
@@ -15,16 +15,12 @@ export class CourseService extends AbstractSimpleCourseService<CourseModel, Gene
 
     protected override get fetchAllValues(): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/get/all`;
-        return this.http.get<any[]>(url, { withCredentials: true }).pipe(
-            map((courses: any[]): CourseModel[] => courses.map((item: any): CourseModel => CourseModel.fromObject(item))),
-        );
+        return this.http.get<any[]>(url, { withCredentials: true });
     }
 
     protected override createValue(createModels: GenericCourseCreateModel[]): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/create`;
-        return this.http.post<any[]>(url, createModels, { withCredentials:  true }).pipe(
-            map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item))),
-        );
+        return this.http.post<any[]>(url, createModels, { withCredentials:  true });
     }
 
     public fetchUsers(course: bigint): Observable<UserModel[]>
@@ -41,5 +37,9 @@ export class CourseService extends AbstractSimpleCourseService<CourseModel, Gene
 
     public findCourse(courses: CourseModel[], id: bigint): CourseModel | undefined {
         return courses.find((course: CourseModel): boolean => course.id === id);
+    }
+
+    protected get translate(): OperatorFunction<any[], CourseModel[]> {
+        return map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item)));
     }
 }
