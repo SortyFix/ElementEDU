@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 //TODO manage access
 
 @RestController @RequestMapping("/api/v1/course/classroom") @RequiredArgsConstructor @Slf4j
@@ -84,5 +86,11 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<ClassRoomModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/all")
+    @Override public @NotNull ResponseEntity<Set<ClassRoomModel>> fetchAll()
+    {
+        return super.fetchAll();
     }
 }

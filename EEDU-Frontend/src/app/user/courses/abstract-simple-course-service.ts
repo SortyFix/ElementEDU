@@ -1,5 +1,5 @@
 import {environment} from "../../../environment/environment";
-import {BehaviorSubject, Observable, tap} from "rxjs";
+import {BehaviorSubject, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
 export abstract class AbstractSimpleCourseService<T, C> {
@@ -18,6 +18,8 @@ export abstract class AbstractSimpleCourseService<T, C> {
             this._fetched = true;
         }));
     }
+
+    protected abstract get translate(): OperatorFunction<any[], T[]>
 
     protected abstract createValue(createModels: C[]): Observable<T[]>;
 

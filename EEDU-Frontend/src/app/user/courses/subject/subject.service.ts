@@ -1,31 +1,27 @@
 import { Injectable } from '@angular/core';
-import {map, Observable, tap} from "rxjs";
+import {map, Observable, OperatorFunction, tap} from "rxjs";
 import {SubjectModel} from "./subject-model";
 import {HttpClient} from "@angular/common/http";
 import {AbstractSimpleCourseService} from "../abstract-simple-course-service";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class SubjectService extends AbstractSimpleCourseService<SubjectModel, { name: string[] }> {
-
-    constructor(http: HttpClient) { super(http) }
+export class SubjectService extends AbstractSimpleCourseService<SubjectModel, { name: string[] }>
+{
+    public constructor(http: HttpClient) { super(http) }
 
     protected override get fetchAllValues(): Observable<SubjectModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/subject/get/all`;
-        return this.http.get<any[]>(url, { withCredentials: true }).pipe(
-            map((subject: any[]): SubjectModel[] =>
-                subject.map((item: any): SubjectModel => SubjectModel.fromObject(item))
-            )
-        );
+        return this.http.get<any[]>(`${this.BACKEND_URL}/course/subject/get/all`, { withCredentials: true });
     }
 
-    protected createValue(createModels: { name: string[] }[]): Observable<SubjectModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/subject/create`;
-        return this.http.post<any[]>(url, createModels, { withCredentials: true }).pipe(
-            map((response: any[]): SubjectModel[] =>
-                response.map((item: any): SubjectModel => SubjectModel.fromObject(item))
-            )
+    protected createValue(models: { name: string[] }[]): Observable<SubjectModel[]> {
+        return this.http.post<any[]>(`${this.BACKEND_URL}/course/subject/create`, models, { withCredentials: true });
+    }
+
+    protected override get translate(): OperatorFunction<any[], SubjectModel[]> {
+        return map((response: any[]): SubjectModel[] =>
+            response.map((item: any): SubjectModel => SubjectModel.fromObject(item))
         );
     }
 }
