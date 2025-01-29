@@ -29,6 +29,7 @@ import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.
 import {UpdateEventComponent} from "./update-event/update-event.component";
 import {AppointmentService} from "../user/courses/appointment/appointment.service";
 import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointment-create-model";
+import {CreateClassRoomComponent} from "../user/courses/classroom/create-class-room/create-class-room.component";
 
 
 @Component({
@@ -153,6 +154,13 @@ export class TimetableComponent implements OnInit, OnDestroy {
     protected createRoom()
     {
         this._dialogRef.open(CreateRoomComponent, {
+            width: '600px',
+            disableClose: true
+        })
+    }
+
+    protected createClassRoom() {
+        this._dialogRef.open(CreateClassRoomComponent, {
             width: '600px',
             disableClose: true
         })
@@ -283,4 +291,5 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     protected readonly AppointmentEntryModel = AppointmentEntryModel;
     protected readonly FrequentAppointmentModel = FrequentAppointmentModel;
+
 }

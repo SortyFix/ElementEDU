@@ -4,6 +4,7 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -70,10 +71,9 @@ public class CourseController extends EntityController<CourseService, CourseMode
     }
 
     @GetMapping("/get/users/{course}")
-    public @NotNull ResponseEntity<UserModel[]> getUsers(@PathVariable long course)
+    public @NotNull ResponseEntity<ReducedUserModel[]> getUsers(@PathVariable long course)
     {
-        Stream<UserModel> models = getService().loadEntityByIDSafe(course).getUsers().stream().map(UserEntity::toModel);
-        return ResponseEntity.ok(models.toArray(UserModel[]::new));
+        return ResponseEntity.ok(getService().loadReducedModelsByCourse(course).toArray(new ReducedUserModel[0]));
     }
 
     @GetMapping("/get/all")

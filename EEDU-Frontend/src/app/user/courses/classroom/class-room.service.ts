@@ -3,11 +3,14 @@ import {AbstractSimpleCourseService} from "../abstract-simple-course-service";
 import {ClassRoomModel} from "./class-room-model";
 import {map, Observable, OperatorFunction} from 'rxjs';
 import {ClassRoomCreateModel, ClassRoomCreatePacket} from "./class-room-create-model";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClassRoomService extends AbstractSimpleCourseService<ClassRoomModel, ClassRoomCreateModel> {
+
+    constructor(http: HttpClient) { super(http); }
 
     protected override get fetchAllValues(): Observable<ClassRoomModel[]> {
         return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, {withCredentials: true});

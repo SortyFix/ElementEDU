@@ -13,11 +13,13 @@ import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserRepository;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,6 +36,11 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     public @NotNull CourseModel[] getCourses(long user)
     {
         return getRepository().findAllByUserId(user).stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
+    }
+
+    public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByCourse(long course)
+    {
+        return getRepository().findAllReducedUsersByCourse(course);
     }
 
     @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException

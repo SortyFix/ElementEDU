@@ -33,11 +33,18 @@ import {ReducedUserModel} from "../../../reduced-user-model";
 })
 export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomModel> {
 
-    private users: ReducedUserModel[] = [];
+    private readonly _users: ReducedUserModel[] = [];
 
     constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService) {
         super(service, dialogRef, formBuilder);
 
-        userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => {this.users = user;});
+        userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => {
+            this._users.length = 0;
+            this._users.push(...user);
+        });
+    }
+
+    protected get users(): ReducedUserModel[] {
+        return this._users;
     }
 }

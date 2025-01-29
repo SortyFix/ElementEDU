@@ -1,5 +1,6 @@
 package de.gaz.eedu.course;
 
+import de.gaz.eedu.user.model.ReducedUserModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,10 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             "WHERE c.id = :id"
     )
     @Override @NotNull Optional<CourseEntity> findById(@NotNull Long id);
+
+
+    @Query("SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName) FROM CourseEntity c JOIN c.users u WHERE c.id = :course")
+    @NotNull @Unmodifiable Set<ReducedUserModel> findAllReducedUsersByCourse(long course);
 
     @Query(
             "SELECT c FROM CourseEntity c " +
