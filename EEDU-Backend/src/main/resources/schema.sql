@@ -2,8 +2,6 @@
 CREATE TABLE IF NOT EXISTS file_entity
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id      BIGINT       NULL,
-    file_name      VARCHAR(255) NULL,
     data_directory VARCHAR(255) NOT NULL
 );
 
@@ -212,7 +210,7 @@ CREATE TABLE IF NOT EXISTS message_entity
 (
     message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     author_id  BIGINT       NOT NULL,
-    body       VARCHAR(255) NOT NULL,
+    body       VARCHAR(1500) NOT NULL,
     timestamp  BIGINT       NOT NULL,
     status     TINYINT,
     FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
@@ -223,8 +221,8 @@ CREATE TABLE IF NOT EXISTS post_entity
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     author VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
-    thumbnailurl VARCHAR(255) NOT NULL,
-    body VARCHAR(255) NOT NULL,
+    thumbnailurl VARCHAR(255),
+    body VARCHAR(65000) NOT NULL,
     time_of_creation BIGINT NOT NULL
 );
 

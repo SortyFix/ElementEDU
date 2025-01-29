@@ -63,7 +63,7 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService, public userService: UserService) {}
+    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -193,6 +193,6 @@ export class UserListComponent {
     }
 
     public get getTheme() {
-        return this.userService.getUserData.theme;
+        return this._userService.getUserData.theme;
     }
 }

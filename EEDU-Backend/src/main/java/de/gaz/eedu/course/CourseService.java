@@ -47,7 +47,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         List<CourseEntity> courseEntities = model.stream().map(clazzModel ->
         {
             //TODO Yonas: please add a way of creating entities without instantly saving them
-            FileCreateModel file = new FileCreateModel(1L, clazzModel.name(), new String[0], "", new String[0]);
+            FileCreateModel file = new FileCreateModel("", new String[0], new String[0]);
             FileEntity fileEntity = file.toEntity(new FileEntity());
             repositories.add(fileEntity);
 

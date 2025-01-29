@@ -14,4 +14,6 @@ public interface ChatRepository extends JpaRepository<ChatEntity, Long>
             + "HAVING SUM(CASE WHEN cu IN (:users) THEN 1 ELSE -1 END) = :listSize")
     @NotNull Optional<List<ChatEntity>> findAllByUsersIn(@NotNull @Param("users") List<Long> users,
                                                          @NotNull @Param("listSize") Long listSize);
+
+    @NotNull Optional<List<ChatEntity>> findByUsersContaining(Long userId);
 }

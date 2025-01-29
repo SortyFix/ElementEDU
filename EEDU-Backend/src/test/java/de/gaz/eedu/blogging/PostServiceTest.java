@@ -38,7 +38,6 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
                 "burger king",
                 new String[]{"NONE"},
-                new String[]{"NONE"},
                 new String[]{"test"}
         );
 
@@ -48,14 +47,12 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 "burger king",
                 System.currentTimeMillis(),
                 new String[]{"NONE"},
-                new String[]{"NONE"},
                 new String[]{"test"});
 
         return Eval.eval(createModel, postModel, (request, expect, result) -> {
             Assertions.assertEquals(createModel.author(), postModel.author());
             Assertions.assertEquals(createModel.title(), postModel.title());
             Assertions.assertEquals(createModel.toEntity(new PostEntity()).toModel().thumbnailBlob(), encodedFile);
-            Assertions.assertArrayEquals(createModel.readPrivileges(), postModel.readPrivileges());
             Assertions.assertArrayEquals(createModel.editPrivileges(), postModel.editPrivileges());
             Assertions.assertArrayEquals(createModel.tags(), postModel.tags());
         });
@@ -71,7 +68,6 @@ public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostMo
                 "10 Reasons for why",
                 Objects.requireNonNull(classloader.getResource("batchfile1.txt")).getPath(),
                 "burger king",
-                new String[]{"Read1", "Read2", "Read3"},
                 new String[]{"Edit1", "Edit2", "Edit3"},
                 new String[]{"Tag1", "Tag2", "Tag3"}
         ))).getFirst();

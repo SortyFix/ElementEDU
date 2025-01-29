@@ -1,10 +1,11 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router, RouterLink, RouterOutlet} from "@angular/router";
 import {UserService} from "../user/user.service";
-import {MatIcon} from "@angular/material/icon";
+import {WebsocketService} from "../chat/websocket.service";
 import {MatDrawer, MatDrawerContainer, MatDrawerContent} from "@angular/material/sidenav";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf, NgStyle} from "@angular/common";
+import {MatButton, MatIconButton} from "@angular/material/button";
 
 @Component({
     selector: 'app-abstract',
@@ -29,7 +30,8 @@ export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
     private _portrait: boolean = false;
 
-    constructor(public router: Router, public userService: UserService) { }
+    constructor(public websocketService: WebsocketService, public router: Router, public userService: UserService) {
+    }
 
     sidebar_buttons = [
         {title:'Dashboard', icon_name: 'dashboard', route:'dashboard'},
@@ -37,12 +39,15 @@ export class AbstractComponent implements OnInit {
         {title:'Timetable', icon_name:'calendar_view_week', route: 'timetable'},
         {title:'News', icon_name: 'newspaper', route: 'news'},
         {title:'Chat', icon_name: 'forum', route: 'chat'},
+        {title:'Issue sick note', icon_name: 'disabled_by_default', route: 'illness-notification'},
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]
 
     responsiveContent() {
         return {
-
+            'padding-left': this.mobile ? '20px' : '20px',
+            'width': this.mobile ? 'calc(100% - 50px)' : 'calc(100% - 100px)',
+            'margin-left': this.mobile ? '' : '20px'
         };
     }
 

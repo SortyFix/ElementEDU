@@ -1,0 +1,71 @@
+<div class="stepper-header">
+    <h2>Create new article</h2>
+    <p>Follow the steps below to write a new article for others to see.</p>
+</div>
+
+<mat-stepper orientation="vertical" [linear]="isLinear" #stepper style="border-radius: 20px" class="stepper">
+    <mat-step [formGroup]="titleFormGroup">
+        <ng-template matStepLabel><strong>Enter a title</strong></ng-template>
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput maxlength="40" formControlName="title" required>
+        </mat-form-field>
+        <button mat-flat-button matStepperNext>Set title</button>
+    </mat-step>
+    <mat-step [formGroup]="authorFormGroup">
+        <ng-template matStepLabel><strong>Specify an author</strong></ng-template>
+        <mat-form-field>
+            <mat-label>Author</mat-label>
+            <input matInput formControlName="author" required>
+        </mat-form-field>
+        <button mat-flat-button matStepperNext>Set author</button>
+    </mat-step>
+    <mat-step [formGroup]="bodyFormGroup">
+        <ng-template matStepLabel><strong>Write the article body</strong></ng-template>
+        <mat-form-field>
+            <mat-label>Article body</mat-label>
+            <textarea matInput formControlName="body" required></textarea>
+            <mat-hint>Hint: ElementEDU uses markdown to style your articles. (max. 65000 characters)</mat-hint>
+        </mat-form-field>
+        <button mat-flat-button matStepperNext>Set body</button>
+    </mat-step>
+    <mat-step>
+        <ng-template matStepLabel><strong>Upload article thumbnail</strong></ng-template>
+        <app-file-upload-button (imagesUploaded)="onFileSelected($event)"></app-file-upload-button>
+        <button mat-flat-button matStepperNext>Next</button>
+    </mat-step>
+    <mat-step [formGroup]="publishFormGroup">
+        <mat-form-field>
+            <ng-template matStepLabel><strong>Final tweaks</strong></ng-template>
+            <mat-label>Edit privileges</mat-label>
+            <mat-chip-grid #reactiveChipGrid [formControl]="privilegeFormControl">
+                <mat-chip-row *ngFor="let keyword of reactivePrivileges(); trackBy: trackByKeyword" (click)="removePrivilege(keyword)">
+                    {{ keyword }}
+                </mat-chip-row>
+            </mat-chip-grid>
+            <input
+                placeholder="Edit Privileges..."
+                [matChipInputFor]="reactiveChipGrid"
+                (matChipInputTokenEnd)="addPrivilege($event)"
+            />
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Tags</mat-label>
+            <mat-chip-grid #tagChipGrid [formControl]="tagFormControl">
+                <mat-chip-row *ngFor="let keyword of reactiveTags(); trackBy: trackByKeyword" (click)="removeTag(keyword)">
+                    {{ keyword }}
+                    <button matChipRemove>
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-chip-row>
+            </mat-chip-grid>
+            <input
+                matInput
+                placeholder="Tags..."
+                [matChipInputFor]="tagChipGrid"
+                (matChipInputTokenEnd)="addTag($event)"
+            />
+        </mat-form-field>
+        <button mat-flat-button style="background-color: rebeccapurple; color: white; width: 100%" (click)="createArticle()">Create article</button>
+    </mat-step>
+</mat-stepper>

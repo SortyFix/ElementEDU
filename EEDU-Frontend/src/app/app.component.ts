@@ -1,6 +1,7 @@
 import {Component, OnInit, signal, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {UserService} from "./user/user.service";
 import {Router} from "@angular/router";
+import {ThemeService} from "./theming/theme.service";
 import {AbstractComponent} from "./abstract/abstract.component";
 import {Authentication} from "./user/authentication/authentication.component";
 import {LoadComponent} from "./load/load.component";
@@ -14,7 +15,7 @@ import {NgIf} from "@angular/common";
         AbstractComponent,
         Authentication,
         LoadComponent,
-        NgIf,
+        NgIf
     ],
     encapsulation: ViewEncapsulation.None
 })
@@ -22,7 +23,7 @@ export class AppComponent implements OnInit
 {
     errorSignal: WritableSignal<string> = signal('')
 
-    constructor(public userService: UserService, public router: Router)
+    constructor(public userService: UserService, public router: Router, public themeService: ThemeService)
     {}
 
     ngOnInit(): void

@@ -52,11 +52,11 @@ VALUES (0, '$2y$10$CsbEQdr99lfl9rWp18wJ3OKPINMuIuWzUgQR3Ek5F.Xj3rNQeD7KG', '', t
 
        (3, NULL, '', true, 4);
 
-INSERT INTO file_entity (file_name, author_id, data_directory)
-VALUES ('howtostaysingleforever.m4a', 1, 'Sexualkunde_8b'),
-       ('ivo_hausaufgaben.exe', 2, 'root'),
-       ('informatik_themen_fr_kühnel.docx', 3, 'Informatik_Q1'),
-       ('ivo_präsentation_cover.svg', 2, 'other');
+INSERT INTO file_entity (data_directory)
+VALUES ('Sexualkunde_8b'),
+       ('root'),
+       ('Informatik_Q1'),
+       ('other');
 
 --- Courses
 INSERT INTO subject_entity(name)

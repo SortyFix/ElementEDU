@@ -13,22 +13,22 @@ public class IllnessNotificationManagementController
 {
     private final IllnessNotificationManagementService illnessNotificationManagementService;
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/open")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')") @PostMapping("/user/open")
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsWithStatusOfUser(@NotNull @RequestBody Long userId, @NotNull @RequestBody IllnessNotificationStatus status){
         return illnessNotificationManagementService.getNotificationsOfUserByStatus(userId, status);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/user/all")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')") @PostMapping("/user/all")
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfUser(@NotNull @RequestBody Long userId){
         return illnessNotificationManagementService.getNotificationsOfUser(userId);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @GetMapping("/{date}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')") @GetMapping("/{date}")
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfDate(@NotNull @PathVariable Long date){
         return illnessNotificationManagementService.getNotificationsOfDate(date);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/respond/{notificationId}/{status}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')") @PostMapping("/respond/{notificationId}/{status}")
     public ResponseEntity<Boolean> respondToNotification(@NotNull @PathVariable Long notificationId, @NotNull
     @PathVariable IllnessNotificationStatus status)
     {
