@@ -91,7 +91,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
         const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
         this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
             start: this.selectedEvent.start,
-            room: frequentData.room.id,
+            room: frequentData.room,
             duration: frequentData.duration,
         })]).subscribe((createdEvent: AppointmentEntryModel[]): void =>
         {
@@ -123,10 +123,8 @@ export class TimetableComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         document.body.classList.add(this.CALENDAR_THEME_CLASS);
 
-        const courses: Observable<CourseModel[]> = this.courseService.courses$;
+        const courses: Observable<CourseModel[]> = this.courseService.value$;
         courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
-
-        this.courseService.fetchCourses().subscribe();
     }
 
     protected get nextEvents(): CalendarEvent[] {
@@ -240,7 +238,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
      * This method processes each {@link CourseModel} in the input array by extracting scheduled appointments and
      * appointment entries. It invokes the {@link #toEvents} method to transform scheduled appointments and maps
      * {@link AppointmentEntryModel} instances to {@link CalendarEvent} using their {@link #asEvent} method. The results
-     * are combined using a flatmapping operation.
+     * are combined using a flat mapping operation.
      *
      * @param courses an array of {@link CourseModel} instances containing appointment data to convert.
      * @returns an array of {@link CalendarEvent} instances derived from the courses' appointments and entries.

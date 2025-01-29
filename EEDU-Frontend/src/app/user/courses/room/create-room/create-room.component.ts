@@ -8,6 +8,8 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {RoomService} from "../room.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
+import {AbstractCreateComponent} from "../../abstract-create-component";
+import {RoomModel} from "../room-model";
 
 @Component({
   selector: 'app-create-room',
@@ -26,48 +28,10 @@ import {GeneralCreateComponent} from "../../../../timetable/general-create-compo
   templateUrl: './create-room.component.html',
   styleUrl: './create-room.component.scss'
 })
-export class CreateRoomComponent {
+export class CreateRoomComponent extends AbstractCreateComponent<RoomModel> {
 
-    private readonly _form: FormGroup;
-    private _loading: boolean = true;
-
-    public constructor(private _roomService: RoomService, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
-        this._form = formBuilder.group({ name: [null, Validators.required] });
-        this.roomService.fetchRooms().subscribe((): void => { this.loading = false; })
-    }
-
-    protected get loading(): boolean {
-        return this._loading;
-    }
-
-    private set loading(value: boolean) {
-        this._loading = value;
-    }
-
-    private get dialogRef(): DialogRef {
-        return this._dialogRef;
-    }
-
-    private get roomService(): RoomService {
-        return this._roomService;
-    }
-
-    protected get form(): FormGroup {
-        return this._form;
-    }
-
-    protected onSubmit(): void
+    public constructor(roomService: RoomService, dialogRef: DialogRef, formBuilder: FormBuilder)
     {
-        if(this.form.invalid)
-        {
-            return;
-        }
-
-        this.roomService.createRoom([this.form.value]).subscribe((): void => { this.dialogRef.close(); })
-    }
-
-    protected get canSubmit(): boolean
-    {
-        return this.form.valid;
+        super(roomService, dialogRef, formBuilder);
     }
 }

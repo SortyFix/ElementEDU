@@ -2,7 +2,7 @@ import {AssignmentCreateModel, AssignmentCreatePacket, GenericAssignmentCreateMo
 
 export interface GenericAppointmentUpdate {
     description: string;
-    room?: number;
+    room?: { id: number };
     assignment?: GenericAssignmentCreateModel;
 }
 
@@ -23,7 +23,7 @@ export class AppointmentUpdateModel {
     public static fromObject(obj: GenericAppointmentUpdate): AppointmentUpdateModel {
         return new AppointmentUpdateModel(
             obj.description,
-            obj.room,
+            obj.room?.id,
             obj.assignment ? AssignmentCreateModel.fromObject(obj.assignment) : undefined
         );
     }

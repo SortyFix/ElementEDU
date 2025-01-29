@@ -17,10 +17,9 @@ import {RoomModel} from "../../room/room-model";
 import {RoomService} from "../../room/room.service";
 import {AppointmentService} from "../appointment.service";
 import {CourseService} from "../../course.service";
-import {AppointmentCreateModel, GenericAppointmentCreateModel} from "../entry/appointment-create-model";
+import {AppointmentCreateModel} from "../entry/appointment-create-model";
 import {
     FrequentAppointmentCreateModel,
-    GenericFrequentAppointmentCreateModel
 } from "../frequent/frequent-appointment-create-model";
 import {GeneralSelectionInput} from "../../../../timetable/general-selection-input/general-selection-input.component";
 
@@ -88,15 +87,16 @@ export class CreateAppointmentComponent {
         formBuilder: FormBuilder
     ) {
 
-        //assume they've been fetched before
-        courseService.courses$.subscribe((value: CourseModel[]): any => this._courses = value);
+        courseService.value$.subscribe((value: CourseModel[]): any => this._courses = value);
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             selected: [0, Validators.required],
         });
 
-        this._roomService.fetchRooms().subscribe((value: RoomModel[]): void => {
+        this._roomService.value$.subscribe((value: RoomModel[]): void =>
+        {
             this._rooms = value;
+            //TODO get rid of loading var and replace with service fetched status
             this.loading = false;
         })
     }
@@ -156,18 +156,6 @@ export class CreateAppointmentComponent {
             case 1: return this._frequent.form.valid;
             default: return false;
         }
-    }
-
-    /**
-     * Retrieves the RoomService instance used by the component
-     *
-     * This accessor provides the instance of {@link RoomService} used for managing room operations.
-     *
-     * @returns the {@link RoomService} instance associated with the component.
-     * @protected
-     */
-    protected get roomService(): RoomService {
-        return this._roomService;
     }
 
     /**
@@ -261,17 +249,8 @@ export class CreateAppointmentComponent {
      */
     private createStandalone(courseId: bigint): void
     {
-        // I must first transform the room model into the room id
-        const object: {
-            start: Date,
-            until: Date,
-            room: RoomModel | number,
-            duration: number,
-        } = this._standalone.form.value;
-        object.room = (object.room as RoomModel)?.id;
-
         this.appointmentService.createAppointment(courseId,
-            [AppointmentCreateModel.fromObject(object as GenericAppointmentCreateModel)]
+            [AppointmentCreateModel.fromObject(this._standalone.form.value)]
         ).subscribe({ next: (): void => this.dialogReference.close() });
     }
 
@@ -291,18 +270,8 @@ export class CreateAppointmentComponent {
      */
     private createFrequent(courseId: bigint): void
     {
-        // I must first transform the room model into the room id
-        const object: {
-            start: Date,
-            until: Date,
-            room: RoomModel | number,
-            duration: number,
-            frequency: number
-        } = this._frequent.form.value;
-        object.room = Number((object.room as RoomModel).id);
-
         this.appointmentService.createFrequent(courseId,
-            [FrequentAppointmentCreateModel.fromObject((object as GenericFrequentAppointmentCreateModel))]
+            [FrequentAppointmentCreateModel.fromObject(this._frequent.form.value)]
         ).subscribe({ next: (): void => this.dialogReference.close() });
     }
 }

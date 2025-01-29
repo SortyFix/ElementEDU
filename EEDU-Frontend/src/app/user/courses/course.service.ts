@@ -1,25 +1,29 @@
 import {Injectable} from '@angular/core';
-import {environment} from "../../../environment/environment";
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, map, Observable, tap} from "rxjs";
+import {map, Observable} from "rxjs";
 import {CourseModel} from "./course-model";
 import {UserModel} from "../user-model";
+import {AbstractSimpleCourseService} from "./abstract-simple-course-service";
+import {GenericCourseCreateModel} from "./course-create-model";
 
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService {
+export class CourseService extends AbstractSimpleCourseService<CourseModel, GenericCourseCreateModel>{
 
-    private readonly BACKEND_URL: string = environment.backendUrl;
-    private readonly _courseSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
+    constructor(http: HttpClient) { super(http); }
 
-    constructor(private http: HttpClient) { }
-
-    public fetchCourses(): Observable<CourseModel[]> {
+    protected override get fetchAllValues(): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/get/all`;
         return this.http.get<any[]>(url, { withCredentials: true }).pipe(
             map((courses: any[]): CourseModel[] => courses.map((item: any): CourseModel => CourseModel.fromObject(item))),
-            tap((courses: CourseModel[]): void => { this._courseSubject.next(courses); }),
+        );
+    }
+
+    protected override createValue(createModels: GenericCourseCreateModel[]): Observable<CourseModel[]> {
+        const url: string = `${this.BACKEND_URL}/course/create`;
+        return this.http.post<any[]>(url, createModels, { withCredentials:  true }).pipe(
+            map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item))),
         );
     }
 
@@ -32,24 +36,10 @@ export class CourseService {
     }
 
     public findCourseLazily(id: bigint): CourseModel | undefined {
-        return this.findCourse(this.courses, id);
+        return this.findCourse(this.value, id);
     }
 
     public findCourse(courses: CourseModel[], id: bigint): CourseModel | undefined {
         return courses.find((course: CourseModel): boolean => course.id === id);
-    }
-
-    public get courses(): CourseModel[]
-    {
-        return this._courseSubject.value;
-    }
-
-    public get courses$(): Observable<CourseModel[]> {
-        return this._courseSubject.asObservable();
-    }
-
-    public update(): void
-    {
-        this._courseSubject.next([...this.courses]);
     }
 }

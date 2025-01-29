@@ -2,7 +2,7 @@
 export interface GenericAppointmentCreateModel {
     start: Date,
     duration: number,
-    room?: number,
+    room?: { id: number },
     description?: string,
     assignment?: AppointmentCreateModel
 }
@@ -30,7 +30,7 @@ export class AppointmentCreateModel
         return new AppointmentCreateModel(
             obj.start,
             obj.duration,
-            obj.room,
+            obj.room?.id,
             obj.description,
             obj.assignment
         );

@@ -3,10 +3,11 @@
 
         <mat-form-field appearance="outline">
             <mat-label>Course Name</mat-label>
-            <input type="text" matInput/>
+            <input formControlName="name" type="text" matInput/>
         </mat-form-field>
 
-        <app-general-selection-input label="Subject" [values]="subjects"></app-general-selection-input>
+        <app-general-selection-input label="Subject" [values]="subjects" formControlName="subject">
+        </app-general-selection-input>
 
         <!--public constructor(-->
         <!--private readonly _name: string,-->

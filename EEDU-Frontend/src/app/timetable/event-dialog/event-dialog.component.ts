@@ -8,8 +8,7 @@ import {
     MatCardSubtitle,
     MatCardTitle
 } from "@angular/material/card";
-import {MatIcon} from "@angular/material/icon";
-import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatButton} from "@angular/material/button";
 
 @Component({
     selector: 'app-event-dialog',
@@ -18,9 +17,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
         MatCardContent,
         MatCard,
         MatCardHeader,
-        MatIcon,
         MatDialogClose,
-        MatIconButton,
         MatCardTitle,
         MatCardSubtitle,
         MatCardActions,

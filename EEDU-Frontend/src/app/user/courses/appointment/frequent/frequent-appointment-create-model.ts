@@ -1,7 +1,7 @@
 export interface GenericFrequentAppointmentCreateModel {
     start: Date,
     until: Date,
-    room: number,
+    room: { id: number },
     duration: number,
     frequency: number
 }
@@ -32,7 +32,7 @@ export class FrequentAppointmentCreateModel {
 
     public static fromObject(obj: GenericFrequentAppointmentCreateModel): FrequentAppointmentCreateModel
     {
-        return new FrequentAppointmentCreateModel(obj.start, obj.until, obj.room, obj.duration, obj.frequency);
+        return new FrequentAppointmentCreateModel(obj.start, obj.until, obj.room.id, obj.duration, obj.frequency);
     }
 
     public get toPacket(): FrequentAppointmentCreatePacket

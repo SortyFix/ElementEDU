@@ -67,7 +67,7 @@ export class UpdateEventComponent {
     public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService)
     {
         // automatically fetches the rooms
-        roomService.rooms$.subscribe((rooms: RoomModel[]): void => {
+        roomService.value$.subscribe((rooms: RoomModel[]): void => {
             this._rooms.length = 0;
             this._rooms.push(...rooms);
         });
@@ -133,7 +133,7 @@ export class UpdateEventComponent {
     {
         this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
             description: this.form.get('description')?.value,
-            room: this.form.get('room')?.value?.id,
+            room: this.form.get('room')?.value,
             // undefined means not updating  !!!
             assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
         })).subscribe((response: AppointmentEntryModel): void => { this.appointment = response;  });
