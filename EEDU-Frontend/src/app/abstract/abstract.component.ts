@@ -23,6 +23,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
         NgIf,
         MatDrawerContent
     ],
+    standalone: true,
     styleUrls: ['./abstract.component.scss']
 })
 

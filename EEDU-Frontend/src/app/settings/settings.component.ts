@@ -16,7 +16,6 @@ import {UserService} from "../user/user.service";
 import {UserListComponent} from "../user/user-list/user-list.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatDivider} from "@angular/material/divider";
-import {FileInfoModel} from "../file/file-info-model";
 
 @Component({
   selector: 'app-settings',
