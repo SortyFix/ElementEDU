@@ -24,6 +24,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {MatLine} from "@angular/material/core";
 import {AccessibilityService} from "../../accessibility.service";
 import {GroupSelectionList} from "../group/group-list/group-selection-list.component";
+import {UserService} from "../user.service";
 
 @Component({
   selector: 'app-user-list',
@@ -62,7 +63,7 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService) {}
+    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -192,6 +193,6 @@ export class UserListComponent {
     }
 
     public get getTheme() {
-        return this.userService.getUserData.theme;
+        return this._userService.getUserData.theme;
     }
 }
