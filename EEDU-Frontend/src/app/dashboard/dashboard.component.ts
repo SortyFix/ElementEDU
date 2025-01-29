@@ -1,18 +1,22 @@
 import { Component } from '@angular/core';
 import {ThemeService} from "../theming/theme.service";
 import {UserService} from "../user/user.service";
-import {CdkDragDrop} from "@angular/cdk/drag-drop";
 import {AppointmentCardComponent} from "./appointment-card/appointment-card.component";
 import {HomeworkCardComponent} from "./homework-card/homework-card.component";
-import {NewsComponent} from "../news/news.component";
 import {NewsCardComponent} from "./news-card/news-card.component";
 import {ChatCardComponent} from "./chat-card/chat-card.component";
-import {RGBAColor} from "angularx-qrcode";
+import {MatIcon} from "@angular/material/icon";
+import {NgComponentOutlet, NgForOf} from "@angular/common";
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    imports: [
+        MatIcon,
+        NgForOf,
+        NgComponentOutlet
+    ],
+    styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
     constructor(public themeService: ThemeService, public userService: UserService) {

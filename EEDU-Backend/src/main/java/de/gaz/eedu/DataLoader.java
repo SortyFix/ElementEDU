@@ -48,10 +48,10 @@ import java.util.stream.Stream;
 
     @Override @Transactional public void run(@NotNull String... args)
     {
-/*        if (userService.findAll().isEmpty())
-        {*/
+        if (userService.getRepository().findByLoginName("root").isEmpty())
+        {
             createDefaultUser();
-//        }
+        }
     }
 
     /**

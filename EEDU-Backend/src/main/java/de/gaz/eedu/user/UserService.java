@@ -14,7 +14,6 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeRepository;
 import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.VerificationService;
-import de.gaz.eedu.user.verification.authority.AuthorityFactory;
 import de.gaz.eedu.user.verification.model.AdvancedUserLoginModel;
 import de.gaz.eedu.user.verification.model.UserLoginModel;
 import io.jsonwebtoken.security.SignatureException;
@@ -137,9 +136,13 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 
-    public @NotNull ReducedUserModel[] findAllAndReduce()
+    public @NotNull Optional<ReducedUserModel> findReduced(long id)
     {
-        return userRepository.findAll().stream().map(UserEntity::toModel).map(UserModel::toReducedModel)
-                .toArray(ReducedUserModel[]::new);
+        return getRepository().findReducedById(id);
+    }
+
+    public @NotNull @Unmodifiable Set<ReducedUserModel> findAllReduced()
+    {
+        return getRepository().findAllReduced();
     }
 }

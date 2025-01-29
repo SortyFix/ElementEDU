@@ -115,8 +115,7 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
         if (status === 406) {
             return "This password does not match the requirements."
         }
-
-        if(status === 403)
+        else if(status === 400)
         {
             return "You cannot use the same password again!"
         }
