@@ -55,7 +55,6 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     @Override
     public @NotNull List<ChatEntity> createEntity(@NotNull Set<ChatCreateModel> model) throws CreationException
     {
-        System.out.println("Creating entity...");
         List<ChatEntity> empty = Collections.emptyList();
         List<ChatEntity> entities = model.stream()
                                          .map(chatCreateModel -> {
@@ -72,7 +71,6 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     }
 
     public @NotNull Optional<List<ChatEntity>> loadEntityByUserIDs(@NotNull List<Long> userIDs){
-        System.out.println(chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size()));
         return chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size());
     }
 
@@ -202,7 +200,6 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
 
             MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
             chatEntity.getMessages().add(messageEntity.getMessageId());
-            System.out.println(chatEntity.getMessages());
 
             messagingTemplate.
                     convertAndSend(wsIdentifiers.getBroker() + "/" + message.chatId(), messageEntity.toModel());
@@ -221,9 +218,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
 
     public String testMessage(@NotNull String string)
     {
-        String addedStuff = "Message recieved: " + string;
-        System.out.println("Message recieved: " + string);
-        return addedStuff;
+        return "Message recieved: " + string;
     }
 
     /**
@@ -259,11 +254,9 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
         return userService.loadEntityById(userId).map(userEntity -> {
             if(chatEntity.getUsers().contains(userEntity.getId()))
             {
-                System.out.println("Returning...");
                 return chatEntity.getMessages().stream().map(id ->
                         messageService.loadEntityById(id).orElseThrow(() -> new EntityUnknownException(chatId)).toModel()).toArray(MessageModel[]::new);
             }
-            System.out.println("Throw U");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         });
     }
