@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -27,7 +26,7 @@ public class FileServiceTest
     @Transactional
     public void testCreateEntity()
     {
-        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
 
         assertNotNull(fileEntity.getId());
@@ -72,7 +71,7 @@ public class FileServiceTest
     @Transactional
     public void testDelete()
     {
-        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});;
+        FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertTrue(fileService.delete(fileEntity.getId(), () -> {}));
     }

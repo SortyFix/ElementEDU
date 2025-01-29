@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -78,6 +77,11 @@ import java.util.function.Function;
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}/files") public ResponseEntity<List<FileInfoModel>> getSingleFiles(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
     {
-        return ResponseEntity.ok(fileService.getFileInfosById(fileId));
+        Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
+        if (fileService.getRepository().findById(fileId).map(access).orElse(false))
+        {
+            return ResponseEntity.ok(fileService.getFileInfosById(fileId));
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }

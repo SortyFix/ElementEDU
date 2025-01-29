@@ -162,17 +162,4 @@ export class SettingsComponent implements OnInit {
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
     }
-
-    // TODO: REMOVE
-    public getFileInfos(id: bigint): void
-    {
-        let files: Observable<FileInfoModel[]> = this.http.get<FileInfoModel[]>("http://localhost:8080/api/v1/file/get/1/files", {withCredentials: true});
-        files.subscribe(files => console.log(files));
-    }
-
-    public getIndexFile(id: bigint, index?: number) {
-        this.fileService.downloadFile(id, index);
-    }
-
-    protected readonly BigInt = BigInt;
 }
