@@ -6,7 +6,7 @@ import {forkJoin, Observable} from "rxjs";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
-import {AsyncPipe, NgForOf} from "@angular/common";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {ThemeService} from "../theming/theme.service";
@@ -16,6 +16,12 @@ import {UserService} from "../user/user.service";
 import {UserListComponent} from "../user/user-list/user-list.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatDivider} from "@angular/material/divider";
+import {
+    MatExpansionModule,
+    MatExpansionPanel,
+    MatExpansionPanelDescription,
+    MatExpansionPanelTitle
+} from "@angular/material/expansion";
 
 @Component({
     selector: 'app-settings',
@@ -32,7 +38,12 @@ import {MatDivider} from "@angular/material/divider";
         NgForOf,
         MatButton,
         FormsModule,
-        MatDivider
+        MatDivider,
+        MatExpansionPanel,
+        MatExpansionPanelTitle,
+        MatExpansionPanelDescription,
+        MatExpansionModule,
+        NgIf
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',

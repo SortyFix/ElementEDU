@@ -16,17 +16,25 @@
 
 <mat-divider></mat-divider>
 
-<p>
-    @if (this.userList.length != 0) {
-        <h3 [style.color]="user.theme.getTextColor('background', false)">User management</h3>
-        <p [style.color]="user.theme.getTextColor('background', false)">
-            Manage specific user privileges and states and view the information of all users.
-        </p>
-        <div class="background">
-            <app-user-list [userList]="userList"></app-user-list>
-        </div>
-    }
-</p> <br>
+<mat-expansion-panel *ngIf="user.inGroup('administrator')">
+    <mat-expansion-panel-header>
+        <mat-panel-title>User Management</mat-panel-title>
+        <mat-panel-description>Manage specific user privileges and states and view the information of all users.</mat-panel-description>
+    </mat-expansion-panel-header>
+    <p>
+        @if (this.userList.length != 0) {
+            <h3 [style.color]="user.theme.getTextColor('background', false)">User management</h3>
+            <p [style.color]="user.theme.getTextColor('background', false)">
+                Manage specific user privileges and states and view the information of all users.
+            </p>
+            <div>
+                <app-user-list [userList]="userList"></app-user-list>
+            </div>
+        }
+    </p> <br>
+
+</mat-expansion-panel>
+
 
 <mat-divider></mat-divider>
 
