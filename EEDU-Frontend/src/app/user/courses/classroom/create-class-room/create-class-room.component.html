@@ -1,0 +1,25 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-general-create title="Create Classroom" [loading]="loading">
+        <mat-card-content>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Class Name</mat-label>
+                <input
+                    type="text"
+                    matInput
+                    formControlName="name"
+                />
+            </mat-form-field>
+
+            <app-general-selection-input label="Select Teacher">
+            </app-general-selection-input>
+
+            <!-- TODO implement userlist -->
+
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
+            <button mat-stroked-button type="submit" [disabled]="!canSubmit">Submit</button>
+        </mat-card-actions>
+    </app-general-create>
+</form>

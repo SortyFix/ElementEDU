@@ -36,10 +36,7 @@ export class CreateCourseComponent extends AbstractCreateComponent<CourseModel> 
 
     private readonly _subjects: SubjectModel[] = [];
 
-    public constructor(
-        courseService: CourseService,
-        dialogRef: DialogRef,
-        formBuilder: FormBuilder,
+    public constructor(courseService: CourseService, dialogRef: DialogRef, formBuilder: FormBuilder,
         private _subjectService: SubjectService)
     {
         super(courseService, dialogRef, formBuilder);
