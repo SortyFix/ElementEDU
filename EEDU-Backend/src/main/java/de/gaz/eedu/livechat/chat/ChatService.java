@@ -22,13 +22,11 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -165,10 +163,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      *     <li>Sends the message to the WebSocket topic associated with the chat.</li>
      * </ul>
      * </p>
-     *
-     * @param authorId The ID of the authenticated user initiating the request, considered as the author of the message.
-     * @param chatId   The ID of the chat to which the message is being sent.
-     * @param body     The text content of the message being sent.
+     * @param json - The json to send via websockets
      * @return A {@link HttpStatus} indicating the outcome of the message sending operation.
      *         Returns {@link HttpStatus#OK} if the operation is successful,
      *         {@link HttpStatus#UNAUTHORIZED} if the user is not authorized to send messages in the chat,
@@ -229,8 +224,6 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      *     it's {@code List<MessageEntity>}) by the providedChat ID. It can only be used if an authorized User ID is given.
      *     If unauthorized, the HTTP Status {@code UNAUTHORIZED} will be thrown, preventing third parties from accessing chat information.
      * </p>
-     * @param userId - The ID of the given user. Has to be an ID available inside the {@code users} attribute of the ChatEntity.
-     * @param chatId - The ID of the requested chat.
      * @return {@code ResponseEntity<ChatModel>} containing chat information.
      * @throws ResponseStatusException with NOT_FOUND if the requested chat could not be found, and UNAUTHORIZED if the given user is not found inside the {@code users} attribute of the ChatEntity.
      */
