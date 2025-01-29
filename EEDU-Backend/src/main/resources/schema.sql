@@ -282,12 +282,12 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- 
        ('Charlotte', 'Zimmer', 'charlotte.zimmer', FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED
        ('James', 'Krause', 'james.krause', FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED
 
-INSERT INTO file_entity (author_id, file_name, data_directory)
-VALUES (5, 'Algebra 101 Repository', '/repo/algebra/101'),   -- File for Algebra 101
-       (6, 'Calculus 101 Repository', '/repo/calculus/101'), -- File for Calculus 101
-       (7, 'Physics 101 Repository', '/repo/physics/101'),   -- File for Physics 101
-       (8, 'History 101 Repository', '/repo/history/101'),   -- File for History 101
-       (9, 'Programming Repository', '/repo/programming'); -- File for Introduction to Programming
+INSERT INTO file_entity (data_directory)
+VALUES ('/repo/algebra/101'),   -- File for Algebra 101
+       ('/repo/calculus/101'), -- File for Calculus 101
+       ('/repo/physics/101'),   -- File for Physics 101
+       ('/repo/history/101'),   -- File for History 101
+       ('/repo/programming'); -- File for Introduction to Programming
 
 INSERT INTO course_entity (name, subject_id, repository_id, class_room_id)
 VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
