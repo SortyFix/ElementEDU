@@ -5,7 +5,6 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AssignmentModel} from "../../../user/courses/appointment/entry/assignment-model";
 import {MatIcon} from "@angular/material/icon";
 import {UserService} from "../../../user/user.service";
-import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignment-teacher-view.component";
 
 @Component({
   selector: 'app-assignment-tab',
@@ -20,7 +19,6 @@ import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignme
         ReactiveFormsModule,
         NgIf,
         MatIcon,
-        AssignmentTeacherViewComponent,
     ],
   templateUrl: './assignment-tab.component.html',
   styleUrl: './assignment-tab.component.scss'
