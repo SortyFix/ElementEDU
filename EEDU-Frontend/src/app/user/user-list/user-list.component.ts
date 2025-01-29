@@ -1,4 +1,4 @@
-import {Component, input, InputSignal} from '@angular/core';
+import {Component, input, InputSignal, ViewChild} from '@angular/core';
 import {UserModel, UserStatus} from "../user-model";
 import {
     MatList,
@@ -25,6 +25,8 @@ import {MatLine} from "@angular/material/core";
 import {AccessibilityService} from "../../accessibility.service";
 import {GroupSelectionList} from "../group/group-list/group-selection-list.component";
 import {UserService} from "../user.service";
+import {MatDialog} from "@angular/material/dialog";
+import {FilterMenuComponent} from "./filter-menu/filter-menu.component";
 
 @Component({
   selector: 'app-user-list',
@@ -63,7 +65,7 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService) {}
+    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService, private _dialog: MatDialog) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -145,6 +147,7 @@ export class UserListComponent {
         {
             accountType = 'Teacher'
         }
+
         return [accountType, `${user.lastName}, ${user.firstName}`];
     }
 
@@ -194,5 +197,14 @@ export class UserListComponent {
 
     public get getTheme() {
         return this._userService.getUserData.theme;
+    }
+
+    protected openFilterMenu(event: MouseEvent) {
+        this._dialog.open(FilterMenuComponent, {
+            position: {
+                top: `${event.clientY}px`,
+                left: `${event.clientX - 50}px`
+            }
+        });
     }
 }
