@@ -1,10 +1,12 @@
 package de.gaz.eedu.file;
 
 import de.gaz.eedu.file.exception.UnknownFileException;
+import de.gaz.eedu.file.model.FileInfoModel;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,10 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -71,9 +77,9 @@ import java.util.zip.ZipOutputStream;
     }
 
     @Transactional
-    public @NotNull ResponseEntity<ByteArrayResource> loadResourceById(@NotNull Long id) throws IOException
+    public @NotNull ResponseEntity<ByteArrayResource> loadResourceById(@NotNull Long id, @Nullable Integer index) throws IOException
     {
-        File directory = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        File directory = getDirectoryFromId(id);
         File[] files = directory.listFiles();
 
         if (files == null || files.length == 0)
@@ -83,33 +89,54 @@ import java.util.zip.ZipOutputStream;
 
         if (files.length == 1)
         {
-            ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                                                                      .filename(files[0].getName())
-                                                                      .build();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(contentDisposition);
-
-            System.out.println(files[0].getName() + " " + headers);
-
-            ResponseEntity<ByteArrayResource> responseEntity =
-                    ResponseEntity.ok()
-                            .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(files[0].getName())))
-                            .headers(headers)
-                            .body(new ByteArrayResource(Files.readAllBytes(Path.of(files[0].getAbsolutePath()))));
-            System.out.println(responseEntity);
-            return responseEntity;
+            return sendSingle(files[0]);
         }
 
+        if(Objects.nonNull(index) && fileIndexExists(files, index))
+        {
+            return sendSingle(files[index]);
+        }
+
+        return zipAndSend(files);
+    }
+
+    public ResponseEntity<ByteArrayResource> zipAndSend(@NotNull File[] files)
+    {
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                                                                  .filename("zip-" + files[0].getName() + ".zip")
-                                                                  .build();
+                .filename("zip-" + files[0].getName() + ".zip")
+                .build();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(contentDisposition);
 
         return ResponseEntity.ok()
-                             .contentType(MediaType.parseMediaType("application/zip; charset=UTF-8"))
-                             .headers(headers)
-                             .body(zipBatch(files));
+                .contentType(MediaType.parseMediaType("application/zip; charset=UTF-8"))
+                .headers(headers)
+                .body(zipBatch(files));
+    }
+
+    public ResponseEntity<ByteArrayResource> sendSingle(@NotNull File file) throws IOException
+    {
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(file.getName())
+                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(contentDisposition);
+
+        System.out.println(file.getName() + " " + headers);
+
+        ResponseEntity<ByteArrayResource> responseEntity =
+                ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(file.getName())))
+                        .headers(headers)
+                        .body(new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath()))));
+        System.out.println(responseEntity);
+        return responseEntity;
+    }
+
+    // Most likely provisional, I will probably redesign the system in the future
+    public List<FileInfoModel> getFileInfosById(@NotNull Long id)
+    {
+        return directoryToFileInfos(getDirectoryFromId(id));
     }
 
     public ByteArrayResource zipBatch(File @NotNull ... files)
@@ -134,10 +161,50 @@ import java.util.zip.ZipOutputStream;
         return fileRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    public @NotNull File getDirectoryFromId(@NotNull Long id)
+    {
+        File file = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        System.out.println(file.getAbsolutePath());
+        return file;
+    }
+
+    public @NotNull ArrayList<FileInfoModel> directoryToFileInfos(@NotNull File directory)
+    {
+        File[] fileList = directory.listFiles();
+        System.out.println(Arrays.toString(fileList));
+        ArrayList<FileInfoModel> files = new ArrayList<>();
+
+        if(fileList != null)
+        {
+            for(int i = 0; i < fileList.length; i++)
+            {
+                File file = fileList[i];
+                files.add(new FileInfoModel(i, file.getName(), file.lastModified(), file.length()));
+            }
+            return files;
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
     @Transactional
     public @NotNull FileEntity createEntity(@NotNull FileCreateModel model)
     {
         FileEntity fileEntity = model.toEntity(new FileEntity());
         return getRepository().save(fileEntity);
+    }
+
+    public @NotNull Boolean fileIndexExists(@NotNull File[] files, @NotNull Integer index)
+    {
+        try
+        {
+            File test = files[index];
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            return false;
+        }
+        return true;
     }
 }
