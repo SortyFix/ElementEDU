@@ -1,9 +1,10 @@
 package de.gaz.eedu.user;
 
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -30,13 +31,19 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "LEFT JOIN FETCH g.privileges p " +
             "LEFT JOIN FETCH u.themeEntity t " +
             "WHERE u.id = :userId")
-    @NotNull Optional<UserEntity> findByIdEagerly(@Param("userId") long userId);
+    @NotNull Optional<UserEntity> findByIdEagerly(long userId);
 
 
     @Query("SELECT u FROM UserEntity u " +
             "LEFT JOIN FETCH u.groups g " +
             "LEFT JOIN FETCH g.privileges p " +
             "LEFT JOIN FETCH u.themeEntity t")
-    @NotNull Set<UserEntity> findAllEagerly();
+    @Unmodifiable @NotNull Set<UserEntity> findAllEagerly();
+
+    @Query("SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName) FROM UserEntity u WHERE u.id = :userId")
+    @NotNull Optional<ReducedUserModel> findReducedById(long userId);
+
+    @Query("SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName) FROM UserEntity u")
+    @Unmodifiable @NotNull Set<ReducedUserModel> findAllReduced();
 
 }

@@ -90,8 +90,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
     /**
      * Retrieves user data for the specified user id.
      * <p>
-     * This method retrieves user data based on the provided user {@code id}. Access is restricted to authenticated users
-     * who either have the "<i>privilege.user.get</i>" authority or are accessing their own data.
+     * This method retrieves user data based on the provided user {@code id}.
      * <p>
      * The invoking user must have the "<i>privilege.user.get</i>" privilege, as configured in the application's properties,
      * or must be the owner of the data being requested to perform this action.
@@ -106,6 +105,22 @@ public class UserController extends EntityController<UserService, UserModel, Use
     }
 
     /**
+     * Retrieves reduced user data for the specified user id.
+     * <p>
+     * This method retrieves reduced user data based on the provided user {@code id}.
+     *
+     * @param id the unique identifier of the user whose reduced data is being retrieved.
+     * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
+     *
+     * //TODO discuss privileges
+     */
+    @GetMapping("/get/{id}/reduced")
+    public @NotNull ResponseEntity<ReducedUserModel> getReducedData(@PathVariable @NotNull Long id)
+    {
+        return getService().findReduced(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Retrieves data for the currently authenticated user.
      * <p>
      * This method retrieves user data for the authenticated user making the request. Access is restricted to
@@ -113,7 +128,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * <p>
      * The invoking user must be the owner of the data being accessed to perform this action.
      *
-     * @param userId the currently authenticated user, provided automatically.
+     * @param user the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
@@ -205,7 +220,8 @@ public class UserController extends EntityController<UserService, UserModel, Use
     public @NotNull ResponseEntity<Set<UserModel>> fetchAll() { return super.fetchAll(); }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/all/reduced")
-    public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced() {
-        return ResponseEntity.ok(userService.findAllAndReduce());
+    public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced()
+    {
+        return ResponseEntity.ok(userService.findAllReduced().toArray(new ReducedUserModel[0]));
     }
 }
