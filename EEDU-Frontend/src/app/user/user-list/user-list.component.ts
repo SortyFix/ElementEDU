@@ -1,4 +1,4 @@
-import {Component, input, InputSignal, ViewChild} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {UserModel, UserStatus} from "../user-model";
 import {
     MatList,
@@ -60,8 +60,8 @@ import {FilterMenuComponent} from "./filter-menu/filter-menu.component";
 })
 export class UserListComponent {
 
-    protected filteredString: string = '';
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
+    protected filteredString: string = '';
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
