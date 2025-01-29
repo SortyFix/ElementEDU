@@ -17,6 +17,7 @@ import {NgIf} from "@angular/common";
         LoadComponent,
         NgIf
     ],
+    standalone: true,
     encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit

@@ -89,9 +89,10 @@ export class FileService {
     }
 
     // ------------------------------ DOWNLOAD -----------------------------------
-    public async fetchFile(id: bigint): Promise<FileResponse> {
+    public async fetchFile(id: bigint, index?: number): Promise<FileResponse> {
         console.log("Fetching file binaries...");
-        const response: Response = await fetch(`${(this.URL_PREFIX)}/get/${id}`, {
+        const url: string = index == null ? `${(this.URL_PREFIX)}/get/${id}` : `${(this.URL_PREFIX)}/get/${id}/${index}`
+        const response: Response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': '*/*'
@@ -127,12 +128,12 @@ export class FileService {
         return disposition ? disposition.split('filename=')[1]?.replace(/"/g, '') || 'default-filename' : 'default-filename';
     }
 
-    public downloadFile(id: bigint): void {
+    public downloadFile(id: bigint, index?: number): void {
         this.getFileInfo(id).subscribe({
-            next: (fileModel) => {
+            next: (fileModel: FileModel) => {
                 console.log("File info received.");
                 console.log(fileModel);
-                this.fetchFile(id).then((response: any) => {
+                this.fetchFile(id, index).then((response: any) => {
                     this.triggerDownload(response.blob, response.fileName);
                 })
             }

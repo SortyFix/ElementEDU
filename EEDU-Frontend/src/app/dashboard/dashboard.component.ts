@@ -16,6 +16,7 @@ import {NgComponentOutlet, NgForOf} from "@angular/common";
         NgForOf,
         NgComponentOutlet
     ],
+    standalone: true,
     styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
