@@ -88,7 +88,13 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
         GroupEntity groupEntity = getGroupService().loadEntityById(3).orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
-        test(Eval.eval(groupEntity, userID == 2, Validator.equals()), userEntity::attachGroups);
+        Runnable test = () -> test(Eval.eval(groupEntity, true, Validator.equals()), userEntity::attachGroups);
+        if(userID == 3)
+        {
+            Assertions.assertThrows(IllegalStateException.class, test::run);
+            return;
+        }
+        test.run();
     }
 
     /**
