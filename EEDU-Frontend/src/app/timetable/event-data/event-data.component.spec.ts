@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UpdateEventComponent } from './update-event.component';
+import { EventDataComponent } from './event-data.component';
 
 describe('UpdateEventComponent', () => {
-  let component: UpdateEventComponent;
-  let fixture: ComponentFixture<UpdateEventComponent>;
+  let component: EventDataComponent;
+  let fixture: ComponentFixture<EventDataComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UpdateEventComponent]
+      imports: [EventDataComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UpdateEventComponent);
+    fixture = TestBed.createComponent(EventDataComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

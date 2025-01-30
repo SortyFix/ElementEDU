@@ -64,11 +64,11 @@
     <div class="appointment-box">
         @if(selectedEvent && selectedEvent.meta.type === AppointmentEntryModel)
         {
-            <app-update-event
+            <app-event-data
                 [title]="selectedEvent.title"
                 [subtitle]="dateToString(selectedEvent.start)"
                 [appointment]="selectedAppointment" #eventComponent
-            ></app-update-event>
+            ></app-event-data>
         }
         @else if (selectedEvent && selectedEvent.meta.type == FrequentAppointmentModel)
         {

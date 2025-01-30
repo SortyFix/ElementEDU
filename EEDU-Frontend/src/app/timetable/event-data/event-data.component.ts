@@ -29,7 +29,7 @@ import {EventTileContentComponent} from "./event-tile-content/event-tile-content
 import {RoomTabComponent} from "./room-tab/room-tab.component";
 
 @Component({
-  selector: 'app-update-event',
+  selector: 'app-event-data',
   standalone: true,
     imports: [
         ReactiveFormsModule,
@@ -52,10 +52,10 @@ import {RoomTabComponent} from "./room-tab/room-tab.component";
         EventTileContentComponent,
         RoomTabComponent
     ],
-  templateUrl: './update-event.component.html',
-  styleUrl: './update-event.component.scss'
+  templateUrl: './event-data.component.html',
+  styleUrl: './event-data.component.scss'
 })
-export class UpdateEventComponent {
+export class EventDataComponent {
 
     public title: InputSignal<string> = input<string>('');
     public subtitle: InputSignal<string> = input<string>('');

@@ -26,7 +26,7 @@ import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/fre
 import {CreateCourseComponent} from "../user/courses/create-course/create-course.component";
 import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
 import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
-import {UpdateEventComponent} from "./update-event/update-event.component";
+import {EventDataComponent} from "./event-data/event-data.component";
 import {AppointmentService} from "../user/courses/appointment/appointment.service";
 import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointment-create-model";
 import {CreateClassRoomComponent} from "../user/courses/classroom/create-class-room/create-class-room.component";
@@ -52,7 +52,7 @@ import {CreateClassRoomComponent} from "../user/courses/classroom/create-class-r
         MatButton,
         NgForOf,
         ReactiveFormsModule,
-        UpdateEventComponent
+        EventDataComponent
     ],
     providers: [
         {
@@ -66,7 +66,7 @@ import {CreateClassRoomComponent} from "../user/courses/classroom/create-class-r
 export class TimetableComponent implements OnInit, OnDestroy {
 
     @ViewChild('controls') controls!: CalendarControlsComponent;
-    @ViewChild('eventComponent') eventComponent!: UpdateEventComponent;
+    @ViewChild('eventComponent') eventComponent!: EventDataComponent;
 
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;

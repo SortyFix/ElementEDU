@@ -11,7 +11,7 @@
                 />
             </mat-form-field>
 
-            <app-general-selection-input label="Select Teacher" [values]="users">
+            <app-general-selection-input *ngIf="users.length > 0" label="Select Teacher" [values]="users">
             </app-general-selection-input>
 
             <!-- TODO implement user list -->

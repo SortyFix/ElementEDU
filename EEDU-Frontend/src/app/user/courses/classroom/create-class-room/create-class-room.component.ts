@@ -13,6 +13,7 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {ClassRoomService} from "../class-room.service";
 import {UserService} from "../../../user.service";
 import {ReducedUserModel} from "../../../reduced-user-model";
+import {NgIf} from "@angular/common";
 
 @Component({
     selector: 'app-create-class-room',
@@ -26,7 +27,8 @@ import {ReducedUserModel} from "../../../reduced-user-model";
         MatFormField,
         MatCardContent,
         GeneralCreateComponent,
-        GeneralSelectionInput
+        GeneralSelectionInput,
+        NgIf
     ],
     templateUrl: './create-class-room.component.html',
     styleUrl: './create-class-room.component.scss'
