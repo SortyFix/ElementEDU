@@ -4,7 +4,7 @@ export interface GenericReducedUserModel {
     id: bigint;
     firstName: string;
     lastName: string;
-    accountType: AccountType;
+    accountType: string;
 }
 
 export class ReducedUserModel {
@@ -18,7 +18,12 @@ export class ReducedUserModel {
 
     public static fromObject(obj: GenericReducedUserModel): ReducedUserModel
     {
-        return new ReducedUserModel(obj.id, obj.firstName, obj.lastName, obj.accountType);
+        return new ReducedUserModel(
+            obj.id,
+            obj.firstName,
+            obj.lastName,
+            AccountType[obj.accountType as keyof typeof AccountType]
+        );
     }
 
     public get id(): bigint {
