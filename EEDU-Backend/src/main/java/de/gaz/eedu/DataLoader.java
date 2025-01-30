@@ -1,5 +1,6 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -67,7 +68,7 @@ import java.util.stream.Stream;
      */
     private void createDefaultUser()
     {
-        String randomPassword = randomPassword(15);
+        String randomPassword = randomPassword();
 
         List<PrivilegeEntity> privilegeEntity = createDefaultPrivileges();
         GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
@@ -132,16 +133,20 @@ import java.util.stream.Stream;
 
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
-        // long line -.-
-        UserCreateModel user = new UserCreateModel("root", "root", "root", true, false, UserStatus.PROSPECTIVE, themeEntity.getId(), new Long[] {groupEntity.getId()});
-        UserEntity userEntity = getUserService().createEntity(Set.of(user)).getFirst();
-        userEntity.setSystemAccount(true);
-        return getUserService().saveEntity(userEntity);
+        return getUserService().saveEntity(getUserService().createEntity(Set.of(new UserCreateModel(
+                "root", // first name
+                "root", // last name
+                "root", // login name
+                AccountType.ADMINISTRATOR,
+                true, // enabled
+                false, // locked
+                UserStatus.PROSPECTIVE,
+                themeEntity.getId(),
+                new Long[] {groupEntity.getId()} // groups
+        ))).getFirst());
     }
 
-    @SuppressWarnings({
-            "SpellCheckingInspection", "SameParameterValue"
-    }) private @NotNull String randomPassword(int length)
+    private @NotNull String randomPassword()
     {
         if (development)
         {
@@ -162,7 +167,7 @@ import java.util.stream.Stream;
         password.append(digits.charAt(random.nextInt(digits.length())));
         password.append(specialSymbols.charAt(random.nextInt(specialSymbols.length())));
 
-        for (int i = 4; i < length; i++)
+        for (int i = 4; i < 15; i++)
         {
             password.append(alphabet.charAt(random.nextInt(alphabet.length())));
         }

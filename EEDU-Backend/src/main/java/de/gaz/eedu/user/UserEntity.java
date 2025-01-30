@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.user.exception.GroupConflictException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
@@ -62,6 +61,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private boolean systemAccount;
+    @Enumerated private AccountType accountType;
     private String firstName, lastName, loginName;
     private boolean enabled, locked;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
@@ -93,9 +93,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 getFirstName(),
                 getLastName(),
                 getLoginName(),
+                getAccountType(),
                 getStatus(),
                 groups,
-                getThemeEntity().toModel());
+                getThemeEntity().toModel()
+        );
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
@@ -177,16 +179,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         List<GroupEntity> entities = Arrays.asList(groupEntities);
-
-        if(inGroup("teacher") && containsGroup(entities, "student"))
-        {
-            throw new GroupConflictException("Teachers cannot be labeled as students.");
-        }
-
-        if(inGroup("student") && containsGroup(entities, "teacher"))
-        {
-            throw new GroupConflictException("Students cannot be labeled as teachers.");
-        }
 
         if(!Collections.disjoint(getGroups(), entities))
         {

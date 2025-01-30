@@ -4,6 +4,7 @@ import {finalize, map, Observable, of, tap} from "rxjs";
 import {UserModel} from "./user-model";
 import {environment} from "../../environment/environment";
 import {ReducedUserModel} from "./reduced-user-model";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +14,7 @@ export class UserService
     private readonly BACKEND_URL: string = environment.backendUrl;
     private _loaded: boolean = false;
 
-    constructor(private _http: HttpClient) {}
+    constructor(private _http: HttpClient, private _snackBar: MatSnackBar) {}
 
     private get http(): HttpClient {
         return this._http;
@@ -27,13 +28,20 @@ export class UserService
             return this.fetchUserData.pipe(tap({
                 next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
                 error: (error: any): void  => {
-                    if(error && 'status' in error && typeof error.status === 'number' && error.status === 403)
+                    if(error && 'status' in error && typeof error.status === 'number')
                     {
+                        // noinspection FallThroughInSwitchStatementJS
+                        switch (error.status) { // fall through
+                            // @ts-ignore
+                            case 404:
+                                this._snackBar.open("The account you are using seems not to exist.")
+                            case 403:
+                                this.logout().subscribe();
+                                break;
+                        }
                         // logout when token expired
-                        this.logout().subscribe();
                         return;
                     }
-                    // idk??
                 }
             }), map((): void => {}));
         }

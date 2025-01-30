@@ -1,10 +1,10 @@
-import {GenericPrivilege, PrivilegeModel} from "./privilege-model";
+import {GenericPrivilegeModel, PrivilegeModel} from "./privilege-model";
 
 export interface GenericGroupModel
 {
     id: bigint;
     name: string;
-    privileges: GenericPrivilege[];
+    privileges: GenericPrivilegeModel[];
 }
 
 export class GroupModel
@@ -17,10 +17,16 @@ export class GroupModel
 
     public static fromObject(obj: GenericGroupModel): GroupModel
     {
-        return new GroupModel(BigInt(obj.id), obj.name, obj.privileges.map((privilege: any): PrivilegeModel =>
+        const models: PrivilegeModel[] = obj.privileges.map((privilege: any): PrivilegeModel =>
         {
             return PrivilegeModel.fromObject(privilege);
-        }));
+        });
+
+        return new GroupModel(BigInt(obj.id), obj.name, models);
+    }
+
+    public hasPrivilege(privilege: string): boolean {
+        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.name === privilege);
     }
 
     public get id(): bigint {
@@ -33,9 +39,5 @@ export class GroupModel
 
     public get privileges(): PrivilegeModel[] {
         return this._privileges;
-    }
-
-    public hasPrivilege(privilege: string): boolean {
-        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.name === privilege);
     }
 }

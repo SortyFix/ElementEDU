@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     last_name      VARCHAR(255) NULL,
     login_name     VARCHAR(255) NULL,
     system_account BIT          NOT NULL,
+    account_type   TINYINT      NOT NULL,
     enabled        BIT          NOT NULL,
     locked         BIT          NOT NULL,
     theme_id       BIGINT       NULL,

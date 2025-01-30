@@ -1,4 +1,4 @@
-export interface GenericPrivilege
+export interface GenericPrivilegeModel
 {
     id: bigint;
     name: string;
@@ -11,9 +11,9 @@ export class PrivilegeModel
         private readonly _name: string
     ) { }
 
-    public static fromObject(obj: GenericPrivilege): PrivilegeModel
+    public static fromObject(obj: GenericPrivilegeModel): PrivilegeModel
     {
-        return new PrivilegeModel(obj.id, obj.name);
+        return new PrivilegeModel(BigInt(obj.id), obj.name);
     }
 
     public get id(): bigint {

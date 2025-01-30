@@ -27,7 +27,6 @@ import java.io.IOException;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/length") public ResponseEntity<Long> getLength()
     {
-        System.out.println(postService.getLength());
         return ResponseEntity.ok(postService.getLength());
     }
 
