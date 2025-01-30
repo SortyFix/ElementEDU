@@ -24,6 +24,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {MatLine} from "@angular/material/core";
 import {AccessibilityService} from "../../accessibility.service";
 import {GroupSelectionList} from "../group/group-list/group-selection-list.component";
+import {AccountType} from "../account-type";
 
 @Component({
   selector: 'app-user-list',
@@ -92,7 +93,7 @@ export class UserListComponent {
         return this._selected.has(entry.loginName);
     }
 
-    protected unselectAll()
+    protected unselectAll(): void
     {
         this._selected.clear();
     }
@@ -120,31 +121,20 @@ export class UserListComponent {
 
     protected icon(user: UserModel): 'person' | 'how_to_reg' | 'manage_accounts'
     {
-        if(user.inGroup('administrator'))
+        switch (user.accountType)
         {
-            return 'manage_accounts';
+            case AccountType.ADMINISTRATOR:
+                return 'manage_accounts';
+            case AccountType.TEACHER:
+                return 'how_to_reg';
+            default:
+                return 'person';
         }
-        else if(user.inGroup('teacher'))
-        {
-            return 'how_to_reg'
-        }
-
-        return 'person';
     }
 
     protected tags(user: UserModel): string[]
     {
-        if(user.inGroup('administrator'))
-        {
-            return ['Administrator']
-        }
-
-        let accountType: string = 'Student';
-        if(user.inGroup('teacher'))
-        {
-            accountType = 'Teacher'
-        }
-        return [accountType, `${user.lastName}, ${user.firstName}`];
+        return [user.accountType, `${user.lastName}, ${user.firstName}`];
     }
 
     protected status(user: UserModel): 'check_circle' | 'error' | 'receipt_long' | 'pending' {
