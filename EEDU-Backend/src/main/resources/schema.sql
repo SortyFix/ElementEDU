@@ -265,23 +265,23 @@ INSERT INTO group_entity (name) VALUES ('teacher'), ('student'), ('parent'), ('g
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('dark', 240, 240, 240, 200, 200, 200);
 
-INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
-VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, TRUE, FALSE, 1, 0),    -- PRESENT
-       ('John', 'Zimmermann', 'john.zimmermann', FALSE, TRUE, FALSE, 1, 1),  -- EXCUSED
-       ('Martin', 'Hansen', 'martin.hansen', FALSE, TRUE, FALSE, 1, 2),      -- UNEXCUSED
-       ('Lora', 'Schmidt', 'lora.schmidt', FALSE, TRUE, FALSE, 1, 1),        -- EXCUSED
-       ('Sara', 'Müller', 'sara.mueller', TRUE, TRUE, FALSE, 1, 0),          -- PRESENT
-       ('Tom', 'Bauer', 'tom.bauer', TRUE, FALSE, FALSE, 1, 2),              -- UNEXCUSED
-       ('Lisa', 'Klein', 'lisa.klein', TRUE, TRUE, FALSE, 1, 3),             -- PROSPECTIVE
-       ('Oliver', 'Wagner', 'oliver.wagner', FALSE, TRUE, TRUE, 1, 0),       -- PRESENT
-       ('Sophia', 'Becker', 'sophia.becker', FALSE, FALSE, FALSE, 1, 1),     -- EXCUSED
-       ('Liam', 'Schneider', 'liam.schneider', FALSE, TRUE, TRUE, 1, 3),     -- PROSPECTIVE
-       ('Emma', 'Fischer', 'emma.fischer', TRUE, TRUE, FALSE, 1, 2),         -- UNEXCUSED
-       ('Noah', 'Weber', 'noah.weber', FALSE, TRUE, FALSE, 1, 1),            -- EXCUSED
-       ('Mia', 'Hoffmann', 'mia.hoffmann', TRUE, TRUE, FALSE, 1, 0),         -- PRESENT
-       ('Ethan', 'Schwarz', 'ethan.schwarz', TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE
-       ('Charlotte', 'Zimmer', 'charlotte.zimmer', FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED
-       ('James', 'Krause', 'james.krause', FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED
+INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
+VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    -- PRESENT Student
+       ('John', 'Zimmermann', 'john.zimmermann', 2, FALSE, TRUE, FALSE, 1, 1),  -- EXCUSED Student
+       ('Martin', 'Hansen', 'martin.hansen', 2, FALSE, TRUE, FALSE, 1, 2),      -- UNEXCUSED Student
+       ('Lora', 'Schmidt', 'lora.schmidt', 1, FALSE, TRUE, FALSE, 1, 1),        -- EXCUSED Teacher
+       ('Sara', 'Müller', 'sara.mueller', 1, TRUE, TRUE, FALSE, 1, 0),          -- PRESENT Teacher
+       ('Tom', 'Bauer', 'tom.bauer', 1, TRUE, FALSE, FALSE, 1, 2),              -- UNEXCUSED Teacher
+       ('Lisa', 'Klein', 'lisa.klein', 2, TRUE, TRUE, FALSE, 1, 3),             -- PROSPECTIVE Student
+       ('Oliver', 'Wagner', 'oliver.wagner', 2, FALSE, TRUE, TRUE, 1, 0),       -- PRESENT Student
+       ('Sophia', 'Becker', 'sophia.becker', 2, FALSE, FALSE, FALSE, 1, 1),     -- EXCUSED Student
+       ('Liam', 'Schneider', 'liam.schneider', 2, FALSE, TRUE, TRUE, 1, 3),     -- PROSPECTIVE Student
+       ('Emma', 'Fischer', 'emma.fischer', 2, TRUE, TRUE, FALSE, 1, 2),         -- UNEXCUSED Student
+       ('Noah', 'Weber', 'noah.weber', 2, FALSE, TRUE, FALSE, 1, 1),            -- EXCUSED Student
+       ('Mia', 'Hoffmann', 'mia.hoffmann', 2, TRUE, TRUE, FALSE, 1, 0),         -- PRESENT Student
+       ('Ethan', 'Schwarz', 'ethan.schwarz', 2, TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE Student
+       ('Charlotte', 'Zimmer', 'charlotte.zimmer', 2, FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED Student
+       ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED Student
 
 INSERT INTO file_entity (data_directory)
 VALUES ('/repo/algebra/101'),   -- File for Algebra 101

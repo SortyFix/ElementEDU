@@ -14,7 +14,7 @@ import java.util.Set;
 @Repository
 public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
 
-    @Query(
+    @Query (
             "SELECT c FROM CourseEntity c " +
             "LEFT JOIN FETCH c.frequentAppointments sA " +
             "LEFT JOIN FETCH c.appointments a " +
@@ -23,14 +23,15 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             "LEFT JOIN FETCH c.users u " +
             "LEFT JOIN FETCH c.repository rE " +
             "WHERE c.id = :id"
-    )
-    @Override @NotNull Optional<CourseEntity> findById(@NotNull Long id);
+    ) @Override @NotNull Optional<CourseEntity> findById(@NotNull Long id);
 
 
-    @Query("SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName) FROM CourseEntity c JOIN c.users u WHERE c.id = :course")
-    @NotNull @Unmodifiable Set<ReducedUserModel> findAllReducedUsersByCourse(long course);
+    @Query (
+            "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
+            "FROM CourseEntity c JOIN c.users u WHERE c.id = :course"
+    ) @NotNull @Unmodifiable Set<ReducedUserModel> findAllReducedUsersByCourse(long course);
 
-    @Query(
+    @Query (
             "SELECT c FROM CourseEntity c " +
             "LEFT JOIN FETCH c.classRoom " +
             "LEFT JOIN FETCH c.frequentAppointments " +
@@ -41,8 +42,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
             "LEFT JOIN FETCH rE.privilege " +
             "LEFT JOIN FETCH rE.tags " +
             "WHERE :userId IN (SELECT u.id FROM c.users u)"
-    )
-    @NotNull @Unmodifiable Set<CourseEntity> findAllByUserId(long userId);
+    ) @NotNull @Unmodifiable Set<CourseEntity> findAllByUserId(long userId);
 
     boolean existsByName(@NotNull String name);
 

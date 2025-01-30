@@ -11,6 +11,7 @@ import {MatChip} from "@angular/material/chips";
 import {
     CreateAppointmentComponent
 } from "../../user/courses/appointment/create-appointment/create-appointment.component";
+import {AccountType} from "../../user/account-type";
 
 @Component({
   selector: 'app-calendar-controls',
@@ -35,7 +36,7 @@ export class CalendarControlsComponent {
     constructor(private _userService: UserService, private _dialog: MatDialog) {}
 
     protected get isTeacher(): boolean {
-        return this._userService.getUserData.inGroup('teacher');
+        return this._userService.getUserData.accountType == AccountType.TEACHER;
     }
 
     protected set viewType(value: CalendarView) {

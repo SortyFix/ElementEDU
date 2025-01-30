@@ -32,16 +32,6 @@ export class AssignmentTabComponent {
 
     private readonly MAX_FILES: 3 = 3;
 
-    constructor(private _userService: UserService) {}
-
-    protected get isTeacher(): boolean {
-        return this._userService.getUserData.inGroup('teacher');
-    }
-
-    protected get isStudent(): boolean {
-        return this._userService.getUserData.inGroup('student');
-    }
-
     protected onDragOver(event: DragEvent): void {
         event.preventDefault();
         event.stopPropagation();
