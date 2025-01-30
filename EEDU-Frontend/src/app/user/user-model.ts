@@ -10,7 +10,7 @@ export interface GenericUserModel {
     lastName: string;
     loginName: string;
     accountType: string;
-    status: UserStatus
+    status: string
     groups: GenericGroupModel[],
     theme: any,
 }
@@ -38,7 +38,7 @@ export class UserModel
             object.lastName,
             object.loginName,
             AccountType[object.accountType as keyof typeof AccountType],
-            object.status,
+            UserStatus[object.status as keyof typeof UserStatus],
             groupModel,
             themeModel
         );
