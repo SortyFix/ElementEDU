@@ -11,12 +11,12 @@ VALUES ('Q1'),
        ('dummy');
 
 /* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
-INSERT INTO user_entity (first_name, last_name, login_name, system_account, enabled, locked, theme_id, status)
-VALUES ('Max', 'Mustermann', 'max.mustermann', FALSE, FALSE, FALSE, 1, 0),
-       ('John', 'Zimmermann', 'john.zimmermann', FALSE, TRUE, TRUE, 2, 0),
-       ('Martin', 'Hansen', 'martin.hansen', FALSE, TRUE, FALSE, 3, 0),
-       ('dummy', 'dummy', 'dummy.dummy', FALSE, TRUE, FALSE, 2, 3),
-       ('gaz', 'gaz', 'gaz', TRUE, TRUE, FALSE, 2, 3);
+INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
+VALUES ('Max', 'Mustermann', 'max.mustermann', 0, FALSE, FALSE, FALSE, 1, 0),
+       ('John', 'Zimmermann', 'john.zimmermann', 1, FALSE, TRUE, TRUE, 2, 0),
+       ('Martin', 'Hansen', 'martin.hansen', 1, FALSE, TRUE, FALSE, 3, 0),
+       ('dummy', 'dummy', 'dummy.dummy', 0, FALSE, TRUE, FALSE, 2, 3),
+       ('gaz', 'gaz', 'gaz', 2, TRUE, TRUE, FALSE, 2, 3);
 
 INSERT INTO message_entity (author_id, body, timestamp, status)
 VALUES (1, 'Hey, wie geht es?', 1702672064, 0),

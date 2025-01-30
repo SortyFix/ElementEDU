@@ -39,12 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Getter(AccessLevel.PROTECTED)
 public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserModel, UserCreateModel> {
-    @Autowired
-    private UserService service;
-    @Autowired
-    private GroupService groupService;
-    @Autowired
-    private ThemeService themeService;
+
+    @Autowired private UserService service;
+    @Autowired private GroupService groupService;
+    @Autowired private ThemeService themeService;
 
     @Contract(pure = true)
     private static @NotNull String @NotNull [] testPasswords() {
@@ -93,7 +91,8 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
         );
 
         final ThemeModel themeModel = themeService.loadByIdSafe(1L);
-        final UserModel expected = new UserModel(5L,
+        final UserModel expected = new UserModel(
+                7L,
                 "jonas",
                 "yonas",
                 "jonas.yonas",
