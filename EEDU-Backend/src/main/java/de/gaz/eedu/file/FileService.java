@@ -19,7 +19,6 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
@@ -122,15 +121,10 @@ import java.util.zip.ZipOutputStream;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(contentDisposition);
 
-        System.out.println(file.getName() + " " + headers);
-
-        ResponseEntity<ByteArrayResource> responseEntity =
-                ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(file.getName())))
-                        .headers(headers)
-                        .body(new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath()))));
-        System.out.println(responseEntity);
-        return responseEntity;
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(URLConnection.guessContentTypeFromName(file.getName())))
+                .headers(headers)
+                .body(new ByteArrayResource(Files.readAllBytes(Path.of(file.getAbsolutePath()))));
     }
 
     // Most likely provisional, I will probably redesign the system in the future
@@ -163,16 +157,13 @@ import java.util.zip.ZipOutputStream;
 
     public @NotNull File getDirectoryFromId(@NotNull Long id)
     {
-        File file = new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(
+        return new File(getRepository().findById(id).map(FileEntity::getFilePath).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-        System.out.println(file.getAbsolutePath());
-        return file;
     }
 
     public @NotNull ArrayList<FileInfoModel> directoryToFileInfos(@NotNull File directory)
     {
         File[] fileList = directory.listFiles();
-        System.out.println(Arrays.toString(fileList));
         ArrayList<FileInfoModel> files = new ArrayList<>();
 
         if(fileList != null)

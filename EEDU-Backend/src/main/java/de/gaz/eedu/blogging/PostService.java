@@ -127,10 +127,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel createPost(@NotNull Long userId, @Nullable MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
-        System.out.println(userEntity.getAuthorities());
         if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ROLE_ADMINISTRATOR"))
         {
-            System.out.println("User has correct privileges, proceeding...");
             if(Objects.nonNull(thumbnail))
             {
                 try {
@@ -143,14 +141,13 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
                 }
                 catch (Exception e)
                 {
-                    System.out.println("createPost");
                     e.printStackTrace();
                 }
             }
             return createEntity(Set.of(new PostCreateModel(createModel.author(), createModel.title(),
                     null, createModel.body(), createModel.editPrivileges(), createModel.tags()))).getFirst().toModel();
         }
-        System.out.println("User does not have the correct privileges: " + getUserService().loadEntityByIDSafe(userId).getAuthorities().toString() + " | Required: ADMIN || " + writePrivilege);
+
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 }
