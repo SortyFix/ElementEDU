@@ -128,7 +128,10 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
             return Optional.empty();
         }
 
-        return getVerificationService().validate(token, (user) -> loadEntityByIDSafe(user).getAuthorities());
+        return getVerificationService().validate(token, (user) -> {
+            Optional<UserEntity> optionalUser = loadEntityById(user);
+            return optionalUser.map(UserEntity::getAuthorities).orElse(Collections.emptySet());
+        });
     }
 
     @Override public @NotNull @Unmodifiable Set<UserEntity> findAllEntities(@NotNull Predicate<UserEntity> predicate)
