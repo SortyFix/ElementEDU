@@ -90,12 +90,9 @@ import java.util.Set;
     {
         try
         {
-            System.out.println("Starting upload");
             for(MultipartFile file : batch)
             {
-                System.out.println("Setting path...");
                 Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
-                System.out.println("Creating path...");
                 createDirectory(subdirectory);
                 if (virusCheck(file.getInputStream()))
                 {
@@ -154,7 +151,7 @@ import java.util.Set;
     public @NotNull String getFilePath(@Nullable String subdirectory)
     {
         String path = String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
-        System.out.println(path);
+
         // TODO: Check if slash is ók
         return path;
     }
