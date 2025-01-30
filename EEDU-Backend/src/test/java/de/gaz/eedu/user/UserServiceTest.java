@@ -60,7 +60,17 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
 
     @Override
     protected @NotNull UserCreateModel occupiedCreateModel() {
-        return new UserCreateModel("Max", "musterman", "max.mustermann", true, false, UserStatus.PRESENT, 1L, new Long[0]);
+        return new UserCreateModel(
+                "Max",
+                "musterman",
+                "max.mustermann",
+                AccountType.STUDENT,
+                true,
+                false,
+                UserStatus.PRESENT,
+                1L,
+                new Long[0]
+        );
     }
 
     @Override
@@ -70,14 +80,35 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
 
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
-        final UserCreateModel createModel = new UserCreateModel("jonas", "yonas", "jonas.yonas", true, false, UserStatus.PRESENT, 1L, new Long[0]);
+        final UserCreateModel createModel = new UserCreateModel(
+                "jonas",
+                "yonas",
+                "jonas.yonas",
+                AccountType.STUDENT,
+                true,
+                false,
+                UserStatus.PRESENT,
+                1L,
+                new Long[0]
+        );
+
         final ThemeModel themeModel = themeService.loadByIdSafe(1L);
-        final UserModel expected = new UserModel(5L, "jonas", "yonas", "jonas.yonas", UserStatus.PRESENT, new GroupModel[0], themeModel);
+        final UserModel expected = new UserModel(5L,
+                "jonas",
+                "yonas",
+                "jonas.yonas",
+                AccountType.STUDENT,
+                UserStatus.PRESENT,
+                new GroupModel[0],
+                themeModel
+        );
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {
+            Assertions.assertEquals(expect, result);
             Assertions.assertEquals(expect.firstName(), result.firstName());
             Assertions.assertEquals(expect.lastName(), result.lastName());
             Assertions.assertEquals(expect.loginName(), result.loginName());
+            Assertions.assertEquals(expect.accountType(), result.accountType());
         });
     }
 

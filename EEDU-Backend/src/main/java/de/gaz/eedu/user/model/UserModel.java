@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
@@ -10,6 +11,7 @@ import de.gaz.eedu.user.theming.ThemeModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -29,8 +31,15 @@ import java.util.Objects;
  * @see UserEntity
  * @see GroupEntity
  */
-public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull String lastName,
-                        @NotNull String loginName, @NotNull UserStatus status, @NotNull GroupModel[] groups, @NotNull ThemeModel theme) implements EntityModel
+public record UserModel(
+        @NotNull Long id,
+        @NotNull String firstName,
+        @NotNull String lastName,
+        @NotNull String loginName,
+        @NotNull AccountType accountType,
+        @NotNull UserStatus status,
+        @NotNull GroupModel[] groups,
+        @NotNull ThemeModel theme) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()
@@ -40,7 +49,10 @@ public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull St
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", loginName='" + loginName + '\'' +
+                ", accountType=" + accountType +
                 ", status=" + status +
+                ", groups=" + Arrays.toString(groups) +
+                ", theme=" + theme +
                 '}';
     }
 
@@ -52,9 +64,9 @@ public record UserModel(@NotNull Long id, @NotNull String firstName, @NotNull St
         return Objects.equals(id, userModel.id);
     }
 
-    public ReducedUserModel toReducedModel()
+    public @NotNull ReducedUserModel toReducedModel()
     {
-        return new ReducedUserModel(id(), firstName(), lastName());
+        return new ReducedUserModel(id(), firstName(), lastName(), accountType());
     }
 
     @Override public int hashCode()
