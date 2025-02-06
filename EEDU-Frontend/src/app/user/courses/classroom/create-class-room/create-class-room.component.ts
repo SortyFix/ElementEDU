@@ -14,6 +14,10 @@ import {ClassRoomService} from "../class-room.service";
 import {UserService} from "../../../user.service";
 import {ReducedUserModel} from "../../../reduced-user-model";
 import {NgIf} from "@angular/common";
+import {AccountType} from "../../../account-type";
+import {
+    GeneralMultipleSelectionInput
+} from "../../../../timetable/general-multiple-selection-input/general-multiple-selection-input.component";
 
 @Component({
     selector: 'app-create-class-room',
@@ -28,7 +32,8 @@ import {NgIf} from "@angular/common";
         MatCardContent,
         GeneralCreateComponent,
         GeneralSelectionInput,
-        NgIf
+        NgIf,
+        GeneralMultipleSelectionInput
     ],
     templateUrl: './create-class-room.component.html',
     styleUrl: './create-class-room.component.scss'
@@ -46,7 +51,15 @@ export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomM
         });
     }
 
-    protected get users(): ReducedUserModel[] {
-        return this._users;
+    protected get teacher(): ReducedUserModel[] {
+        return this.getUsers(AccountType.TEACHER);
+    }
+
+    protected get students(): ReducedUserModel[] {
+        return this.getUsers(AccountType.STUDENT);
+    }
+
+    private getUsers(accountType: AccountType): ReducedUserModel[] {
+        return this._users.filter((user: ReducedUserModel): boolean => user.accountType === accountType);
     }
 }

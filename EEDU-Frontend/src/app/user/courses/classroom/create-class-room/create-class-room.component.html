@@ -11,8 +11,15 @@
                 />
             </mat-form-field>
 
-            <app-general-selection-input *ngIf="users.length > 0" label="Select Teacher" [values]="users">
+            <app-general-selection-input *ngIf="teacher.length > 0" label="Select Teacher" [values]="teacher">
             </app-general-selection-input>
+
+            <app-general-multiple-selection-input
+                [values]="students"
+                label="Select Students"
+                placeholder="Enter a students name and press enter">
+
+            </app-general-multiple-selection-input>
 
             <!-- TODO implement user list -->
 
