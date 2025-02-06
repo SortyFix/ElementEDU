@@ -23,7 +23,8 @@ public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatMo
         Long[] emptyArr = new Long[0];
         Long currentTime = System.currentTimeMillis();
         ChatCreateModel chatCreateModel = new ChatCreateModel(emptyArr, currentTime);
-        ChatModel chatModel = new ChatModel(5L, "Bauer, Maxi" ,currentTime, emptyArr, emptyArr);
+        // Empty string because no user has been given; therefore no name
+        ChatModel chatModel = new ChatModel(5L, "" ,currentTime, emptyArr, emptyArr);
         return Eval.eval(chatCreateModel, chatModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());

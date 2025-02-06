@@ -35,7 +35,11 @@ import java.io.IOException;
         return ResponseEntity.ok(postService.getPostList(pageNumber));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRATOR')") @PostMapping("/post") public ResponseEntity<PostModel> createPost(@AuthenticationPrincipal Long userId, @NotNull @RequestPart("createModel") PostCreateModel createModel, @Nullable @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile)
+    @PreAuthorize("hasRole('ADMINISTRATOR')") @PostMapping("/post")
+    public ResponseEntity<PostModel> createPost(
+            @AuthenticationPrincipal Long userId,
+            @NotNull @RequestPart("createModel") PostCreateModel createModel,
+            @Nullable @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile)
     {
         return ResponseEntity.ok(postService.createPost(userId, multipartFile, createModel));
     }

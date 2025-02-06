@@ -90,10 +90,11 @@ import java.util.Set;
     {
         try
         {
+            createDirectory(subdirectory);
+
             for(MultipartFile file : batch)
             {
-                Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
-                createDirectory(subdirectory);
+                Path path = Path.of(getFilePath(subdirectory), file.getName());
                 if (virusCheck(file.getInputStream()))
                 {
                     file.transferTo(path);
