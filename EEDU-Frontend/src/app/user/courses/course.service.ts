@@ -74,7 +74,7 @@ export class CourseService extends AbstractSimpleCourseService<CourseModel, Gene
 
     protected override createValue(createModels: GenericCourseCreateModel[]): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/create`;
-        return this.http.post<any[]>(url, createModels, { withCredentials:  true });
+        return this.http.post<any[]>(url, createModels, { withCredentials: true });
     }
 
     protected override get translate(): OperatorFunction<any[], CourseModel[]> {
