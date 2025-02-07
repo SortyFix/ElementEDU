@@ -33,9 +33,9 @@ export class CourseService extends AbstractSimpleCourseService<CourseModel, Gene
     public fetchUsers(course: bigint): Observable<ReducedUserModel[]>
     {
         const url: string = `${this.BACKEND_URL}/get/users/${course}`;
-        return this.http.get<ReducedUserModel[]>(url).pipe(
-            map((user: any[]): ReducedUserModel[] => user.map((item: any): ReducedUserModel => ReducedUserModel.fromObject(item)))
-        );
+        return this.http.get<ReducedUserModel[]>(url).pipe(map((user: any[]): ReducedUserModel[] =>
+            user.map((item: any): ReducedUserModel => ReducedUserModel.fromObject(item))
+        ));
     }
 
     /**
