@@ -7,12 +7,12 @@ import {MatInput} from "@angular/material/input";
 import {SubjectModel} from "../subject/subject-model";
 import {SubjectService} from "../subject/subject.service";
 import {GeneralCreateComponent} from "../../../timetable/general-create-component/general-create.component";
-import {GeneralSelectionInput} from "../../../timetable/general-selection-input/general-selection-input.component";
 import {AbstractCreateComponent} from "../abstract-create-component";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {DialogRef} from "@angular/cdk/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {SelectionInput} from "../../../common/selection-input/selection-input.component";
 
 @Component({
   selector: 'app-create-course',
@@ -26,8 +26,8 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
         GeneralCreateComponent,
         MatCardActions,
         MatButton,
-        GeneralSelectionInput,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        SelectionInput
     ],
   templateUrl: './create-course.component.html',
   styleUrl: './create-course.component.scss'

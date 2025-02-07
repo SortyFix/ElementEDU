@@ -8,12 +8,12 @@
             <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
             <mat-datepicker #datepicker></mat-datepicker>
         </mat-form-field>
-        <app-general-selection-input
+        <general-selection-input
             *ngIf="rooms().length > 0"
             label="Room"
             formControlName="room"
             [values]="rooms()" style="flex: 1">
-        </app-general-selection-input>
+        </general-selection-input>
     </div>
 
 

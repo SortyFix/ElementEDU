@@ -18,7 +18,6 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {MatButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {GeneralSelectionInput} from "../general-selection-input/general-selection-input.component";
 import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
 import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment-create-model";
 import {AssignmentTabComponent} from "./assignment-tab/assignment-tab.component";
@@ -27,6 +26,7 @@ import {
 } from "../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
 import {EventTileContentComponent} from "./event-tile-content/event-tile-content.component";
 import {RoomTabComponent} from "./room-tab/room-tab.component";
+import {SelectionInput} from "../../common/selection-input/selection-input.component";
 
 @Component({
   selector: 'app-event-data',
@@ -46,11 +46,11 @@ import {RoomTabComponent} from "./room-tab/room-tab.component";
         MatInput,
         MatCardActions,
         MatButton,
-        GeneralSelectionInput,
         AssignmentTabComponent,
         DateTimePickerComponent,
         EventTileContentComponent,
-        RoomTabComponent
+        RoomTabComponent,
+        SelectionInput
     ],
   templateUrl: './event-data.component.html',
   styleUrl: './event-data.component.scss'

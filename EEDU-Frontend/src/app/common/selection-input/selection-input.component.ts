@@ -5,7 +5,7 @@ import {
     InputSignal,
     model,
     ModelSignal,
-    OnChanges, Signal,
+    Signal,
     signal,
     Type,
     WritableSignal
@@ -24,10 +24,52 @@ import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow}
 import {MatIcon} from "@angular/material/icon";
 import {ENTER} from "@angular/cdk/keycodes";
 
-const type: Type<GeneralMultipleSelectionInput<any>> = forwardRef((): typeof GeneralMultipleSelectionInput => GeneralMultipleSelectionInput);
+const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => SelectionInput);
 
+/**
+ * A reusable general selection input component
+ *
+ * It allows users to select one or multiple item(s) from a list of values, supports Angular forms integration through
+ * the {@link ControlValueAccessor} interface, and validates the selected input via the {@link Validator} interface.
+ *
+ * This generic component operates on items of type T, where T must have a name property.
+ *
+ * @typeParam T the type of items managed by the component. Must include a name property of type string.
+ *
+ * @example
+ * <!-- bind it to a standalone input -->
+ * <general-selection-input
+ *     label="Select an Option"
+ *     placeholder="Option Name..."
+ *     [(ngModel)]="selectedOption"
+ *     [values]="availableOptions" // must include "name: string" attribute
+ * ></general-selection-input>
+ *
+ * <!-- can also be used within a form -->
+ * <form>
+ *      <general-selection-input
+ *          label="Select an Option"
+ *          placeholder="Option Name..."
+ *          formControlName="option"
+ *          [values]="availableOptions" // must include "name: string" attribute
+ *      ></general-selection-input>
+ * </form>
+ *
+ * <!-- is able to capture multiple entries -->
+ * <form>
+ *      <general-selection-input
+ *          label="Select Options"
+ *          placeholder="Option Name..."
+ *          formControlName="option"
+ *          [values]="availableOptions" // must include "name: string" attribute
+ *          [multiple]="true"
+ *      ></general-selection-input>
+ * </form>
+ *
+ * @author Ivo Quiring
+ */
 @Component({
-    selector: 'app-general-multiple-selection-input',
+    selector: 'general-selection-input',
     standalone: true,
     imports: [
         MatFormField,
@@ -48,15 +90,19 @@ const type: Type<GeneralMultipleSelectionInput<any>> = forwardRef((): typeof Gen
         { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true },
         { provide: NG_VALIDATORS, useExisting: type, multi: true }
     ],
-    templateUrl: './general-multiple-selection-input.component.html',
-    styleUrl: './general-multiple-selection-input.component.scss'
+    templateUrl: './selection-input.component.html',
+    styleUrl: './selection-input.component.scss'
 })
-export class GeneralMultipleSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
+export class SelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
 
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
     public values: InputSignal<T[]> = input<T[]>([]);
+
+    public allowNull: InputSignal<boolean> = input<boolean>(false);
+
     public allowDuplicates: InputSignal<boolean> = input<boolean>(false);
+    public multiple: InputSignal<boolean> = input<boolean>(false);
 
     protected currentValue: ModelSignal<string> = model<string>('');
     protected selectedValues: WritableSignal<T[]> = signal<T[]>([]);
@@ -81,7 +127,7 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
     });
 
 
-    public onChange: (value: T[]) => void = (): void => {};
+    public onChange: (value: T[] | T) => void = (): void => {};
     public onTouched: () => void = (): void => {};
 
     public writeValue(value: T): void {
@@ -101,16 +147,20 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
         this.onTouched = fn;
     }
 
-    public validate(): { invalidSelection: boolean } | null {
-        if(this.selectedValues().length == 0)
+    public validate(): { invalidSelection: true } | { unset: true } | null {
+
+        if(this.multiple() && this.selectedValues().length == 0)
         {
             return { invalidSelection: true };
         }
-        return null;
-    }
 
-    protected get separatorKeysCodes(): number[] {
-        return [ENTER];
+        console.log(this.filter(this.currentValue()).length);
+        if(!this.multiple() && this.filter(this.currentValue()).length !== 1)
+        {
+            return { unset: true };
+        }
+
+        return null;
     }
 
     protected add(event: MatChipInputEvent): string {
@@ -121,11 +171,18 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
             return event.value;
         }
 
-        this.selectedValues.update((values: T[]): T[] => [...values, ...value]);
-        this.onChange(this.selectedValues());
-
-        this.currentValue.set('');
+        this.value = value[0];
         return '';
+    }
+
+    protected selected(event: MatAutocompleteSelectedEvent): void {
+        const value: T[] = this.filter(event.option.viewValue);
+        if(value.length == 1)
+        {
+            this.value = value[0];
+        }
+
+        event.option.deselect();
     }
 
     private filter(input: string): T[]
@@ -138,16 +195,18 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
         });
     }
 
-    protected selected(event: MatAutocompleteSelectedEvent): void {
-        const value: T | null = this.values().find((c: T): boolean => c.name == event.option.viewValue) || null;
-        if(value)
+    protected set value(value: T)
+    {
+        if(this.multiple())
         {
             this.selectedValues.update((values: T[]): T[] => [...values, value]);
             this.onChange(this.selectedValues())
+            this.currentValue.set('');
+            return;
         }
 
-        this.currentValue.set('');
-        event.option.deselect();
+        this.currentValue.set(value.name);
+        this.onChange(value);
     }
 
     protected remove(value: T): void {
@@ -162,4 +221,6 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
             return [...values];
         });
     }
+
+    protected readonly ENTER = ENTER;
 }

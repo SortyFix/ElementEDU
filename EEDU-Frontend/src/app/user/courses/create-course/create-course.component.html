@@ -6,8 +6,11 @@
             <input formControlName="name" type="text" matInput/>
         </mat-form-field>
 
-        <app-general-selection-input label="Subject" [values]="subjects" formControlName="subject">
-        </app-general-selection-input>
+        <general-selection-input
+            [values]="subjects"
+            label="Subject"
+            formControlName="subject">
+        </general-selection-input>
 
         <!--public constructor(-->
         <!--private readonly _name: string,-->

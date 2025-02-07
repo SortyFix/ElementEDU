@@ -4,10 +4,8 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
 import {NgIf} from "@angular/common";
-import {
-    GeneralSelectionInput
-} from "../../../../../timetable/general-selection-input/general-selection-input.component";
 import {RoomModel} from "../../../room/room-model";
+import {SelectionInput} from "../../../../../common/selection-input/selection-input.component";
 
 @Component({
   selector: 'app-create-standalone-appointment',
@@ -18,8 +16,8 @@ import {RoomModel} from "../../../room/room-model";
         MatTabGroup,
         MatTab,
         DurationPickerComponent,
-        GeneralSelectionInput,
-        NgIf
+        NgIf,
+        SelectionInput
     ],
   templateUrl: './create-standalone-appointment.component.html',
   styleUrl: './create-standalone-appointment.component.scss'

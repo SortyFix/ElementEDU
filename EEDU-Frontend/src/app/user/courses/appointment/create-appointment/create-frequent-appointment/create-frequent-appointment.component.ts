@@ -9,10 +9,8 @@ import {NgIf} from "@angular/common";
 import {DurationPickerComponent, DurationType} from "../duration-picker/duration-picker.component";
 import {DateTimePickerComponent} from "../date-time-picker/date-time-picker.component";
 import {RoomModel} from "../../../room/room-model";
-import {
-    GeneralSelectionInput
-} from "../../../../../timetable/general-selection-input/general-selection-input.component";
 import {AccessibilityService} from "../../../../../accessibility.service";
+import {SelectionInput} from "../../../../../common/selection-input/selection-input.component";
 
 @Component({
   selector: 'app-create-frequent-appointment',
@@ -31,7 +29,7 @@ import {AccessibilityService} from "../../../../../accessibility.service";
         MatTooltip,
         NgIf,
         MatSuffix,
-        GeneralSelectionInput
+        SelectionInput
     ],
   templateUrl: './create-frequent-appointment.component.html',
   styleUrl: './create-frequent-appointment.component.scss'

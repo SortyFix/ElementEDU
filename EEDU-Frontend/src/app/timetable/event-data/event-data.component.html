@@ -52,13 +52,13 @@
                     <mat-grid-tile rowspan="1" colspan="3" >
                         <app-event-tile-content title="Room" #room>
                             <app-room-tab [editing]="room.editing" [room]="form.get('room')?.value">
-                                <app-general-selection-input
+                                <general-selection-input
                                     class="form-field"
                                     formControlName="room"
                                     placeholder="Enter Room"
                                     *ngIf="rooms.length > 0"
                                     [label]="null" [values]="rooms">
-                                </app-general-selection-input>
+                                </general-selection-input>
                             </app-room-tab>
                         </app-event-tile-content>
                     </mat-grid-tile>

@@ -21,7 +21,7 @@ import {AppointmentCreateModel} from "../entry/appointment-create-model";
 import {
     FrequentAppointmentCreateModel,
 } from "../frequent/frequent-appointment-create-model";
-import {GeneralSelectionInput} from "../../../../timetable/general-selection-input/general-selection-input.component";
+import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 
 /**
  * A component for creating appointments
@@ -40,7 +40,6 @@ import {GeneralSelectionInput} from "../../../../timetable/general-selection-inp
         MatCardContent,
         FormsModule,
         ReactiveFormsModule,
-        GeneralSelectionInput,
         MatDialogClose,
         MatTabGroup,
         MatTab,
@@ -49,6 +48,7 @@ import {GeneralSelectionInput} from "../../../../timetable/general-selection-inp
         CreateStandaloneAppointmentComponent,
         CreateFrequentAppointmentComponent,
         GeneralCreateComponent,
+        SelectionInput,
     ],
   templateUrl: './create-appointment.component.html',
   styleUrl: './create-appointment.component.scss',

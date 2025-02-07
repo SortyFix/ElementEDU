@@ -1,4 +1,4 @@
-import {Component, OnChanges, SimpleChanges} from '@angular/core';
+import {Component} from '@angular/core';
 import {AbstractCreateComponent} from "../../abstract-create-component";
 import {ClassRoomModel} from "../class-room-model";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
@@ -7,19 +7,16 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
-import {GeneralSelectionInput} from "../../../../timetable/general-selection-input/general-selection-input.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {DialogRef} from "@angular/cdk/dialog";
 import {ClassRoomService} from "../class-room.service";
 import {UserService} from "../../../user.service";
 import {ReducedUserModel} from "../../../reduced-user-model";
 import {AccountType} from "../../../account-type";
-import {
-    GeneralMultipleSelectionInput
-} from "../../../../timetable/general-multiple-selection-input/general-multiple-selection-input.component";
-import {CourseModel} from "../../course-model";
 import {CourseService} from "../../course.service";
 import {ClassRoomCreateModel} from "../class-room-create-model";
+import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
+import {CourseModel} from "../../course-model";
 
 @Component({
     selector: 'app-create-class-room',
@@ -33,8 +30,7 @@ import {ClassRoomCreateModel} from "../class-room-create-model";
         MatFormField,
         MatCardContent,
         GeneralCreateComponent,
-        GeneralSelectionInput,
-        GeneralMultipleSelectionInput
+        SelectionInput
     ],
     templateUrl: './create-class-room.component.html',
     styleUrl: './create-class-room.component.scss'

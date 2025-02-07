@@ -1,11 +1,11 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <app-general-create title="Create new Appointment" [loading]="loading">
         <mat-card-content class="content-wrapper">
-            <app-general-selection-input
+            <general-selection-input
                 label="Enter the Course this Appointment applies to"
                 formControlName="course"
                 [values]="courses">
-            </app-general-selection-input>
+            </general-selection-input>
 
             <mat-tab-group animationDuration="200ms"
                            [selectedIndex]="form.get('selected')?.value"
