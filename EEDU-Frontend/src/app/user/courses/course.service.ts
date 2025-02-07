@@ -17,7 +17,7 @@ import {HttpClient} from "@angular/common/http";
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService extends AbstractSimpleCourseService<CourseModel, GenericCourseCreateModel>{
+export class CourseService extends AbstractSimpleCourseService<CourseModel, GenericCourseCreateModel> {
 
     constructor(http: HttpClient) { super(http); }
 
