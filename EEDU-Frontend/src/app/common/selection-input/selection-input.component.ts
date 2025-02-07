@@ -107,6 +107,15 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
     protected currentValue: ModelSignal<string> = model<string>('');
     protected selectedValues: WritableSignal<T[]> = signal<T[]>([]);
 
+    /**
+     * Returns all accessible values from the list of values.
+     *
+     * Returns an array of values accessible to the user to select.
+     * This needs to be done, because when not allowing duplicates the accessible
+     * values need to dynamically disappear accordingly.
+     *
+     * @protected
+     */
     protected accessibleValues: Signal<T[]> = computed((): T[] => {
         return this.values().filter((value: T): boolean =>
         {
@@ -114,6 +123,17 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
         });
     });
 
+    /**
+     * Filters values based on the input given.
+     *
+     * Returns an array of filtered values retrieved from {@link accessibleValues} consisting of the type T provided by the class.
+     * This is required for live updating the suggestions while the user enters something into
+     * the input field.
+     *
+     * When the current value is undefined it will not filter anything.
+     *
+     * @protected
+     */
     protected filteredValues: Signal<T[]> = computed((): T[] => {
         const currentValue: string | undefined = this.currentValue()?.toLowerCase();
         if(!currentValue) {
@@ -130,6 +150,15 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
     public onChange: (value: T[] | T) => void = (): void => {};
     public onTouched: () => void = (): void => {};
 
+    /**
+     * Writes a new value to the component
+     *
+     * This method sets the internal value of the component to the provided value. It is part of the
+     * {@link ControlValueAccessor} interface implementation and is invoked to update the value programmatically.
+     *
+     * @param value the new value of type T or null to be written to the component.
+     * @public
+     */
     public writeValue(value: T): void {
 
         if(!value) {
@@ -139,14 +168,49 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
         this.currentValue.set(value.name);
     }
 
+    /**
+     * Registers a callback function to handle changes to the component's value
+     *
+     * This method is part of the {@link ControlValueAccessor} interface implementation. It assigns the provided
+     * callback function to be invoked whenever the value of the component changes.
+     *
+     * @param fn the callback function to handle value changes.
+     * @public
+     */
     public registerOnChange(fn: any): void {
         this.onChange = fn;
     }
 
+    /**
+     * Registers a callback function to handle the touched state of the component
+     *
+     * This method is part of the {@link ControlValueAccessor} interface implementation. It assigns the provided
+     * callback function to be invoked when the component is marked as touched by user interaction.
+     *
+     * @param fn the callback function to handle the touched state.
+     * @public
+     */
     public registerOnTouched(fn: any): void {
         this.onTouched = fn;
     }
 
+    /**
+     * Validates the current value of the component.
+     *
+     * This method checks whether the component's value can be considered valid based on its configuration.
+     * If multiple values are allowed, the component is considered
+     * invalid when the length of the {@link selectedValues()} array is 0.
+     *
+     * If only one value is allowed, the component is considered invalid when the current value does not
+     * match any value from the {@link accessibleValues()} array.
+     *
+     * @returns {{ invalidSelection: true } | { unset: true } | null }
+     * { invalidSelection: true } is returned when multiple values are allowed, but none have been selected.
+     * { unset: true } is returned when only one value is allowed, but none has been selected.
+     * null is returned when it is acceptable to have no value selected, or when the component's configuration requirements are met.
+     *
+     * @public
+     */
     public validate(): { invalidSelection: true } | { unset: true } | null {
 
         if(this.multiple() && this.selectedValues().length == 0)
@@ -154,7 +218,6 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
             return { invalidSelection: true };
         }
 
-        console.log(this.filter(this.currentValue()).length);
         if(!this.multiple() && this.filter(this.currentValue()).length !== 1)
         {
             return { unset: true };
