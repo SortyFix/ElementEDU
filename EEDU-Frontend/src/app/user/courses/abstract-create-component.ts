@@ -37,7 +37,12 @@ export abstract class AbstractCreateComponent<T> {
             return;
         }
 
-        this._service.create([this.form.value]).subscribe((): void => { this._dialogRef.close(); })
+        this._service.create(this.createModel).subscribe((): void => { this._dialogRef.close(); })
+    }
+
+    protected get createModel(): any[]
+    {
+        return this.form.value;
     }
 
     protected get canSubmit(): boolean {

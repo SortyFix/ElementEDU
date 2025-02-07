@@ -15,7 +15,7 @@
         matInput
         #valueInput
         [(ngModel)]="currentValue"
-        [placeholder]="valueInput.disabled ? '' : placeholder()"
+        [placeholder]="placeholder()"
         [matChipInputFor]="chipGrid"
         [matAutocomplete]="complete"
         [matChipInputSeparatorKeyCodes]="separatorKeysCodes"

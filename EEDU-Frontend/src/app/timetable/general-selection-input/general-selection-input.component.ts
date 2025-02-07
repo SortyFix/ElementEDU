@@ -113,7 +113,7 @@ export class GeneralSelectionInput<T extends {name: string}> implements ControlV
      */
     private filterValues(inputValue: string, values: T[]): T[] {
         const filterValue: string = inputValue.toLowerCase();
-        return values.filter((value: T) => value.name.toLowerCase().includes(filterValue));
+        return values.filter((value: T): boolean => value.name.toLowerCase().includes(filterValue));
     }
 
     /**

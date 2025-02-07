@@ -51,7 +51,7 @@ const type: Type<GeneralMultipleSelectionInput<any>> = forwardRef((): typeof Gen
     templateUrl: './general-multiple-selection-input.component.html',
     styleUrl: './general-multiple-selection-input.component.scss'
 })
-export class GeneralMultipleSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator, OnChanges {
+export class GeneralMultipleSelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
 
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
@@ -84,10 +84,12 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
     public onChange: (value: T[]) => void = (): void => {};
     public onTouched: () => void = (): void => {};
 
-    public ngOnChanges(): void {
-    }
-
     public writeValue(value: T): void {
+
+        if(!value) {
+            return;
+        }
+
         this.currentValue.set(value.name);
     }
 
@@ -100,7 +102,7 @@ export class GeneralMultipleSelectionInput<T extends {name: string}> implements 
     }
 
     public validate(): { invalidSelection: boolean } | null {
-        if(this.selectedValues.length == 0)
+        if(this.selectedValues().length == 0)
         {
             return { invalidSelection: true };
         }

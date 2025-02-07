@@ -1,34 +1,38 @@
 export interface GenericClassRoomCreateModel {
     name: string;
-    users?: { id: bigint }[],
+    students?: { id: bigint }[],
     courses?: { id: bigint }[],
+    tutor?: { id: bigint },
 }
 
-export interface ClassRoomCreatePacket { name: string; users: bigint[]; courses: bigint[]; }
+export interface ClassRoomCreatePacket { name: string; students: bigint[]; courses: bigint[]; tutor?: bigint }
 
 export class ClassRoomCreateModel {
 
     public constructor(
         private readonly _name: string,
-        private readonly _users: bigint[],
+        private readonly _students: bigint[],
         private readonly _courses: bigint[],
+        private readonly _tutor?: bigint,
     ) {}
 
     public static fromObject(obj: GenericClassRoomCreateModel): ClassRoomCreateModel {
 
         return new ClassRoomCreateModel(
             obj.name,
-            obj.users?.map((item: { id: bigint }): bigint => { return item.id }) || [],
-            obj.courses?.map((item: { id: bigint }): bigint => { return item.id }) || []
+            obj.students?.map((item: { id: bigint }): bigint => { return item.id }) || [],
+            obj.courses?.map((item: { id: bigint }): bigint => { return item.id }) || [],
+            obj.tutor?.id
         )
     }
 
     public get toPacket(): ClassRoomCreatePacket
     {
         return {
-            name: this._name,
-            users: this._users,
-            courses: this._courses
+            name: this.name,
+            tutor: this.tutor,
+            students: this.students,
+            courses: this.courses
         }
     }
 
@@ -36,8 +40,12 @@ export class ClassRoomCreateModel {
         return this._name;
     }
 
-    public get users(): bigint[] {
-        return this._users;
+    public get tutor(): bigint | undefined {
+        return this._tutor;
+    }
+
+    public get students(): bigint[] {
+        return this._students;
     }
 
     public get courses(): bigint[] {

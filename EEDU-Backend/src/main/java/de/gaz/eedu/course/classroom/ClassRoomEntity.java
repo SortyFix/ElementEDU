@@ -6,8 +6,9 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
@@ -32,17 +33,26 @@ import java.util.stream.Collectors;
 public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
-
     private String name;
-
-    @OneToMany(mappedBy = "classRoom") @JsonManagedReference
+    @OneToMany(mappedBy = "classRoom") @JsonManagedReference @Getter(AccessLevel.PRIVATE)
     private final Set<UserEntity> users = new HashSet<>();
-    @OneToMany(mappedBy = "classRoom") @JsonBackReference private final Set<CourseEntity> courses = new HashSet<>();
+    @OneToMany(mappedBy = "classRoom") @JsonBackReference
+    private final Set<CourseEntity> courses = new HashSet<>();
 
-    @Override public ClassRoomModel toModel()
+    public ClassRoomEntity(@NotNull Collection<CourseEntity> courses)
     {
-        //TODO
-        return new ClassRoomModel(getId(), getName(), new UserModel[0], new CourseModel[0]);
+        this.courses.addAll(courses);
+    }
+
+    @Override public @NotNull ClassRoomModel toModel()
+    {
+        return new ClassRoomModel(
+                getId(),
+                getName(),
+                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
+                getCourses().stream().map(CourseEntity::toModel).toArray(CourseModel[]::new),
+                getTutor().map(UserEntity::toReducedModel).orElse(null)
+        );
     }
 
     /**
@@ -54,20 +64,20 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      */
     public @NotNull Optional<UserEntity> getTutor()
     {
-        return getStudents().stream().filter(teacherPredicate(true)).findFirst();
+        return getUsers().stream().filter(teacherPredicate(true)).findFirst();
     }
 
     /**
      * Sets the specified user entity as the tutor for the current classroom, modifying the current tutor if it exists.
      * <p>
-     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "teacher" role.
+     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "tutor" role.
      * If the classroom already has a tutor, it will be overridden by the new tutor. The process is facilitated through the provided
      * {@link ClassRoomService} instance, allowing for the saving of changes.
      *
      * @param classRoomService the {@link ClassRoomService} instance to be used for persisting changes if needed.
      * @param userEntity       the {@link UserEntity} instance representing the tutor to be set for the classroom.
      * @return true if the tutor was successfully set, false otherwise.
-     * @throws ResponseStatusException if the specified user lacks the "teacher" role.
+     * @throws ResponseStatusException if the specified user lacks the "tutor" role.
      * @see #setTutor(UserEntity)
      */
     public boolean setTutor(@NotNull ClassRoomService classRoomService, @NotNull UserEntity userEntity)
@@ -76,25 +86,25 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
     }
 
     /**
-     * Sets the specified user entity as the tutor for the current classroom, ensuring the user has the "teacher" role.
+     * Sets the specified user entity as the tutor for the current classroom, ensuring the user has the "tutor" role.
      * <p>
-     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "teacher" role.
+     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "tutor" role.
      * If the classroom already has a tutor, it will be overridden by the new tutor. This method does not persist the changes.
      * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
      * {@link #setTutor(ClassRoomService, UserEntity)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method.
      *
      * @param userEntity the {@link UserEntity} instance representing the tutor to be set for the classroom.
      * @return true if the tutor was successfully set, false otherwise.
-     * @throws ResponseStatusException if the specified user lacks the "teacher" role.
+     * @throws ResponseStatusException if the specified user lacks the "tutor" role.
      * @see #setTutor(ClassRoomService, UserEntity)
      * @see ClassRoomService#saveEntity(Iterable)
      */
     public boolean setTutor(@NotNull UserEntity userEntity) throws ResponseStatusException
     {
         // TODO think about what would happen if user looses role
-        if (!userEntity.hasRole("teacher"))
+        if (teacherPredicate(false).test(userEntity))
         {
-            String errorMessage = "The specified user lacks the teacher role.";
+            String errorMessage = "The specified user lacks the tutor role.";
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, errorMessage, new IllegalArgumentException());
         }
 
@@ -267,15 +277,15 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
     /**
      * Generates a {@code Predicate<UserEntity>} based on the specified role condition.
      * <p>
-     * This method creates a Predicate<UserEntity> based on the specified role condition (teacher or not).
+     * This method creates a Predicate<UserEntity> based on the specified role condition (tutor or not).
      * The generated predicate can be used to filter UserEntity objects based on their role.
      *
-     * @param teacher true if the generated predicate should check for the "teacher" role, false otherwise.
+     * @param teacher true if the generated predicate should check for the "tutor" role, false otherwise.
      * @return a Predicate<UserEntity> based on the specified role condition.
      */
     @Contract(pure = true, value = "_ -> new") private @NotNull Predicate<UserEntity> teacherPredicate(boolean teacher)
     {
-        return current -> (teacher == current.hasRole("teacher"));
+        return current -> (teacher == current.getAccountType().equals(AccountType.TEACHER));
     }
 
     @Contract(pure = true, value = "-> new")

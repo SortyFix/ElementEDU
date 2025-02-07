@@ -11,17 +11,27 @@
                 />
             </mat-form-field>
 
-            <app-general-selection-input *ngIf="teacher.length > 0" label="Select Teacher" [values]="teacher">
+            <app-general-selection-input
+                [values]="teacher"
+                label="Select Tutor"
+                placeholder="Enter the tutor you wish to set for this class"
+                formControlName="tutor">
             </app-general-selection-input>
 
             <app-general-multiple-selection-input
                 [values]="students"
                 label="Select Students"
-                placeholder="Enter a students name and press enter">
+                placeholder="Enter a students name and press enter"
+                formControlName="students">
 
             </app-general-multiple-selection-input>
 
-            <!-- TODO implement user list -->
+            <app-general-multiple-selection-input
+                [values]="courses"
+                label="Select Courses"
+                placeholder="Enter a course this class should be added to and press enter"
+                formControlName="courses">
+            </app-general-multiple-selection-input>
 
         </mat-card-content>
         <mat-card-actions align="end">

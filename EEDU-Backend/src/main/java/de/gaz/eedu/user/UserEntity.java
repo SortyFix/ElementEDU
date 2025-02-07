@@ -8,6 +8,7 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
@@ -98,6 +99,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 groups,
                 getThemeEntity().toModel()
         );
+    }
+    
+    public @NotNull ReducedUserModel toReducedModel()
+    {
+        return new ReducedUserModel(this.getId(), this.getFirstName(), this.getLastName(), this.getAccountType());
     }
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()

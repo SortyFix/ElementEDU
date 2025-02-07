@@ -1,10 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, OnChanges, SimpleChanges} from '@angular/core';
 import {AbstractCreateComponent} from "../../abstract-create-component";
 import {ClassRoomModel} from "../class-room-model";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
-import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {GeneralSelectionInput} from "../../../../timetable/general-selection-input/general-selection-input.component";
@@ -13,11 +13,13 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {ClassRoomService} from "../class-room.service";
 import {UserService} from "../../../user.service";
 import {ReducedUserModel} from "../../../reduced-user-model";
-import {NgIf} from "@angular/common";
 import {AccountType} from "../../../account-type";
 import {
     GeneralMultipleSelectionInput
 } from "../../../../timetable/general-multiple-selection-input/general-multiple-selection-input.component";
+import {CourseModel} from "../../course-model";
+import {CourseService} from "../../course.service";
+import {ClassRoomCreateModel} from "../class-room-create-model";
 
 @Component({
     selector: 'app-create-class-room',
@@ -32,7 +34,6 @@ import {
         MatCardContent,
         GeneralCreateComponent,
         GeneralSelectionInput,
-        NgIf,
         GeneralMultipleSelectionInput
     ],
     templateUrl: './create-class-room.component.html',
@@ -41,14 +42,33 @@ import {
 export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomModel> {
 
     private readonly _users: ReducedUserModel[] = [];
+    private readonly _courses: CourseModel[] = [];
 
-    constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService) {
+    constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, courseService: CourseService) {
         super(service, dialogRef, formBuilder);
 
         userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => {
             this._users.length = 0;
             this._users.push(...user);
         });
+
+        courseService.value$.subscribe((course: CourseModel[]): void => {
+            this._courses.length = 0;
+            this._courses.push(...course);
+        });
+    }
+
+    protected override getForm(formBuilder: FormBuilder): FormGroup {
+        return formBuilder.group({
+            name: [null, Validators.required],
+            students: [null, Validators.required],
+            courses: [null, Validators.required],
+            tutor: [null, Validators.required],
+        });
+    }
+
+    protected override get createModel(): any[] {
+        return [ClassRoomCreateModel.fromObject(this.form.value)];
     }
 
     protected get teacher(): ReducedUserModel[] {
@@ -57,6 +77,10 @@ export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomM
 
     protected get students(): ReducedUserModel[] {
         return this.getUsers(AccountType.STUDENT);
+    }
+
+    protected get courses(): CourseModel[] {
+        return this._courses;
     }
 
     private getUsers(accountType: AccountType): ReducedUserModel[] {
