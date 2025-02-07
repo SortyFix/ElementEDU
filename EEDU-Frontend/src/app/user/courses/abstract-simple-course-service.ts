@@ -12,7 +12,7 @@ export abstract class AbstractSimpleCourseService<T, C> {
     protected abstract get fetchAllValues(): Observable<T[]>;
 
     public get fetchAll(): Observable<T[]> {
-        return this.fetchAllValues.pipe(tap((response: T[]): void =>
+        return this.fetchAllValues.pipe(this.translate, tap((response: T[]): void =>
         {
             this._subject.next(response)
             this._fetched = true;
