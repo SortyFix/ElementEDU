@@ -4,6 +4,7 @@ package de.gaz.eedu.user.group;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
@@ -40,22 +41,6 @@ import java.util.stream.Stream;
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity")
 public class GroupEntity implements EntityModelRelation<GroupModel>
 {
-
-    private final static Set<String> PROTECTED_GROUPS;
-
-    static {
-        PROTECTED_GROUPS = Set.of(
-                "administrator",
-                "teacher",
-                "student"
-        );
-    }
-
-    public static @NotNull @Unmodifiable Set<String> getProtectedGroups()
-    {
-        return PROTECTED_GROUPS;
-    }
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;
 
@@ -68,7 +53,10 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
 
     public @NotNull @Unmodifiable Set<GrantedAuthority> toSpringSecurity()
     {
-        return Stream.concat(getAuthorities().stream(), Stream.of(toRole())).collect(Collectors.toSet());
+        return Stream.concat(
+                getAuthorities().stream(),
+                Stream.of(toRole())
+        ).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override public @NotNull GroupModel toModel()
@@ -237,7 +225,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
 
     @Override public boolean isDeletable()
     {
-        return !getProtectedGroups().contains(getName());
+        return !AccountType.groupSet().contains(getName());
     }
 
     @Contract(pure = true, value = "-> new")

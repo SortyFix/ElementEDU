@@ -185,7 +185,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         List<GroupEntity> entities = Arrays.asList(groupEntities);
-
+        log.info("{} {} {}", getFullName(), Arrays.toString(groupEntities), getGroups());
         if(!Collections.disjoint(getGroups(), entities))
         {
             throw new IllegalStateException("The user already has one of these groups.");
@@ -281,15 +281,6 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return hasAuthority("ROLE_" + role);
     }
 
-    /**
-     * Checks if the user has the specified authority.
-     * <p>
-     * This method checks if the user has the specified authority. Returns {@code true} if the user has the specified authority;
-     * otherwise, returns {@code false}.
-     *
-     * @param name The name of the authority to check.
-     * @return {@code true} if the user has the specified authority; {@code false} otherwise.
-     */
     public boolean hasAuthority(@NotNull String name)
     {
         return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(name.toUpperCase()));

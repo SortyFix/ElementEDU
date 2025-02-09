@@ -260,7 +260,7 @@ VALUES ('Mathematics'),
        ('History'),
        ('Computer Science');
 
-INSERT INTO group_entity (name) VALUES ('tutor'), ('student'), ('parent'), ('girl'), ('boys');
+INSERT INTO group_entity (name) VALUES ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('dark', 240, 240, 240, 200, 200, 200);
@@ -298,23 +298,6 @@ VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
        ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
 
 INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
-
-INSERT INTO user_groups (group_id, user_id) VALUES
-       (1, 5),   -- Sara Müller (tutor)
-       (1, 6),   -- Tom Bauer (tutor)
-       (1, 8),   -- Oliver Wagner (tutor)
-       (1, 12),  -- Mia Hoffmann (tutor)
-       (1, 13),  -- Ethan Schwarz (tutor)
-       (2, 1),   -- Max Mustermann (student)
-       (2, 2),   -- John Zimmermann (student)
-       (2, 3),   -- Martin Hansen (student)
-       (2, 4),   -- Lora Schmidt (student)
-       (2, 7),   -- Lisa Klein (student)
-       (2, 9),   -- Sophia Becker (student)
-       (2, 10),  -- Liam Schneider (student)
-       (2, 11),  -- Emma Fischer (student)
-       (2, 14),  -- Charlotte Zimmer (student)
-       (2, 15);  -- James Krause (student)
 
 INSERT INTO course_users (course_id, user_id)
 VALUES (1, 5), -- Sara Müller to Algebra 101

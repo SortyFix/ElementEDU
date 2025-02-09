@@ -54,6 +54,11 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      */
     @Transactional(readOnly = true) public @NotNull Optional<E> loadEntityById(long id)
     {
+        if(getRepository() instanceof OverriddenEagerRepository<?> overridden)
+        {
+            //noinspection unchecked
+            return (Optional<E>) overridden.findByIdEagerly(id);
+        }
         return getRepository().findById(id);
     }
 
@@ -105,6 +110,11 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
 
     @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> findAllEntities(@NotNull Predicate<E> predicate)
     {
+        if(getRepository() instanceof OverriddenEagerRepository<?> overridden)
+        {
+            //noinspection unchecked
+            return ((Set<E>) overridden.findAllEagerly()).stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+        }
         return getRepository().findAll().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 

@@ -70,9 +70,9 @@ import java.util.stream.Stream;
     {
         String randomPassword = randomPassword();
 
-        List<PrivilegeEntity> privilegeEntity = createDefaultPrivileges();
-        GroupEntity groupEntity = createDefaultGroup(privilegeEntity);
-        UserEntity userEntity = createDefaultUser(createDefaultTheme(), groupEntity);
+        createDefaultPrivileges();
+        createDefaultGroup();
+        UserEntity userEntity = createDefaultUser(createDefaultTheme());
         setPassword(userEntity, randomPassword);
 
         log.info("A default user has been created");
@@ -96,28 +96,17 @@ import java.util.stream.Stream;
         getCredentialService().createEntity(Set.of(credential));
     }
 
-    private @NotNull List<PrivilegeEntity> createDefaultPrivileges()
+    private void createDefaultPrivileges()
     {
-        Stream<PrivilegeCreateModel> stream = PrivilegeEntity.getProtectedPrivileges().stream().map(PrivilegeCreateModel::new);
-        return getPrivilegeService().createEntity(stream.collect(Collectors.toSet()));
+        Set<String> privileges = PrivilegeEntity.getProtectedPrivileges();
+        getPrivilegeService().createEntity(privileges.stream().map(PrivilegeCreateModel::new).collect(Collectors.toSet()));
     }
 
-    private @NotNull GroupEntity createDefaultGroup(@NotNull List<PrivilegeEntity> privileges)
+    private void createDefaultGroup()
     {
-        Stream<GroupCreateModel> stream = GroupEntity.getProtectedGroups().stream().map(group ->
-        {
-            if(Objects.equals(group, "administrator"))
-            {
-                return new GroupCreateModel(group, privileges.stream().map(PrivilegeEntity::getId).toArray(Long[]::new));
-            }
-            if(Objects.equals(group, "student") || Objects.equals(group, "teacher"))
-            {
-                return null;
-            }
-            return new GroupCreateModel(group, new Long[0]);
-        });
-
-        return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getName(), "administrator")).findFirst().orElseThrow();
+        getGroupService().createEntity(AccountType.groupSet().stream().map(
+                (currentGroup) -> new GroupCreateModel(currentGroup, new Long[0])
+        ).collect(Collectors.toSet()));
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
@@ -131,7 +120,7 @@ import java.util.stream.Stream;
         }).findFirst().orElseThrow();
     }
 
-    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
+    private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity)
     {
         return getUserService().saveEntity(getUserService().createEntity(Set.of(new UserCreateModel(
                 "root", // first name
@@ -142,7 +131,7 @@ import java.util.stream.Stream;
                 false, // locked
                 UserStatus.PROSPECTIVE,
                 themeEntity.getId(),
-                new Long[] {groupEntity.getId()} // groups
+                new Long[] {} // groups
         ))).getFirst());
     }
 

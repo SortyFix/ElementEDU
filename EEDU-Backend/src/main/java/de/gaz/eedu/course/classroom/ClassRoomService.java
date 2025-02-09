@@ -11,7 +11,7 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserRepository;
+import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;

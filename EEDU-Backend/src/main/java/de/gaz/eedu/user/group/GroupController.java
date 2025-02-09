@@ -52,15 +52,10 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      */
     @PreAuthorize("hasAuthority('USER_GROUP_ATTACH')")
     @PostMapping("/{user}/attach")
-    public HttpStatus attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    public @NotNull HttpStatus attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
-
-        GroupEntity[] entities = getService().loadEntityById(groups).toArray(GroupEntity[]::new);
-        UserService userService = getService().getUserService();
-
-        boolean modified = userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return getService().attachGroups(user, groups) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**

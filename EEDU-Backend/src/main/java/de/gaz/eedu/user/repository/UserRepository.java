@@ -1,5 +1,6 @@
-package de.gaz.eedu.user;
+package de.gaz.eedu.user.repository;
 
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.validation.constraints.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -20,27 +21,11 @@ import java.util.Set;
  * @author ivo
  */
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
-
+public interface UserRepository extends JpaRepository<UserEntity, Long>, UserRepositoryOverride
+{
     @NotNull Optional<UserEntity> findByLoginName(@NotNull String loginName);
 
     @NotNull boolean existsByLoginNameIn(@NotNull Collection<String> loginNames);
-
-    @Query(
-            "SELECT u FROM UserEntity u " +
-            "LEFT JOIN FETCH u.groups g " +
-            "LEFT JOIN FETCH g.privileges p " +
-            "LEFT JOIN FETCH u.themeEntity t " +
-            "WHERE u.id = :userId"
-    ) @NotNull Optional<UserEntity> findByIdEagerly(long userId);
-
-
-    @Query(
-            "SELECT u FROM UserEntity u " +
-            "LEFT JOIN FETCH u.groups g " +
-            "LEFT JOIN FETCH g.privileges p " +
-            "LEFT JOIN FETCH u.themeEntity t"
-    ) @Unmodifiable @NotNull Set<UserEntity> findAllEagerly();
 
     @Query(
             "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
