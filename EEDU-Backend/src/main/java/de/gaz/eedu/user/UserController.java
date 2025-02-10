@@ -130,7 +130,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @param user the currently authenticated user, provided automatically.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @GetMapping("/get") public @NotNull ResponseEntity<UserModel> getOwnData(@AuthenticationPrincipal long user)
     {
         return getData(user);

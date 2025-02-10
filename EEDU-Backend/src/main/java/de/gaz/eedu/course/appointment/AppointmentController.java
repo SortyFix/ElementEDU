@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +32,9 @@ public class AppointmentController extends EntityController<AppointmentService, 
 {
     private final AppointmentService service;
 
-    @PostMapping("/{course}/schedule/frequent") public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
+    @PostMapping("/{course}/schedule/frequent")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
     {
         log.info("Received incoming request for scheduling frequent appointment(s) {} in course {}.", appointments, course);
 
@@ -42,13 +45,17 @@ public class AppointmentController extends EntityController<AppointmentService, 
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
-    @PostMapping("/update/standalone/{appointment}") public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
+    @PostMapping("/update/standalone/{appointment}")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
     {
         log.info("Received incoming request for updating the appointment {} with the updated data {}.", appointment, updateModel);
         return ResponseEntity.ok(getService().update(appointment, updateModel));
     }
 
-    @PostMapping("/{course}/unschedule/frequent") public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
+    @PostMapping("/{course}/unschedule/frequent")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
     {
         log.info("Received incoming request for unscheduling frequent appointment(s) {} from course {}.", appointments, course);
         boolean modified = getService().unscheduleFrequent(course, appointments);
@@ -56,18 +63,22 @@ public class AppointmentController extends EntityController<AppointmentService, 
     }
 
     @PostMapping("/{course}/schedule/standalone")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
     public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
 
         List<AppointmentEntryModel> createdEntities = getService().createAppointment(course,  Set.of(createModel));
         return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
     }
 
-    @DeleteMapping("/frequent/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @DeleteMapping("/frequent/delete/{id}")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
     {
         return super.delete(id);
     }
 
-    @GetMapping("/frequent/get/{id}") @Override public @NotNull ResponseEntity<FrequentAppointmentModel> getData(@PathVariable @NotNull Long id)
+    @GetMapping("/frequent/get/{id}")
+    @Override public @NotNull ResponseEntity<FrequentAppointmentModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
     }
