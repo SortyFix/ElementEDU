@@ -92,7 +92,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      */
     private @NotNull GrantedAuthority toRole()
     {
-        return new SimpleGrantedAuthority("ROLE_" + getName().toUpperCase());
+        return new SimpleGrantedAuthority("ROLE_" + getName().toLowerCase());
     }
 
     /**
