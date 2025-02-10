@@ -18,8 +18,14 @@ import java.util.Set;
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String name;
-    private byte backgroundColorR, backgroundColorG, backgroundColorB;
-    private byte widgetColorR, widgetColorG, widgetColorB;
+
+    @Column(name = "background_color_r") private byte backgroundColorR;
+    @Column(name = "background_color_g") private byte backgroundColorG;
+    @Column(name = "background_color_b") private byte backgroundColorB;
+    @Column(name = "widget_color_r") private byte widgetColorR;
+    @Column(name = "widget_color_g") private byte widgetColorG;
+    @Column(name = "widget_color_b") private byte widgetColorB;
+
     @OneToMany(mappedBy = "themeEntity", cascade = {
             CascadeType.REFRESH,
             CascadeType.PERSIST

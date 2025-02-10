@@ -74,12 +74,12 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
 -- User --
 CREATE TABLE IF NOT EXISTS theme_entity
 (
-    background_colorr   TINYINT     NOT NULL,
-    background_colorg   TINYINT     NOT NULL,
-    background_colorb   TINYINT     NOT NULL,
-    widget_colorr       TINYINT     NOT NULL,
-    widget_colorg       TINYINT     NOT NULL,
-    widget_colorb       TINYINT     NOT NULL,
+    background_color_r   TINYINT     NOT NULL,
+    background_color_g   TINYINT     NOT NULL,
+    background_color_b   TINYINT     NOT NULL,
+    widget_color_r       TINYINT     NOT NULL,
+    widget_color_g       TINYINT     NOT NULL,
+    widget_color_b       TINYINT     NOT NULL,
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(255) NULL
 );
