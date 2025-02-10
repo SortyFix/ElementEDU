@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public record ThemeCreateModel(String name, short[] backgroundColor, short[] widgetColor) implements CreationModel<ThemeEntity>
+public record ThemeCreateModel(String name, byte[] backgroundColor, byte[] widgetColor) implements CreationModel<ThemeEntity>
 {
 
     @Override
@@ -15,13 +15,13 @@ public record ThemeCreateModel(String name, short[] backgroundColor, short[] wid
     {
         themeEntity.setName(name());
 
-        themeEntity.setBackgroundColor_r(backgroundColor[0]);
-        themeEntity.setBackgroundColor_g(backgroundColor[1]);
-        themeEntity.setBackgroundColor_b(backgroundColor[2]);
+        themeEntity.setBackgroundColorR(backgroundColor[0]);
+        themeEntity.setBackgroundColorG(backgroundColor[1]);
+        themeEntity.setBackgroundColorB(backgroundColor[2]);
 
-        themeEntity.setWidgetColor_r(widgetColor[0]);
-        themeEntity.setWidgetColor_g(widgetColor[1]);
-        themeEntity.setWidgetColor_b(widgetColor[2]);
+        themeEntity.setWidgetColorR(widgetColor[0]);
+        themeEntity.setWidgetColorG(widgetColor[1]);
+        themeEntity.setWidgetColorB(widgetColor[2]);
 
         themeEntity.setUsers(new HashSet<>());
         return themeEntity;

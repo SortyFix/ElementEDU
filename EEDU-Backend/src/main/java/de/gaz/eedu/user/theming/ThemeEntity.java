@@ -18,8 +18,8 @@ import java.util.Set;
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String name;
-    private short backgroundColor_r, backgroundColor_g, backgroundColor_b;
-    private short widgetColor_r, widgetColor_g, widgetColor_b;
+    private byte backgroundColorR, backgroundColorG, backgroundColorB;
+    private byte widgetColorR, widgetColorG, widgetColorB;
     @OneToMany(mappedBy = "themeEntity", cascade = {
             CascadeType.REFRESH,
             CascadeType.PERSIST
@@ -27,8 +27,9 @@ import java.util.Set;
 
     @Override @Contract(pure = true) public @NotNull ThemeModel toModel()
     {
-        return new ThemeModel(getId(), getName(), getBackgroundColor_r(), getBackgroundColor_g(), getBackgroundColor_b(),
-                getWidgetColor_r(), getWidgetColor_g(), getWidgetColor_b());
+        return new ThemeModel(getId(), getName(),
+                getBackgroundColorR(), getBackgroundColorG(), getBackgroundColorB(),
+                getWidgetColorR(), getWidgetColorG(), getWidgetColorB());
     }
 
     @Contract(pure = true) public @NotNull SimpleThemeModel toSimpleModel()

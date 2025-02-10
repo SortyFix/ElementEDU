@@ -61,7 +61,7 @@ public class ThemeController
             return ResponseEntity.ok(userService.loadEntityById(id).get().getThemeEntity().toModel());
         }
 
-        ThemeCreateModel fallbackTheme = new ThemeCreateModel("fallback", new short[]{255, 255, 255}, new short[]{200, 200, 200});
+        ThemeCreateModel fallbackTheme = new ThemeCreateModel("fallback", new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF}, new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
         // Return fallback theme if theme cannot be loaded
         return ResponseEntity.ok(fallbackTheme.toEntity(new ThemeEntity()).toModel());
     }

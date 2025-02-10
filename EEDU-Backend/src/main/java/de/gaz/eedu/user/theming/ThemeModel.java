@@ -6,20 +6,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record ThemeModel(@NotNull Long id, @NotNull String name, int backgroundColor_r, int backgroundColor_g, int backgroundColor_b,
-                         int widgetColor_r, int widgetColor_g, int widgetColor_b) implements EntityModel
+public record ThemeModel(@NotNull Long id, @NotNull String name,
+                         byte backgroundColorR, byte backgroundColorG, byte backgroundColorB,
+                         byte widgetColorR, byte widgetColorG, byte widgetColorB) implements EntityModel
 {
     @Contract(pure = true) @Override public String toString()
     {
         return "ThemeModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", backgroundColor_r=" + backgroundColor_r +
-                ", backgroundColor_g=" + backgroundColor_g +
-                ", backgroundColor_b=" + backgroundColor_b +
-                ", widgetColor_r=" + widgetColor_r +
-                ", widgetColor_g=" + widgetColor_g +
-                ", widgetColor_b=" + widgetColor_b +
+                ", backgroundColor_r=" + backgroundColorR +
+                ", backgroundColor_g=" + backgroundColorG +
+                ", backgroundColor_b=" + backgroundColorB +
+                ", widgetColor_r=" + widgetColorR +
+                ", widgetColor_g=" + widgetColorG +
+                ", widgetColor_b=" + widgetColorB +
                 '}';
     }
 

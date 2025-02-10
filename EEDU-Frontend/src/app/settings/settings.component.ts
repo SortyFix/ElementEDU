@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
-import {forkJoin, Observable} from "rxjs";
+import {forkJoin, map, Observable} from "rxjs";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
@@ -39,7 +39,7 @@ import {MatDivider} from "@angular/material/divider";
 })
 
 export class SettingsComponent implements OnInit {
-    constructor(public userService: UserService, public http: HttpClient, public themeService: ThemeService, public fileService: FileService) {
+    constructor(public userService: UserService, public http: HttpClient) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
@@ -113,8 +113,9 @@ export class SettingsComponent implements OnInit {
      * @param parsedUserData Parsed object representation of the userData JSON retrieved from local storage
      */
     public processSettings(parsedUserData: any) {
-        const theme$ = this.setTheme(this.selectedTheme);
-        const observables = [theme$]; // add further observables along the way
+        const theme$: Observable<ThemeModel> = this.setTheme(this.selectedTheme);
+        console.log(theme$);
+        const observables: Observable<ThemeModel>[] = [theme$]; // add further observables along the way
 
         forkJoin(observables).subscribe(([themeEntity]) => {
             parsedUserData.theme = themeEntity;
@@ -130,11 +131,15 @@ export class SettingsComponent implements OnInit {
      * @param themeId Theme ID to be set.
      * @returns Observable<ThemeEntity> carrying the full newly selected theme.
      */
-    public setTheme(themeId: bigint) {
+    public setTheme(themeId: bigint): Observable<ThemeModel> {
         const url: string = `http://localhost:8080/${this.THEME_URL}/me/theme/set`;
         return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
-        });
+        }).pipe(map(model => {
+            return new ThemeModel(model.id, model.name,
+                model.backgroundColorR + 128, model.backgroundColorG + 128, model.backgroundColorB + 128,
+                model.widgetColorR + 128, model.widgetColorG + 128, model.widgetColorB + 128);
+        }));
     }
 
     /**
