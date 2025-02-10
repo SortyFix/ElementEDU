@@ -23,17 +23,6 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
 {
     @NotNull protected abstract R getRepository();
 
-    protected final boolean duplicates(@NotNull C @NotNull [] data)
-    {
-        Set<C> set = new HashSet<>();
-        for (C element : data) {
-            if (!set.add(element)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Loads an entity {@link E} by its id.
      * <p>
@@ -54,10 +43,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      */
     @Transactional(readOnly = true) public @NotNull Optional<E> loadEntityById(long id)
     {
-        if(getRepository() instanceof OverriddenEagerRepository<?> overridden)
+        if(getRepository() instanceof EntityRepository<?> overridden)
         {
             //noinspection unchecked
-            return (Optional<E>) overridden.findByIdEagerly(id);
+            return (Optional<E>) overridden.findEntity(id);
         }
         return getRepository().findById(id);
     }
@@ -110,10 +99,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
 
     @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> findAllEntities(@NotNull Predicate<E> predicate)
     {
-        if(getRepository() instanceof OverriddenEagerRepository<?> overridden)
+        if(getRepository() instanceof EntityRepository<?> overridden)
         {
             //noinspection unchecked
-            return ((Set<E>) overridden.findAllEagerly()).stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+            return ((Set<E>) overridden.findAllEntities()).stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
         }
         return getRepository().findAll().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
@@ -234,6 +223,11 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      */
     @Transactional public @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity)
     {
+        if(getRepository() instanceof EntityRepository<?> overridden)
+        {
+            //noinspection unchecked
+            return ((EntityRepository<T>) overridden).saveAllEntities(entity);
+        }
         return getRepository().saveAll(entity);
     }
 

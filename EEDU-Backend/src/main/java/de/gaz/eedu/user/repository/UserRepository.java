@@ -21,7 +21,7 @@ import java.util.Set;
  * @author ivo
  */
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long>, UserRepositoryOverride
+public interface UserRepository extends JpaRepository<UserEntity, Long>, UserEntityRepository
 {
     @NotNull Optional<UserEntity> findByLoginName(@NotNull String loginName);
 

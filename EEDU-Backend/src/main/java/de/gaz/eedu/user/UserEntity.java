@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,6 +75,18 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     private @Nullable ClassRoomEntity classRoom;
 
+    // Transient is not saved inside the database
+    @Transient @Getter(AccessLevel.PROTECTED) private GroupEntity typeGroup;
+
+    public void setTypeGroup(@NotNull GroupEntity typeGroup)
+    {
+        if(this.typeGroup == typeGroup)
+        {
+            return;
+        }
+        this.typeGroup = typeGroup;
+    }
+
     @Override public String getPassword()
     {
         throw new UnsupportedOperationException("Users can have multiple passwords");
@@ -108,8 +119,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 
     @Override public Set<? extends GrantedAuthority> getAuthorities()
     {
-        Function<GroupEntity, Stream<GrantedAuthority>> flat = groupEntity -> groupEntity.toSpringSecurity().stream();
-        return groups.stream().flatMap(flat).collect(Collectors.toSet());
+        return getGroups().stream().flatMap(groupEntity ->
+        {
+            Set<GrantedAuthority> authorities = groupEntity.toSpringSecurity();
+            return authorities.stream();
+        }).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override public @NotNull String getUsername()
@@ -185,18 +199,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         List<GroupEntity> entities = Arrays.asList(groupEntities);
-        log.info("{} {} {}", getFullName(), Arrays.toString(groupEntities), getGroups());
-        if(!Collections.disjoint(getGroups(), entities))
+        if(!Collections.disjoint(this.groups, entities))
         {
             throw new IllegalStateException("The user already has one of these groups.");
         }
 
         return this.groups.addAll(entities);
-    }
-
-    private static boolean containsGroup(@NotNull Collection<GroupEntity> entities, @NotNull String name)
-    {
-        return entities.stream().anyMatch(group -> Objects.equals(group.getName(), name));
     }
 
     /**
@@ -243,6 +251,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      * This is necessary to clarify that the list should not be edited this way but rather using the method
      * {@link #attachGroups(GroupEntity...)}
      * or {@link #detachGroups(Long...)}.
+     * <p>
+     * Update 10.02.2025:
+     * Note that {@link #getTypeGroup()} will get added to the list.
      *
      * @return an unmodifiable list.
      * @see #attachGroups(GroupEntity...)
@@ -250,7 +261,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
      */
     public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
     {
-        return Collections.unmodifiableSet(groups);
+        if(Objects.isNull(getTypeGroup()))
+        {
+            throw new IllegalStateException("The type group was not yet set.");
+        }
+
+        return Stream.concat(groups.stream(), Stream.of(getTypeGroup())).collect(Collectors.toUnmodifiableSet());
     }
 
     /**

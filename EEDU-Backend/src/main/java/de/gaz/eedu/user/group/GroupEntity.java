@@ -51,6 +51,15 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
     @JoinTable(name = "group_privileges", joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
     private final Set<PrivilegeEntity> privileges = new HashSet<>();
 
+    @Transient @Getter(AccessLevel.PROTECTED)
+    private final Set<PrivilegeEntity> spoofedPrivileges = new HashSet<>();
+
+    public void setSpoofedPrivileges(@NotNull Collection<PrivilegeEntity> spoofedPrivileges)
+    {
+        this.spoofedPrivileges.clear();
+        this.spoofedPrivileges.addAll(spoofedPrivileges);
+    }
+
     public @NotNull @Unmodifiable Set<GrantedAuthority> toSpringSecurity()
     {
         return Stream.concat(
@@ -210,7 +219,7 @@ public class GroupEntity implements EntityModelRelation<GroupModel>
      */
     public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges()
     {
-        return Collections.unmodifiableSet(privileges);
+        return Stream.concat(privileges.stream(), getSpoofedPrivileges().stream()).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override public boolean deleteManagedRelations()
