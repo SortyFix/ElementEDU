@@ -42,7 +42,7 @@ export class IllnessNotificationComponent {
     reason!: string;
     until!: Date | null;
 
-    constructor(private http: HttpClient, private fileService: FileService) {}
+    constructor(private http: HttpClient) {}
 
     onFileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
