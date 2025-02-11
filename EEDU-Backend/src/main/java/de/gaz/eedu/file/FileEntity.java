@@ -110,15 +110,8 @@ import java.util.Set;
 
     public @NotNull Boolean ifFileExists(@NotNull String subdirectory, @NotNull String localPath)
     {
-        File repository = new File(getFilePath(subdirectory));
-
-        if(repository.isDirectory())
-        {
-            File file = new File(getFilePath(subdirectory), localPath);
-            return !file.isDirectory() && file.exists();
-        }
-
-        return false;
+        File file = new File(getFilePath(subdirectory), localPath);
+        return !file.isDirectory() && file.exists();
     }
 
     /**
