@@ -137,7 +137,7 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
 
     @Override public @NotNull @Unmodifiable Set<UserEntity> findAllEntities(@NotNull Predicate<UserEntity> predicate)
     {
-        return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+        return getRepository().findAllEntities().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 
     public @NotNull Optional<ReducedUserModel> findReduced(long id)

@@ -64,7 +64,10 @@ export class UserListComponent {
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService, private _dialog: MatDialog) {}
+    constructor(
+        protected accessibilityService: AccessibilityService,
+        private _userService: UserService, private _dialog: MatDialog
+    ) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS

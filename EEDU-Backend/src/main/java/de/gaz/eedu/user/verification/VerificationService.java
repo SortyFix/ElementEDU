@@ -16,7 +16,6 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.sqm.TemporalUnit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +29,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.*;
 
@@ -55,6 +53,12 @@ public class VerificationService
 {
     @Value("${jwt.secret}") private String secret;
     @Value("${development}") private boolean development = false;
+
+    public boolean isFullyAuthenticated()
+    {
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        return hasToken(JwtTokenType.AUTHORIZED) || hasToken(JwtTokenType.ADVANCED_AUTHORIZATION);
+    }
 
     /**
      * Checks for a specific token type.

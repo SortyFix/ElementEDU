@@ -24,7 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -90,6 +89,6 @@ public class GroupService extends EntityService<GroupRepository, GroupEntity, Gr
 
     @Override public @NotNull @Unmodifiable Set<GroupEntity> findAllEntities(@NotNull Predicate<GroupEntity> predicate)
     {
-        return getRepository().findAllEagerly().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+        return getRepository().findAllEntities().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
     }
 }

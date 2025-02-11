@@ -20,6 +20,7 @@ import {
     MatExpansionPanelDescription,
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
+import {AbstractItemListComponent} from "../common/abstract-item-list/abstract-item-list.component";
 
 @Component({
     selector: 'app-settings',
@@ -41,7 +42,8 @@ import {
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
         MatExpansionModule,
-        NgIf
+        NgIf,
+        AbstractItemListComponent
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
@@ -49,6 +51,11 @@ import {
 })
 export class SettingsComponent implements OnInit {
     constructor(public userService: UserService, public http: HttpClient) {
+    }
+
+    public test(user: UserModel): string
+    {
+        return user.loginName;
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;

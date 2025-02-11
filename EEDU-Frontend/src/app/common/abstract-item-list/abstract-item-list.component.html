@@ -1,0 +1,56 @@
+<mat-list>
+    <mat-list-item >
+        <mat-form-field appearance="outline">
+            <mat-label>User Search</mat-label>
+            <input name="search"
+                   type="search"
+                   placeholder="Filter..."
+                   [(ngModel)]="filteredString"
+                   (input)="unselectAll()"
+                   autofocus matInput>
+        </mat-form-field>
+        <mat-accordion>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <mat-checkbox [checked]="isSelected('all')"
+                              [indeterminate]="partiallySelected"
+                              (change)="toggle('all')"
+                              *ngIf="values().length != 0"
+                              class="text-color">
+                    Select All
+                </mat-checkbox>
+            </div>
+            <mat-expansion-panel *ngFor="let value of values()">
+                <mat-expansion-panel-header tabindex="-1">
+                    <mat-panel-title>
+                        <a matListItemTitle>
+                            <mat-checkbox
+                                [checked]="isSelected(value)"
+                                (change)="toggle(value)"
+                                (click)="$event.stopPropagation()"
+                                (keydown)="handleKeyDown($event, value)">
+                            </mat-checkbox>
+                            <mat-icon class="icon" *ngIf="icon()">
+                                {{ icon()!(value) }}
+                            </mat-icon>
+                            <a class="title">
+                                {{ title()(value) }}
+                            </a>
+                        </a>
+
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <mat-chip-set *ngIf="chips()">
+                            @for (tag of chips()!(value); track tag) {
+                                <mat-chip>{{ tag }}</mat-chip>
+                            }
+                        </mat-chip-set>
+                        <mat-icon class="icon" *ngIf="icon()">
+                            {{ icon()!(value) }}
+                        </mat-icon>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+            </mat-expansion-panel>
+        </mat-accordion>
+
+    </mat-list-item>
+</mat-list>
