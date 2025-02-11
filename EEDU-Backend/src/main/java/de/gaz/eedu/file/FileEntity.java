@@ -15,7 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -106,6 +108,19 @@ import java.util.Set;
             System.out.println(e);
             throw new MaliciousFileException(subdirectory, e);
         }
+    }
+
+    public @NotNull Boolean ifFileExists(@NotNull String subdirectory, @NotNull String localPath)
+    {
+        File repository = new File(getFilePath(subdirectory));
+
+        if(repository.isDirectory())
+        {
+            File file = new File(getFilePath(subdirectory), localPath);
+            return !file.isDirectory() && file.exists();
+        }
+
+        return false;
     }
 
     /**

@@ -48,6 +48,10 @@ public class FileServiceTest
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
         assertDoesNotThrow(() -> fileEntity.uploadBatch("", batch));
+
+        // ifFileExists() test
+        assertTrue(fileEntity.ifFileExists("", "batchfile1.txt"));
+        assertFalse(fileEntity.ifFileExists("", "ThisFileShouldntExist.txt"));
         assertTrue(Arrays.stream(batch).allMatch(mockMultipartFile -> Files.exists(Path.of(fileEntity.getFilePath(), mockMultipartFile.getOriginalFilename()))));
     }
 
