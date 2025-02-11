@@ -15,9 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -166,10 +164,7 @@ import java.util.Set;
 
     public @NotNull String getFilePath(@Nullable String subdirectory)
     {
-        String path = String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
-
-        // TODO: Check if slash is ók
-        return path;
+        return String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
     }
 
     /**
