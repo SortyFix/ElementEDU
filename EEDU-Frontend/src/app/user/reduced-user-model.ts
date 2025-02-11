@@ -30,6 +30,10 @@ export class ReducedUserModel {
         return this._id;
     }
 
+    public get name(): string {
+        return `${this.lastName}, ${this.firstName}`;
+    }
+
     public get firstName(): string {
         return this._firstName;
     }

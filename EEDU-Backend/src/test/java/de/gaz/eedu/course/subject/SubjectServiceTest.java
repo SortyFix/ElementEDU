@@ -1,10 +1,8 @@
 package de.gaz.eedu.course.subject;
 
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.course.subjects.SubjectEntity;
-import de.gaz.eedu.course.subjects.SubjectService;
-import de.gaz.eedu.course.subjects.model.SubjectCreateModel;
-import de.gaz.eedu.course.subjects.model.SubjectModel;
+import de.gaz.eedu.course.subject.model.SubjectCreateModel;
+import de.gaz.eedu.course.subject.model.SubjectModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

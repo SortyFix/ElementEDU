@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {HttpClient} from "@angular/common/http";
 import {SimpleThemeEntity} from "../theming/simple-theme-entity";
@@ -6,7 +6,7 @@ import {forkJoin, map, Observable} from "rxjs";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
-import {AsyncPipe, NgForOf} from "@angular/common";
+import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {UserModel} from "../user/user-model";
@@ -14,10 +14,16 @@ import {UserService} from "../user/user.service";
 import {UserListComponent} from "../user/user-list/user-list.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatDivider} from "@angular/material/divider";
+import {
+    MatExpansionModule,
+    MatExpansionPanel,
+    MatExpansionPanelDescription,
+    MatExpansionPanelTitle
+} from "@angular/material/expansion";
 
 @Component({
-  selector: 'app-settings',
-  standalone: true,
+    selector: 'app-settings',
+    standalone: true,
     imports: [
         UserListComponent,
         MatFormField,
@@ -30,12 +36,17 @@ import {MatDivider} from "@angular/material/divider";
         NgForOf,
         MatButton,
         FormsModule,
-        MatDivider
+        MatDivider,
+        MatExpansionPanel,
+        MatExpansionPanelTitle,
+        MatExpansionPanelDescription,
+        MatExpansionModule,
+        NgIf
     ],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss'
+    templateUrl: './settings.component.html',
+    styleUrl: './settings.component.scss',
+    encapsulation: ViewEncapsulation.None
 })
-
 export class SettingsComponent implements OnInit {
     constructor(public userService: UserService, public http: HttpClient) {
     }

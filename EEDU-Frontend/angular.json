@@ -30,7 +30,8 @@
                             "src/assets"
                         ],
                         "styles": [
-                            "src/styles.scss"
+                            "src/styles.scss",
+                            "src/assets/styles/angular-calendar.scss"
                         ],
                         "scripts": []
                     },
@@ -69,6 +70,9 @@
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
+                    "options": {
+                        "hmr": true
+                    },
                     "configurations": {
                         "production": {
                             "buildTarget": "EEDU-Frontend:build:production"
@@ -99,7 +103,8 @@
                             "src/assets"
                         ],
                         "styles": [
-                            "src/styles.scss"
+                            "src/styles.scss",
+                            "src/assets/styles/angular-calendar.scss"
                         ],
                         "scripts": []
                     }

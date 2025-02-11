@@ -1,0 +1,9 @@
+.duration-picker {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    mat-form-field {
+        width: 100px;
+    }
+}

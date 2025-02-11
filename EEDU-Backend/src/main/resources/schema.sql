@@ -45,30 +45,40 @@ CREATE TABLE IF NOT EXISTS course_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
-CREATE TABLE IF NOT EXISTS scheduled_appointment_entity
+CREATE TABLE IF NOT EXISTS room_entity
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id  BIGINT         NOT NULL,
-    time_stamp BIGINT         NOT NULL,
-    duration   BIGINT         NOT NULL,
-    period     VARBINARY(255) NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES course_entity (id)
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS frequent_appointment_entity
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id        BIGINT NOT NULL,
+    room_id          BIGINT NOT NULL,
+    start_time_stamp BIGINT NOT NULL,
+    until_time_stamp   BIGINT NOT NULL,
+    duration         BIGINT NOT NULL,
+    frequency           INT    NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES course_entity (id),
+    FOREIGN KEY (room_id) REFERENCES room_entity(id)
 );
 
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
     id                       BIGINT PRIMARY KEY,
-    time_stamp               BIGINT         NOT NULL,
-    publish                  BIGINT         NOT NULL,
     duration                 BIGINT         NOT NULL,
-    description              VARCHAR(255),
-    homework                 VARCHAR(255),
-    submit_homework          BOOLEAN        NOT NULL,
-    submit_until             BIGINT         NULL,
+    publish                  BIGINT         NOT NULL,
+    description              VARCHAR(1000)   NULL,
+    assignment_description   VARCHAR(255)   NULL,
+    publish_assignment       BIGINT         NULL,
+    submit_assignment_until  BIGINT         NULL,
+    room_id                  BIGINT         NULL,
     course_appointment_id    BIGINT         NOT NULL,
-    scheduled_appointment_id BIGINT         NULL,
+    frequent_appointment_id BIGINT         NULL,
+    FOREIGN KEY (room_id) REFERENCES room_entity (id),
     FOREIGN KEY (course_appointment_id) REFERENCES course_entity (id),
-    FOREIGN KEY (scheduled_appointment_id) REFERENCES scheduled_appointment_entity (id)
+    FOREIGN KEY (frequent_appointment_id) REFERENCES frequent_appointment_entity (id)
 );
 
 -- User --
@@ -237,3 +247,73 @@ CREATE TABLE IF NOT EXISTS post_tags
     tags VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
+
+
+INSERT INTO class_room_entity (name)
+VALUES ('Room 101'),
+       ('Room 102'),
+       ('Room 103');
+
+INSERT INTO subject_entity (name)
+VALUES ('Mathematics'),
+       ('Physics'),
+       ('History'),
+       ('Computer Science');
+
+INSERT INTO group_entity (name) VALUES ('parent'), ('girl'), ('boys');
+
+INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
+VALUES ('dark', 240, 240, 240, 200, 200, 200);
+
+INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
+VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    -- PRESENT Student
+       ('John', 'Zimmermann', 'john.zimmermann', 2, FALSE, TRUE, FALSE, 1, 1),  -- EXCUSED Student
+       ('Martin', 'Hansen', 'martin.hansen', 2, FALSE, TRUE, FALSE, 1, 2),      -- UNEXCUSED Student
+       ('Lora', 'Schmidt', 'lora.schmidt', 1, FALSE, TRUE, FALSE, 1, 1),        -- EXCUSED Teacher
+       ('Sara', 'Müller', 'sara.mueller', 1, TRUE, TRUE, FALSE, 1, 0),          -- PRESENT Teacher
+       ('Tom', 'Bauer', 'tom.bauer', 1, TRUE, FALSE, FALSE, 1, 2),              -- UNEXCUSED Teacher
+       ('Lisa', 'Klein', 'lisa.klein', 2, TRUE, TRUE, FALSE, 1, 3),             -- PROSPECTIVE Student
+       ('Oliver', 'Wagner', 'oliver.wagner', 2, FALSE, TRUE, TRUE, 1, 0),       -- PRESENT Student
+       ('Sophia', 'Becker', 'sophia.becker', 2, FALSE, FALSE, FALSE, 1, 1),     -- EXCUSED Student
+       ('Liam', 'Schneider', 'liam.schneider', 2, FALSE, TRUE, TRUE, 1, 3),     -- PROSPECTIVE Student
+       ('Emma', 'Fischer', 'emma.fischer', 2, TRUE, TRUE, FALSE, 1, 2),         -- UNEXCUSED Student
+       ('Noah', 'Weber', 'noah.weber', 2, FALSE, TRUE, FALSE, 1, 1),            -- EXCUSED Student
+       ('Mia', 'Hoffmann', 'mia.hoffmann', 2, TRUE, TRUE, FALSE, 1, 0),         -- PRESENT Student
+       ('Ethan', 'Schwarz', 'ethan.schwarz', 2, TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE Student
+       ('Charlotte', 'Zimmer', 'charlotte.zimmer', 2, FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED Student
+       ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED Student
+
+INSERT INTO file_entity (data_directory)
+VALUES ('/repo/algebra/101'),   -- File for Algebra 101
+       ('/repo/calculus/101'), -- File for Calculus 101
+       ('/repo/physics/101'),   -- File for Physics 101
+       ('/repo/history/101'),   -- File for History 101
+       ('/repo/programming'); -- File for Introduction to Programming
+
+INSERT INTO course_entity (name, subject_id, repository_id, class_room_id)
+VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
+       ('Calculus 101', 1, 2, 1), -- Mathematics (Calculus), Room 101
+       ('Physics 101', 2, 3, 2),  -- Physics, Room 102
+       ('History 101', 3, 4, 3),  -- History, Room 103
+       ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
+
+INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
+
+INSERT INTO course_users (course_id, user_id)
+VALUES (1, 5), -- Sara Müller to Algebra 101
+       (1, 6), -- Tom Bauer to Algebra 101
+       (2, 5), -- Sara Müller to Calculus 101
+       (3, 7), -- Lisa Klein to Physics 101
+       (4, 5), -- Sara Müller to History 101
+       (5, 5), -- Sara Müller to Introduction to Programming
+       (1, 1), -- Max Mustermann to Algebra 101
+       (1, 2), -- John Zimmermann to Algebra 101
+       (1, 3), -- Martin Hansen to Algebra 101
+       (2, 1), -- Max Mustermann to Calculus 101
+       (2, 7), -- Lisa Klein to Calculus 101
+       (3, 1), -- Max Mustermann to Physics 101
+       (3, 4), -- Lora Schmidt to Physics 101
+       (4, 3), -- Martin Hansen to History 101
+       (4, 4), -- Lora Schmidt to History 101
+       (5, 2), -- John Zimmermann to Introduction to Programming
+       (5, 10); -- Liam Schneider to Introduction to Programming

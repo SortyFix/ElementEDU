@@ -12,11 +12,12 @@
         <mat-checkbox [checked]="isSelected('all')"
                       [indeterminate]="partiallySelected"
                       (change)="toggle('all')"
-                      *ngIf="users.length != 0">
+                      *ngIf="users.length != 0"
+                      class="text-color">
             Select All
         </mat-checkbox>
 
-        <button mat-button  style="text-align: right;">
+        <button mat-button  style="text-align: right;" (click)="openFilterMenu($event)">
             Filter
         </button>
     </div>
@@ -30,8 +31,9 @@
                         (click)="$event.stopPropagation()"
                         (keydown)="handleKeyDown($event, user)">
                     </mat-checkbox>
-                    <mat-icon class="icon">{{ icon(user) }}</mat-icon>
-                    {{ user.loginName }}
+                    <mat-icon class="icon">{{ icon(user) }}</mat-icon><a [style.color]="getTheme.getTextColor('background', false)">
+                        {{ user.loginName }}
+                    </a>
                 </a>
 
             </mat-panel-title>

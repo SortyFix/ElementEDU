@@ -48,7 +48,6 @@ public class UserController extends EntityController<UserService, UserModel, Use
 {
     @Getter(AccessLevel.PROTECTED) private final UserService service;
     @Value("${development}") private final boolean development = false;
-    private final UserService userService;
 
     /**
      * Creates a new user utilizing the provided {@link UserCreateModel}.
@@ -217,11 +216,14 @@ public class UserController extends EntityController<UserService, UserModel, Use
     }
 
     @PreAuthorize("hasAnyAuthority('USER_OTHERS_GET')") @GetMapping("/all") @Override
-    public @NotNull ResponseEntity<Set<UserModel>> fetchAll() { return super.fetchAll(); }
+    public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
+    {
+        return super.fetchAll();
+    }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/all/reduced")
     public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced()
     {
-        return ResponseEntity.ok(userService.findAllReduced().toArray(new ReducedUserModel[0]));
+        return ResponseEntity.ok(getService().findAllReduced().toArray(new ReducedUserModel[0]));
     }
 }

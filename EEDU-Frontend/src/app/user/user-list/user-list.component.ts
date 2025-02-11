@@ -23,6 +23,9 @@ import {FormsModule} from "@angular/forms";
 import {MatTooltip} from "@angular/material/tooltip";
 import {MatLine} from "@angular/material/core";
 import {AccessibilityService} from "../../accessibility.service";
+import {UserService} from "../user.service";
+import {MatDialog} from "@angular/material/dialog";
+import {FilterMenuComponent} from "./filter-menu/filter-menu.component";
 import {AccountType} from "../account-type";
 
 @Component({
@@ -56,12 +59,12 @@ import {AccountType} from "../account-type";
 })
 export class UserListComponent {
 
-    protected filteredString: string = '';
     public readonly userList: InputSignal<UserModel[]> = input([] as UserModel[]);
+    protected filteredString: string = '';
     private _selected: Set<string> = new Set();
     private _editGroup: string | undefined = undefined;
 
-    constructor(protected accessibilityService: AccessibilityService) {}
+    constructor(protected accessibilityService: AccessibilityService, private _userService: UserService, private _dialog: MatDialog) {}
 
     handleKeyDown(event: KeyboardEvent, user: UserModel) {
         // noinspection FallThroughInSwitchStatementJS
@@ -177,5 +180,18 @@ export class UserListComponent {
     protected set editGroup(user: UserModel | undefined)
     {
         this._editGroup = user?.loginName;
+    }
+
+    public get getTheme() {
+        return this._userService.getUserData.theme;
+    }
+
+    protected openFilterMenu(event: MouseEvent) {
+        this._dialog.open(FilterMenuComponent, {
+            position: {
+                top: `${event.clientY}px`,
+                left: `${event.clientX - 50}px`
+            }
+        });
     }
 }

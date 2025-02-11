@@ -77,10 +77,10 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     }
 
     /**
-     * Creates a new chat room with the specified users.
+     * Creates a new chat name with the specified users.
      *
-     * <p>This endpoint requires authentication, and the current user initiating the request is considered as the creator of the chat room.
-     * The request body should contain a list of user IDs representing the participants in the chat room. A room must have at least two users to be valid.
+     * <p>This endpoint requires authentication, and the current user initiating the request is considered as the creator of the chat name.
+     * The request body should contain a list of user IDs representing the participants in the chat name. A name must have at least two users to be valid.
      * </p>
      * <p>
      * If the number of users is less than two, the response will be a {@link HttpStatus#FORBIDDEN} status.
@@ -94,14 +94,14 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
      * If any of these checks fail, the response will be a {@link HttpStatus#FORBIDDEN} status.
      * </p>
      * <p>
-     * Additionally, checks if a chat room already exists with the same set of users. If such a chat room exists, the response will be a {@link HttpStatus#CONFLICT} status.
+     * Additionally, checks if a chat name already exists with the same set of users. If such a chat name exists, the response will be a {@link HttpStatus#CONFLICT} status.
      * </p>
      * <p>
-     * If all validation checks pass, a new chat room is created with the specified users, and a {@link ResponseEntity} containing the created chat room's details is returned with a {@link HttpStatus#OK} status.
+     * If all validation checks pass, a new chat name is created with the specified users, and a {@link ResponseEntity} containing the created chat name's details is returned with a {@link HttpStatus#OK} status.
      * </p>
      *
-     * @param users       A list of user IDs representing the participants in the chat room.
-     * @return A {@link ResponseEntity} containing the details of the created chat room if successful, or an appropriate HTTP status indicating the outcome.
+     * @param users       A list of user IDs representing the participants in the chat name.
+     * @return A {@link ResponseEntity} containing the details of the created chat name if successful, or an appropriate HTTP status indicating the outcome.
      */
 
     @Transactional
@@ -217,10 +217,10 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     }
 
     /**
-     * Retrives chat data of a chat room.
+     * Retrives chat data of a chat name.
      *
      * <p>
-     *     This method fetches information of a chat room (as a {@link ChatModel} containing the chat details like
+     *     This method fetches information of a chat name (as a {@link ChatModel} containing the chat details like
      *     it's {@code List<MessageEntity>}) by the providedChat ID. It can only be used if an authorized User ID is given.
      *     If unauthorized, the HTTP Status {@code UNAUTHORIZED} will be thrown, preventing third parties from accessing chat information.
      * </p>

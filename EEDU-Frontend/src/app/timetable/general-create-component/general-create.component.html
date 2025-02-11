@@ -1,0 +1,11 @@
+<mat-card>
+    <mat-progress-bar class="loading-bar" mode="indeterminate" *ngIf="loading()"></mat-progress-bar>
+    <div class="overlay" *ngIf="loading()"></div>
+    <mat-card-header style="display: flex; justify-content: space-between">
+        <mat-card-title>{{ title() }}</mat-card-title>
+        <button mat-icon-button mat-dialog-close class="close-button">
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-card-header>
+    <ng-content></ng-content>
+</mat-card>

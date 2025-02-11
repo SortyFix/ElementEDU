@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
 :root {
@@ -5,6 +6,7 @@
     --background-color: black;
     --widget-color: black;
     --mat-sidenav-content-background-color: transparent;
+    --mat-text-color: var(--text-color);
 }
 
 html, body {
@@ -102,3 +104,26 @@ textarea::placeholder {
     color: var(--text-color);
 }
 
+
+@include mat.datepicker-overrides((
+    calendar-period-button-text-color: var(--text-color),
+    calendar-body-label-text-color: var(--text-color),
+    calendar-date-selected-state-text-color: var(--text-color),
+    calendar-header-text-color: var(--text-color),
+    calendar-date-text-color: var(--text-color),
+    range-input-disabled-state-text-color: var(--text-color),
+    calendar-container-text-color: var(--text-color),
+    calendar-header-divider-color: color-mix(in srgb, var(--text-color) 25%, transparent)
+));
+
+@include mat.divider-overrides((
+    color: color-mix(in srgb, var(--text-color) 25%, transparent)
+));
+
+@include mat.button-toggle-overrides((
+    background-color: rgba(0,0,0,0),
+    text-color: var(--text-color),
+    divider-color: var(--widget-color),
+    selected-state-background-color: var(--widget-color),
+    selected-state-text-color: var(--text-color),
+));

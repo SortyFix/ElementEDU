@@ -1,15 +1,10 @@
 package de.gaz.eedu.course;
 
-import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
-import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
-import de.gaz.eedu.course.appointment.scheduled.ScheduledAppointmentEntity;
 import de.gaz.eedu.course.classroom.ClassRoomRepository;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.SubjectService;
+import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -17,18 +12,16 @@ import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.UserRepository;
+import de.gaz.eedu.user.model.ReducedUserModel;
+import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
@@ -37,41 +30,17 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final CourseRepository repository;
     private final SubjectService subjectService;
     private final UserRepository userRepository;
-    private final ClassRoomRepository classRoomRepository;
-    private final AppointmentEntryRepository appointmentEntryRepository;
+    private final ClassRoomRepository classRepository;
     private final FileService fileService;
 
-    @Contract(pure = true, value = "_, _ -> new")
-    private static @NotNull CreationFactory<AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
+    public @NotNull CourseModel[] getCourses(long user)
     {
-        return entity ->
-        {
-            if (Objects.isNull(entryCreateModel.duration()))
-            {
-                return attachScheduled(entryCreateModel, course, entity);
-            }
-            entity.setDuration(Duration.ofSeconds(entryCreateModel.duration()));
-            return entity;
-        };
+        return getRepository().findAllByUserId(user).stream().map(CourseEntity::toModel).toArray(CourseModel[]::new);
     }
 
-    @Contract(pure = true, value = "_,_,_ -> param3")
-    private static @NotNull AppointmentEntryEntity attachScheduled(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course, @NotNull AppointmentEntryEntity entity) throws CreationException
+    public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByCourse(long course)
     {
-        Set<ScheduledAppointmentEntity> scheduledAppointments = course.getScheduledAppointments();
-        Instant timeStamp = Instant.ofEpochSecond(entryCreateModel.timeStamp());
-        return scheduledAppointments.stream().filter(event -> event.inPeriod(timeStamp)).map(event ->
-        {
-            entity.setDuration(event.getDuration());
-            entity.setScheduledAppointment(event);
-            return entity;
-        }).findFirst().orElseThrow(() -> new CreationException(HttpStatus.BAD_REQUEST));
-    }
-
-    @Contract(pure = true, value = "_, _ -> _")
-    private static long generateId(@NotNull Long timeStamp, @NotNull CourseEntity entity)
-    {
-        return (entity.getId() + "-" + timeStamp).hashCode();
+        return getRepository().findAllReducedUsersByCourse(course);
     }
 
     @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException
@@ -101,7 +70,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
                 // assign class
                 if (clazzModel.classId() != null)
                 {
-                    getClassRoomRepository().findById(clazzModel.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
+                    getClassRepository().findById(clazzModel.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
                     {
                         throw new EntityUnknownException(clazzModel.classId());
                     });
@@ -117,53 +86,4 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         getFileService().getRepository().saveAll(repositories);
         return saveEntity(courseEntities);
     }
-
-    @Transactional public @NotNull AppointmentEntryEntity getAppointment(@NotNull Long timeStamp, @NotNull Long courseId)
-    {
-        CourseEntity course = loadEntityByIDSafe(courseId);
-        long id = generateId(courseId, course);
-
-        return Arrays.stream(course.getEntries()).filter(entry -> Objects.equals(entry.getId(), id)).findFirst().orElseGet(() -> {
-
-            AppointmentEntryCreateModel createModel = new AppointmentEntryCreateModel(timeStamp);
-            return createAppointmentUnsafe(id, createModel, course);
-        });
-    }
-
-    @Transactional public void createAppointment(@NotNull Long courseId, @NotNull AppointmentEntryCreateModel entryCreateModel)
-    {
-        CourseEntity courseEntity = loadEntityByIDSafe(courseId);
-
-        long id = generateId(entryCreateModel.timeStamp(), courseEntity);
-        if (Arrays.stream(courseEntity.getEntries()).anyMatch(entry -> Objects.equals(entry.getId(), id)))
-        {
-            throw new OccupiedException();
-        }
-
-        // intentionally ignore return value
-        createAppointmentUnsafe(id, entryCreateModel, courseEntity);
-    }
-
-    /**
-     * This method generates a new {@link AppointmentEntryEntity}.
-     * <p>
-     * Generates a new {@link AppointmentEntryEntity} from a {@link AppointmentEntryCreateModel}. Unlike {@link #createAppointment(Long, AppointmentEntryCreateModel)}
-     * this method wont check whether it will override an exiting appointment entry.
-     *  TODO I'll improve the doc once I get home
-     *
-     * @param id already computed before. Will be the id of the entity
-     * @param entryCreateModel entry blueprint
-     * @param course the course they are attached to.
-     * @return the newly created entity.
-     */
-    private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
-    {
-        CreationFactory<AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
-        AppointmentEntryEntity entry = entryCreateModel.toEntity(new AppointmentEntryEntity(id), factory);
-        getAppointmentEntryRepository().save(entry);
-
-        course.setEntry(this, entry);
-        return entry;
-    }
-
 }

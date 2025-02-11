@@ -1,1 +1,81 @@
-<p>timetable works!</p>
+<div class="container">
+    <div class="calendar-container">
+        <div class="calendar-info-wrapper" [style.flex-direction]="wrap ? 'column' : 'row'">
+            <!-- Calendar Component -->
+            <div class="calendar-wrapper">
+                <app-calendar-controls #controls></app-calendar-controls>
+                <div class="scrollable-container">
+                    <mwl-calendar-month-view *ngIf="controls.viewType === CalendarView.Month"
+                                             [viewDate]="controls.viewDate"
+                                             [events]="events"
+                                             [locale]="'en-GB'"
+                                             [weekStartsOn]="1"
+                                             (dayClicked)="onDayClicked($event.day)"
+                                             (eventClicked)="onEventClicked($event.event)">
+                    </mwl-calendar-month-view>
+                    <mwl-calendar-week-view *ngIf="controls.viewType === CalendarView.Week"
+                                            [viewDate]="controls.viewDate"
+                                            [events]="events"
+                                            [locale]="'en-GB'"
+                                            [weekStartsOn]="1"
+                                            (eventClicked)="onEventClicked($event.event)">
+                    </mwl-calendar-week-view>
+                    <mwl-calendar-day-view *ngIf="controls.viewType === CalendarView.Day"
+                                           [viewDate]="controls.viewDate"
+                                           [events]="events"
+                                           [locale]="'en-GB'"
+                                           (eventClicked)="onEventClicked($event.event)">
+                    </mwl-calendar-day-view>
+                </div>
+                <div style="display: flex; justify-content: space-between">
+                    <button mat-button>Import into another Calendar</button>
+                    <button mat-button>Export to File</button>
+                </div>
+            </div>
+
+            <!-- Mini Calendar and Events on-->
+            <div class="info-box"
+                 [style.margin-top]="wrap ? '5px' : '0'"
+                 [style.margin-left]="!wrap ? '5px' : '0'"
+                 [style.max-width]="wrap ? null : '350px'">
+                @if(!wrap)
+                {
+                    <mat-calendar [(selected)]="controls.viewDate"></mat-calendar>
+                    <mat-divider></mat-divider>
+                }
+                <h4 class="mat-title" [style.text-align]="'center'">Upcoming homework & tests</h4>
+                <div class="upcoming-events-container">
+                    <mat-list *ngFor="let event of nextEvents">
+                        <mat-list-item>
+                            <span matListItemTitle>{{ dateToString(event.start) }}</span>
+                            <span matListItemLine>{{ event.title }}</span>
+                        </mat-list-item>
+                    </mat-list>
+
+                    <button (click)="createCourse()">Create course</button>
+                    <button (click)="createSubject()">Create subject</button>
+                    <button (click)="createRoom()">Create room</button>
+                    <button (click)="createClassRoom()">Create ClassRoom</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="appointment-box">
+        @if(selectedEvent && selectedEvent.meta.type === AppointmentEntryModel)
+        {
+            <app-event-data
+                [title]="selectedEvent.title"
+                [subtitle]="dateToString(selectedEvent.start)"
+                [appointment]="selectedAppointment" #eventComponent
+            ></app-event-data>
+        }
+        @else if (selectedEvent && selectedEvent.meta.type == FrequentAppointmentModel)
+        {
+            <button mat-raised-button (click)="createEvent()">Edit data</button>
+        }
+    </div>
+
+</div>
+
+

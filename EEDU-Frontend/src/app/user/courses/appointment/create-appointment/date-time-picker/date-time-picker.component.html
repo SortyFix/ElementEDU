@@ -1,0 +1,15 @@
+<div class="datetime-container">
+    <mat-form-field class="datepicker-input" appearance="outline">
+        <mat-label>{{ label() }} Date</mat-label>
+        <input matInput [min]="minDate()" [matDatepicker]="datepicker" [(ngModel)]="date" (ngModelChange)="updateValue()">
+        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+        <mat-datepicker #datepicker ></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field class="timepicker-input" appearance="outline">
+        <mat-label>{{ label() }} Time</mat-label>
+        <input matInput [matTimepicker]="timepicker" [(ngModel)]="time" (ngModelChange)="updateValue()">
+        <mat-timepicker-toggle matSuffix [for]="timepicker"></mat-timepicker-toggle>
+        <mat-timepicker #timepicker></mat-timepicker>
+    </mat-form-field>
+</div>

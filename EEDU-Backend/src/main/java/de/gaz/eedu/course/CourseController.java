@@ -4,6 +4,8 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
+import de.gaz.eedu.user.model.UserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 //TODO manage access. Yes, I'll do it later
 
@@ -58,5 +62,23 @@ public class CourseController extends EntityController<CourseService, CourseMode
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/courses/{user}")
+    public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
+    {
+        return ResponseEntity.ok(getService().getCourses(user));
+    }
+
+    @GetMapping("/get/users/{course}")
+    public @NotNull ResponseEntity<ReducedUserModel[]> getUsers(@PathVariable long course)
+    {
+        return ResponseEntity.ok(getService().loadReducedModelsByCourse(course).toArray(new ReducedUserModel[0]));
+    }
+
+    @GetMapping("/get/all")
+    public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
+    {
+        return getCourses(user);
     }
 }

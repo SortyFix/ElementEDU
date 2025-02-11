@@ -1,0 +1,63 @@
+@import "angular-calendar/scss/angular-calendar";
+
+.calendar-theme {
+    $bg-primary: var(--background-color);
+    $bg-secondary: var(--background-color);
+    $bg-today: var(--widget-color);
+    $bg-active: #595959;
+    $text-color: var(--text-color);
+    $border-color: color-mix(in srgb, var(--text-color) 4%, transparent);
+
+    // Call the calendar mixin with a sass color map of your theme. Every property is optional.
+    // For a list of all variables and how they are used,
+    // see https://github.com/mattlewis92/angular-calendar/tree/main/projects/angular-calendar/src/variables.scss
+    @include cal-theme(
+            (
+                bg-primary: $bg-primary,
+                bg-secondary: $bg-secondary,
+                weekend-color: indianred,
+                bg-active: $bg-active,
+                border-color: $border-color,
+                gray: $bg-secondary,
+                today-bg: $bg-today,
+                event-color-primary: #663BB8,
+                badge-color: #b93131,
+            )
+    );
+
+    .cal-month-view .cal-day-cell.cal-out-month .cal-day-number {
+        opacity: 0.15;
+    }
+
+    background-color: $bg-primary;
+    color: $text-color;
+
+    .card {
+        border-color: $border-color;
+    }
+
+    .card-header {
+        background-color: $bg-secondary;
+    }
+
+    .card-body {
+        background-color: $bg-primary;
+    }
+
+    .nav-tabs {
+        border-bottom-color: $border-color;
+    }
+
+    .nav-tabs .nav-link.active {
+        background-color: $bg-primary;
+        color: $text-color;
+        border-color: $border-color;
+    }
+
+    .nav-tabs .nav-link:hover,
+    .nav-tabs .nav-link:focus {
+        border-color: $border-color;
+    }
+}
+
+

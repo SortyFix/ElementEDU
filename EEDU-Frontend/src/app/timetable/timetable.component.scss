@@ -1,0 +1,53 @@
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-color);
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px 0 5px;
+
+    .calendar-info-wrapper {
+        display: flex;
+        width: 100%;
+    }
+
+    .calendar-wrapper {
+        flex: 3;
+
+        .scrollable-container {
+            margin-top: 5px;
+            overflow-y: auto;
+            overflow-x: auto;
+
+            mwl-calendar-month-view,
+            mwl-calendar-week-view,
+            mwl-calendar-day-view {
+                display: inline-block;
+                min-width: 700px;
+                max-height: 570px;
+                width: 100%;
+            }
+        }
+    }
+
+    .info-box {
+        flex: 1;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        color: var(--text-color);
+
+        border-radius: 4px;
+        background-color: var(--widget-color);
+
+        span {
+            color: var(--text-color);
+        }
+    }
+}
+
+.appointment-box {
+    padding: 10px;
+    border-radius: 4px;
+    color: var(--text-color);
+}

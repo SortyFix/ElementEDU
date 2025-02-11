@@ -2,10 +2,10 @@ package de.gaz.eedu.course;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
-import de.gaz.eedu.course.appointment.scheduled.model.ScheduledAppointmentModel;
+import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
-import de.gaz.eedu.course.subjects.model.SubjectModel;
+import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
@@ -39,7 +39,7 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
         CourseCreateModel create = new CourseCreateModel("7b-German", 1L, null, new Long[0]);
 
         SubjectModel subjectModel = new SubjectModel(1L, "German");
-        CourseModel courseModel = new CourseModel(5L, "7b-German", subjectModel, new UserModel[0], new ScheduledAppointmentModel[0]);
+        CourseModel courseModel = new CourseModel(5L, "7b-German", subjectModel, new UserModel[0], new FrequentAppointmentModel[0]);
 
         return Eval.eval(create, courseModel, (request, expect, result) ->
         {

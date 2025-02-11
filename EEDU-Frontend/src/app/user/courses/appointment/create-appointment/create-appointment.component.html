@@ -1,0 +1,36 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-general-create title="Create new Appointment" [loading]="loading">
+        <mat-card-content class="content-wrapper">
+            <general-selection-input
+                label="Enter the Course this Appointment applies to"
+                formControlName="course"
+                [values]="courses">
+            </general-selection-input>
+
+            <mat-tab-group animationDuration="200ms"
+                           [selectedIndex]="form.get('selected')?.value"
+                           (selectedIndexChange)="form.get('selected')?.setValue($event)">
+                <mat-tab label="Appointment">
+                    <div class="appointment-content">
+                        <app-create-standalone-appointment
+                            [rooms]="rooms"
+                            #standalone>
+                        </app-create-standalone-appointment>
+                    </div>
+                </mat-tab>
+                <mat-tab label="Frequent Appointment">
+                    <div class="appointment-content">
+                        <app-create-frequent-appointment
+                            [rooms]="rooms"
+                            #frequent>
+                        </app-create-frequent-appointment>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
+            <button [disabled]="!canSubmit()" mat-stroked-button type="submit">Submit</button>
+        </mat-card-actions>
+    </app-general-create>
+</form>

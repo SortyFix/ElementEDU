@@ -6,7 +6,7 @@ import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,25 +26,25 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomService, ClassRoo
 
     @Contract(pure = true, value = "-> new")
     private static @NotNull Stream<ArrayTestData<Long>> getUser() {
-        return Stream.of(new ArrayTestData<>(1, new Long[]{1L}), new ArrayTestData<>(2, new Long[]{2L, 3L}), new ArrayTestData<>(3, new Long[]{}));
+        return Stream.of(new ArrayTestData<>(1, 1L), new ArrayTestData<>(2, 2L, 3L), new ArrayTestData<>(3, new Long[]{}));
     }
 
     @Override
     protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval() {
-        ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b", new Long[0], new Long[0]);
-        ClassRoomModel classRoomModel = new ClassRoomModel(5L, "5b", new UserModel[0], new CourseModel[0]);
+        ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b", new Long[0], new Long[0], 2L);
+        ClassRoomModel classRoomModel = new ClassRoomModel(5L, "5b", new ReducedUserModel[0], new CourseModel[0], null);
 
         return Eval.eval(classRoomCreateModel, classRoomModel, (request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.name(), result.name());
-            Assertions.assertArrayEquals(expect.users(), result.users());
+            Assertions.assertArrayEquals(expect.students(), result.students());
             Assertions.assertArrayEquals(expect.courses(), result.courses());
         });
     }
 
     @Override
     protected @NotNull ClassRoomCreateModel occupiedCreateModel() {
-        return new ClassRoomCreateModel("Q1", new Long[0], new Long[0]);
+        return new ClassRoomCreateModel("Q1", new Long[0], new Long[0], 2L);
     }
 
     @Transactional
