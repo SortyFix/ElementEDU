@@ -1,12 +1,12 @@
 export class ThemeModel {
     constructor(public readonly id: bigint,
                 public readonly name: string,
-                public readonly backgroundColor_r: number,
-                public readonly backgroundColor_g: number,
-                public readonly backgroundColor_b: number,
-                public readonly widgetColor_r: number,
-                public readonly widgetColor_g: number,
-                public readonly widgetColor_b: number)
+                public readonly backgroundColorR: number,
+                public readonly backgroundColorG: number,
+                public readonly backgroundColorB: number,
+                public readonly widgetColorR: number,
+                public readonly widgetColorG: number,
+                public readonly widgetColorB: number)
     { }
 
     public static fromObject(obj: any): ThemeModel
@@ -14,12 +14,12 @@ export class ThemeModel {
         return new ThemeModel(
             obj.id,
             obj.name,
-            obj.backgroundColor_r,
-            obj.backgroundColor_g,
-            obj.backgroundColor_b,
-            obj.widgetColor_r,
-            obj.widgetColor_g,
-            obj.widgetColor_b);
+            obj.backgroundColorR,
+            obj.backgroundColorG,
+            obj.backgroundColorB,
+            obj.widgetColorR,
+            obj.widgetColorG,
+            obj.widgetColorB);
     }
 
     /**
@@ -28,7 +28,7 @@ export class ThemeModel {
      */
     public get getBackgroundColor(): string
     {
-        return `rgb(${this.backgroundColor_r}, ${this.backgroundColor_g}, ${this.backgroundColor_b})`
+        return `rgb(${this.backgroundColorR + 128}, ${this.backgroundColorG + 128}, ${this.backgroundColorB + 128})`
     }
 
     /**
@@ -37,7 +37,7 @@ export class ThemeModel {
      */
     public get getWidgetColor(): string
     {
-        return `rgb(${this.widgetColor_r}, ${this.widgetColor_g}, ${this.widgetColor_b})`
+        return `rgb(${this.widgetColorR + 128}, ${this.widgetColorG + 128}, ${this.widgetColorB + 128})`
     }
 
     /**
@@ -76,14 +76,14 @@ export class ThemeModel {
         let r, g, b: number;
         switch (type) {
             case "background":
-                r = this.backgroundColor_r;
-                g = this.backgroundColor_g;
-                b = this.backgroundColor_b;
+                r = this.backgroundColorR + 128;
+                g = this.backgroundColorG + 128;
+                b = this.backgroundColorB + 128;
                 break;
             case "widget":
-                r = this.widgetColor_r;
-                g = this.widgetColor_g;
-                b = this.widgetColor_b;
+                r = this.widgetColorR + 128;
+                g = this.widgetColorG + 128;
+                b = this.widgetColorB + 128;
                 break;
         }
         return this.getTextColorByLuminance(r, g, b, isTitle);

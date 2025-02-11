@@ -5,7 +5,6 @@ import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -106,14 +104,16 @@ public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
                 editPrivileges.toArray(String[]::new), tags.toArray(String[]::new));
     }
 
-    public @NotNull String encode() throws IOException
-    {
-        File[] files = new File(thumbnailURL).listFiles();
-        if (files != null) {
-            byte[] fileContent = Files.readAllBytes(Path.of(thumbnailURL + "/" + files[0].getName()));
-            return Base64.getEncoder().encodeToString(fileContent);
-        }
-        return null;
+    public String encode() throws IOException {
+        File file = new File(thumbnailURL);
+
+        File encodedFile = Optional.ofNullable(file.listFiles())
+                .filter(files -> files.length > 0)
+                .map(files -> files[0])
+                .orElse(file);
+
+        byte[] fileContent = Files.readAllBytes(encodedFile.toPath());
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 
     private <T> boolean updateDatabase(@NotNull PostService userService, @NotNull T entity, @NotNull Predicate<T> predicate)

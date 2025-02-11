@@ -90,10 +90,11 @@ import java.util.Set;
     {
         try
         {
+            createDirectory(subdirectory);
+
             for(MultipartFile file : batch)
             {
-                Path path = Path.of(getFilePath(subdirectory), file.getOriginalFilename());
-                createDirectory(subdirectory);
+                Path path = Path.of(getFilePath(subdirectory), file.getName());
                 if (virusCheck(file.getInputStream()))
                 {
                     file.transferTo(path);
@@ -105,6 +106,12 @@ import java.util.Set;
             System.out.println(e);
             throw new MaliciousFileException(subdirectory, e);
         }
+    }
+
+    public @NotNull Boolean ifFileExists(@NotNull String subdirectory, @NotNull String localPath)
+    {
+        File file = new File(getFilePath(subdirectory), localPath);
+        return !file.isDirectory() && file.exists();
     }
 
     /**
@@ -150,10 +157,7 @@ import java.util.Set;
 
     public @NotNull String getFilePath(@Nullable String subdirectory)
     {
-        String path = String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
-
-        // TODO: Check if slash is ók
-        return path;
+        return String.format("%s/%s/%s/%s", BASE_DIRECTORY, getDataDirectory(), getId(), Objects.requireNonNullElse(subdirectory, ""));
     }
 
     /**

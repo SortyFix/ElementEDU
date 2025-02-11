@@ -111,8 +111,13 @@ import java.util.stream.Stream;
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark", new short[]{5, 5, 5}, new short[]{10, 10, 10});
-        ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight", new short[]{20, 20, 20}, new short[]{220, 220, 220});
+        ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark",
+                new byte[]{Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5},
+                new byte[]{Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10});
+        ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight",
+                new byte[]{Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255},
+                new byte[]{Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235});
+
         return getThemeService().createEntity(Set.of(defaultDark, defaultLight)).stream().filter(theme ->
         {
             // Dark will be set as default
