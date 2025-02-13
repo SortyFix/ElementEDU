@@ -2,7 +2,7 @@ package de.gaz.eedu.management.illnessnotifications;
 
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
-import de.gaz.eedu.user.illnessnotifications.IllnessNotificationModel;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationService;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationStatus;
 import lombok.AllArgsConstructor;

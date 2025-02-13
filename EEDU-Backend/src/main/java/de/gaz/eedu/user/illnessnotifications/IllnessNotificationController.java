@@ -1,6 +1,8 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.user.UserService;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
+import de.gaz.eedu.user.illnessnotifications.model.ReducedIllnessNotificationModel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController @RequestMapping(value = "/api/v1/illness/me") public class IllnessNotificationController
@@ -25,5 +29,11 @@ import org.springframework.web.server.ResponseStatusException;
         return userService.loadEntityById(id).map(userEntity ->
                         ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
                                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    }
+
+    @PreAuthorize("isAuthenticated()") @GetMapping("/my-notifications")
+    public ResponseEntity<List<ReducedIllnessNotificationModel>> getOwnNotifications(@AuthenticationPrincipal Long id)
+    {
+        return illnessNotificationService.getReducedEntitiesByUser(id);
     }
 }

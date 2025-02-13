@@ -1,7 +1,8 @@
-package de.gaz.eedu.user.illnessnotifications;
+package de.gaz.eedu.user.illnessnotifications.model;
 
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.file.FileModel;
+import de.gaz.eedu.user.illnessnotifications.IllnessNotificationStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,5 +28,9 @@ public record IllnessNotificationModel(@NotNull Long id, @NotNull Long userId,
     public int hashCode()
     {
         return Objects.hash(id(), userId(), status(), timestamp(), reason());
+    }
+
+    public ReducedIllnessNotificationModel toReducedModel() {
+        return new ReducedIllnessNotificationModel(id(), userId(), status(), timestamp(), expirationTime());
     }
 }

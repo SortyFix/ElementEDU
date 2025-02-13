@@ -1,6 +1,6 @@
-<div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between;">
-    <div style="flex: 1; min-width: 300px;">
-        <h1 class="text">Issue a sick note</h1>
+<div class="container">
+    <div class="form-section">
+        <h1 class="text">Issue a Sick Note</h1>
 
         <p class="text">
             Fill in the fields below to send an illness notification request to your school's management.<br>
@@ -29,7 +29,7 @@
                 </div>
             </div>
 
-            <mat-form-field appearance="outline" class="full-width-field" [(ngModel)]="until">
+            <mat-form-field appearance="outline" class="full-width-field">
                 <mat-label>End date of sick leave</mat-label>
                 <input matInput [matDatepicker]="picker" (dateInput)="setDate($event)" (dateChange)="setDate($event)">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -42,7 +42,25 @@
         </div>
     </div>
 
-    <div class="info-container">
-        <h2>Your last sick note</h2>
+    <div class="sick-notes-section">
+        <h2>Your Sick Notes</h2>
+        <div class="sick-notes-container" *ngIf="illnessNotifications.length > 0; else noNotes">
+            <div class="sick-note-card" *ngFor="let x of illnessNotifications">
+                <div class="sick-note-header">
+                    <mat-icon class="status-icon">
+                        {{ getAppropriateIcon(x.status) }}
+                    </mat-icon>
+                    <span class="status-text">{{ x.status }}</span>
+                </div>
+                <div class="sick-note-body">
+                    <p><strong>ID:</strong> {{ x.id }}</p>
+                    <p><strong>Submitted:</strong> {{ formatDate(x.timestamp) }}</p>
+                    <p><strong>Valid Until:</strong> {{ formatDate(x.expirationTime) }}</p>
+                </div>
+            </div>
+        </div>
+        <ng-template #noNotes>
+            <p>No sick notes available.</p>
+        </ng-template>
     </div>
 </div>
