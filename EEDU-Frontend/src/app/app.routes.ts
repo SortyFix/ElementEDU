@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {CoursesComponent} from "./courses/courses.component";
 import {TimetableComponent} from "./timetable/timetable.component";
 import {NewsComponent} from "./news/news.component";
 import {ChatComponent} from "./chat/chat.component";
@@ -11,7 +10,6 @@ import {IllnessNotificationComponent} from "./illness-notification/illness-notif
 export const routes: Routes = [
     {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
     {path: 'dashboard', component: DashboardComponent},
-    {path: 'courses', component: CoursesComponent},
     {path: 'timetable', component: TimetableComponent},
     {path: 'news', component: NewsComponent},
     {path: 'news/:id', component: NewsPageComponent},

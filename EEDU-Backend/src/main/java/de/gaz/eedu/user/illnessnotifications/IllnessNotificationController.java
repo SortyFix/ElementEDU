@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.illnessnotifications;
 
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import de.gaz.eedu.user.illnessnotifications.model.ReducedIllnessNotificationModel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
