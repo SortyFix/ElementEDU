@@ -20,7 +20,20 @@ export class AppointmentService {
 
     private readonly BACKEND_URL: string = environment.backendUrl;
 
-    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService) { }
+    constructor(
+        private readonly _http: HttpClient,
+        private readonly _courseService: CourseService,
+        private readonly _fileService: FileService
+    ) { }
+
+    public get nextAppointments(): readonly AppointmentEntryModel[]
+    {
+        return this.courseService.value.flatMap(
+            (course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries
+        ).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort(
+            (a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime()
+        );
+    }
 
     protected get http(): HttpClient {
         return this._http;
