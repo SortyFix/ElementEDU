@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {AppointmentService} from "../../user/courses/appointment/appointment.service";
+import {AppointmentEntryModel} from "../../user/courses/appointment/entry/appointment-entry-model";
 
 @Component({
   selector: 'app-appointment-card',
@@ -9,4 +11,9 @@ import { Component } from '@angular/core';
 })
 export class AppointmentCardComponent {
 
+    public constructor(private readonly _appointmentService: AppointmentService) {}
+
+    protected get appointments(): readonly AppointmentEntryModel[] {
+        return this._appointmentService.nextAppointments.slice(0, 5);
+    }
 }
