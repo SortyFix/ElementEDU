@@ -35,6 +35,13 @@ export class AppointmentService {
         );
     }
 
+    public get nextAssignments(): readonly AssignmentModel[]
+    {
+        return this.nextAppointments.filter(
+            (appointment: AppointmentEntryModel): boolean => !!appointment.assignment
+        ).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel> appointment.assignment);
+    }
+
     protected get http(): HttpClient {
         return this._http;
     }
