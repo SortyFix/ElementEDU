@@ -13,12 +13,14 @@ export interface GenericAppointmentEntry {
 
 export class AppointmentEntryModel {
 
-    constructor(private readonly _id: bigint,
-                private readonly _duration: number,
-                private readonly _description: string = "No description has been set",
-                private readonly _attachedScheduled?: bigint,
-                private readonly _room?: RoomModel,
-                public readonly _assignment?: AssignmentModel) {}
+    constructor(
+        private readonly _id: bigint,
+        private readonly _duration: number,
+        private readonly _description: string = "No description has been set",
+        private readonly _attachedScheduled?: bigint,
+        private readonly _room?: RoomModel,
+        public readonly _assignment?: AssignmentModel
+    ) {}
 
     public static fromObject(object: GenericAppointmentEntry): AppointmentEntryModel {
         return new AppointmentEntryModel(
