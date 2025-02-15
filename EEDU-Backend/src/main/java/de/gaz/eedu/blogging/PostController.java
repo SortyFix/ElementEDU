@@ -35,7 +35,7 @@ import java.io.IOException;
         return ResponseEntity.ok(postService.getPostList(pageNumber));
     }
 
-    @PreAuthorize("hasRole('ADMINISTRATOR')") @PostMapping("/post")
+    @PreAuthorize("hasAuthority('ROLE_administrator')") @PostMapping("/post")
     public ResponseEntity<PostModel> createPost(
             @AuthenticationPrincipal Long userId,
             @NotNull @RequestPart("createModel") PostCreateModel createModel,

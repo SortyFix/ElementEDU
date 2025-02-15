@@ -127,7 +127,8 @@ public class PostService extends EntityService<PostRepository, PostEntity, PostM
     public @NotNull PostModel createPost(@NotNull Long userId, @Nullable MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
-        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ROLE_ADMINISTRATOR"))
+        // TODO: FIX ADMIN AUTHORITIES
+        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ROLE_administrator"))
         {
             if(Objects.nonNull(thumbnail))
             {

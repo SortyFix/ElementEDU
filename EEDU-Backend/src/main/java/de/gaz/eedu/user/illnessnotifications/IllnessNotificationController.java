@@ -25,9 +25,10 @@ import java.util.List;
             @AuthenticationPrincipal Long id, @RequestParam("reason") @NotNull String reason,
             @RequestParam("expirationTime") @NotNull Long expirationTime, @RequestParam(value = "file") MultipartFile file)
     {
-        return userService.loadEntityById(id).map(userEntity ->
-                        ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file)))
-                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        return userService.loadEntityById(id).map(userEntity -> {
+            System.out.println(userEntity.getAuthorities());
+            return ResponseEntity.ok(illnessNotificationService.excuse(id, reason, expirationTime, file));
+                        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/my-notifications")
