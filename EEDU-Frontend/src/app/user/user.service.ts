@@ -14,7 +14,7 @@ export class UserService
     private readonly BACKEND_URL: string = environment.backendUrl;
     private _loaded: boolean = false;
 
-    constructor(private _http: HttpClient, private _snackBar: MatSnackBar) {}
+    public constructor(private _http: HttpClient, private _snackBar: MatSnackBar) {}
 
     private get http(): HttpClient {
         return this._http;

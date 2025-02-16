@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpEvent} from "@angular/common/http";
 import {environment} from "../../../../environment/environment";
 import {CourseService} from "../course.service";
 import {map, Observable, tap} from "rxjs";
@@ -12,6 +12,8 @@ import {
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
+import {FileService} from "../../../file/file.service";
+import {AssignmentModel} from "./entry/assignment-model";
 
 @Injectable({
     providedIn: 'root'
@@ -48,6 +50,12 @@ export class AppointmentService {
 
     protected get courseService(): CourseService {
         return this._courseService;
+    }
+
+    public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>>
+    {
+        const url: string = `${environment.backendUrl}/course/appointment/submit/assignment/${appointment}`;
+        return this._fileService.uploadFiles(url, assignmentFiles);
     }
 
     /**

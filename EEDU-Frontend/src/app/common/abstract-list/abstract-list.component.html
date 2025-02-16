@@ -1,0 +1,90 @@
+<mat-form-field appearance="outline">
+    <mat-label>User Search</mat-label>
+    <input name="search"
+           type="search"
+           placeholder="Filter..."
+           [(ngModel)]="filteredString"
+           (input)="unselectAll()"
+           autofocus matInput>
+</mat-form-field>
+
+<div>
+    <mat-list>
+        <mat-checkbox [checked]="isSelected('all')"
+                      [indeterminate]="partiallySelected"
+                      (change)="toggle('all')"
+                      *ngIf="filteredValues.length != 0 && selectionType() === SelectionType.MULTIPLE"
+                      class="text-color">
+            Select All
+        </mat-checkbox>
+
+        @for (value of filteredValues; track value) {
+
+            <mat-list-item [class]="selectionType() === SelectionType.SINGLE ? 'selectable' : null">
+                <div matListItemTitle style="width: 100%; display: flex; justify-content: space-between">
+                    <div>
+                        <mat-checkbox
+                            *ngIf="selectionType() === SelectionType.MULTIPLE"
+                            [checked]="isSelected(value)"
+                            (change)="toggle(value)"
+                            (click)="$event.stopPropagation()"
+                            (keydown)="handleKeyDown($event, value)">
+                        </mat-checkbox>
+                        <mat-icon matListItemIcon class="icon" *ngIf="icon()">
+                            {{ icon()!(value) }}
+                        </mat-icon>
+                        <a class="title">{{ title()!(value) }}</a>
+                    </div>
+
+                    <div>
+                        <mat-chip-set *ngIf="chips()">
+                            @for (tag of chips()!(value); track tag) {
+                                <mat-chip>{{ tag }}</mat-chip>
+                            }
+                        </mat-chip-set>
+                    </div>
+                </div>
+            </mat-list-item>
+        }
+    </mat-list>
+</div>
+
+<mat-accordion class="list-accordion" hidden>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <mat-checkbox [checked]="isSelected('all')"
+                      [indeterminate]="partiallySelected"
+                      (change)="toggle('all')"
+                      *ngIf="filteredValues.length != 0 && selectionType() === SelectionType.MULTIPLE"
+                      class="text-color">
+            Select All
+        </mat-checkbox>
+    </div>
+    <mat-expansion-panel *ngFor="let value of filteredValues">
+        <mat-expansion-panel-header tabindex="-1">
+            <mat-panel-title>
+                <a matListItemTitle>
+                    <mat-checkbox
+                        *ngIf="selectionType() === SelectionType.MULTIPLE"
+                        [checked]="isSelected(value)"
+                        (change)="toggle(value)"
+                        (click)="$event.stopPropagation()"
+                        (keydown)="handleKeyDown($event, value)">
+                    </mat-checkbox>
+                    <mat-icon class="icon" *ngIf="hasIcon">{{ loadIcon(value) }}</mat-icon>
+                    <a class="title">{{ loadTitle(value) }}</a>
+                </a>
+
+            </mat-panel-title>
+            <mat-panel-description>
+                <mat-chip-set *ngIf="hasChips">
+                    @for (tag of loadChips(value); track tag) { <mat-chip>{{ tag }}</mat-chip> }
+                </mat-chip-set>
+                <!--
+                <mat-icon class="icon" *ngIf="icon">
+                    {{ icon(value) }}
+                </mat-icon>
+                -->
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+    </mat-expansion-panel>
+</mat-accordion>

@@ -3,6 +3,7 @@ package de.gaz.eedu.course.appointment;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
+import de.gaz.eedu.course.appointment.entry.model.AssignmentInsightModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -16,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -43,6 +46,28 @@ public class AppointmentController extends EntityController<AppointmentService, 
         })).collect(Collectors.toSet())).stream();
 
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
+    }
+
+    @PostMapping("/submit/assignment/{appointment}/status")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)
+    {
+        return ResponseEntity.ok(getService().getInsight(appointment).toArray(AssignmentInsightModel[]::new));
+    }
+
+    @PostMapping("/submit/assignment/{appointment}/status/{user}")
+    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    public @NotNull ResponseEntity<AssignmentInsightModel> submitStatus(@PathVariable long appointment, @PathVariable long user)
+    {
+        ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
+        return getService().getInsight(appointment, user).map(ResponseEntity::ok).orElse(notFound);
+    }
+
+    @PostMapping("/submit/assignment/{appointment}")
+    public @NotNull HttpStatus submitAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @NotNull @RequestPart("file") MultipartFile[] files)
+    {
+        getService().submitAssignment(userId, appointment, files);
+        return HttpStatus.OK;
     }
 
     @PostMapping("/update/standalone/{appointment}")

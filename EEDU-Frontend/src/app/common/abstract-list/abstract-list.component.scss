@@ -1,0 +1,29 @@
+.list-accordion .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-accordion .mat-mdc-form-field + .mat-mdc-form-field {
+    margin-left: 8px;
+}
+
+.title
+{
+    color: var(--text-color);
+}
+
+.icon
+{
+    margin-right: 3px;
+}
+
+.selectable
+{
+    user-select: none;
+
+    &:hover
+    {
+        cursor: pointer;
+        font-weight: bold;
+    }
+}

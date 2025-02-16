@@ -6,27 +6,22 @@ import {forkJoin, map, Observable} from "rxjs";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, NgForOf} from "@angular/common";
 import {ThemeModel} from "../theming/theme-model";
 import {MatButton} from "@angular/material/button";
 import {UserModel} from "../user/user-model";
 import {UserService} from "../user/user.service";
-import {UserListComponent} from "../user/user-list/user-list.component";
 import {MatInputModule} from "@angular/material/input";
 import {MatDivider} from "@angular/material/divider";
 import {
     MatExpansionModule,
-    MatExpansionPanel,
-    MatExpansionPanelDescription,
-    MatExpansionPanelTitle
 } from "@angular/material/expansion";
-import {AbstractItemListComponent} from "../common/abstract-item-list/abstract-item-list.component";
+import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-list.component";
 
 @Component({
     selector: 'app-settings',
     standalone: true,
     imports: [
-        UserListComponent,
         MatFormField,
         MatInputModule,
         ReactiveFormsModule,
@@ -38,12 +33,8 @@ import {AbstractItemListComponent} from "../common/abstract-item-list/abstract-i
         MatButton,
         FormsModule,
         MatDivider,
-        MatExpansionPanel,
-        MatExpansionPanelTitle,
-        MatExpansionPanelDescription,
         MatExpansionModule,
-        NgIf,
-        AbstractItemListComponent
+        FullUserListComponent
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
@@ -51,11 +42,6 @@ import {AbstractItemListComponent} from "../common/abstract-item-list/abstract-i
 })
 export class SettingsComponent implements OnInit {
     constructor(public userService: UserService, public http: HttpClient) {
-    }
-
-    public test(user: UserModel): string
-    {
-        return user.loginName;
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
@@ -66,8 +52,6 @@ export class SettingsComponent implements OnInit {
 
     public THEME_URL: string = "api/v1/user";
 
-    private _userList: UserModel[] = [];
-
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
         this.themeForm.valueChanges.subscribe((selectedTheme) => {
@@ -75,8 +59,6 @@ export class SettingsComponent implements OnInit {
                 this.selectedTheme = selectedTheme.id;
             }
         });
-
-        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this._userList = users });
     }
 
     /**
@@ -168,10 +150,6 @@ export class SettingsComponent implements OnInit {
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
         const url: string = `http://localhost:8080/${this.THEME_URL}/theme/all`;
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
-    }
-
-    protected get userList(): UserModel[] {
-        return this._userList;
     }
 
     public openEmail(body: string) {

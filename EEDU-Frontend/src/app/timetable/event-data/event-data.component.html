@@ -34,7 +34,7 @@
                     <!-- Assignments -->
                     <mat-grid-tile rowspan="3" colspan="3">
                         <app-event-tile-content title="Assignment" #appointment>
-                            <app-assignment-tab [editing]="appointment.editing" [assignment]="assignmentModel">
+                            <app-assignment-tab [editing]="appointment.editing" [appointment]="event">
 
                                 <mat-form-field appearance="outline" class="form-field">
                                     <textarea matInput style="height: 120px;" formControlName="assignment"></textarea>

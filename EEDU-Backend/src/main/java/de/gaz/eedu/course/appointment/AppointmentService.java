@@ -14,7 +14,7 @@ import de.gaz.eedu.course.room.RoomRepository;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
-import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
@@ -42,6 +43,7 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
     private final AppointmentEntryRepository entryRepository;
     private final CourseRepository courseRepository;
     private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
 
     @Contract(pure = true, value = "_, _ -> _")
     private static long generateId(@NotNull CourseEntity entity, @NotNull Long timeStamp)
@@ -61,17 +63,22 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
         return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
     }
 
-    public @NotNull List<AssignmentInsightModel> getInsight(@NotNull AppointmentEntryEntity entry)
+    public @NotNull List<AssignmentInsightModel> getInsight(long appointment)
     {
-        Set<AssignmentInsightModel> assignmentInsights = new HashSet<>();
-
-        CourseEntity course = entry.getCourse();
-        for (UserEntity user : course.getUsers())
-        {
-            //assignmentInsights.add(new AssignmentInsightModel(user.getLoginName(), ))
-        }
-        return List.copyOf(assignmentInsights);
+        return getEntryRepository().findById(appointment).map(entry -> {
+            return entry.getCourse().getUsers().stream().map(entry::getInsight).toList();
+        }).orElse(Collections.emptyList());
     }
+
+    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
+    {
+        return getEntryRepository().findById(appointment).map(entry -> {
+            return entry.getInsight(getUserRepository().findEntity(user).orElseThrow(
+                    () -> new EntityUnknownException(user))
+            );
+        });
+    }
+
 
     @Contract(pure = true)
     private static boolean setAssignment(@NotNull AppointmentEntryEntity entity, @Nullable AssignmentCreateModel assignment)
@@ -180,6 +187,13 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
         CourseEntity courseEntity = getCourse(courseId);
         List<AppointmentEntryEntity> entities = createAppointmentUnsafe(courseEntity, entryCreateModel);
         return getEntryRepository().saveAll(entities).stream().map(AppointmentEntryEntity::toModel).toList();
+    }
+
+    public void submitAssignment(long user, long assignment, @NotNull MultipartFile[] files)
+    {
+        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
+        AppointmentEntryEntity entry = entryReference.orElseThrow(() -> new EntityUnknownException(assignment));
+        entry.submitAssignment(user, files);
     }
 
     /**
