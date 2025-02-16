@@ -263,7 +263,7 @@ VALUES ('Mathematics'),
 INSERT INTO group_entity (name) VALUES ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
-VALUES ('dark', -120, -120, -100, -105, -105, -90);
+VALUES ('dark', 120, 120, 120, 100, 100, 100);
 
 INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    -- PRESENT Student

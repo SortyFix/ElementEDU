@@ -1,6 +1,10 @@
-<div *ngIf="articleList.length == 0">
-    <h3 style="color: white">No articles yet!</h3>
+<div *ngIf="loading">
+    Loading...
 </div>
+<div *ngIf="!loading">
+    <div *ngIf="articleList.length == 0">
+        <h3 style="color: white">No articles yet!</h3>
+    </div>
 
 <div *ngIf="articleList.length > 0" class="highlighted-article">
     <div class="highlighted-banner">
@@ -20,32 +24,32 @@
     </div>
 </div>
 
-<div *ngIf="articleList.length > 0" id="container" #container>
-    <mat-grid-list [cols]="calculateColumns()" rowHeight="420px" width="100%" (window:resize)="calculateColumns()">
-        <mat-grid-tile *ngFor="let x of articleList">
-            <div class="news-card" (click)="openArticle(x.id)" style="cursor: pointer;">
-                <div class="news-thumbnail" *ngIf="thumbnailBlobExists(x)">
-                    <img [src]="x.thumbnailBlob" alt="">
-                </div>
-                <div class="news-content">
-                    <h3 class="news-title">{{ x.title }}</h3>
-                    <div class="news-footer">
-                        <div class="news-info">
-                            <div class="news-author">
-                                <span class="author-icon"></span>
-                                {{ x.author }}
-                            </div>
-                            <div class="news-date">
-                                <span class="date-icon"></span>
-                                {{ this.getTimeString(x.timeOfCreation) }}
+    <div *ngIf="articleList.length > 0" id="container" #container>
+        <mat-grid-list [cols]="calculateColumns()" rowHeight="420px" width="100%" (window:resize)="calculateColumns()">
+            <mat-grid-tile *ngFor="let x of articleList">
+                <div class="news-card" (click)="openArticle(x.id)" style="cursor: pointer;">
+                    <div class="news-thumbnail" *ngIf="thumbnailBlobExists(x)">
+                        <img [ngSrc]="x.thumbnailBlob" alt="" fill>
+                    </div>
+                    <div class="news-content">
+                        <h3 class="news-title">{{ x.title }}</h3>
+                        <div class="news-footer">
+                            <div class="news-info">
+                                <div class="news-author">
+                                    <span class="author-icon"></span>
+                                    {{ x.author }}
+                                </div>
+                                <div class="news-date">
+                                    <span class="date-icon"></span>
+                                    {{ this.getTimeString(x.timeOfCreation) }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </mat-grid-tile>
-    </mat-grid-list>c
-</div>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </div>
 
 <mat-paginator [hidePageSize]="true"
                [pageSize]="10"
@@ -55,8 +59,12 @@
                 style="background-color: var(--widget-color); color: var(--text-color)">
 </mat-paginator>
 
-<button mat-fab class="add-article-button" *ngIf="hasPermission()" (click)="openArticleCreation()">
-    <mat-icon>add</mat-icon>
-</button>
+    <button mat-fab class="add-article-button" *ngIf="hasPermission()" (click)="openArticleCreation()">
+        <mat-icon>add</mat-icon>
+    </button>
+
+
+
+</div>
 
 

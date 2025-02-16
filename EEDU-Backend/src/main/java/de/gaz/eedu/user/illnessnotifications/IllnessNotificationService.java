@@ -6,8 +6,12 @@ import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.file.exception.MaliciousFileException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.UserStatus;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationCreateModel;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
+import de.gaz.eedu.user.illnessnotifications.model.ReducedIllnessNotificationModel;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -81,6 +85,13 @@ import java.util.Set;
                         userEntity.setStatus(status.equals(IllnessNotificationStatus.ACCEPTED) ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
                 () -> ResponseEntity.status(HttpStatus.FORBIDDEN).body(false));
         return ResponseEntity.ok(true);
+    }
+
+    public ResponseEntity<List<ReducedIllnessNotificationModel>> getReducedEntitiesByUser(@NotNull Long userId)
+    {
+        UserEntity user = userService.loadEntityByIDSafe(userId);
+        return ResponseEntity.ok(illnessNotificationRepository.getIllnessNotificationEntitiesByUser(user).stream()
+                .map(entity -> entity.toModel().toReducedModel()).toList());
     }
 
     @Override

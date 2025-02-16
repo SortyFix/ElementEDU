@@ -5,6 +5,7 @@ import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;

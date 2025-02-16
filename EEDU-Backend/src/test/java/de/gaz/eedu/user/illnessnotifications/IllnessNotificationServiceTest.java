@@ -5,6 +5,8 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationCreateModel;
+import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;

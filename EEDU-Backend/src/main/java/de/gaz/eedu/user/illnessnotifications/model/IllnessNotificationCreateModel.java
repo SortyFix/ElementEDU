@@ -1,6 +1,8 @@
-package de.gaz.eedu.user.illnessnotifications;
+package de.gaz.eedu.user.illnessnotifications.model;
 
 import de.gaz.eedu.entity.model.CreationModel;
+import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
+import de.gaz.eedu.user.illnessnotifications.IllnessNotificationStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
