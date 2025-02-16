@@ -4,7 +4,6 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AssignmentModel} from "../../../user/courses/appointment/entry/assignment-model";
 import {MatIcon} from "@angular/material/icon";
-import {UserService} from "../../../user/user.service";
 import {AppointmentService} from "../../../user/courses/appointment/appointment.service";
 import {AppointmentEntryModel} from "../../../user/courses/appointment/entry/appointment-entry-model";
 import {tap} from "rxjs";

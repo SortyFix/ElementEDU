@@ -9,7 +9,7 @@ export abstract class AbstractSimpleCourseService<T, C> {
 
     protected constructor(private readonly _http: HttpClient) {}
 
-    protected abstract get fetchAllValues(): Observable<T[]>;
+    protected abstract get fetchAllValues(): Observable<any[]>;
 
     public get fetchAll(): Observable<T[]> {
         return this.fetchAllValues.pipe(this.translate, tap((response: T[]): void =>

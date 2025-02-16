@@ -59,9 +59,9 @@ export class AbstractList<T> {
     public readonly icon: InputSignal<((value: T) => string) | undefined> = input<((value: T) => string) | undefined>(undefined);
     public readonly chips: InputSignal<((value: T) => string[]) | undefined> = input<((value: T) => string[]) | undefined>(undefined);
 
-    public readonly filter: InputSignal<((input: string, values: T[]) => T[])> = input<((input: string, values: T[]) => T[])>((): T[] => this.values());
+    public readonly filter: InputSignal<((input: string, values: readonly T[]) => readonly T[])> = input<((input: string, values: readonly T[]) => readonly T[])>((): readonly T[] => this.values());
 
-    public readonly values: InputSignal<T[]> = input<T[]>([]);
+    public readonly values: InputSignal<readonly T[]> = input<readonly T[]>([]);
 
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
 
@@ -112,7 +112,7 @@ export class AbstractList<T> {
         return this.selected.size > 0 && !this.isSelected('all');
     }
 
-    protected get filteredValues(): T[]
+    protected get filteredValues(): readonly T[]
     {
         return this.filter()!(this.filteredString, this.values())
     }

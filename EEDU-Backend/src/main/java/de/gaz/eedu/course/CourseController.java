@@ -70,15 +70,22 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return ResponseEntity.ok(getService().getCourses(user));
     }
 
-    @GetMapping("/get/users/{course}")
-    public @NotNull ResponseEntity<ReducedUserModel[]> getUsers(@PathVariable long course)
-    {
-        return ResponseEntity.ok(getService().loadReducedModelsByCourse(course).toArray(new ReducedUserModel[0]));
-    }
-
-    @GetMapping("/get/all")
+    @GetMapping("/get/courses")
     public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
     {
         return getCourses(user);
+    }
+
+
+    @GetMapping("/get/all")
+    @Override public @NotNull ResponseEntity<Set<CourseModel>> fetchAll()
+    {
+        return super.fetchAll();
+    }
+
+    @GetMapping("/users/{course}")
+    public @NotNull ResponseEntity<ReducedUserModel[]> getUsers(@PathVariable long course)
+    {
+        return ResponseEntity.ok(getService().loadReducedModelsByCourse(course).toArray(new ReducedUserModel[0]));
     }
 }

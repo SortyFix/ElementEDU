@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {map, Observable, OperatorFunction} from "rxjs";
+import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {CourseModel} from "./course-model";
 import {AbstractSimpleCourseService} from "./abstract-simple-course-service";
 import {GenericCourseCreateModel} from "./course-create-model";
@@ -19,7 +19,35 @@ import {HttpClient} from "@angular/common/http";
 })
 export class CourseService extends AbstractSimpleCourseService<CourseModel, GenericCourseCreateModel> {
 
-    constructor(http: HttpClient) { super(http); }
+    private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
+    private _fetchedAdmin: boolean = false;
+
+    public constructor(http: HttpClient) { super(http); }
+
+    private get fetchAdminCourses(): Observable<CourseModel[]> {
+        const url: string = `${this.BACKEND_URL}/course/get/all`;
+        return this.http.get<any[]>(url, { withCredentials: true }).pipe(
+            this.translate, tap((response: CourseModel[]): void =>
+            {
+                this._allSubject.next(response);
+                console.log("feteched stuff")
+                this._fetchedAdmin = true;
+            })
+        );
+    }
+
+    public get fetchedAdmin(): boolean
+    {
+        return this._fetchedAdmin;
+    }
+
+    public get adminCourses$(): Observable<CourseModel[]> {
+        if(!this.fetchedAdmin)
+        {
+            this.fetchAdminCourses.subscribe();
+        }
+        return this._allSubject.asObservable();
+    }
 
     /**
      * Fetches the list of {@link ReducedUserModel} from a specific {@link CourseModel}.
@@ -67,8 +95,8 @@ export class CourseService extends AbstractSimpleCourseService<CourseModel, Gene
         return courses.find((course: CourseModel): boolean => course.id === id);
     }
 
-    protected override get fetchAllValues(): Observable<CourseModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/get/all`;
+    protected override get fetchAllValues(): Observable<any[]> {
+        const url: string = `${this.BACKEND_URL}/course/get/courses`;
         return this.http.get<any[]>(url, { withCredentials: true });
     }
 

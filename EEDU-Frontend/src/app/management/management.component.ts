@@ -1,12 +1,21 @@
 import {Component, OnInit} from '@angular/core';
-import {UserListComponent} from "../user/user-list/user-list.component";
 import { UserModel } from '../user/user-model';
 import {UserService} from "../user/user.service";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {RoomListComponent} from "./list/room-list.component";
+import {SubjectListComponent} from "./list/subject-list.component";
+import {ClassRoomListComponent} from "./list/class-room-list.component";
+import {CourseListComponent} from "./list/course-list.component";
 
 @Component({
     selector: 'app-management',
     imports: [
-        UserListComponent
+        MatTab,
+        MatTabGroup,
+        RoomListComponent,
+        SubjectListComponent,
+        ClassRoomListComponent,
+        CourseListComponent,
     ],
     templateUrl: './management.component.html',
     standalone: true,

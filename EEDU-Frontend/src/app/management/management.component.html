@@ -8,4 +8,9 @@
     Manage other users here. Reassign them to new groups, manage their authorities, <br>
     assign them a different status or delete their account.
 </p>
-<app-user-list [userList]="userList" class="list"></app-user-list>
+<mat-tab-group>
+    <mat-tab label="Courses"><app-course-list></app-course-list></mat-tab>
+    <mat-tab label="Classes"><app-class-room-list></app-class-room-list></mat-tab>
+    <mat-tab label="Rooms"><app-room-list></app-room-list></mat-tab>
+    <mat-tab label="Subjects"><app-subject-list></app-subject-list></mat-tab>
+</mat-tab-group>
