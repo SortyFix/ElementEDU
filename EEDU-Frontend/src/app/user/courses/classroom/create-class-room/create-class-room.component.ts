@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {AbstractCreateComponent} from "../../abstract-create-component";
+import {AbstractCourseComponentsCreate} from "../../abstract-course-components-create";
 import {ClassRoomModel} from "../class-room-model";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
@@ -35,23 +35,20 @@ import {CourseModel} from "../../course-model";
     templateUrl: './create-class-room.component.html',
     styleUrl: './create-class-room.component.scss'
 })
-export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomModel> {
+export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
-    private readonly _users: ReducedUserModel[] = [];
-    private readonly _courses: CourseModel[] = [];
+    private _users: ReducedUserModel[] = [];
+    private _courses: CourseModel[] = [];
 
-    constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, courseService: CourseService) {
+    constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder);
 
-        userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => {
-            this._users.length = 0;
-            this._users.push(...user);
-        });
+        userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => { this._users = user; });
+        this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
+    }
 
-        courseService.value$.subscribe((course: CourseModel[]): void => {
-            this._courses.length = 0;
-            this._courses.push(...course);
-        });
+    protected override get loading(): boolean {
+        return super.loading && this._courseService.fetchedAdmin;
     }
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {
@@ -63,21 +60,16 @@ export class CreateClassRoomComponent extends AbstractCreateComponent<ClassRoomM
         });
     }
 
-    protected override get createModel(): any[] {
+    protected override get createModel(): ClassRoomCreateModel[]
+    {
         return [ClassRoomCreateModel.fromObject(this.form.value)];
     }
 
-    protected get teacher(): ReducedUserModel[] {
-        return this.getUsers(AccountType.TEACHER);
-    }
+    protected get teacher(): ReducedUserModel[] { return this.getUsers(AccountType.TEACHER); }
 
-    protected get students(): ReducedUserModel[] {
-        return this.getUsers(AccountType.STUDENT);
-    }
+    protected get students(): ReducedUserModel[] { return this.getUsers(AccountType.STUDENT); }
 
-    protected get courses(): CourseModel[] {
-        return this._courses;
-    }
+    protected get courses(): CourseModel[] { return this._courses; }
 
     private getUsers(accountType: AccountType): ReducedUserModel[] {
         return this._users.filter((user: ReducedUserModel): boolean => user.accountType === accountType);

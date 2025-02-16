@@ -7,7 +7,7 @@ import {MatInput} from "@angular/material/input";
 import {SubjectModel} from "../subject/subject-model";
 import {SubjectService} from "../subject/subject.service";
 import {GeneralCreateComponent} from "../../../timetable/general-create-component/general-create.component";
-import {AbstractCreateComponent} from "../abstract-create-component";
+import {AbstractCourseComponentsCreate} from "../abstract-course-components-create";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {DialogRef} from "@angular/cdk/dialog";
@@ -32,7 +32,7 @@ import {SelectionInput} from "../../../common/selection-input/selection-input.co
   templateUrl: './create-course.component.html',
   styleUrl: './create-course.component.scss'
 })
-export class CreateCourseComponent extends AbstractCreateComponent<CourseModel> {
+export class CreateCourseComponent extends AbstractCourseComponentsCreate<CourseModel> {
 
     private readonly _subjects: SubjectModel[] = [];
 

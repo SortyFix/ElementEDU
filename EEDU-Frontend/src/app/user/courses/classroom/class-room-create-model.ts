@@ -5,7 +5,13 @@ export interface GenericClassRoomCreateModel {
     tutor?: { id: bigint },
 }
 
-export interface ClassRoomCreatePacket { name: string; students: bigint[]; courses: bigint[]; tutor?: bigint }
+export interface ClassRoomCreatePacket
+{
+    name: string;
+    students: number[];
+    courses: number[];
+    tutor?: number
+}
 
 export class ClassRoomCreateModel {
 
@@ -30,9 +36,9 @@ export class ClassRoomCreateModel {
     {
         return {
             name: this.name,
-            tutor: this.tutor,
-            students: this.students,
-            courses: this.courses
+            tutor: Number(this.tutor),
+            students: this.students.map((id: bigint): number => Number(id)),
+            courses: this.courses.map((id: bigint): number => Number(id)),
         }
     }
 

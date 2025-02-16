@@ -9,7 +9,7 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {SubjectModel} from "../subject-model";
 import {SubjectService} from "../subject.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
-import {AbstractCreateComponent} from "../../abstract-create-component";
+import {AbstractCourseComponentsCreate} from "../../abstract-course-components-create";
 
 @Component({
   selector: 'app-create-subject',
@@ -28,7 +28,7 @@ import {AbstractCreateComponent} from "../../abstract-create-component";
   templateUrl: './create-subject.component.html',
   styleUrl: './create-subject.component.scss'
 })
-export class CreateSubjectComponent extends AbstractCreateComponent<SubjectModel> {
+export class CreateSubjectComponent extends AbstractCourseComponentsCreate<SubjectModel> {
     public constructor(subjectService: SubjectService, dialogRef: DialogRef, formBuilder: FormBuilder) {
         super(subjectService, dialogRef, formBuilder);
     }

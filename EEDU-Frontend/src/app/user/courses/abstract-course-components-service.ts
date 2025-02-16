@@ -2,7 +2,7 @@ import {environment} from "../../../environment/environment";
 import {BehaviorSubject, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
-export abstract class AbstractSimpleCourseService<T, C> {
+export abstract class AbstractCourseComponentsService<T, C> {
     protected readonly BACKEND_URL: string = environment.backendUrl;
     private readonly _subject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
     private _fetched: boolean = false
@@ -21,10 +21,12 @@ export abstract class AbstractSimpleCourseService<T, C> {
 
     protected abstract get translate(): OperatorFunction<any[], T[]>
 
-    protected abstract createValue(createModels: C[]): Observable<T[]>;
+    protected abstract createValue(createModels: C[]): Observable<any[]>;
 
     public create(models: C[]): Observable<T[]> {
-        return this.createValue(models).pipe(tap((response: T[]): void => this._subject.next([...this.value, ...response])));
+        return this.createValue(models).pipe(
+            tap((response: T[]): void => this._subject.next([...this.value, ...response]))
+        );
     }
 
     public update(): void

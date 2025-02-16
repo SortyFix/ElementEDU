@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {map, Observable, OperatorFunction} from "rxjs";
 import {RoomModel} from "./room-model";
-import {AbstractSimpleCourseService} from "../abstract-simple-course-service";
+import {AbstractCourseComponentsService} from "../abstract-course-components-service";
 
 @Injectable({
     providedIn: 'root'
 })
-export class RoomService extends AbstractSimpleCourseService<RoomModel, { name: string[] }> {
+export class RoomService extends AbstractCourseComponentsService<RoomModel, { name: string }> {
 
     constructor(http: HttpClient) { super(http); }
 
-    protected createValue(createModels: { name: string[] }[]): Observable<RoomModel[]>
+    protected createValue(createModels: { name: string }[]): Observable<RoomModel[]>
     {
         return this.http.post<any[]>(`${this.BACKEND_URL}/course/room/create`, createModels, { withCredentials: true });
     }

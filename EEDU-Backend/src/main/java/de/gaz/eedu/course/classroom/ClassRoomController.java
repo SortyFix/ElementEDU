@@ -73,7 +73,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return classRoom.detachStudents(getService(), users) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
-    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
     {
         return super.create(model);

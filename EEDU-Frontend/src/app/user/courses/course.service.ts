@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {CourseModel} from "./course-model";
-import {AbstractSimpleCourseService} from "./abstract-simple-course-service";
+import {AbstractCourseComponentsService} from "./abstract-course-components-service";
 import {GenericCourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
@@ -9,7 +9,7 @@ import {HttpClient} from "@angular/common/http";
 /**
  * Service for managing {@link CourseModel} instances.
  *
- * This service extends {@link AbstractSimpleCourseService} to provide functionalities
+ * This service extends {@link AbstractCourseComponentsService} to provide functionalities
  * for handling courses, including retrieval and creation operations.
  *
  * @author Ivo Quiring
@@ -17,7 +17,7 @@ import {HttpClient} from "@angular/common/http";
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService extends AbstractSimpleCourseService<CourseModel, GenericCourseCreateModel> {
+export class CourseService extends AbstractCourseComponentsService<CourseModel, GenericCourseCreateModel> {
 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
     private _fetchedAdmin: boolean = false;

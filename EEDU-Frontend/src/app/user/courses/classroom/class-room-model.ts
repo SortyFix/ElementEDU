@@ -20,7 +20,7 @@ export class ClassRoomModel {
 
     public static fromObject(obj: GenericClassRoomModel): ClassRoomModel
     {
-        return new ClassRoomModel(obj.id, obj.name, obj.users, obj.courses);
+        return new ClassRoomModel(obj.id, obj.name, obj.users || [], obj.courses || []);
     }
 
     public get id(): bigint {
