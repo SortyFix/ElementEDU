@@ -94,7 +94,8 @@ import java.util.Set;
 
             for(MultipartFile file : batch)
             {
-                Path path = Path.of(getFilePath(subdirectory), file.getName());
+                String fileName = Objects.requireNonNullElse(file.getOriginalFilename(), file.getName());
+                Path path = Path.of(getFilePath(subdirectory), fileName);
                 if (virusCheck(file.getInputStream()))
                 {
                     file.transferTo(path);
