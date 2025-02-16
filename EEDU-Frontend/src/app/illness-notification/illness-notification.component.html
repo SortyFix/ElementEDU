@@ -13,6 +13,10 @@
                 <textarea matInput class="reason-textarea" [(ngModel)]="reason"></textarea>
             </mat-form-field>
 
+            <app-file-upload>
+
+            </app-file-upload>
+
             <div class="file-upload-container">
                 <input type="file" id="fileInput" hidden (change)="onFileSelected($event)">
                 <label for="fileInput" class="file-upload-label">

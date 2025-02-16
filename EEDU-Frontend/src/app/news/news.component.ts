@@ -2,7 +2,7 @@ import {Component, ElementRef, Injectable, OnInit, ViewChild} from '@angular/cor
 import {HttpClient} from "@angular/common/http";
 import {PostModel} from "./post-model";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NewsService} from "./news.service";
 import {MatIcon} from "@angular/material/icon";
@@ -22,7 +22,8 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
         MatIcon,
         MatFabButton,
         NgIf,
-        MatPaginator
+        MatPaginator,
+        NgOptimizedImage
     ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss'
@@ -31,6 +32,8 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
     providedIn: 'root', // Default dependency injection for the whole app
 })
 export class NewsComponent implements OnInit {
+
+    protected loading: boolean = true;
     pageIndex: number = 0;
 
     constructor(public http: HttpClient,
@@ -66,6 +69,7 @@ export class NewsComponent implements OnInit {
                     this.openArticle(BigInt(+params['id']));
                 }
             });
+            this.loading = false;
         });
     }
 
