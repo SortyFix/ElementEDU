@@ -13,8 +13,9 @@ import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {IllnessNotificationModel} from "./model/illness-notification-model";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {IllnessNotificationStatus} from "./illness-notification-status";
+import {FileUploadComponent} from "../common/file-upload/file-upload.component";
 
 @Component({
   selector: 'app-illness-notification',
@@ -33,7 +34,8 @@ import {IllnessNotificationStatus} from "./illness-notification-status";
         MatSuffix,
         NgIf,
         FormsModule,
-        NgForOf
+        NgForOf,
+        FileUploadComponent
     ],
   templateUrl: './illness-notification.component.html',
   styleUrl: './illness-notification.component.scss'
@@ -56,17 +58,14 @@ export class IllnessNotificationComponent implements OnInit {
         })
     }
 
-    onFileSelected(event$: Event): void {
-        const input = event$.target as HTMLInputElement;
-        if(input.files && input.files.length > 0) {
-            this.selectedFile = input.files[0];
-        }
-    }
-
     getOwnSickNotes(): Observable<IllnessNotificationModel[]> {
         return this.http.get<IllnessNotificationModel[]>(`${this.prefix}/my-notifications`, {
             withCredentials: true
         });
+    }
+
+    onFilesSelected(files: FileList): void {
+        this.selectedFile = files.item(0);
     }
 
     getAppropriateIcon(status: IllnessNotificationStatus): 'check_circle' | 'schedule' | 'cancel' | 'dangerous'
@@ -88,12 +87,12 @@ export class IllnessNotificationComponent implements OnInit {
         return date.toLocaleDateString("en-GB", { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
-    setDate(event: MatDatepickerInputEvent<Date>)
+    setDate(event: MatDatepickerInputEvent<Date>): void
     {
         this.until = event.value;
     }
 
-    onRequestSent() {
+    onRequestSent(): Subscription | undefined {
         console.log(this.until);
         if (!this.until)
         {
@@ -109,6 +108,7 @@ export class IllnessNotificationComponent implements OnInit {
 
         if(!this.selectedFile)
         {
+            console.log("No file selected.");
             return;
         }
 
