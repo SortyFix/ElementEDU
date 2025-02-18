@@ -99,7 +99,8 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
                 AccountType.STUDENT,
                 UserStatus.PRESENT,
                 new GroupModel[0],
-                themeModel
+                themeModel,
+                null
         );
 
         return Eval.eval(createModel, expected, (request, expect, result) -> {

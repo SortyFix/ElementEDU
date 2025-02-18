@@ -26,6 +26,13 @@ export enum SelectionType
     NONE
 }
 
+export interface ListItemInfo<T>
+{
+    title: (value: T) => string;
+    icon?: (value: T) => string;
+    chips?: (value: T) => string[];
+}
+
 @Component({
   selector: 'list',
     imports: [
@@ -55,9 +62,8 @@ export enum SelectionType
 })
 export class AbstractList<T> {
 
-    public readonly title: InputSignal<(value: T) => string> = input<(value: T) => string>((): string => "title");
-    public readonly icon: InputSignal<((value: T) => string) | undefined> = input<((value: T) => string) | undefined>(undefined);
-    public readonly chips: InputSignal<((value: T) => string[]) | undefined> = input<((value: T) => string[]) | undefined>(undefined);
+    public readonly itemInfo: InputSignal<ListItemInfo<T> | undefined> = input<ListItemInfo<T>>();
+
     public readonly filter: InputSignal<((input: string, values: readonly T[]) => readonly T[])> = input<((input: string, values: readonly T[]) => readonly T[])>((): readonly T[] => this.values());
     public readonly values: InputSignal<readonly T[]> = input<readonly T[]>([]);
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
@@ -66,6 +72,11 @@ export class AbstractList<T> {
 
     private readonly _selected: Set<T> = new Set<T>();
     protected filteredString: string = '';
+    private _selectionMode: boolean = false;
+
+    protected get selectionMode(): boolean {
+        return this._selectionMode;
+    }
 
     protected handleKeyDown(event: KeyboardEvent, value: T): void {
         // noinspection FallThroughInSwitchStatementJS
@@ -82,30 +93,15 @@ export class AbstractList<T> {
         }
     }
 
-    protected get hasIcon(): boolean
-    {
-        return !!this.icon();
-    }
+    protected loadTitle(value: T): string { return this.itemInfo()!.title(value); }
 
-    protected loadIcon(value: T): string
-    {
-        return this.icon()!(value);
-    }
+    protected get hasIcon(): boolean { return !!this.itemInfo()!.icon; }
 
-    protected get hasChips(): boolean
-    {
-        return !!this.icon();
-    }
+    protected loadIcon(value: T): string { return this.itemInfo()!.icon!(value); }
 
-    protected loadChips(value: T): string[]
-    {
-        return this.chips()!(value);
-    }
+    protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
 
-    protected loadTitle(value: T): string
-    {
-        return this.title()!(value);
-    }
+    protected loadChips(value: T): string[] { return this.itemInfo()!.chips!(value); }
 
     protected get partiallySelected(): boolean {
         return this.selected.size > 0 && !this.isSelected('all');
@@ -146,6 +142,10 @@ export class AbstractList<T> {
         if(this.isSelected(value))
         {
             this._selected.delete(value);
+            if(this._selected.size == 0)
+            {
+                this._selectionMode = false;
+            }
             return;
         }
         this._selected.add(value);
@@ -161,4 +161,13 @@ export class AbstractList<T> {
     }
 
     protected readonly SelectionType: typeof SelectionType = SelectionType;
+
+    protected firstSelect(value: T): void {
+        if(this.selectionType() === SelectionType.MULTIPLE)
+        {
+            this._selectionMode = true;
+        }
+
+        return this.toggle(value);
+    }
 }

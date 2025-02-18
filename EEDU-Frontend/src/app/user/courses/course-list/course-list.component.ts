@@ -6,9 +6,9 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateCourseComponent} from "../create-course/create-course.component";
-import {AbstractCourseComponentList} from "../abstract-course-components/abstract-course-component-list";
 import {NgIf} from "@angular/common";
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {AbstractCourseComponentList} from "../abstract-course-components/list/abstract-course-component-list";
 
 @Component({
     selector: 'app-course-list',
@@ -20,29 +20,30 @@ import {MatProgressBar} from "@angular/material/progress-bar";
         MatIcon,
         NgIf,
     ],
-    templateUrl: '../abstract-course-components/abstract-course-components-list.html',
-    styleUrl: '../abstract-course-components/abstract-course-components-list.scss'
+    templateUrl: '../abstract-course-components/list/abstract-course-components-list.html',
+    styleUrl: '../abstract-course-components/list/abstract-course-components-list.scss'
 })
 export class CourseListComponent extends AbstractCourseComponentList<CourseModel> {
 
-    public constructor(service: CourseService, dialog: MatDialog) { super(service, dialog, CreateCourseComponent); }
-
-    protected override subscribe(): void {
-        (super.service as CourseService).adminCourses$.subscribe(
-            (values: CourseModel[]): void => { this.values = values; }
-        );
+    public constructor(service: CourseService, dialog: MatDialog)
+    {
+        super(service, dialog, CreateCourseComponent, {
+            title: (value: CourseModel): string => value.name,
+            chips: (value: CourseModel): string[] => [
+                value.subject.name,
+                `${value.appointmentEntries.length} Appointments`,
+                `${value.frequentAppointments.length} Frequent Appointments`
+            ]
+        });
     }
 
-    protected override get loaded(): boolean { return (super.service as CourseService).fetchedAdmin; }
+    protected override get loaded(): boolean
+    {
+        return (super.service as CourseService).fetchedAdmin;
+    }
 
-    protected override title(course: CourseModel): string { return course.name; }
-
-    protected override icon(course: CourseModel): string { return 'book_5'; }
-
-    protected override chips(course: CourseModel): string[] {
-        return [
-            course.subject.name,
-            `${course.appointmentEntries.length} Appointments and ${course.frequentAppointments.length} Frequent Appointments`
-        ];
+    protected override subscribe(): void {
+        const courseService: CourseService = super.service as CourseService;
+        courseService.adminCourses$.subscribe((values: CourseModel[]): void => { this.values = values; });
     }
 }

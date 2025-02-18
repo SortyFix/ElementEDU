@@ -9,11 +9,11 @@ import {MatInput} from "@angular/material/input";
 import {RoomService} from "../room.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {RoomModel} from "../room-model";
-import {
-    AbstractCourseComponentsCreateMultiple
-} from "../../abstract-course-components/abstract-course-components-create-multiple";
 import {MatChipGrid, MatChipInput, MatChipRemove, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
+import {
+    AbstractCourseComponentsCreateMultiple
+} from "../../abstract-course-components/create/abstract-course-components-create-multiple";
 
 @Component({
   selector: 'app-create-room',
@@ -34,7 +34,7 @@ import {MatIcon} from "@angular/material/icon";
         MatChipInput,
         MatChipRemove
     ],
-  templateUrl: '../../abstract-course-components/abstract-course-components-create-multiple.html',
+  templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
 })
 export class CreateRoomComponent extends AbstractCourseComponentsCreateMultiple<RoomModel> {
 

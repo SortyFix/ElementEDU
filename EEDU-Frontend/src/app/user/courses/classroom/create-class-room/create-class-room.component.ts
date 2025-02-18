@@ -10,13 +10,15 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {DialogRef} from "@angular/cdk/dialog";
 import {ClassRoomService} from "../class-room.service";
 import {UserService} from "../../../user.service";
-import {ReducedUserModel} from "../../../reduced-user-model";
 import {AccountType} from "../../../account-type";
 import {CourseService} from "../../course.service";
 import {ClassRoomCreateModel} from "../class-room-create-model";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 import {CourseModel} from "../../course-model";
-import {AbstractCourseComponentsCreate} from "../../abstract-course-components/abstract-course-components-create";
+import {
+    AbstractCourseComponentsCreate
+} from "../../abstract-course-components/create/abstract-course-components-create";
+import {UserModel} from "../../../user-model";
 
 @Component({
     selector: 'app-create-class-room',
@@ -36,13 +38,13 @@ import {AbstractCourseComponentsCreate} from "../../abstract-course-components/a
 })
 export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
-    private _users: ReducedUserModel[] = [];
+    private _users: UserModel[] = [];
     private _courses: CourseModel[] = [];
 
     constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder, "Create Class Room");
 
-        userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => { this._users = user; });
+        userService.fetchAll.subscribe((user: UserModel[]): void => { this._users = user; });
         this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
     }
 
@@ -64,13 +66,19 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
         return [ClassRoomCreateModel.fromObject(this.form.value)];
     }
 
-    protected get teacher(): ReducedUserModel[] { return this.getUsers(AccountType.TEACHER); }
+    protected get teacher(): UserModel[]
+    {
+        return this.getUsers(AccountType.TEACHER);
+    }
 
-    protected get students(): ReducedUserModel[] { return this.getUsers(AccountType.STUDENT); }
+    protected get students(): UserModel[]
+    {
+        return this.getUsers(AccountType.STUDENT);
+    }
 
     protected get courses(): CourseModel[] { return this._courses; }
 
-    private getUsers(accountType: AccountType): ReducedUserModel[] {
-        return this._users.filter((user: ReducedUserModel): boolean => user.accountType === accountType);
+    private getUsers(accountType: AccountType): UserModel[] {
+        return this._users.filter((user: UserModel): boolean => user.accountType === accountType && !user.classroom);
     }
 }

@@ -1,9 +1,7 @@
 import {Component} from '@angular/core';
 import {UserModel} from "../../user-model";
 import {UserService} from "../../user.service";
-import {
-    AbstractList, SelectionType
-} from "../../../common/abstract-list/abstract-list.component";
+import {AbstractList, ListItemInfo, SelectionType} from "../../../common/abstract-list/abstract-list.component";
 import {AccountType} from "../../account-type";
 
 @Component({
@@ -30,25 +28,19 @@ export class FullUserListComponent
         })
     }
 
-    public get chips(): ((value: UserModel) => string[]) {
-        return (value: UserModel): string[] =>
-        {
-            return [value.accountType, `${value.lastName}, ${value.firstName}`];
+    protected get listData(): ListItemInfo<UserModel> {
+        return {
+            title: (value: UserModel): string => value.loginName,
+            chips: (value: UserModel): string[] => [value.accountType, `${value.lastName}, ${value.firstName}`],
+            icon: (value: UserModel): string => {
+                switch (value.accountType) {
+                    case AccountType.ADMINISTRATOR: return 'manage_accounts';
+                    case AccountType.TEACHER: return 'how_to_reg';
+                    default: return 'person';
+                }
+            }
         }
     }
 
-    public get icon(): ((value: UserModel) => string) {
-        return (value: UserModel): string => {
-            switch (value.accountType)
-            {
-                case AccountType.ADMINISTRATOR: return 'manage_accounts';
-                case AccountType.TEACHER: return 'how_to_reg';
-                default: return 'person';
-            }
-        };
-    }
-
     public get values(): UserModel[] { return this._users; }
-
-    public title(value: UserModel): string { return value.loginName; }
 }

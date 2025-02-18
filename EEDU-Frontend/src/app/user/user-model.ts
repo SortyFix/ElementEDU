@@ -1,6 +1,7 @@
 import {ThemeModel} from "../theming/theme-model";
 import {GenericGroupModel, GroupModel} from "./group/group-model";
 import {AccountType} from "./account-type";
+import {ClassRoomModel, GenericClassRoomModel} from "./courses/classroom/class-room-model";
 
 export enum UserStatus {PRESENT = "PRESENT", EXCUSED = "EXCUSED", UNEXCUSED = "UNEXCUSED", PROSPECTIVE = "PROSPECTIVE" }
 
@@ -13,6 +14,7 @@ export interface GenericUserModel {
     status: string
     groups: GenericGroupModel[],
     theme: any,
+    classroom?: GenericClassRoomModel
 }
 
 export class UserModel
@@ -25,7 +27,8 @@ export class UserModel
         private readonly _accountType: AccountType,
         private readonly _status: UserStatus,
         private readonly _groups: GroupModel[],
-        private readonly _theme: ThemeModel
+        private readonly _theme: ThemeModel,
+        private readonly _classroom?: ClassRoomModel
     ) {}
 
     public static fromObject(object: GenericUserModel): UserModel
@@ -40,7 +43,8 @@ export class UserModel
             AccountType[object.accountType as keyof typeof AccountType],
             UserStatus[object.status as keyof typeof UserStatus],
             groupModel,
-            themeModel
+            themeModel,
+            !!object.classroom ? ClassRoomModel.fromObject(object.classroom) : undefined,
         );
     }
 
@@ -65,6 +69,10 @@ export class UserModel
         return this._lastName;
     }
 
+    public get name(): string {
+        return `${this.lastName}, ${this.firstName}`;
+    }
+
     public get loginName(): string {
         return this._loginName;
     }
@@ -83,5 +91,9 @@ export class UserModel
 
     public get theme(): ThemeModel {
         return this._theme;
+    }
+
+    public get classroom(): ClassRoomModel | undefined {
+        return this._classroom;
     }
 }

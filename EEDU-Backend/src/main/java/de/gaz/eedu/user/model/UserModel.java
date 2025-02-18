@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.model;
 
+import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
@@ -10,6 +11,7 @@ import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.theming.ThemeModel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -39,7 +41,8 @@ public record UserModel(
         @NotNull AccountType accountType,
         @NotNull UserStatus status,
         @NotNull GroupModel[] groups,
-        @NotNull ThemeModel theme) implements EntityModel
+        @NotNull ThemeModel theme,
+        @Nullable ClassRoomModel classroom) implements EntityModel
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()
@@ -53,6 +56,7 @@ public record UserModel(
                 ", status=" + status +
                 ", groups=" + Arrays.toString(groups) +
                 ", theme=" + theme +
+                ", classroom=" + classroom +
                 '}';
     }
 

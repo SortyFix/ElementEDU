@@ -1,7 +1,7 @@
-import {AbstractCourseComponentsService} from "./abstract-course-components-service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
-import {SelectionType} from "../../../common/abstract-list/abstract-list.component";
+import {ListItemInfo, SelectionType} from "../../../../common/abstract-list/abstract-list.component";
+import {AbstractCourseComponentsService} from "../abstract-course-components-service";
 
 export abstract class AbstractCourseComponentList<T extends { id: number | bigint }> {
 
@@ -12,12 +12,24 @@ export abstract class AbstractCourseComponentList<T extends { id: number | bigin
     protected constructor(
         private readonly _service: AbstractCourseComponentsService<T, any>,
         private readonly _dialog: MatDialog,
-        private readonly _componentType: ComponentType<any>)
+        private readonly _componentType: ComponentType<any>,
+        private readonly _listData: ListItemInfo<T>)
     {
+
+        if(!this._listData.icon)
+        {
+            this._listData.icon = (): string => _service.icon;
+        }
+
         this.subscribe();
     }
 
     protected openDialog(): MatDialogRef<any>
+    {
+        return this._dialog.open(this._componentType, { width: '600px', disableClose: true });
+    }
+
+    protected openDeleteDialog(): MatDialogRef<any>
     {
         return this._dialog.open(this._componentType, { width: '600px', disableClose: true });
     }
@@ -49,8 +61,7 @@ export abstract class AbstractCourseComponentList<T extends { id: number | bigin
         return this._service;
     }
 
-    protected abstract title(value: T): string;
-
-    protected icon(value: T): string { return ''; }
-    protected chips(value: T): string[] { return []; }
+    protected get itemInfo(): ListItemInfo<T> {
+        return this._listData;
+    }
 }

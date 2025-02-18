@@ -68,9 +68,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
 
         // safe external managed relations
         getUserRepository().saveAllEntities(entities.stream().flatMap(this::getUsers).toList());
-        getCourseService().saveEntity(
-                entities.stream().flatMap(clazz -> clazz.getCourses().stream()).toList()
-        );
+        getCourseService().saveEntity(entities.stream().flatMap(clazz -> clazz.getCourses().stream()).toList());
 
         return entities;
     }
@@ -101,6 +99,7 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
             ClassRoomEntity classRoomEntity = new ClassRoomEntity(courses, users);
             tutor.setClassRoom(classRoomEntity);
             fetchedUsers.forEach(userEntity -> userEntity.setClassRoom(classRoomEntity));
+            courses.forEach(course -> course.linkClassRoom(classRoomEntity));
             return current.toEntity(classRoomEntity);
         };
     }

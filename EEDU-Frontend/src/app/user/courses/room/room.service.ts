@@ -3,13 +3,14 @@ import {HttpClient} from "@angular/common/http";
 import {map, Observable, OperatorFunction} from "rxjs";
 import {RoomModel} from "./room-model";
 import {AbstractCourseComponentsService} from "../abstract-course-components/abstract-course-components-service";
+import {icons} from "../../../../environment/styles";
 
 @Injectable({
     providedIn: 'root'
 })
 export class RoomService extends AbstractCourseComponentsService<RoomModel, { name: string }> {
 
-    constructor(http: HttpClient) { super(http); }
+    public constructor(http: HttpClient) { super(http, icons.room); }
 
     protected createValue(createModels: { name: string }[]): Observable<RoomModel[]>
     {

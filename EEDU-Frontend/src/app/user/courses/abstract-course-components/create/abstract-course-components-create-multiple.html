@@ -3,7 +3,7 @@
         <mat-card-content>
 
             <mat-form-field appearance="outline">
-                <mat-label>Subject Name</mat-label>
+                <mat-label>Name</mat-label>
                 <mat-chip-grid #reactiveChipGrid aria-label="Enter reactive form keywords" formControlName="name">
                     @for (keyword of chips(); track keyword) {
                         <mat-chip-row (removed)="remove(keyword)">

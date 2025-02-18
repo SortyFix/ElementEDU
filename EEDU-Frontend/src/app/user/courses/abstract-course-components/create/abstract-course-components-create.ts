@@ -1,6 +1,6 @@
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AbstractCourseComponentsService} from "./abstract-course-components-service";
 import {DialogRef} from "@angular/cdk/dialog";
+import {AbstractCourseComponentsService} from "../abstract-course-components-service";
 
 export abstract class AbstractCourseComponentsCreate<T> {
 

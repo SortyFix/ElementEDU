@@ -3,8 +3,17 @@
     align-items: center;
 }
 
-.list-accordion .mat-mdc-form-field + .mat-mdc-form-field {
+.list-accordion .mat-mdc-form-field + .mat-mdc-form-field mat-icon {
     margin-left: 8px;
+}
+
+mat-expansion-panel .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-color {
+    color: var(--text-color);
 }
 
 .title
@@ -15,15 +24,4 @@
 .icon
 {
     margin-right: 3px;
-}
-
-.selectable
-{
-    user-select: none;
-
-    &:hover
-    {
-        cursor: pointer;
-        font-weight: bold;
-    }
 }

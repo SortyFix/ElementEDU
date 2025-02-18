@@ -4,13 +4,14 @@ import {map, Observable, OperatorFunction} from 'rxjs';
 import {ClassRoomCreateModel, ClassRoomCreatePacket} from "./class-room-create-model";
 import {HttpClient} from "@angular/common/http";
 import {AbstractCourseComponentsService} from "../abstract-course-components/abstract-course-components-service";
+import {icons} from "../../../../environment/styles";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClassRoomService extends AbstractCourseComponentsService<ClassRoomModel, ClassRoomCreateModel> {
 
-    public constructor(http: HttpClient) { super(http); }
+    public constructor(http: HttpClient) { super(http, icons.classroom); }
 
     protected override get fetchAllValues(): Observable<ClassRoomModel[]> {
         return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, {withCredentials: true});

@@ -8,11 +8,11 @@
         <button mat-flat-button (click)="openDialog()">Create first entry</button>
     </div>
 
-    <list *ngIf="loaded && values.length > 0"
-        [title]="title"
-        [icon]="icon"
-        [chips]="chips"
-        [values]="values" [height]="300"
+    <list
+        *ngIf="loaded && values.length > 0"
+        [itemInfo]="itemInfo"
+        [values]="values"
+        [height]="300"
         [selectionType]="SelectionType.MULTIPLE" #list>
         <div style="margin-left: auto">
             <button mat-icon-button *ngIf="list.currentSelected.length > 0" (click)="delete(list.currentSelected)">

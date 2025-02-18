@@ -12,7 +12,7 @@ import {CourseService} from "../course.service";
 import {DialogRef} from "@angular/cdk/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {SelectionInput} from "../../../common/selection-input/selection-input.component";
-import {AbstractCourseComponentsCreate} from "../abstract-course-components/abstract-course-components-create";
+import {AbstractCourseComponentsCreate} from "../abstract-course-components/create/abstract-course-components-create";
 
 @Component({
   selector: 'app-create-course',

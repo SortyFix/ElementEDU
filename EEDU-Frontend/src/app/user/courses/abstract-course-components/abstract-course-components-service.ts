@@ -3,11 +3,16 @@ import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environment/environment";
 
 export abstract class AbstractCourseComponentsService<T extends { id: number | bigint }, C> {
+
     protected readonly BACKEND_URL: string = environment.backendUrl;
     private readonly _subject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
     private _fetched: boolean = false
 
-    protected constructor(private readonly _http: HttpClient) {}
+    protected constructor(private readonly _http: HttpClient, private readonly _icon: string) {}
+
+    public get icon(): string {
+        return this._icon;
+    }
 
     protected abstract get fetchAllValues(): Observable<any[]>;
 
@@ -19,6 +24,11 @@ export abstract class AbstractCourseComponentsService<T extends { id: number | b
         }));
     }
 
+    public clearCache(): void
+    {
+        this._fetched = false;
+    }
+
     protected abstract get translate(): OperatorFunction<any[], T[]>
 
     protected abstract createValue(createModels: C[]): Observable<any[]>;
@@ -27,15 +37,20 @@ export abstract class AbstractCourseComponentsService<T extends { id: number | b
 
     public create(models: C[]): Observable<T[]> {
         return this.createValue(models).pipe(
-            tap((response: T[]): void => this._subject.next([...this.value, ...response]))
+            this.translate, tap((response: T[]): void => this._subject.next([...this.value, ...response]))
         );
     }
 
     public delete(id: (number | bigint)[]): Observable<void>
     {
         return this.deleteValue(id.map(((item: number | bigint): number => Number(item)))).pipe(map((): void => {
-            this.value$.next(this.value.filter(((value: T): boolean =>!id.includes(Number(value.id)))));
+            this.postDelete(id);
         }));
+    }
+
+    protected postDelete(id: (number | bigint)[]): void
+    {
+        this.value$.next(this.value.filter(((value: T): boolean =>!id.includes(Number(value.id)))));
     }
 
     public update(): void

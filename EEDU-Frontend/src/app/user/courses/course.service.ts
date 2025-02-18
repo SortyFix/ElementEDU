@@ -5,6 +5,7 @@ import {GenericCourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
 import {AbstractCourseComponentsService} from "./abstract-course-components/abstract-course-components-service";
+import {icons} from "../../../environment/styles";
 
 /**
  * Service for managing {@link CourseModel} instances.
@@ -22,7 +23,7 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
     private _fetchedAdmin: boolean = false;
-    public constructor(http: HttpClient) { super(http); }
+    public constructor(http: HttpClient) { super(http, icons.course); }
 
     private get fetchAdminCourses(): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/get/all`;
@@ -33,6 +34,11 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
                 this._fetchedAdmin = true;
             })
         );
+    }
+
+    public override clearCache() {
+        super.clearCache();
+        this._fetchedAdmin = false;
     }
 
     public get fetchedAdmin(): boolean

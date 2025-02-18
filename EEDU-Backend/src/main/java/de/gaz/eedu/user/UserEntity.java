@@ -116,7 +116,8 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 getAccountType(),
                 getStatus(),
                 groups,
-                getThemeEntity().toModel()
+                getThemeEntity().toModel(),
+                getClassRoom().map(ClassRoomEntity::toModel).orElse(null)
         );
     }
     
