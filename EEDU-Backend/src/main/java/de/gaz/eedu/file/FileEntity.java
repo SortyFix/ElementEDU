@@ -83,7 +83,6 @@ import java.util.Set;
      * </p>
      *
      * @param batch The batch to be uploaded.
-     * @return True if the upload is successful, false otherwise.
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */

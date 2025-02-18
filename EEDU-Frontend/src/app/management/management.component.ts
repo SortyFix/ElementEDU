@@ -1,4 +1,4 @@
-import {Component, OnInit, signal, WritableSignal} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UserListComponent} from "../user/user-list/user-list.component";
 import { UserModel } from '../user/user-model';
 import {UserService} from "../user/user.service";
