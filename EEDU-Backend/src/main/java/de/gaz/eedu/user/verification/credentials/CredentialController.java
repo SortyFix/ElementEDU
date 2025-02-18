@@ -10,7 +10,6 @@ import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreateModel;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,11 +51,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
 {
-    @Value("${development}") private final boolean development = false;
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
     @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or (@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and #id == authentication.principal))")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }

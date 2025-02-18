@@ -20,8 +20,8 @@ import {AbstractCourseComponentsService} from "./abstract-course-components/abst
 export class CourseService extends AbstractCourseComponentsService<CourseModel, GenericCourseCreateModel> {
 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
-    private _fetchedAdmin: boolean = false;
 
+    private _fetchedAdmin: boolean = false;
     public constructor(http: HttpClient) { super(http); }
 
     private get fetchAdminCourses(): Observable<CourseModel[]> {
@@ -102,6 +102,11 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
     protected override createValue(createModels: GenericCourseCreateModel[]): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/create`;
         return this.http.post<any[]>(url, createModels, { withCredentials: true });
+    }
+
+    protected override deleteValue(id: number[]): Observable<void> {
+        const url: string = `${this.BACKEND_URL}/course/delete/${id.toString()}`;
+        return this.http.delete<void>(url, { withCredentials: true });
     }
 
     protected override get translate(): OperatorFunction<any[], CourseModel[]> {

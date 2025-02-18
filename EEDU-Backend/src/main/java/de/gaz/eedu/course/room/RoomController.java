@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,12 @@ public class RoomController extends EntityController<RoomService, RoomModel, Roo
     public @NotNull ResponseEntity<RoomModel[]> create(@NotNull @RequestBody RoomCreateModel[] model) throws CreationException
     {
         return super.create(model);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    {
+        return super.delete(id);
     }
 
     @GetMapping("/get/all")

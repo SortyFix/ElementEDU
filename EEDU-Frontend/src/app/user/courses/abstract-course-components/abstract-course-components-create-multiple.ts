@@ -18,13 +18,16 @@ export class AbstractCourseComponentsCreateMultiple<T> extends AbstractCourseCom
 
     // inspired by https://material.angular.io/components/chips/overview#chips-reactive-form
 
-    protected add(event: MatChipInputEvent): void
-    {
+    protected add(event: MatChipInputEvent): void {
+
         const value: string = (event.value || '').trim();
 
-        if (value)
-        {
-            this.chips.update((keywords: string[]): string[] => [...keywords, value]);
+        if (value) {
+            this.chips.update((keywords: string[]): string[] => {
+                // deduplicate
+                const filteredKeywords: string[] = keywords.filter((keyword: string): boolean => keyword !== value);
+                return [...filteredKeywords, value];
+            });
         }
 
         event.chipInput!.clear();

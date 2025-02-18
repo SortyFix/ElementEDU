@@ -118,7 +118,7 @@ public class GroupController extends EntityController<GroupService, GroupModel, 
      * @return {@code true} if the group was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('GROUP_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @Override public @NotNull HttpStatus delete(@PathVariable @NotNull Long... id)
     {
         return super.delete(id);
     }

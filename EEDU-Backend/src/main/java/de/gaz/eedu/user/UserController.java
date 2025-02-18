@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -81,7 +82,7 @@ public class UserController extends EntityController<UserService, UserModel, Use
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @Override public @NotNull HttpStatus delete(@PathVariable @NotNull Long... id)
     {
         return super.delete(id);
     }

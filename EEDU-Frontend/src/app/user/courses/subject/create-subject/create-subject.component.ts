@@ -9,7 +9,7 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {SubjectModel} from "../subject-model";
 import {SubjectService} from "../subject.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
-import {MatChipGrid, MatChipInput, MatChipRow} from "@angular/material/chips";
+import {MatChipGrid, MatChipInput, MatChipRemove, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {
     AbstractCourseComponentsCreateMultiple
@@ -31,7 +31,8 @@ import {
         MatIcon,
         MatChipRow,
         MatChipGrid,
-        MatChipInput
+        MatChipInput,
+        MatChipRemove
     ],
   templateUrl: '../../abstract-course-components/abstract-course-components-create-multiple.html',
 })

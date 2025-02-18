@@ -10,7 +10,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.function.Function;
@@ -154,12 +156,23 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional public boolean delete(long id)
+    @Transactional public boolean delete(Long... id)
     {
-        return getRepository().findById(id).map(entry ->
+        Collection<E> entities = getRepository().findAllById(List.of(id));
+        if(entities.isEmpty())
         {
-            validate(entry.isDeletable(), unauthorizedThrowable());
+            return false;
+        }
 
+        List<E> systemEntities = entities.stream().filter(entity -> !entity.isDeletable()).toList();
+        if(!systemEntities.isEmpty())
+        {
+            String error = "The entities/entity " + systemEntities + " can not be deleted.";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, error);
+        }
+
+        for (E entry : entities)
+        {
             String entityName = entry.getClass().getSimpleName();
             log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
@@ -169,10 +182,11 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
 
             deleteRelations(entry);
 
-            getRepository().deleteById(id);
             log.info("The deletion process of the entity {} {} has been successfully executed.", entityName, id);
-            return true;
-        }).orElse(false);
+        }
+
+        getRepository().deleteAll(entities);
+        return true;
     }
 
     public void deleteRelations(@NotNull E entry) { }

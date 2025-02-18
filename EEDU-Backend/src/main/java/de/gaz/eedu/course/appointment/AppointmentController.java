@@ -97,7 +97,7 @@ public class AppointmentController extends EntityController<AppointmentService, 
 
     @DeleteMapping("/frequent/delete/{id}")
     @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @Override public @NotNull HttpStatus delete(@PathVariable @NotNull Long... id)
     {
         return super.delete(id);
     }

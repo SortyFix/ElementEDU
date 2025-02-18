@@ -1,8 +1,8 @@
-import {BehaviorSubject, Observable, OperatorFunction, tap} from "rxjs";
+import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environment/environment";
 
-export abstract class AbstractCourseComponentsService<T, C> {
+export abstract class AbstractCourseComponentsService<T extends { id: number | bigint }, C> {
     protected readonly BACKEND_URL: string = environment.backendUrl;
     private readonly _subject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
     private _fetched: boolean = false
@@ -23,10 +23,19 @@ export abstract class AbstractCourseComponentsService<T, C> {
 
     protected abstract createValue(createModels: C[]): Observable<any[]>;
 
+    protected abstract deleteValue(id: number[]): Observable<void>;
+
     public create(models: C[]): Observable<T[]> {
         return this.createValue(models).pipe(
             tap((response: T[]): void => this._subject.next([...this.value, ...response]))
         );
+    }
+
+    public delete(id: (number | bigint)[]): Observable<void>
+    {
+        return this.deleteValue(id.map(((item: number | bigint): number => Number(item)))).pipe(map((): void => {
+            this.value$.next(this.value.filter(((value: T): boolean =>!id.includes(Number(value.id)))));
+        }));
     }
 
     public update(): void

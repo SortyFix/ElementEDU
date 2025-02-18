@@ -55,7 +55,7 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
     }
 
     @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }

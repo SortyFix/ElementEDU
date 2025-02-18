@@ -48,7 +48,7 @@ export enum SelectionType
         FormsModule,
         MatInput,
         MatListItemIcon,
-        MatListItem
+        MatListItem,
     ],
   templateUrl: './abstract-list.component.html',
   styleUrl: './abstract-list.component.scss'
@@ -61,6 +61,8 @@ export class AbstractList<T> {
     public readonly filter: InputSignal<((input: string, values: readonly T[]) => readonly T[])> = input<((input: string, values: readonly T[]) => readonly T[])>((): readonly T[] => this.values());
     public readonly values: InputSignal<readonly T[]> = input<readonly T[]>([]);
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
+
+    public readonly height: InputSignal<number | undefined> = input<number | undefined>();
 
     private readonly _selected: Set<T> = new Set<T>();
     protected filteredString: string = '';

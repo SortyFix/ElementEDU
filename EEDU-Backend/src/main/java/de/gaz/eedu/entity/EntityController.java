@@ -3,7 +3,6 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -48,7 +48,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
         log.info("Received an incoming create request from class {}.", getClass().getSuperclass());
         try
         {
-            List<M> created = getService().create(Set.of(model));
+            List<M> created = getService().create(new HashSet<>(List.of(model)));
             M[] models = created.toArray((M[]) Array.newInstance(created.getFirst().getClass(), created.size()));
             return ResponseEntity.status(HttpStatus.CREATED).body(models);
         }
@@ -66,10 +66,10 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
-    public @NotNull Boolean delete(@NotNull Long id)
+    public @NotNull HttpStatus delete(@NotNull Long... id)
     {
-        log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getService().delete(id);
+        log.info("Received an incoming delete request from class {} with id(s) {}.", getClass().getSuperclass(), id);
+        return getService().delete(id) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**

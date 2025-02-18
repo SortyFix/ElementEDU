@@ -65,7 +65,13 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
         }
 
         List<ClassRoomEntity> entities = saveEntity(model.stream().map(classroomFactory()).toList());
+
+        // safe external managed relations
         getUserRepository().saveAllEntities(entities.stream().flatMap(this::getUsers).toList());
+        getCourseService().saveEntity(
+                entities.stream().flatMap(clazz -> clazz.getCourses().stream()).toList()
+        );
+
         return entities;
     }
 

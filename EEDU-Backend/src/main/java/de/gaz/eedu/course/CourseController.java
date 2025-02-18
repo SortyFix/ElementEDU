@@ -5,7 +5,6 @@ import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
-import de.gaz.eedu.user.model.UserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
-import java.util.stream.Stream;
 
 //TODO manage access. Yes, I'll do it later
 
@@ -54,7 +52,7 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return super.create(model);
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }

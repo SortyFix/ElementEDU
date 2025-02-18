@@ -10,7 +10,7 @@
 
 <div>
     <mat-list>
-        <div style="display: flex; justify-content: space-between">
+        <div style="display: flex">
             <mat-checkbox [checked]="isSelected('all')"
                           [indeterminate]="partiallySelected"
                           (change)="toggle('all')"
@@ -19,40 +19,40 @@
                 Select All
             </mat-checkbox>
 
-            <!-- I am aware that this might be sneaky. Some even might say it's considered dumb, but it works -->
-            <span *ngIf="filteredValues.length == 0"></span>
-
             <ng-content></ng-content>
         </div>
 
-        @for (value of filteredValues; track value) {
+        <div [style.height]="height() + 'px'" style="overflow: scroll;">
+            @for (value of filteredValues; track value) {
 
-            <mat-list-item [class]="selectionType() === SelectionType.SINGLE ? 'selectable' : null">
-                <div matListItemTitle style="width: 100%; display: flex; justify-content: space-between">
-                    <div>
-                        <mat-checkbox
-                            *ngIf="selectionType() === SelectionType.MULTIPLE"
-                            [checked]="isSelected(value)"
-                            (change)="toggle(value)"
-                            (click)="$event.stopPropagation()"
-                            (keydown)="handleKeyDown($event, value)">
-                        </mat-checkbox>
-                        <mat-icon matListItemIcon class="icon" *ngIf="icon()">
-                            {{ icon()!(value) }}
-                        </mat-icon>
-                        <a class="title">{{ title()!(value) }}</a>
-                    </div>
+                <mat-list-item [class]="selectionType() === SelectionType.SINGLE ? 'selectable' : null">
+                    <div matListItemTitle style="width: 100%; display: flex; justify-content: space-between">
+                        <div>
+                            <mat-checkbox
+                                *ngIf="selectionType() === SelectionType.MULTIPLE"
+                                [checked]="isSelected(value)"
+                                (change)="toggle(value)"
+                                (click)="$event.stopPropagation()"
+                                (keydown)="handleKeyDown($event, value)">
+                            </mat-checkbox>
+                            <mat-icon matListItemIcon class="icon" *ngIf="icon()">
+                                {{ icon()!(value) }}
+                            </mat-icon>
+                            <a class="title">{{ title()!(value) }}</a>
+                        </div>
 
-                    <div>
-                        <mat-chip-set *ngIf="chips()">
-                            @for (tag of chips()!(value); track tag) {
-                                <mat-chip>{{ tag }}</mat-chip>
-                            }
-                        </mat-chip-set>
+                        <div>
+                            <mat-chip-set *ngIf="chips()">
+                                @for (tag of chips()!(value); track tag) {
+                                    <mat-chip>{{ tag }}</mat-chip>
+                                }
+                            </mat-chip-set>
+                        </div>
                     </div>
-                </div>
-            </mat-list-item>
-        }
+                </mat-list-item>
+            }
+        </div>
+
     </mat-list>
 </div>
 

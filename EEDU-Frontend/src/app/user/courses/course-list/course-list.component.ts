@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {AbstractList} from "../../../common/abstract-list/abstract-list.component";
-import {ManagementLoadingBar} from "../../../management/management-loading-bar/management-loading-bar.component";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {MatButton, MatIconButton} from "@angular/material/button";
@@ -9,12 +8,13 @@ import {MatDialog} from "@angular/material/dialog";
 import {CreateCourseComponent} from "../create-course/create-course.component";
 import {AbstractCourseComponentList} from "../abstract-course-components/abstract-course-component-list";
 import {NgIf} from "@angular/common";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-course-list',
     imports: [
+        MatProgressBar,
         AbstractList,
-        ManagementLoadingBar,
         MatIconButton,
         MatButton,
         MatIcon,
@@ -37,7 +37,7 @@ export class CourseListComponent extends AbstractCourseComponentList<CourseModel
 
     protected override title(course: CourseModel): string { return course.name; }
 
-    protected override icon(course: CourseModel): string { return 'library_books'; }
+    protected override icon(course: CourseModel): string { return 'book_5'; }
 
     protected override chips(course: CourseModel): string[] {
         return [

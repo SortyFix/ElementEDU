@@ -7,6 +7,7 @@ import de.gaz.eedu.exception.CreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
     //@PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
     @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }

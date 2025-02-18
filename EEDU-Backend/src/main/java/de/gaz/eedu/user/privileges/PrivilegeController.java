@@ -67,7 +67,7 @@ public class PrivilegeController extends EntityController<PrivilegeService, Priv
      * @return {@code true} if the privilege was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('PRIVILEGE_DELETE')") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    public @NotNull HttpStatus delete(@PathVariable @NotNull Long... id)
     {
         return super.delete(id);
     }

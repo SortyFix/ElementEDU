@@ -19,6 +19,11 @@ export class SubjectService extends AbstractCourseComponentsService<SubjectModel
         return this.http.post<any[]>(`${this.BACKEND_URL}/course/subject/create`, models, { withCredentials: true });
     }
 
+    protected override deleteValue(id: number[]): Observable<void> {
+        const url: string = `${this.BACKEND_URL}/course/subject/delete/${id.toString()}`;
+        return this.http.delete<void>(url, { withCredentials: true });
+    }
+
     protected override get translate(): OperatorFunction<any[], SubjectModel[]> {
         return map((response: any[]): SubjectModel[] =>
             response.map((item: any): SubjectModel => SubjectModel.fromObject(item))

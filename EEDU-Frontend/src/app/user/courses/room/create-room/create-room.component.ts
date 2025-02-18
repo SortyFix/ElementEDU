@@ -12,7 +12,7 @@ import {RoomModel} from "../room-model";
 import {
     AbstractCourseComponentsCreateMultiple
 } from "../../abstract-course-components/abstract-course-components-create-multiple";
-import {MatChipGrid, MatChipInput, MatChipRow} from "@angular/material/chips";
+import {MatChipGrid, MatChipInput, MatChipRemove, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 
 @Component({
@@ -31,7 +31,8 @@ import {MatIcon} from "@angular/material/icon";
         MatChipGrid,
         MatChipRow,
         MatIcon,
-        MatChipInput
+        MatChipInput,
+        MatChipRemove
     ],
   templateUrl: '../../abstract-course-components/abstract-course-components-create-multiple.html',
 })

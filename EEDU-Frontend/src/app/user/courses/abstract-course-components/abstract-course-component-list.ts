@@ -3,7 +3,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {SelectionType} from "../../../common/abstract-list/abstract-list.component";
 
-export abstract class AbstractCourseComponentList<T> {
+export abstract class AbstractCourseComponentList<T extends { id: number | bigint }> {
 
     private _values: readonly T[] = [];
 
@@ -20,6 +20,11 @@ export abstract class AbstractCourseComponentList<T> {
     protected openDialog(): MatDialogRef<any>
     {
         return this._dialog.open(this._componentType, { width: '600px', disableClose: true });
+    }
+
+    protected delete(selectedValues: T[]): void
+    {
+        this._service.delete(selectedValues.map((value: T): number | bigint => value.id)).subscribe();
     }
 
     protected subscribe(): void

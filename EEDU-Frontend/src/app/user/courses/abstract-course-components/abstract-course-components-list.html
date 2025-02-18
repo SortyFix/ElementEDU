@@ -1,20 +1,26 @@
-<app-timetable-commons [loading]="!loaded" *ngIf="values.length > 0 || !loaded">
-    <list
+
+<div class="container">
+
+    <mat-progress-bar mode="indeterminate" *ngIf="!loaded"></mat-progress-bar>
+
+    <div class="empty-list-content" *ngIf="loaded && values.length == 0">
+        <mat-icon class="empty-list-icon">folder_open</mat-icon>
+        <button mat-flat-button (click)="openDialog()">Create first entry</button>
+    </div>
+
+    <list *ngIf="loaded && values.length > 0"
         [title]="title"
         [icon]="icon"
         [chips]="chips"
-        [values]="values"
-        [selectionType]="SelectionType.MULTIPLE">
-        <button mat-icon-button (click)="openDialog()">
-            <mat-icon>add</mat-icon>
-        </button>
+        [values]="values" [height]="300"
+        [selectionType]="SelectionType.MULTIPLE" #list>
+        <div style="margin-left: auto">
+            <button mat-icon-button *ngIf="list.currentSelected.length > 0" (click)="delete(list.currentSelected)">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openDialog()">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
     </list>
-</app-timetable-commons>
-
-<div class="empty-list-container" *ngIf="loaded && values.length == 0" >
-    <div class="empty-list-content">
-        <mat-icon class="empty-list-icon">folder_open</mat-icon>
-        <br>
-        <button mat-flat-button (click)="openDialog()">Create first entry</button>
-    </div>
 </div>

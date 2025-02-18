@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import {AbstractList} from "../../../../common/abstract-list/abstract-list.component";
-import {ManagementLoadingBar} from "../../../../management/management-loading-bar/management-loading-bar.component";
 import {SubjectModel} from "../subject-model";
 import {SubjectService} from "../subject.service";
 import {MatIcon} from "@angular/material/icon";
@@ -9,16 +8,17 @@ import {CreateSubjectComponent} from "../create-subject/create-subject.component
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {AbstractCourseComponentList} from "../../abstract-course-components/abstract-course-component-list";
 import {NgIf} from "@angular/common";
+import {MatProgressBar} from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-subject-list',
     imports: [
+        MatProgressBar,
         AbstractList,
-        ManagementLoadingBar,
         MatIconButton,
         MatButton,
         MatIcon,
-        NgIf
+        NgIf,
     ],
     templateUrl: '../../abstract-course-components/abstract-course-components-list.html',
     styleUrl: '../../abstract-course-components/abstract-course-components-list.scss'
