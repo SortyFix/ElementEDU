@@ -8,21 +8,13 @@
            autofocus matInput>
 </mat-form-field>
 
+<!--
 <div>
     <mat-list>
         <div style="display: flex">
-            <mat-checkbox [checked]="isSelected('all')"
-                          [indeterminate]="partiallySelected"
-                          (change)="toggle('all')"
-                          *ngIf="
-                          filteredValues.length != 0
-                          && selectionType() === SelectionType.MULTIPLE
-                          && selectionMode"
-                          class="text-color">
-                Select All
-            </mat-checkbox>
-
-            <ng-content></ng-content>
+            <all-checkbox [checked]="isSelected('all')" [indeterminate]="partiallySelected" [show]="showCheckboxes">
+                <ng-content></ng-content>
+            </all-checkbox>
         </div>
 
         <div [style.height]="height() + 'px'" style="overflow: scroll;">
@@ -31,17 +23,14 @@
                 <mat-list-item class="selectable" (click)="firstSelect(value)">
                     <div matListItemTitle style="width: 100%; display: flex; justify-content: space-between">
                         <div>
-                            <mat-checkbox
-                                *ngIf="selectionType() === SelectionType.MULTIPLE && selectionMode"
+                            <single-checkbox
                                 [checked]="isSelected(value)"
-                                (change)="toggle(value)"
-                                (click)="$event.stopPropagation()"
-                                (keydown)="handleKeyDown($event, value)" >
-                            </mat-checkbox>
-                            <mat-icon matListItemIcon class="icon" *ngIf="hasIcon">
-                                {{ loadIcon(value) }}
-                            </mat-icon>
-                            <a class="title">{{ loadTitle(value) }}</a>
+                                [icon]="loadIcon(value)"
+                                [title]="loadTitle(value)"
+                                [show]="showCheckboxes"
+                                (keyboardEvent)="handleKeyDown($event, value)"
+                                (onToggle)="toggle(value)">
+                            </single-checkbox>
                         </div>
 
                         <div>
@@ -58,32 +47,19 @@
 
     </mat-list>
 </div>
+-->
 
-<mat-accordion multi>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <mat-checkbox [checked]="isSelected('all')"
-                      [indeterminate]="partiallySelected"
-                      (change)="toggle('all')"
-                      *ngIf="filteredValues.length != 0 && selectionType() === SelectionType.MULTIPLE"
-                      class="text-color">
-            Select All
-        </mat-checkbox>
-    </div>
+<mat-accordion>
+    <all-checkbox [checked]="isSelected('all')" [indeterminate]="partiallySelected">
+        <ng-content></ng-content>
+    </all-checkbox>
     <mat-expansion-panel *ngFor="let value of filteredValues" >
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
-                <a matListItemTitle>
-                    <mat-checkbox
-                        *ngIf="selectionType() === SelectionType.MULTIPLE"
-                        [checked]="isSelected(value)"
-                        (change)="toggle(value)"
-                        (click)="$event.stopPropagation()"
-                        (keydown)="handleKeyDown($event, value)">
-                    </mat-checkbox>
-                    <mat-icon class="icon" *ngIf="hasIcon">{{ loadIcon(value) }}</mat-icon>
-                    <a class="title">{{ loadTitle(value) }}</a>
-                </a>
-
+                <single-checkbox [checked]="isSelected(value)" [icon]="loadIcon(value)" [title]="loadTitle(value)"
+                    (keyboardEvent)="handleKeyDown($event, value)"
+                    (onToggle)="toggle(value)">
+                </single-checkbox>
             </mat-panel-title>
             <mat-panel-description>
                 <mat-chip-set *ngIf="hasChips">

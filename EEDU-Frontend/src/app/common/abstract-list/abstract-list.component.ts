@@ -1,16 +1,9 @@
 import {Component, input, InputSignal} from '@angular/core';
-import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf} from "@angular/common";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {
-    MatList,
-    MatListItem,
-    MatListItemIcon,
-    MatListItemTitle,
-} from "@angular/material/list";
 import {
     MatAccordion,
-    MatExpansionPanel, MatExpansionPanelDescription,
+    MatExpansionPanel,
+    MatExpansionPanelDescription,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
@@ -18,7 +11,10 @@ import {MatChip, MatChipSet} from "@angular/material/chips";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
+import {AllCheckBoxComponent} from "./checkboxes/all-check-box.component";
+import {SingleCheckBoxComponent} from "./checkboxes/single-check-box.component";
 
+// noinspection JSUnusedGlobalSymbols
 export enum SelectionType
 {
     MULTIPLE,
@@ -34,31 +30,26 @@ export interface ListItemInfo<T>
 }
 
 @Component({
-  selector: 'list',
+    selector: 'list',
     imports: [
-        MatIcon,
-        NgIf,
-        MatCheckbox,
-        MatListItemTitle,
-        MatExpansionPanelTitle,
-        MatExpansionPanelHeader,
-        MatExpansionPanelDescription,
-        MatChip,
         MatChipSet,
+        MatChip,
         MatExpansionPanel,
-        NgForOf,
         MatAccordion,
-        MatLabel,
+        MatExpansionPanelTitle,
+        MatExpansionPanelDescription,
+        MatExpansionPanelHeader,
         MatFormField,
-        MatListItemTitle,
-        MatList,
-        FormsModule,
         MatInput,
-        MatListItemIcon,
-        MatListItem,
+        MatLabel,
+        NgIf,
+        FormsModule,
+        NgForOf,
+        AllCheckBoxComponent,
+        SingleCheckBoxComponent,
     ],
-  templateUrl: './abstract-list.component.html',
-  styleUrl: './abstract-list.component.scss'
+    templateUrl: './abstract-list.component.html',
+    styleUrl: './abstract-list.component.scss'
 })
 export class AbstractList<T> {
 
@@ -72,11 +63,6 @@ export class AbstractList<T> {
 
     private readonly _selected: Set<T> = new Set<T>();
     protected filteredString: string = '';
-    private _selectionMode: boolean = false;
-
-    protected get selectionMode(): boolean {
-        return this._selectionMode;
-    }
 
     protected handleKeyDown(event: KeyboardEvent, value: T): void {
         // noinspection FallThroughInSwitchStatementJS
@@ -95,9 +81,10 @@ export class AbstractList<T> {
 
     protected loadTitle(value: T): string { return this.itemInfo()!.title(value); }
 
-    protected get hasIcon(): boolean { return !!this.itemInfo()!.icon; }
-
-    protected loadIcon(value: T): string { return this.itemInfo()!.icon!(value); }
+    protected loadIcon(value: T): string | undefined
+    {
+        return this.itemInfo()?.icon ? this.itemInfo()!.icon!(value) : undefined;
+    }
 
     protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
 
@@ -142,10 +129,6 @@ export class AbstractList<T> {
         if(this.isSelected(value))
         {
             this._selected.delete(value);
-            if(this._selected.size == 0)
-            {
-                this._selectionMode = false;
-            }
             return;
         }
         this._selected.add(value);
@@ -158,16 +141,5 @@ export class AbstractList<T> {
     public get currentSelected(): T[]
     {
         return Array.from(this.selected.values());
-    }
-
-    protected readonly SelectionType: typeof SelectionType = SelectionType;
-
-    protected firstSelect(value: T): void {
-        if(this.selectionType() === SelectionType.MULTIPLE)
-        {
-            this._selectionMode = true;
-        }
-
-        return this.toggle(value);
     }
 }
