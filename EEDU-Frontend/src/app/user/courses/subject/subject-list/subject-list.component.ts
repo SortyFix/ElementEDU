@@ -6,18 +6,22 @@ import {SubjectService} from "../subject.service";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateSubjectComponent} from "../create-subject/create-subject.component";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {AbstractCourseComponentList} from "../../abstract-course-components/abstract-course-component-list";
+import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-subject-list',
+    selector: 'app-subject-list',
     imports: [
         AbstractList,
         ManagementLoadingBar,
         MatIconButton,
-        MatIcon
+        MatButton,
+        MatIcon,
+        NgIf
     ],
-  templateUrl: '../../abstract-course-components/abstract-course-components-list.html',
+    templateUrl: '../../abstract-course-components/abstract-course-components-list.html',
+    styleUrl: '../../abstract-course-components/abstract-course-components-list.scss'
 })
 export class SubjectListComponent extends AbstractCourseComponentList<SubjectModel> {
     public constructor(service: SubjectService, dialog: MatDialog) { super(service, dialog, CreateSubjectComponent); }

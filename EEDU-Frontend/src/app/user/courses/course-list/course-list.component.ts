@@ -3,21 +3,25 @@ import {AbstractList} from "../../../common/abstract-list/abstract-list.componen
 import {ManagementLoadingBar} from "../../../management/management-loading-bar/management-loading-bar.component";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateCourseComponent} from "../create-course/create-course.component";
 import {AbstractCourseComponentList} from "../abstract-course-components/abstract-course-component-list";
+import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-course-list',
+    selector: 'app-course-list',
     imports: [
         AbstractList,
         ManagementLoadingBar,
         MatIconButton,
+        MatButton,
         MatIcon,
+        NgIf,
     ],
-  templateUrl: '../abstract-course-components/abstract-course-components-list.html',
+    templateUrl: '../abstract-course-components/abstract-course-components-list.html',
+    styleUrl: '../abstract-course-components/abstract-course-components-list.scss'
 })
 export class CourseListComponent extends AbstractCourseComponentList<CourseModel> {
 

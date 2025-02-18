@@ -1,0 +1,13 @@
+.empty-list-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 450px;
+    text-align: center;
+}
+
+.empty-list-icon {
+    transform: scale(4);
+    padding: 30px;
+    -webkit-text-fill-color: var(--widget-color);
+}

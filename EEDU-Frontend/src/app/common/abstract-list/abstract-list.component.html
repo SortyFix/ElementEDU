@@ -1,4 +1,4 @@
-<mat-form-field appearance="outline">
+<mat-form-field appearance="outline" *ngIf="filteredValues.length != 0 && filter()">
     <mat-label>Search</mat-label>
     <input name="search"
            type="search"
@@ -10,13 +10,20 @@
 
 <div>
     <mat-list>
-        <mat-checkbox [checked]="isSelected('all')"
-                      [indeterminate]="partiallySelected"
-                      (change)="toggle('all')"
-                      *ngIf="filteredValues.length != 0 && selectionType() === SelectionType.MULTIPLE"
-                      class="text-color">
-            Select All
-        </mat-checkbox>
+        <div style="display: flex; justify-content: space-between">
+            <mat-checkbox [checked]="isSelected('all')"
+                          [indeterminate]="partiallySelected"
+                          (change)="toggle('all')"
+                          *ngIf="filteredValues.length != 0 && selectionType() === SelectionType.MULTIPLE"
+                          class="text-color">
+                Select All
+            </mat-checkbox>
+
+            <!-- I am aware that this might be sneaky. Some even might say it's considered dumb, but it works -->
+            <span *ngIf="filteredValues.length == 0"></span>
+
+            <ng-content></ng-content>
+        </div>
 
         @for (value of filteredValues; track value) {
 

@@ -1,10 +1,20 @@
-<app-timetable-commons [loading]="!loaded">
-    <button mat-icon-button (click)="openDialog()"><mat-icon>add</mat-icon></button>
+<app-timetable-commons [loading]="!loaded" *ngIf="values.length > 0 || !loaded">
     <list
         [title]="title"
         [icon]="icon"
         [chips]="chips"
         [values]="values"
         [selectionType]="SelectionType.MULTIPLE">
+        <button mat-icon-button (click)="openDialog()">
+            <mat-icon>add</mat-icon>
+        </button>
     </list>
 </app-timetable-commons>
+
+<div class="empty-list-container" *ngIf="loaded && values.length == 0" >
+    <div class="empty-list-content">
+        <mat-icon class="empty-list-icon">folder_open</mat-icon>
+        <br>
+        <button mat-flat-button (click)="openDialog()">Create first entry</button>
+    </div>
+</div>

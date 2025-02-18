@@ -6,18 +6,22 @@ import {AbstractList} from "../../../../common/abstract-list/abstract-list.compo
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateRoomComponent} from "../create-room/create-room.component";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {AbstractCourseComponentList} from "../../abstract-course-components/abstract-course-component-list";
+import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-room-list',
+    selector: 'app-room-list',
     imports: [
         AbstractList,
         ManagementLoadingBar,
         MatIconButton,
-        MatIcon
+        MatButton,
+        MatIcon,
+        NgIf
     ],
-  templateUrl: '../../abstract-course-components/abstract-course-components-list.html',
+    templateUrl: '../../abstract-course-components/abstract-course-components-list.html',
+    styleUrl: '../../abstract-course-components/abstract-course-components-list.scss'
 })
 export class RoomListComponent extends AbstractCourseComponentList<RoomModel>{
     public constructor(service: RoomService, dialog: MatDialog) { super(service, dialog, CreateRoomComponent); }
