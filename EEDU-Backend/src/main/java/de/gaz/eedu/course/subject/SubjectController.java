@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -29,17 +30,17 @@ public class SubjectController extends EntityController<SubjectService, SubjectM
         return subjectService;
     }
 
-    //@PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model) throws CreationException
+    @PostMapping("/create")
+    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
+    @Override public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model) throws CreationException
     {
         log.info("WORK???");
         return super.create(model);
     }
 
-    //@PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    @Override
-    public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
+    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }

@@ -48,13 +48,13 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
-    @PreAuthorize("@verificationService.isFullyAuthenticated()")
+    @PreAuthorize("hasAuthority('CLASS_CREATE')")
     @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
     {
         return super.create(model);
     }
 
-    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+    @PreAuthorize("hasAuthority('CLASS_DELETE')")
     @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);

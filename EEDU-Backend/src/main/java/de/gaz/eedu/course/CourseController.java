@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,17 +48,22 @@ public class CourseController extends EntityController<CourseService, CourseMode
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
+    @PostMapping("/create")
+    @PreAuthorize("hasAuthority('COURSE_CREATE')")
+    @Override public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
     {
         return super.create(model);
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('COURSE_DELETE')")
+    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
     {
         return super.delete(id);
     }
 
-    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
+    @GetMapping("/get/{id}")
+    @Override public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
     }

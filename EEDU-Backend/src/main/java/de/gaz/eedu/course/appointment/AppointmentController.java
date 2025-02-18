@@ -71,7 +71,7 @@ public class AppointmentController extends EntityController<AppointmentService, 
     }
 
     @PostMapping("/update/standalone/{appointment}")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
     public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
     {
         log.info("Received incoming request for updating the appointment {} with the updated data {}.", appointment, updateModel);
@@ -79,7 +79,7 @@ public class AppointmentController extends EntityController<AppointmentService, 
     }
 
     @PostMapping("/{course}/unschedule/frequent")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
     public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
     {
         log.info("Received incoming request for unscheduling frequent appointment(s) {} from course {}.", appointments, course);
@@ -88,7 +88,7 @@ public class AppointmentController extends EntityController<AppointmentService, 
     }
 
     @PostMapping("/{course}/schedule/standalone")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
     public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel) {
 
         List<AppointmentEntryModel> createdEntities = getService().createAppointment(course,  Set.of(createModel));
