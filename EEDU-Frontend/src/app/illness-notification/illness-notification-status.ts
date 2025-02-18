@@ -1,5 +1,5 @@
 export enum IllnessNotificationStatus {
-    DECLINED,
-    PENDING,
-    ACCEPTED
+    DECLINED = "DECLINED",
+    PENDING = "PENDING",
+    ACCEPTED = "ACCEPTED"
 }

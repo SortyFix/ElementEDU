@@ -3,6 +3,34 @@
     Accept or decline sick notes here. Make sure that all information <br>
     is correct and credible. The status of the sick note is visible to the user.
 </p>
+
+<div *ngIf="illnessNotifications.length != 0">
+    <mat-accordion style="background-color: var(--widget-color)">
+        <div *ngFor="let x of illnessNotifications" style="background-color: var(--widget-color)">
+            <mat-expansion-panel class="list-element">
+                <mat-expansion-panel-header style="background-color: var(--widget-color)">
+                    <mat-panel-title class="text"> {{ x.user.name }} </mat-panel-title>
+                    <mat-panel-description class="text"> {{ x.expirationTimeString }} </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="expansion-body">
+                    <div class="notification-details">
+                        <h3>From:</h3> <span>{{ x.timestampString }}</span>
+                        <h3>To:</h3> <span>{{ x.expirationTimeString }}</span>
+                        <h3>Reason:</h3> <span>{{ x.reason }}</span>
+                    </div>
+                    <button mat-flat-button class="appendix-button" (click)="downloadFile(x.fileModel.id)">
+                        Download Appendix
+                    </button>
+                </div>
+            </mat-expansion-panel>
+        </div>
+    </mat-accordion>
+</div>
+
+<div *ngIf="illnessNotifications.length == 0" class="text">
+    <p style="text-indent: 2em"> No pending sick notes! </p>
+</div>
+
 <h1 class="text">Manage users</h1>
 <p class="text">
     Manage other users here. Reassign them to new groups, manage their authorities, <br>

@@ -1,6 +1,6 @@
 import {IllnessNotificationStatus} from "../illness-notification-status";
 
-export interface IllnessNotificationModel {
+export interface ReducedIllnessNotificationModel {
     readonly id: bigint;
     readonly userId: bigint;
     readonly status: IllnessNotificationStatus;

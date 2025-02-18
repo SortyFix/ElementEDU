@@ -2,6 +2,7 @@ package de.gaz.eedu.file;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.exception.MaliciousFileException;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -142,7 +143,7 @@ import java.util.Set;
      */
     public boolean hasAccess(@NotNull UserEntity userEntity)
     {
-        return userEntity.hasAnyAuthority(getPrivilege());
+        return userEntity.hasAnyAuthority(getPrivilege()) || userEntity.getAccountType().equals(AccountType.ADMINISTRATOR);
     }
 
     /**

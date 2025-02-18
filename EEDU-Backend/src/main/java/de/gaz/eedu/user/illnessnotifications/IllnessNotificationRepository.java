@@ -10,5 +10,5 @@ public interface IllnessNotificationRepository extends JpaRepository<IllnessNoti
 {
     @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUser(@NotNull UserEntity userId);
     @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByTimeStamp(@NotNull Long date);
-    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByUserAndStatus(@NotNull UserEntity userId, @NotNull IllnessNotificationStatus status);
+    @NotNull List<IllnessNotificationEntity> getIllnessNotificationEntitiesByStatus(@NotNull IllnessNotificationStatus status);
 }

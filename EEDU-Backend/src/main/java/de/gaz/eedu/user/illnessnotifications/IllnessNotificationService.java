@@ -64,7 +64,7 @@ import java.util.Set;
 
         FileEntity fileEntity = fileService.createEntity(new FileCreateModel(
                 "illness_notifications",
-                new String[] { "Management" },
+                new String[] { "Management", "ADMINISTRATOR" },
                 new String[] { "illness_notification" }));
 
         try
@@ -92,6 +92,13 @@ import java.util.Set;
         UserEntity user = userService.loadEntityByIDSafe(userId);
         return ResponseEntity.ok(illnessNotificationRepository.getIllnessNotificationEntitiesByUser(user).stream()
                 .map(entity -> entity.toModel().toReducedModel()).toList());
+    }
+
+    public ResponseEntity<List<IllnessNotificationModel>> getPendingNotifications()
+    {
+        return ResponseEntity.ok(illnessNotificationRepository.
+                getIllnessNotificationEntitiesByStatus(IllnessNotificationStatus.PENDING)
+                .stream().map(IllnessNotificationEntity::toModel).toList());
     }
 
     @Override

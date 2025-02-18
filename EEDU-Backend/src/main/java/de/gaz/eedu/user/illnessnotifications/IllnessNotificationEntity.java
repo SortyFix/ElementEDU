@@ -27,7 +27,7 @@ public class IllnessNotificationEntity implements EntityObject, EntityModelRelat
     public IllnessNotificationModel toModel()
     {
         return new IllnessNotificationModel(id,
-                user.getId(),
+                user.toReducedModel(),
                 status,
                 reason,
                 getTimeStamp(),

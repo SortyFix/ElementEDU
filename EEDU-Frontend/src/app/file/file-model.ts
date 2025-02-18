@@ -6,4 +6,14 @@ export class FileModel {
         public readonly tags: string[],
         public fileName: string
     ) { }
+
+    public static fromObject(obj: any): FileModel {
+        return new FileModel(
+            obj.id,
+            obj.dataDirectory,
+            obj.privileges,
+            obj.tags,
+            obj.fileName
+        )
+    }
 }
