@@ -44,36 +44,44 @@ import java.util.stream.Stream;
  * @see GroupEntity
  * @see de.gaz.eedu.user.privileges.PrivilegeEntity
  */
-@Entity
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
-@Table(name = "user_entity")
-@Slf4j
+@Entity @Table(name = "user_entity")
+@Slf4j @NoArgsConstructor @AllArgsConstructor @Getter @Setter
 public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
 {
-    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
-    private final Set<CourseEntity> courses = new HashSet<>();
     @Enumerated UserStatus status;
     //finish this line and the sql
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
     List<IllnessNotificationEntity> illnessNotificationEntities = new ArrayList<>();
+
+    // id
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
+
+    // user data
     private boolean systemAccount;
     @Enumerated private AccountType accountType;
     private String firstName, lastName, loginName;
     private boolean enabled, locked;
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) @JsonManagedReference
+
+    // credentials
+    @JsonManagedReference @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CredentialEntity> credentials = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "theme_id") @JsonManagedReference
     private ThemeEntity themeEntity;
-    @ManyToMany @JsonManagedReference @Setter(AccessLevel.PRIVATE) @JoinTable(
+
+    // groups
+    @JsonManagedReference @ManyToMany @JoinTable(
             name = "user_groups", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id")
-    ) @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
-    @ManyToOne(fetch = FetchType.LAZY) @JsonBackReference @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
-    private @Nullable ClassRoomEntity classRoom;
+    ) @Setter(AccessLevel.PRIVATE) @Getter(AccessLevel.NONE) private Set<GroupEntity> groups = new HashSet<>();
+
+    // courses
+    @JsonBackReference @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    @Getter(AccessLevel.NONE) private final Set<CourseEntity> courses = new HashSet<>();
+
+    // classroom
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "class_room_id") @JsonManagedReference
+    @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE) private @Nullable ClassRoomEntity classRoom;
 
     // Transient is not saved inside the database
     @Transient @Getter(AccessLevel.PROTECTED) private GroupEntity typeGroup;
@@ -361,6 +369,17 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return Stream.concat(this.courses.stream(), courseStream).collect(Collectors.toUnmodifiableSet());
     }
 
+    public boolean setClassRoom(@NotNull UserService userService, @Nullable ClassRoomEntity classRoom)
+    {
+        return this.saveEntityIfPredicateTrue(userService, classRoom, this::setClassRoom);
+    }
+
+    public boolean setClassRoom(@Nullable ClassRoomEntity classRoom)
+    {
+        this.classRoom = classRoom;
+        return true;
+    }
+
     /**
      * Retrieves the optional {@link ClassRoomEntity} assigned to this course, if any.
      * <p>
@@ -375,16 +394,16 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
     }
 
     /**
-     * Checks if a {@link ClassRoomEntity} is assigned to this course.
+     * Checks if a {@link ClassRoomEntity} is assigned to this user.
      * <p>
-     * This method returns true if a {@link ClassRoomEntity} is currently assigned to this course, indicating
-     * that the course is associated with a specific class. It returns false if no class is currently assigned.
+     * This method returns true if a {@link ClassRoomEntity} is currently assigned to this user, indicating
+     * that the user is associated with a specific class. It returns false if no class is currently assigned.
      * <p>
-     * Note: This method relies on the presence or absence of the assigned {@link ClassRoomEntity} as determined by the
-     * {@link #getClassRoom()} method. To assign a {@link ClassRoomEntity} to this course, use the {@link ClassRoomEntity#attachStudents(UserEntity...)}
-     * method, and to disassociate the current class, use the {@link ClassRoomEntity#detachStudents(Long...)} method.
+     * Note: To assign a {@link ClassRoomEntity} to this course, use the {@link #setClassRoom(ClassRoomEntity)} method.
      *
      * @return {@code true} if a {@link ClassRoomEntity} is assigned, false otherwise.
+     * @see #setClassRoom(ClassRoomEntity)
+     * @see #setClassRoom(UserService, ClassRoomEntity)
      */
     public boolean hasClassRoomAssigned()
     {
@@ -429,7 +448,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
         return Objects.hash(getId());
     }
 
-    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @NotNull T entity, @NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull UserService userService, @Nullable T entity, @NotNull Predicate<T> predicate)
     {
         if (predicate.test(entity))
         {

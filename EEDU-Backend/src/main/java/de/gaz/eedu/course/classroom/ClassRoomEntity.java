@@ -1,7 +1,6 @@
 package de.gaz.eedu.course.classroom;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
@@ -14,9 +13,6 @@ import lombok.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -29,19 +25,21 @@ import java.util.stream.Collectors;
  * @see EntityModelRelation
  * @see ClassRoomModel
  */
-@Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "class_room_entity")
+@Entity @Getter @Setter @NoArgsConstructor @Table(name = "class_room_entity")
 public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
 {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE) private Long id;
     private String name;
-    @OneToMany(mappedBy = "classRoom") @JsonManagedReference @Getter(AccessLevel.PRIVATE)
+    @OneToMany(mappedBy = "classRoom") @JsonBackReference @Getter(AccessLevel.PRIVATE)
     private final Set<UserEntity> users = new HashSet<>();
     @OneToMany(mappedBy = "classRoom") @JsonBackReference
     private final Set<CourseEntity> courses = new HashSet<>();
 
-    public ClassRoomEntity(@NotNull Collection<CourseEntity> courses)
+    public ClassRoomEntity(@NotNull Collection<CourseEntity> courses, @NotNull Collection<UserEntity> users)
     {
         this.courses.addAll(courses);
+        this.users.addAll(users);
     }
 
     @Override public @NotNull ClassRoomModel toModel()
@@ -51,7 +49,7 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
                 getName(),
                 getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
                 getCourses().stream().map(CourseEntity::toModel).toArray(CourseModel[]::new),
-                getTutor().map(UserEntity::toReducedModel).orElse(null)
+                getTutor().toReducedModel()
         );
     }
 
@@ -62,171 +60,9 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
      *
      * @return an {@link Optional} containing the tutor for the classroom if one exists.
      */
-    public @NotNull Optional<UserEntity> getTutor()
+    public @NotNull UserEntity getTutor()
     {
-        return getUsers().stream().filter(teacherPredicate(true)).findFirst();
-    }
-
-    /**
-     * Sets the specified user entity as the tutor for the current classroom, modifying the current tutor if it exists.
-     * <p>
-     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "tutor" role.
-     * If the classroom already has a tutor, it will be overridden by the new tutor. The process is facilitated through the provided
-     * {@link ClassRoomService} instance, allowing for the saving of changes.
-     *
-     * @param classRoomService the {@link ClassRoomService} instance to be used for persisting changes if needed.
-     * @param userEntity       the {@link UserEntity} instance representing the tutor to be set for the classroom.
-     * @return true if the tutor was successfully set, false otherwise.
-     * @throws ResponseStatusException if the specified user lacks the "tutor" role.
-     * @see #setTutor(UserEntity)
-     */
-    public boolean setTutor(@NotNull ClassRoomService classRoomService, @NotNull UserEntity userEntity)
-    {
-        return saveEntityIfPredicateTrue(classRoomService, userEntity, this::setTutor);
-    }
-
-    /**
-     * Sets the specified user entity as the tutor for the current classroom, ensuring the user has the "tutor" role.
-     * <p>
-     * This method sets the provided user as the tutor for the classroom. It ensures that the user has the required "tutor" role.
-     * If the classroom already has a tutor, it will be overridden by the new tutor. This method does not persist the changes.
-     * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #setTutor(ClassRoomService, UserEntity)}, or {@link ClassRoomService#saveEntity(Iterable)} after calling this method.
-     *
-     * @param userEntity the {@link UserEntity} instance representing the tutor to be set for the classroom.
-     * @return true if the tutor was successfully set, false otherwise.
-     * @throws ResponseStatusException if the specified user lacks the "tutor" role.
-     * @see #setTutor(ClassRoomService, UserEntity)
-     * @see ClassRoomService#saveEntity(Iterable)
-     */
-    public boolean setTutor(@NotNull UserEntity userEntity) throws ResponseStatusException
-    {
-        // TODO think about what would happen if user looses role
-        if (teacherPredicate(false).test(userEntity))
-        {
-            String errorMessage = "The specified user lacks the tutor role.";
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, errorMessage, new IllegalArgumentException());
-        }
-
-        if (this.users.removeIf(teacherPredicate(true)))
-        {
-            String logMessage = "The tutor from classroom {} has been overridden.";
-            LoggerFactory.getLogger(ClassRoomEntity.class).info(logMessage, getId());
-        }
-
-        return this.users.add(userEntity);
-    }
-
-    /**
-     * Unsets the tutor for the current classroom, using the provided {@link ClassRoomService} instance to persist changes.
-     *
-     * @param classRoomService the {@link ClassRoomService} instance to be used for persisting changes if needed.
-     * @return true if the tutor was successfully unset, false otherwise.
-     * @see #unsetTutor()
-     */
-    public boolean unsetTutor(@NotNull ClassRoomService classRoomService)
-    {
-        return saveEntityIfPredicateTrue(classRoomService, unsetTutor(), value -> value);
-    }
-
-    /**
-     * Unsets the tutor for the current classroom.
-     * <p>
-     * This method removes the tutor from the classroom. This method does not persist the changes.
-     * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #unsetTutor(ClassRoomService)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method.
-     *
-     * @return true if the tutor was successfully unset, false otherwise.
-     * @see #unsetTutor(ClassRoomService)
-     * @see ClassRoomService#saveEntity(Iterable)
-     */
-    public boolean unsetTutor()
-    {
-        return this.users.removeIf(teacherPredicate(true));
-    }
-
-    /**
-     * Attaches the specified student entities to the current classroom.
-     * <p>
-     * This method attaches students to the current classroom.
-     * The attachment process is facilitated through the provided {@link ClassRoomService} instance,
-     * allowing for the saving of changes.
-     *
-     * @param classRoomService the {@link ClassRoomService} instance to be used for persisting changes if needed.
-     * @param user             the array of {@link UserEntity} instances representing students to be attached to the classroom.
-     * @return true if any students were attached, false otherwise.
-     * @see #attachStudents(UserEntity...)
-     */
-    public boolean attachStudents(@NotNull ClassRoomService classRoomService, @NonNull UserEntity... user)
-    {
-        return saveEntityIfPredicateTrue(classRoomService, user, this::attachStudents);
-    }
-
-    /**
-     * Attaches the specified student entities to the current classroom, ensuring uniqueness.
-     * <p>
-     * This method attaches students to the classroom, filtering out those already attached based on their equality.
-     * It ensures that only unique, non-duplicate students are added.
-     * <p>
-     * Note that this method does not persist the changes.
-     * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #attachStudents(ClassRoomService, UserEntity...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
-     *
-     * @param user The array of {@link UserEntity} instances representing students to be attached to the classroom.
-     * @return true if any students were attached, false otherwise.
-     * @see #attachStudents(ClassRoomService, UserEntity...)
-     * @see ClassRoomService#saveEntity(Iterable)
-     */
-    public boolean attachStudents(@NonNull UserEntity... user)
-    {
-        return this.users.addAll(Arrays.stream(user).filter(teacherPredicate(false)).collect(Collectors.toSet()));
-    }
-
-    /**
-     * Detaches students with the specified IDs from the current classroom.
-     * <p>
-     * This method detaches students from the current classroom based on their IDs. I
-     * The detachment process is facilitated through the provided {@link ClassRoomService} instance, allowing for the saving of changes.
-     *
-     * @param classRoomService the {@link ClassRoomService} instance to be used for persisting changes if needed.
-     * @param ids              the array of student IDs to be detached from the classroom.
-     * @return true if any students were detached, false otherwise.
-     * @see #detachStudents(Long...)
-     */
-    public boolean detachStudents(@NotNull ClassRoomService classRoomService, @NonNull Long... ids)
-    {
-        return saveEntityIfPredicateTrue(classRoomService, ids, this::detachStudents);
-    }
-
-    /**
-     * Detaches students with the specified IDs from the current classroom.
-     * <p>
-     * This method detaches students from the classroom based on their IDs, filtering out those who are not currently attached.
-     * It ensures that only existing students are detached.
-     * <p>
-     * Note that this method does not persist the changes.
-     * In order for the changes to be permanent, this object needs to be saved, which can be achieved by
-     * {@link #detachStudents(ClassRoomService, Long...)}, or {@link ClassRoomService#saveEntity(Iterable) } after calling this method
-     *
-     * @param ids The array of student IDs to be detached from the classroom.
-     * @return true if any students were detached, false otherwise.
-     * @see #detachStudents(ClassRoomService, Long...)
-     * @see ClassRoomService#saveEntity(Iterable)
-     */
-    public boolean detachStudents(@NonNull Long... ids)
-    {
-        List<Long> detachGroupIds = Arrays.asList(ids);
-        return this.users.removeIf(user -> detachGroupIds.contains(user.getId()));
-    }
-
-    public boolean detachStudents(@NotNull ClassRoomService classRoomService)
-    {
-        return saveEntityIfPredicateTrue(classRoomService, detachStudents(), value -> value);
-    }
-
-    public boolean detachStudents()
-    {
-        return users.removeIf(teacherPredicate(false));
+        return getUsers().stream().filter(teacherPredicate(true)).findFirst().orElseThrow();
     }
 
     /**
@@ -241,35 +77,14 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
         return users.stream().filter(teacherPredicate(false)).collect(Collectors.toUnmodifiableSet());
     }
 
-    /**
-     * Saves the provided entity in the database if the given predicate evaluates to true.
-     * <p>
-     * This method checks the specified predicate on the provided entity and saves it using the provided
-     * ClassRoomService if the predicate evaluates to true. Otherwise, it does not save the entity.
-     *
-     * @param classRoomService the service responsible for saving the entity.
-     * @param test             the entity to be saved.
-     * @param predicate        the condition that, if true, triggers the entity to be saved.
-     * @param <T>              the type of the entity.
-     * @return true if the entity was saved, false otherwise.
-     */
-    private <T> boolean saveEntityIfPredicateTrue(
-            @NotNull ClassRoomService classRoomService, @NotNull T test, @NotNull Predicate<T> predicate)
-    {
-        if (predicate.test(test))
-        {
-            classRoomService.saveEntity(this);
-            return true;
-        }
-        return false;
-    }
-
     @Override public boolean deleteManagedRelations()
     {
         if(this.users.isEmpty())
         {
+
             return false;
         }
+
         this.users.clear();
         return true;
     }

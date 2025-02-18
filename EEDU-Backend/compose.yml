@@ -7,7 +7,7 @@ services:
       MYSQL_USER: spring
       MYSQL_PASSWORD: spring
     ports:
-      - '3306'
+      - "5053:3306"
     networks:
         - eedu-network
 networks:

@@ -1,6 +1,6 @@
-import {environment} from "../../../environment/environment";
 import {BehaviorSubject, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../../environment/environment";
 
 export abstract class AbstractCourseComponentsService<T, C> {
     protected readonly BACKEND_URL: string = environment.backendUrl;

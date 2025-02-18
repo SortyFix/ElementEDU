@@ -7,12 +7,12 @@ import {MatInput} from "@angular/material/input";
 import {SubjectModel} from "../subject/subject-model";
 import {SubjectService} from "../subject/subject.service";
 import {GeneralCreateComponent} from "../../../timetable/general-create-component/general-create.component";
-import {AbstractCourseComponentsCreate} from "../abstract-course-components-create";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {DialogRef} from "@angular/cdk/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {SelectionInput} from "../../../common/selection-input/selection-input.component";
+import {AbstractCourseComponentsCreate} from "../abstract-course-components/abstract-course-components-create";
 
 @Component({
   selector: 'app-create-course',
@@ -30,7 +30,6 @@ import {SelectionInput} from "../../../common/selection-input/selection-input.co
         SelectionInput
     ],
   templateUrl: './create-course.component.html',
-  styleUrl: './create-course.component.scss'
 })
 export class CreateCourseComponent extends AbstractCourseComponentsCreate<CourseModel> {
 
@@ -39,7 +38,7 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
     public constructor(courseService: CourseService, dialogRef: DialogRef, formBuilder: FormBuilder,
         private _subjectService: SubjectService)
     {
-        super(courseService, dialogRef, formBuilder);
+        super(courseService, dialogRef, formBuilder, "Create Course");
 
         this._subjectService.value$.subscribe((subjects: SubjectModel[]): void => {
             this._subjects.length = 0;

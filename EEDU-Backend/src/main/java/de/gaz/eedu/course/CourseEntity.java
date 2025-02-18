@@ -15,6 +15,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -40,7 +41,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
     private String name;
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "class_room_id", referencedColumnName = "id")
-    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private ClassRoomEntity classRoom;
+    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private @Nullable ClassRoomEntity classRoom;
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "subject_id", referencedColumnName = "id")
     private SubjectEntity subject;

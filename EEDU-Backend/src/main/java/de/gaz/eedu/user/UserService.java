@@ -100,9 +100,6 @@ public class UserService extends EntityService<UserRepository, UserEntity, UserM
         Set<CourseEntity> courses = entry.getCourses();
         courses.forEach(courseEntity -> courseEntity.detachUsers(entry.getId()));
         getClassRoomService().getCourseService().saveEntity(courses);
-
-        // detach user from class
-        entry.getClassRoom().ifPresent(clazz -> clazz.detachStudents(getClassRoomService(), entry.getId()));
     }
 
     @Transactional public @NotNull Optional<GeneratedToken> requestLogin(@NotNull LoginModel loginModel)

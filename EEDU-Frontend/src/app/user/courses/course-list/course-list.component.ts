@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import {AbstractList} from "../../../common/abstract-list/abstract-list.component";
 import {ManagementLoadingBar} from "../../../management/management-loading-bar/management-loading-bar.component";
-import {AbstractCourseComponentList} from "../abstract-course-component-list";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialog} from "@angular/material/dialog";
 import {CreateCourseComponent} from "../create-course/create-course.component";
+import {AbstractCourseComponentList} from "../abstract-course-components/abstract-course-component-list";
 
 @Component({
   selector: 'app-course-list',
@@ -17,7 +17,7 @@ import {CreateCourseComponent} from "../create-course/create-course.component";
         MatIconButton,
         MatIcon,
     ],
-  templateUrl: '../abstract-course-components-list.html',
+  templateUrl: '../abstract-course-components/abstract-course-components-list.html',
 })
 export class CourseListComponent extends AbstractCourseComponentList<CourseModel> {
 

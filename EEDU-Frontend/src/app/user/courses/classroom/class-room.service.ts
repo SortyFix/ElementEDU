@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {AbstractCourseComponentsService} from "../abstract-course-components-service";
 import {ClassRoomModel} from "./class-room-model";
 import {map, Observable, OperatorFunction} from 'rxjs';
 import {ClassRoomCreateModel, ClassRoomCreatePacket} from "./class-room-create-model";
 import {HttpClient} from "@angular/common/http";
+import {AbstractCourseComponentsService} from "../abstract-course-components/abstract-course-components-service";
 
 @Injectable({
     providedIn: 'root'

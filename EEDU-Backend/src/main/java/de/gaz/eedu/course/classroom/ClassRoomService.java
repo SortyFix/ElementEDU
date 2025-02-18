@@ -5,7 +5,6 @@ import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.entity.EntityService;
-import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -16,15 +15,18 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * This service handles the lifecycle management of {@link ClassRoomEntity}, including creation, deletion, and retrieval.
@@ -46,6 +48,7 @@ import java.util.Set;
  * @see EntityService
  * @author Ivo Quiring
  */
+@Slf4j
 @RequiredArgsConstructor @Service @Getter
 public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
@@ -61,57 +64,39 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
             throw new OccupiedException();
         }
 
-        return saveEntity(model.stream().map(current ->
-        {
-            ClassRoomEntity classRoomEntity = new ClassRoomEntity(getCourseService().loadEntityById(current.courses()));
-            return current.toEntity(classRoomEntity, this.classroomFactory(current));
-        }).toList());
+        List<ClassRoomEntity> entities = saveEntity(model.stream().map(classroomFactory()).toList());
+        getUserRepository().saveAllEntities(entities.stream().flatMap(this::getUsers).toList());
+        return entities;
     }
 
     @Override public void deleteRelations(@NotNull ClassRoomEntity entry)
     {
-        // remove this classroom from all courses
-        Set<CourseEntity> courses = entry.getCourses();
-        courses.forEach(CourseEntity::unlinkClassRoom);
-        getCourseService().saveEntity(courses);
+        // remove this classroom from all courses and users
+        getCourseService().saveEntity(entry.getCourses().stream().peek(CourseEntity::unlinkClassRoom).toList());
+        getUserRepository().saveAllEntities(getUsers(entry).peek(user -> user.setClassRoom(null)).toList());
     }
 
-    /**
-     * Provides a stateless {@link CreationFactory}.
-     * <p>
-     * This method provides a {@link CreationFactory} that is used to apply changes to the entity after it has been
-     * created. This is required for operations that require access to other repositories or services. In this specific
-     * case it handles two major components which includes the following:
-     * <ul>
-     *     <li>Setting and fetching the tutor {@link UserEntity}, with {@link #fetchTutor(long)}, if {@link ClassRoomCreateModel#tutor()} is not null.</li>
-     *     <li>Fetching all {@link UserEntity}s inside of the createModel and attaching them to the newly created class</li>
-     * </ul>
-     * <p>
-     * Note! This returns a function and therefore is stateless.
-     *
-     * @param createModel current model which provides details of the newly created entity
-     * @return a stateless function which sets the required attributes of the passed create model.
-     */
-    @Contract(pure = true, value = "_ -> new")
-    private @NotNull CreationFactory<ClassRoomEntity> classroomFactory(@NotNull ClassRoomCreateModel createModel)
+    private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom)
     {
-        return (entity ->
+        Stream<UserEntity> students = classRoom.getStudents().stream();
+        return Stream.concat(students, Stream.of(classRoom.getTutor()));
+    }
+
+    @Contract(pure = true, value = "-> new")
+    private @NotNull Function<ClassRoomCreateModel, ClassRoomEntity> classroomFactory()
+    {
+        return current ->
         {
-            // attach users and tutor
-            Long tutorId = createModel.tutor();
-            if(Objects.nonNull(tutorId))
-            {
-                entity.setTutor(fetchTutor(tutorId));
-            }
+            UserEntity tutor = fetchTutor(current.tutor());
+            List<UserEntity> fetchedUsers = getUserRepository().findAllById(List.of(current.students()));
+            Collection<UserEntity> users = Stream.concat(Stream.of(tutor), fetchedUsers.stream()).toList();
+            Collection<CourseEntity> courses = getCourseService().loadEntityById(current.courses());
 
-            if (createModel.students().length > 0)
-            {
-                List<UserEntity> userEntities = getUserRepository().findAllById(List.of(createModel.students()));
-                entity.attachStudents(userEntities.toArray(UserEntity[]::new));
-            }
-
-            return entity;
-        });
+            ClassRoomEntity classRoomEntity = new ClassRoomEntity(courses, users);
+            tutor.setClassRoom(classRoomEntity);
+            fetchedUsers.forEach(userEntity -> userEntity.setClassRoom(classRoomEntity));
+            return current.toEntity(classRoomEntity);
+        };
     }
 
     /**
@@ -141,7 +126,8 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
         UserEntity tutor = getUserRepository().findById(tutorId).orElseThrow(() -> new EntityUnknownException(tutorId));
         if(!tutor.getAccountType().equals(AccountType.TEACHER))
         {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The given user's account type is not equal to teacher.");
+            String error = "The given user's id %s does not represent a teachers account.";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, tutorId));
         }
         return tutor;
     }

@@ -9,7 +9,11 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {SubjectModel} from "../subject-model";
 import {SubjectService} from "../subject.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
-import {AbstractCourseComponentsCreate} from "../../abstract-course-components-create";
+import {MatChipGrid, MatChipInput, MatChipRow} from "@angular/material/chips";
+import {MatIcon} from "@angular/material/icon";
+import {
+    AbstractCourseComponentsCreateMultiple
+} from "../../abstract-course-components/abstract-course-components-create-multiple";
 
 @Component({
   selector: 'app-create-subject',
@@ -23,13 +27,16 @@ import {AbstractCourseComponentsCreate} from "../../abstract-course-components-c
         MatFormField,
         MatInput,
         ReactiveFormsModule,
-        GeneralCreateComponent
+        GeneralCreateComponent,
+        MatIcon,
+        MatChipRow,
+        MatChipGrid,
+        MatChipInput
     ],
-  templateUrl: './create-subject.component.html',
-  styleUrl: './create-subject.component.scss'
+  templateUrl: '../../abstract-course-components/abstract-course-components-create-multiple.html',
 })
-export class CreateSubjectComponent extends AbstractCourseComponentsCreate<SubjectModel> {
+export class CreateSubjectComponent extends AbstractCourseComponentsCreateMultiple<SubjectModel> {
     public constructor(subjectService: SubjectService, dialogRef: DialogRef, formBuilder: FormBuilder) {
-        super(subjectService, dialogRef, formBuilder);
+        super(subjectService, dialogRef, formBuilder, "Create Subjects");
     }
 }

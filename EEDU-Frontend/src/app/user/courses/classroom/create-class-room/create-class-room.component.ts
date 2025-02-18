@@ -1,5 +1,4 @@
 import {Component} from '@angular/core';
-import {AbstractCourseComponentsCreate} from "../../abstract-course-components-create";
 import {ClassRoomModel} from "../class-room-model";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
@@ -17,6 +16,7 @@ import {CourseService} from "../../course.service";
 import {ClassRoomCreateModel} from "../class-room-create-model";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 import {CourseModel} from "../../course-model";
+import {AbstractCourseComponentsCreate} from "../../abstract-course-components/abstract-course-components-create";
 
 @Component({
     selector: 'app-create-class-room',
@@ -33,7 +33,6 @@ import {CourseModel} from "../../course-model";
         SelectionInput
     ],
     templateUrl: './create-class-room.component.html',
-    styleUrl: './create-class-room.component.scss'
 })
 export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
@@ -41,7 +40,7 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
     private _courses: CourseModel[] = [];
 
     constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
-        super(service, dialogRef, formBuilder);
+        super(service, dialogRef, formBuilder, "Create Class Room");
 
         userService.fetchAllReduced.subscribe((user: ReducedUserModel[]): void => { this._users = user; });
         this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });

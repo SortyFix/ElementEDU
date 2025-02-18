@@ -1,26 +1,28 @@
-<app-general-create title="Create new Course" [loading]="loading">
-    <mat-card-content class="content-wrapper">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-general-create title="{{ title }}" [loading]="loading">
+        <mat-card-content class="content-wrapper">
 
-        <mat-form-field appearance="outline">
-            <mat-label>Course Name</mat-label>
-            <input formControlName="name" type="text" matInput/>
-        </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Course Name</mat-label>
+                <input formControlName="name" type="text" matInput/>
+            </mat-form-field>
 
-        <general-selection-input
-            [values]="subjects"
-            label="Subject"
-            formControlName="subject">
-        </general-selection-input>
+            <general-selection-input
+                [values]="subjects"
+                label="Subject"
+                formControlName="subject">
+            </general-selection-input>
 
-        <!--public constructor(-->
-        <!--private readonly _name: string,-->
-        <!--private readonly _subjectId: number,-->
-        <!--private readonly _classId?: number,-->
-        <!--private readonly _users: number[] = []-->
-        <!--) {}-->
-    </mat-card-content>
-    <mat-card-actions align="end">
-        <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
-        <button mat-stroked-button type="submit">Submit</button>
-    </mat-card-actions>
-</app-general-create>
+            <!--public constructor(-->
+            <!--private readonly _name: string,-->
+            <!--private readonly _subjectId: number,-->
+            <!--private readonly _classId?: number,-->
+            <!--private readonly _users: number[] = []-->
+            <!--) {}-->
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
+            <button mat-stroked-button type="submit">Submit</button>
+        </mat-card-actions>
+    </app-general-create>
+</form>

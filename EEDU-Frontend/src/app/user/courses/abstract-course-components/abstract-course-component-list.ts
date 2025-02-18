@@ -1,7 +1,7 @@
-import {SelectionType} from "../../common/abstract-list/abstract-list.component";
 import {AbstractCourseComponentsService} from "./abstract-course-components-service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
+import {SelectionType} from "../../../common/abstract-list/abstract-list.component";
 
 export abstract class AbstractCourseComponentList<T> {
 

@@ -8,8 +8,12 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {RoomService} from "../room.service";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
-import {AbstractCourseComponentsCreate} from "../../abstract-course-components-create";
 import {RoomModel} from "../room-model";
+import {
+    AbstractCourseComponentsCreateMultiple
+} from "../../abstract-course-components/abstract-course-components-create-multiple";
+import {MatChipGrid, MatChipInput, MatChipRow} from "@angular/material/chips";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-create-room',
@@ -23,15 +27,18 @@ import {RoomModel} from "../room-model";
         MatLabel,
         MatFormField,
         ReactiveFormsModule,
-        MatInput
+        MatInput,
+        MatChipGrid,
+        MatChipRow,
+        MatIcon,
+        MatChipInput
     ],
-  templateUrl: './create-room.component.html',
-  styleUrl: './create-room.component.scss'
+  templateUrl: '../../abstract-course-components/abstract-course-components-create-multiple.html',
 })
-export class CreateRoomComponent extends AbstractCourseComponentsCreate<RoomModel> {
+export class CreateRoomComponent extends AbstractCourseComponentsCreateMultiple<RoomModel> {
 
     public constructor(roomService: RoomService, dialogRef: DialogRef, formBuilder: FormBuilder)
     {
-        super(roomService, dialogRef, formBuilder);
+        super(roomService, dialogRef, formBuilder, "Create Room");
     }
 }

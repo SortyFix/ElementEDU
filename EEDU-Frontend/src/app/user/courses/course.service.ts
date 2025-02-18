@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {CourseModel} from "./course-model";
-import {AbstractCourseComponentsService} from "./abstract-course-components-service";
 import {GenericCourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
+import {AbstractCourseComponentsService} from "./abstract-course-components/abstract-course-components-service";
 
 /**
  * Service for managing {@link CourseModel} instances.
@@ -30,7 +30,6 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
             this.translate, tap((response: CourseModel[]): void =>
             {
                 this._allSubject.next(response);
-                console.log("feteched stuff")
                 this._fetchedAdmin = true;
             })
         );

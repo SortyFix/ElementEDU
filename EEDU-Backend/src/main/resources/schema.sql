@@ -248,12 +248,6 @@ CREATE TABLE IF NOT EXISTS post_tags
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
-
-INSERT INTO class_room_entity (name)
-VALUES ('Room 101'),
-       ('Room 102'),
-       ('Room 103');
-
 INSERT INTO subject_entity (name)
 VALUES ('Mathematics'),
        ('Physics'),
@@ -291,11 +285,11 @@ VALUES ('/repo/algebra/101'),   -- File for Algebra 101
        ('/repo/programming'); -- File for Introduction to Programming
 
 INSERT INTO course_entity (name, subject_id, repository_id, class_room_id)
-VALUES ('Algebra 101', 1, 1, 1),  -- Mathematics (Algebra), Room 101
-       ('Calculus 101', 1, 2, 1), -- Mathematics (Calculus), Room 101
-       ('Physics 101', 2, 3, 2),  -- Physics, Room 102
-       ('History 101', 3, 4, 3),  -- History, Room 103
-       ('Introduction to Programming', 4, 5, 2); -- Computer Science, Room 102
+VALUES ('Algebra 101', 1, 1, NULL),  -- Mathematics (Algebra), Room 101
+       ('Calculus 101', 1, 2, NULL), -- Mathematics (Calculus), Room 101
+       ('Physics 101', 2, 3, NULL),  -- Physics, Room 102
+       ('History 101', 3, 4, NULL),  -- History, Room 103
+       ('Introduction to Programming', 4, 5, NULL); -- Computer Science, Room 102
 
 INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
 

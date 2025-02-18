@@ -1,11 +1,12 @@
-import {ReducedUserModel} from "../../reduced-user-model";
+import {GenericReducedUserModel, ReducedUserModel} from "../../reduced-user-model";
 import {CourseModel} from "../course-model";
 
 export interface GenericClassRoomModel
 {
     id: bigint;
     name: string;
-    users: ReducedUserModel[];
+    tutor: GenericReducedUserModel;
+    students: GenericReducedUserModel[];
     courses: CourseModel[];
 }
 
@@ -14,13 +15,16 @@ export class ClassRoomModel {
     constructor(
         private readonly _id: bigint,
         private readonly _name: string,
-        private readonly _users: ReducedUserModel[],
+        private readonly _tutor: ReducedUserModel,
+        private readonly _students: ReducedUserModel[],
         private readonly _courses: CourseModel[]
     ) { }
 
     public static fromObject(obj: GenericClassRoomModel): ClassRoomModel
     {
-        return new ClassRoomModel(obj.id, obj.name, obj.users || [], obj.courses || []);
+        return new ClassRoomModel(obj.id, obj.name, ReducedUserModel.fromObject(obj.tutor), obj.students.map(
+            (item: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(item)
+        ), obj.courses);
     }
 
     public get id(): bigint {
@@ -31,8 +35,12 @@ export class ClassRoomModel {
         return this._name;
     }
 
-    public get users(): ReducedUserModel[] {
-        return this._users;
+    public get students(): ReducedUserModel[] {
+        return this._students;
+    }
+
+    public get tutor(): ReducedUserModel {
+        return this._tutor;
     }
 
     public get courses(): CourseModel[] {

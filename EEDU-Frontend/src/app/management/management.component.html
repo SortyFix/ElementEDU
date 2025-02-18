@@ -10,7 +10,24 @@
 </p>
 
 <mat-tab-group>
-    @for (tab of asyncCourseComponents | async; track tab) {
-        <mat-tab [label]="tab.label"><ng-container *ngComponentOutlet="tab.component"></ng-container></mat-tab>
-    }
+    <mat-tab label="Courses">
+        <ng-template matTabContent>
+            <app-course-list></app-course-list>
+        </ng-template>
+    </mat-tab>
+    <mat-tab label="Class Rooms">
+        <ng-template matTabContent>
+            <app-class-room-list></app-class-room-list>
+        </ng-template>
+    </mat-tab>
+    <mat-tab label="Rooms">
+        <ng-template matTabContent>
+            <app-room-list></app-room-list>
+        </ng-template>
+    </mat-tab>
+    <mat-tab label="Subjects">
+        <ng-template matTabContent>
+            <app-subject-list></app-subject-list>
+        </ng-template>
+    </mat-tab>
 </mat-tab-group>

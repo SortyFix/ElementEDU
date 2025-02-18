@@ -3,12 +3,25 @@ import {AbstractCourseComponentsService} from "./abstract-course-components-serv
 import {DialogRef} from "@angular/cdk/dialog";
 
 export abstract class AbstractCourseComponentsCreate<T> {
+
+    private readonly _title: string;
+
     private readonly _values: T[] = [];
     private readonly _form: FormGroup;
 
-    protected constructor(private _service: AbstractCourseComponentsService<any, any>, private _dialogRef: DialogRef, formBuilder: FormBuilder) {
+    protected constructor
+    (
+        private _service: AbstractCourseComponentsService<any, any>,
+        private _dialogRef: DialogRef, formBuilder: FormBuilder,
+        title: string
+    ) {
         this._form = this.getForm(formBuilder);
-        this._service.value$.subscribe((values: T[]) => { this.values = values; });
+        this._service.value$.subscribe((values: T[]): void => { this.values = values; });
+        this._title = title;
+    }
+
+    protected get title(): string {
+        return this._title;
     }
 
     protected get form(): FormGroup {

@@ -4,7 +4,6 @@ import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,12 +29,6 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return userService.getClassRoomService();
     }
 
-    @PostMapping("{classroom}/tutor/{tutor}") public @NotNull HttpStatus setTutor(@PathVariable long classroom, @PathVariable long tutor)
-    {
-        ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classroom);
-        return classRoom.setTutor(getUserService().loadEntityByIDSafe(tutor)) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-    }
-
     @PostMapping("{course}/link/{classroom}") public @NotNull HttpStatus linkClass(@PathVariable long course, @PathVariable long classroom)
     {
         log.info("Received incoming request for linking the class {} to course {}.", classroom, course);
@@ -53,24 +46,6 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         CourseService courseService = getService().getCourseService();
         boolean modified = courseService.loadEntityByIDSafe(course).unlinkClassRoom(courseService);
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-    }
-
-    @PostMapping("/{classId}/attach") public @NotNull HttpStatus attachUser(@NotNull @PathVariable Long classId, @NotNull @RequestBody Long... users)
-    {
-        log.info("Received incoming request for attaching user(s) {} to classroom {}.", users, classId);
-
-        ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classId);
-        UserEntity[] userArray = getUserService().loadEntityById(users).toArray(UserEntity[]::new);
-
-        return classRoom.attachStudents(getService(), userArray) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-    }
-
-    @GetMapping("{classId}/detach") public @NotNull HttpStatus detachUser(@NotNull @PathVariable Long classId, @NotNull @RequestBody Long... users)
-    {
-        log.info("Received incoming request for detaching user(s) {} from classroom {}.", users, classId);
-
-        ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classId);
-        return classRoom.detachStudents(getService(), users) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     @PreAuthorize("@verificationService.isFullyAuthenticated()")
