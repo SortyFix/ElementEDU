@@ -1,0 +1,17 @@
+<div class="file-upload-container">
+    <input type="file" id="fileInput" hidden [multiple]="maxFiles() > 1" (change)="onFileSelected($event)" [accept]="accept()">
+    <label for="fileInput" class="file-upload-label">
+        <div class="file-upload-content">
+            <mat-icon>upload</mat-icon>
+            <div class="upload-text">
+                <p>Click to upload medical document</p>
+            </div>
+        </div>
+    </label>
+    <div class="selected-file" *ngIf="this.containsMultipleFiles">
+        {{ selectedFiles?.length }} files selected.
+    </div>
+    <div class="selected-file" *ngIf="this.containsOneFile">
+        {{ this.singleFileName }}
+    </div>
+</div>
