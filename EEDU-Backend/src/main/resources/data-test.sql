@@ -30,7 +30,7 @@ VALUES ('Users'),
        ('Admin'),
        ('Dummy');
 
-INSERT INTO privilege_entity (name)
+INSERT INTO privilege_entity (id)
 VALUES ('READ'),
        ('WRITE'),
        ('MODERATE'),
@@ -89,7 +89,7 @@ MERGE INTO chat_entity_users (chat_id, user_id) VALUES (1, 1), (1, 3), (2, 2), (
 
 MERGE INTO user_groups (user_id, group_id) VALUES (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (3, 3), (4, 4);
 
-MERGE INTO group_privileges (group_id, privilege_id) VALUES (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (3, 3), (4, 4);
+MERGE INTO group_privileges (group_id, privilege_id) VALUES (1, 'READ'), (2, 'READ'), (2, 'WRITE'), (3, 'READ'), (3, 'WRITE'), (3, 'MODERATE'), (4, 'DUMMY');
 
 MERGE INTO course_users (course_id, user_id) VALUES (2, 2), (3, 1), (4, 4);
 

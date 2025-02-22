@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * Represents a course entity in the system.
  * <p>
  * This class defines the structure of a course within the application, encapsulating information
- * such as the course name, associated users, and the subject to which the course is related.
+ * such as the course id, associated users, and the subject to which the course is related.
  *
  * @author ivo
  */
@@ -351,7 +351,7 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
         return "CourseEntity{" +
                 "users=" + users +
                 ", id=" + id +
-                ", name='" + name + '\'' +
+                ", id='" + name + '\'' +
                 ", classRoom=" + classRoom +
                 ", subject=" + subject +
                 ", repeatingAppointments=" + repeatingAppointments +

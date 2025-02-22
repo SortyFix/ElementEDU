@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * This class represents a database entry of a group.
  * <p>
- * This is the representation of a database entry of a group. It contains its id, name, users and the
+ * This is the representation of a database entry of a group. It contains its id, id, users and the
  * privileges this group has.
  * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by
  * adding {@link PrivilegeEntity}s to
@@ -77,17 +77,17 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
     }
 
     /**
-     * This method is used to convert the name of a user/role to a format that aligns with spring API,
+     * This method is used to convert the id of a user/role to a format that aligns with spring API,
      * specifically {@link GrantedAuthority}.
      * <p>
-     * The format adopted is to prefix the name with "ROLE_", this is because the spring API
+     * The format adopted is to prefix the id with "ROLE_", this is because the spring API
      * uses roles to check authorizations and expects role names to be in specific formats.
      * GrantedAuthority is a key interface in the Spring Security framework, representing an
      * authority that's been granted to an Authentication object. The main benefit of this
      * convention is that it enables method level security.
      *
      * @return a new {@link SimpleGrantedAuthority} object which
-     * incorporates the adjusted (prefixed) name/role. SimpleGrantedAuthority is a basic,
+     * incorporates the adjusted (prefixed) id/role. SimpleGrantedAuthority is a basic,
      * immutable implementation of {@link GrantedAuthority}.
      * @see SimpleGrantedAuthority
      * @see GrantedAuthority
@@ -153,7 +153,7 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
      *
      * @param privilegeEntity which should be added to this method.
      * @return whether a {@link PrivilegeEntity} has been added to this method.
-     * @see #revokePrivilege(Long...)
+     * @see #revokePrivilege(String...)
      * @see #getPrivileges()
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
@@ -163,7 +163,7 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
 
     /**
      * Revokes various privileges from this group and saves the state using the provided group service.
-     * The privileges are specified via their IDs. The method will invoke {@link #revokePrivilege(Long...)}
+     * The privileges are specified via their IDs. The method will invoke {@link #revokePrivilege(String...)}
      * to perform the actual removal of the privileges, and then use the service to save the updated entity state.
      * <p>
      * The process is carried out within a transaction, ensuring that all changes are either applied in full
@@ -173,7 +173,7 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
      * @param id           the IDs of the privileges to revoke
      * @return true if a privilege was successfully revoked and the group entity was saved, false otherwise
      */
-    @Transactional public boolean revokePrivilege(@NotNull GroupService groupService, @NotNull Long... id)
+    @Transactional public boolean revokePrivilege(@NotNull GroupService groupService, @NotNull String... id)
     {
         if (revokePrivilege(id))
         {
@@ -198,9 +198,9 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
      * @see #grantPrivilege(PrivilegeEntity...)
      * @see #getPrivileges()
      */
-    public boolean revokePrivilege(@NotNull Long... id)
+    public boolean revokePrivilege(@NotNull String... id)
     {
-        Collection<Long> revokeIds = Arrays.asList(id);
+        Collection<String> revokeIds = Arrays.asList(id);
         return privileges.removeIf(privilege -> revokeIds.contains(privilege.getId()));
     }
 
@@ -213,11 +213,11 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
      * Note that this method returns a {@link Unmodifiable} set as the list
      * should not be edited here.
      * To grant or revoke privileges the methods {@link #grantPrivilege(PrivilegeEntity...)} or
-     * {@link #revokePrivilege(Long...)} can be used.
+     * {@link #revokePrivilege(String...)} can be used.
      *
      * @return an unmodifiable list containing all privileges this group has.
      * @see #grantPrivilege(PrivilegeEntity...)
-     * @see #revokePrivilege(Long...)
+     * @see #revokePrivilege(String...)
      */
     public @NotNull @Unmodifiable Set<PrivilegeEntity> getPrivileges()
     {
@@ -241,7 +241,7 @@ public class GroupEntity implements EntityModelRelation<Long, GroupModel>
 
     @Override public String toString()
     {
-        return "GroupEntity{" + "id=" + id + ", name='" + name + '\'' + ", users=" + users + ", privileges=" + privileges + '}';
+        return "GroupEntity{" + "id=" + id + ", id='" + name + '\'' + ", users=" + users + ", privileges=" + privileges + '}';
     }
 
     @Override public boolean equals(Object object)

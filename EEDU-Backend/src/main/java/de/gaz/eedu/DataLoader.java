@@ -108,13 +108,13 @@ import java.util.stream.Stream;
         {
             if(Objects.equals(group, "administrator"))
             {
-                return new GroupCreateModel(group, privileges.stream().map(PrivilegeEntity::getId).toArray(Long[]::new));
+                return new GroupCreateModel(group, privileges.stream().map(PrivilegeEntity::getId).toArray(String[]::new));
             }
             if(Objects.equals(group, "student") || Objects.equals(group, "teacher"))
             {
                 return null;
             }
-            return new GroupCreateModel(group, new Long[0]);
+            return new GroupCreateModel(group, new String[0]);
         });
 
         return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getName(), "administrator")).findFirst().orElseThrow();
@@ -139,9 +139,9 @@ import java.util.stream.Stream;
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity, @NotNull GroupEntity groupEntity)
     {
         return getUserService().saveEntity(getUserService().createEntity(Set.of(new UserCreateModel(
-                "root", // first name
-                "root", // last name
-                "root", // login name
+                "root", // first id
+                "root", // last id
+                "root", // login id
                 AccountType.ADMINISTRATOR,
                 true, // enabled
                 false, // locked

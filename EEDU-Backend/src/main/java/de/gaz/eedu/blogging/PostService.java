@@ -79,7 +79,7 @@ public class PostService extends EntityService<Long, PostRepository, PostEntity,
     /**
      * Edits an existing model by setting and saving all given values.
      * @param postId the id of the post to edit
-     * @param author the name of the author; Has no connection to other UserEntities, merely for style
+     * @param author the id of the author; Has no connection to other UserEntities, merely for style
      * @param title the title of the post
      * @param body the body of the post
      * @return PostModel containing the given values

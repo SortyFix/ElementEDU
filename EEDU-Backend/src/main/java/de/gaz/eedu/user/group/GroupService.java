@@ -49,7 +49,7 @@ public class GroupService extends EntityService<Long, GroupRepository, GroupEnti
 
         return getRepository().saveAll(createModel.stream().map(current -> current.toEntity(new GroupEntity(), group ->
         {
-            List<Long> ids = Arrays.asList(current.privileges());
+            List<String> ids = Arrays.asList(current.privileges());
             group.grantPrivilege(getPrivilegeRepository().findAllById(ids).toArray(PrivilegeEntity[]::new));
             return group;
         })).toList());

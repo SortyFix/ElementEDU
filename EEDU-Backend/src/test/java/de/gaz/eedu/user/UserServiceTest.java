@@ -136,7 +136,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
      * whereas the removal of a user with userID 2 is anticipated to fail. The users are present as declared in
      * the data-test.sql file.
      * <p>
-     * Similar to the 'testUserAddGroup' method, {@link ParameterizedTest} and a custom name are used to provide
+     * Similar to the 'testUserAddGroup' method, {@link ParameterizedTest} and a custom id are used to provide
      * better clarity in the logs when a test fails, and the {@link ValueSource} annotation provides the input
      * values for the tests.
      * <p>
