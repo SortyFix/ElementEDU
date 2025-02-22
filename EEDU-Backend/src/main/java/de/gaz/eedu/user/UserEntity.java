@@ -166,14 +166,14 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * Attaches a {@link GroupEntity} to this user.
      * <p>
      * This method adds groups this user should be in. This is stored in {@code groups}.
-     * These groups can be detached using {@link #detachGroups(Long...)}.
+     * These groups can be detached using {@link #detachGroups(String...)}.
      * <p>
      * Note that this method accesses {@code groups} directly as the getter
      * {@link #getGroups()} returns an {@link Unmodifiable} list.
      *
      * @param groupEntities to add to the user.
      * @return whether a group has been added or not.
-     * @see #detachGroups(Long...)
+     * @see #detachGroups(String...)
      * @see #getGroups()
      */
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
@@ -190,7 +190,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
 
     private static boolean containsGroup(@NotNull Collection<GroupEntity> entities, @NotNull String name)
     {
-        return entities.stream().anyMatch(group -> Objects.equals(group.getName(), name));
+        return entities.stream().anyMatch(group -> Objects.equals(group.getId(), name));
     }
 
     /**
@@ -206,7 +206,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @param ids         The IDs of the groups to be detached.
      * @return true if a group was successfully detached and the user entity was saved, false otherwise.
      */
-    public boolean detachGroups(@NotNull UserService userService, @NotNull Long... ids)
+    public boolean detachGroups(@NotNull UserService userService, @NotNull String... ids)
     {
         return saveEntityIfPredicateTrue(userService, ids, this::detachGroups);
     }
@@ -224,9 +224,9 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @see #attachGroups(GroupEntity...)
      * @see #getGroups()
      */
-    public boolean detachGroups(@NotNull Long... ids)
+    public boolean detachGroups(@NotNull String... ids)
     {
-        List<Long> detachGroupIds = Arrays.asList(ids);
+        List<String> detachGroupIds = Arrays.asList(ids);
         return this.groups.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
     }
 
@@ -236,11 +236,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * This method returns the contents of the list {@code groups} and makes it {@link Unmodifiable}.
      * This is necessary to clarify that the list should not be edited this way but rather using the method
      * {@link #attachGroups(GroupEntity...)}
-     * or {@link #detachGroups(Long...)}.
+     * or {@link #detachGroups(String...)}.
      *
      * @return an unmodifiable list.
      * @see #attachGroups(GroupEntity...)
-     * @see #detachGroups(Long...)
+     * @see #detachGroups(String...)
      */
     public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
     {
@@ -253,12 +253,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * This method searches for a {@link GroupEntity} in the user's groups with a matching id. Returns {@code true}
      * if a matching group is found, indicating the user's membership in that group; otherwise, returns {@code false}.
      *
-     * @param name The id of the group to check for membership.
+     * @param id The id of the group to check for membership.
      * @return {@code true} if the user is a member of a group with the specified id; {@code false} otherwise.
      */
-    public boolean inGroup(@NotNull String name)
+    public boolean inGroup(@NotNull String id)
     {
-        return getGroups().stream().anyMatch(groupEntity -> groupEntity.getName().equals(name));
+        return getGroups().stream().anyMatch(groupEntity -> Objects.equals(groupEntity.getId(), id));
     }
 
     /**

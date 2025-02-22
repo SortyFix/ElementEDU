@@ -108,7 +108,7 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
      *                   Must not be null.
      */
     @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_GRANT')") @PutMapping("/{group}/grant/{privileges}")
-    public @NotNull ResponseEntity<Void> grantPrivileges(@PathVariable long group, @PathVariable @NotNull String[] privileges)
+    public @NotNull ResponseEntity<Void> grantPrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
 
@@ -134,7 +134,7 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
      *                   Must not be null.
      */
     @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_REVOKE')") @DeleteMapping("/{group}/revoke/{privileges}")
-    public @NotNull ResponseEntity<Void> revokePrivileges(@PathVariable long group, @PathVariable @NotNull String[] privileges)
+    public @NotNull ResponseEntity<Void> revokePrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
     {
         log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);
 

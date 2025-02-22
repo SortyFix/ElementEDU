@@ -67,7 +67,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
                 false,
                 UserStatus.PRESENT,
                 1L,
-                new Long[0]
+                new String[0]
         );
     }
 
@@ -88,7 +88,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
                 false,
                 UserStatus.PRESENT,
                 1L,
-                new Long[0]
+                new String[0]
         );
 
         final ThemeModel themeModel = themeService.loadByIdSafe(1L);
@@ -116,7 +116,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     @ValueSource(longs = {2, 3})
     @ParameterizedTest(name = "{index} => request={0}")
     public void testAttachGroup(long userID) {
-        GroupEntity groupEntity = getGroupService().loadEntityById(3L).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getGroupService().loadEntityById("admin").orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
         Runnable test = () -> test(Eval.eval(groupEntity, true, Validator.equals()), userEntity::attachGroups);
@@ -152,7 +152,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void testDetachGroup(long userID) {
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
-        test(Eval.eval(3L /* groupId */, userID == 3, Validator.equals()), userEntity::detachGroups);
+        test(Eval.eval("admin", userID == 3, Validator.equals()), userEntity::detachGroups);
     }
 
     @ParameterizedTest

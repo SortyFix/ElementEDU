@@ -28,12 +28,13 @@ import java.util.Set;
  *
  * @author Ivo Quiring
  */
+
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/user/group")
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-@Slf4j
-public class GroupController extends EntityController<Long, GroupService, GroupModel, GroupCreateModel>
+@RequestMapping("/api/v1/user/group")
+public class GroupController extends EntityController<String, GroupService, GroupModel, GroupCreateModel>
 {
     private final GroupService service;
 
@@ -52,8 +53,8 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
      *               Must not be null.
      */
     @PreAuthorize("hasAuthority('USER_GROUP_ATTACH')")
-    @PostMapping("/{user}/attach")
-    public HttpStatus attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    @PostMapping("/{user}/attach/{groups}")
+    public ResponseEntity<Void> attachGroups(@PathVariable long user, @PathVariable @NotNull String[] groups)
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
 
@@ -61,7 +62,7 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
         UserService userService = getService().getUserService();
 
         boolean modified = userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
     /**
@@ -80,13 +81,13 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
      */
     @PreAuthorize("hasAuthority('USER_GROUP_DETACH')")
     @PostMapping("/{user}/detach")
-    public @NotNull HttpStatus detachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    public @NotNull ResponseEntity<Void> detachGroups(@PathVariable long user, @RequestBody @NotNull String... groups)
     {
         log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
 
         UserService userService = getService().getUserService();
         boolean modified = userService.loadEntityByIDSafe(user).detachGroups(userService, groups);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
     /**
@@ -124,7 +125,7 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
      * @return {@code true} if the group was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('GROUP_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull String[] id)
     {
         return super.delete(id);
     }
@@ -142,13 +143,13 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
      * @param id the unique identifier of the group to retrieve, provided as a path variable. Must not be null.
      * @return a {@link ResponseEntity} containing the {@link GroupModel} of the specified group.
      */
-    @PreAuthorize("hasAnyAuthority('USER_GROUP_ATTACH', 'USER_GROUP_DETACH', 'DELETE', 'CREATE')") @GetMapping("/get/{id}") @Override
-    public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull Long id)
+    @GetMapping("/get/{id}") @Override
+    public @NotNull ResponseEntity<GroupModel> getData(@PathVariable @NotNull String id)
     {
         return super.getData(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('USER_GROUP_ATTACH', 'USER_GROUP_DETACH', 'DELETE', 'CREATE')") @GetMapping("/get/all") @Override
+    @GetMapping("/get/all") @Override
     public @NotNull ResponseEntity<Set<GroupModel>> fetchAll()
     {
         return super.fetchAll();

@@ -15,6 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Objects;
+
 /**
  * Test class for GroupService.
  * <p>
@@ -27,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author ivo
  */
 @Getter(AccessLevel.PROTECTED)
-public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntity, GroupModel, GroupCreateModel>
+public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
     @Autowired private GroupService service;
     @Autowired private PrivilegeService privilegeService;
@@ -35,17 +37,17 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
         GroupCreateModel groupCreateModel = new GroupCreateModel("test", new String[0]);
-        GroupModel groupModel = new GroupModel(5L, "test", new PrivilegeModel[0]);
+        GroupModel groupModel = new GroupModel("test", new PrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
-            Assertions.assertEquals(expect.name(), result.name());
+            Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.privileges().length, result.privileges().length);
         });
     }
 
     @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
-        return new GroupCreateModel("Users", new String[0]);
+        return new GroupCreateModel("user", new String[0]);
     }
 
     /**
@@ -71,11 +73,12 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
      * @param groupID the current group id to be tested for granting privilege. These are adjustable in the
      *                {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional public void testGroupGrantPrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"moderator", "admin"})
+    @Transactional public void testGroupGrantPrivilege(String groupID)
     {
         PrivilegeEntity privilegeEntity = getPrivilegeService().loadEntityByIDSafe("MODERATE");
         GroupEntity groupEntity = getService().loadEntityByIDSafe(groupID);
-        test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
+        test(Eval.eval(privilegeEntity, Objects.equals(groupID, "moderator"), Validator.equals()), groupEntity::grantPrivilege);
     }
 
     /**

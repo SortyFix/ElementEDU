@@ -117,7 +117,7 @@ import java.util.stream.Stream;
             return new GroupCreateModel(group, new String[0]);
         });
 
-        return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getName(), "administrator")).findFirst().orElseThrow();
+        return getGroupService().createEntity(stream.filter(Objects::nonNull).collect(Collectors.toSet())).stream().filter(group -> Objects.equals(group.getId(), "administrator")).findFirst().orElseThrow();
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
@@ -147,7 +147,7 @@ import java.util.stream.Stream;
                 false, // locked
                 UserStatus.PROSPECTIVE,
                 themeEntity.getId(),
-                new Long[] {groupEntity.getId()} // groups
+                new String[] { groupEntity.getId() } // groups
         ))).getFirst());
     }
 
