@@ -10,9 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record ClassRoomModel(@NonNull Long id, @NonNull String name, @NonNull UserModel[] users,
-                             @NonNull CourseModel[] courses) implements EntityModel
-{
+public record ClassRoomModel(
+        @NonNull Long id,
+        @NonNull String name,
+        @NonNull UserModel[] users,
+        @NonNull CourseModel[] courses
+) implements EntityModel<Long> {
 
     @Contract(pure = true)
     @Override

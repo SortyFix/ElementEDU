@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  * @see PrivilegeEntity
  */
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity")
-public class GroupEntity implements EntityModelRelation<GroupModel>
+public class GroupEntity implements EntityModelRelation<Long, GroupModel>
 {
 
     private final static Set<String> PROTECTED_GROUPS;

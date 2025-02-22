@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service @AllArgsConstructor
-public class ThemeService extends EntityService<ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
+public class ThemeService extends EntityService<Long, ThemeRepository, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
     private final ThemeRepository themeRepository;
 

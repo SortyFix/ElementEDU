@@ -48,7 +48,7 @@ public class WebsocketTest
 
     @Test
     // This test needs to run with a Spring Boot Application/Server running in the background, as Websockets require one.
-    public void wsMessageRecieveTest()
+    public void wsMessageReceiveTest()
     {
         try{
             StompSession session = stompClient.connectAsync(getWebsocketURL(), new StompSessionHandlerAdapter() {})

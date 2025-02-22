@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public record GroupModel(@NotNull Long id, @NotEmpty(message = "Name must not be empty.") String name,
-                         @NotNull PrivilegeModel[] privileges) implements EntityModel
+                         @NotNull PrivilegeModel[] privileges) implements EntityModel<Long>
 {
 
 

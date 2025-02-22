@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 //TODO manage access
 
 @RestController @RequestMapping("/api/v1/course/classroom") @RequiredArgsConstructor @Slf4j
-public class ClassRoomController extends EntityController<ClassRoomService, ClassRoomModel, ClassRoomCreateModel>
+public class ClassRoomController extends EntityController<Long, ClassRoomService, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final UserService userService;
 

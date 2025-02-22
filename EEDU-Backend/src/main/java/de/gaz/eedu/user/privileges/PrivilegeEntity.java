@@ -13,7 +13,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity") public class PrivilegeEntity implements EntityModelRelation<PrivilegeModel>
+@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity")
+public class PrivilegeEntity implements EntityModelRelation<Long, PrivilegeModel>
 {
     private final static Set<String> PROTECTED_PRIVILEGES;
 

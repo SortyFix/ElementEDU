@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @Getter(AccessLevel.PROTECTED)
-public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, ThemeModel, ThemeCreateModel>
+public class ThemeServiceTest extends ServiceTest<Long, ThemeService, ThemeEntity, ThemeModel, ThemeCreateModel>
 {
     @Autowired private ThemeService service;
 
@@ -40,7 +40,7 @@ public class ThemeServiceTest extends ServiceTest<ThemeService, ThemeEntity, The
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities()
+    protected @NotNull TestData<Long, Boolean>[] deleteEntities()
     {
         return new TestData[] {new TestData<>(4, true) };
     }

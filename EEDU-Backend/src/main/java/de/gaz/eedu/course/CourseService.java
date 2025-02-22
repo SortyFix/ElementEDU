@@ -32,7 +32,7 @@ import java.time.Instant;
 import java.util.*;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
-public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
+public class CourseService extends EntityService<Long, CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     private final CourseRepository repository;
     private final SubjectService subjectService;
@@ -42,7 +42,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
     private final FileService fileService;
 
     @Contract(pure = true, value = "_, _ -> new")
-    private static @NotNull CreationFactory<AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
+    private static @NotNull CreationFactory<Long, AppointmentEntryEntity> createEntity(@NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
     {
         return entity ->
         {
@@ -158,7 +158,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
      */
     private @NotNull AppointmentEntryEntity createAppointmentUnsafe(long id, @NotNull AppointmentEntryCreateModel entryCreateModel, @NotNull CourseEntity course)
     {
-        CreationFactory<AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
+        CreationFactory<Long, AppointmentEntryEntity> factory = createEntity(entryCreateModel, course);
         AppointmentEntryEntity entry = entryCreateModel.toEntity(new AppointmentEntryEntity(id), factory);
         getAppointmentEntryRepository().save(entry);
 

@@ -5,12 +5,12 @@ import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
 import de.gaz.eedu.user.verification.VerificationService;
+import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
 import de.gaz.eedu.user.verification.credentials.model.TemporaryCredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.UndefinedCredentialCreateModel;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -50,7 +50,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/user/login/credentials")
 @RequiredArgsConstructor
-public class CredentialController extends EntityController<CredentialService, CredentialModel, CredentialCreateModel>
+public class CredentialController extends EntityController<Long, CredentialService, CredentialModel, CredentialCreateModel>
 {
     @Value("${development}") private final boolean development = false;
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
@@ -115,7 +115,8 @@ public class CredentialController extends EntityController<CredentialService, Cr
     {
         validate(getService().enable(method, code, token), unauthorizedThrowable());
 
-        if (isAuthorized(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
+        // return login token after user has set up the credential
+        if (hasAuthority(JwtTokenType.CREDENTIAL_CREATION_PENDING.getAuthority().getAuthority(), VerificationAuthority.class))
         {
             return authorizeToken(getService().verify(method, code, token), response);
         }
@@ -137,6 +138,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PostMapping("/verify")
     public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute @NotNull TokenData token, @NotNull HttpServletResponse response)
     {
+        //noinspection unchecked
         List<String> credentials = token.get("available", List.class);
         CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
 

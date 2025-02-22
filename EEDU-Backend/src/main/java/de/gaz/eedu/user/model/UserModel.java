@@ -39,7 +39,7 @@ public record UserModel(
         @NotNull AccountType accountType,
         @NotNull UserStatus status,
         @NotNull GroupModel[] groups,
-        @NotNull ThemeModel theme) implements EntityModel
+        @NotNull ThemeModel theme) implements EntityModel<Long>
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()

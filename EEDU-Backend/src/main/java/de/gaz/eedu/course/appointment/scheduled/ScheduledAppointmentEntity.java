@@ -20,9 +20,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Setter @Entity @Getter @NoArgsConstructor
-public class ScheduledAppointmentEntity implements EntityModelRelation<ScheduledAppointmentModel>
+public class ScheduledAppointmentEntity implements EntityModelRelation<Long, ScheduledAppointmentModel>
 {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     @JsonBackReference @ManyToOne(optional = false) @JoinColumn(name = "course_id", referencedColumnName = "id")
     private CourseEntity course;
     private Instant timeStamp;

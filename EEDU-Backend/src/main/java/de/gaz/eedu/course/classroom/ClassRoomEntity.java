@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @see ClassRoomModel
  */
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "class_room_entity")
-public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
+public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     private String name;

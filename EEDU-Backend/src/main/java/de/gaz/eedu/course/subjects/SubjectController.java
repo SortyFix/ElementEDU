@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/course/subject")
 @RequiredArgsConstructor
-public class SubjectController extends EntityController<SubjectService, SubjectModel, SubjectCreateModel>
+public class SubjectController extends EntityController<Long, SubjectService, SubjectModel, SubjectCreateModel>
 {
     private final SubjectService subjectService;
 

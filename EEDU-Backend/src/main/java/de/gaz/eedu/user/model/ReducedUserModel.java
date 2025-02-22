@@ -14,6 +14,7 @@ public record ReducedUserModel(@NotNull Long id, @NotNull String firstName, @Not
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", accountType=" + accountType +
                 '}';
     }
 

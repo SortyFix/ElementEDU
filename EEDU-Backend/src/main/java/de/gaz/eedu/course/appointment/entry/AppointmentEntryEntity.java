@@ -26,9 +26,9 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
+@Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject<Long>
 {
-    @Setter(AccessLevel.NONE) @Id private long id;
+    @Setter(AccessLevel.NONE) @Id private Long id;
     private Instant timeStamp;
     private Duration duration;
     private String description, homework;

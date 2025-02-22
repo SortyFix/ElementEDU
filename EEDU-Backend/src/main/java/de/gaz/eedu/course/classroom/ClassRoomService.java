@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor @Service @Getter
-public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
+public class ClassRoomService extends EntityService<Long, ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.NONE) private final ClassRoomRepository classRoomRepository;
     private final CourseService courseService;

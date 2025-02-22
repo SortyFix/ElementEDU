@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record PrivilegeCreateModel(@NotNull String name) implements CreationModel<PrivilegeEntity>
+public record PrivilegeCreateModel(@NotNull String name) implements CreationModel<Long, PrivilegeEntity>
 {
     @Override public @NotNull PrivilegeEntity toEntity(@NotNull PrivilegeEntity privilegeEntity)
     {

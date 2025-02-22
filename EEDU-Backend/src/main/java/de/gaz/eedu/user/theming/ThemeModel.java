@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public record ThemeModel(@NotNull Long id, @NotNull String name,
                          byte backgroundColorR, byte backgroundColorG, byte backgroundColorB,
-                         byte widgetColorR, byte widgetColorG, byte widgetColorB) implements EntityModel
+                         byte widgetColorR, byte widgetColorG, byte widgetColorB) implements EntityModel<Long>
 {
     @Contract(pure = true) @Override public String toString()
     {

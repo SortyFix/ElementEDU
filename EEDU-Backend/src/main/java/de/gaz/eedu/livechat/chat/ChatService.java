@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Getter
-public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
+public class ChatService extends EntityService<Long, ChatRepository, ChatEntity, ChatModel, ChatCreateModel>
 {
     private final ChatRepository chatRepository;
     private final SimpMessagingTemplate messagingTemplate;
@@ -138,7 +138,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
     public @NotNull ChatModel getPersonalizedModel(@NotNull ChatEntity chatEntity, @NotNull Long userId)
     {
         return new ChatModel(
-                chatEntity.getChatId(),
+                chatEntity.getId(),
                 getChatTitle(userId, chatEntity.getUsers()),
                 chatEntity.getTimeOfCreation(),
                 chatEntity.getUsers().toArray(new Long[0]),
@@ -194,7 +194,7 @@ public class ChatService extends EntityService<ChatRepository, ChatEntity, ChatM
             }
 
             MessageEntity messageEntity = messageService.createEntity(Set.of(messageCreateModel)).getFirst();
-            chatEntity.getMessages().add(messageEntity.getMessageId());
+            chatEntity.getMessages().add(messageEntity.getId());
 
             messagingTemplate.
                     convertAndSend(wsIdentifiers.getBroker() + "/" + message.chatId(), messageEntity.toModel());

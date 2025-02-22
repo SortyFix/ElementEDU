@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Set;
 
 @Getter(AccessLevel.PROTECTED)
-public class CredentialServiceTest extends ServiceTest<CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel>
+public class CredentialServiceTest extends ServiceTest<Long, CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
 
     @Autowired private CredentialService service;

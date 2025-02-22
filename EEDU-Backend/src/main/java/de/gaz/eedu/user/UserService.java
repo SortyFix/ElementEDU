@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 @Slf4j
-public class UserService extends EntityService<UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
+public class UserService extends EntityService<Long, UserRepository, UserEntity, UserModel, UserCreateModel> implements UserDetailsService
 {
     @Getter private final VerificationService verificationService;
     @Getter private final ClassRoomService classRoomService;

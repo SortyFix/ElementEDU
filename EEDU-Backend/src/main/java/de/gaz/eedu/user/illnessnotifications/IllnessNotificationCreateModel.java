@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public record IllnessNotificationCreateModel(@NotNull Long userId, @NotNull String reason, @NotNull Long timestamp,
                                              @NotNull Long expirationTime,
-                                             @Nullable Long fileId) implements CreationModel<IllnessNotificationEntity>
+                                             @Nullable Long fileId) implements CreationModel<Long, IllnessNotificationEntity>
 {
     @Override public boolean equals(Object o)
     {

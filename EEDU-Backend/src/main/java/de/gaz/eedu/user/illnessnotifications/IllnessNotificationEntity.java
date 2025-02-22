@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 @AllArgsConstructor @NoArgsConstructor @Getter @Setter @Entity @Builder @Table(name="illness_notification_entity")
-public class IllnessNotificationEntity implements EntityObject, EntityModelRelation<IllnessNotificationModel>
+public class IllnessNotificationEntity implements EntityModelRelation<Long, IllnessNotificationModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     @ManyToOne @JoinColumn(name = "user_id") @JsonBackReference private UserEntity user;

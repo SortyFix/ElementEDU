@@ -5,7 +5,7 @@ import de.gaz.eedu.user.UserEntity;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull Long timestamp) implements CreationModel<MessageEntity>
+public record MessageCreateModel(@NotNull Long authorId, @NotNull String body, @NotNull Long timestamp) implements CreationModel<Long, MessageEntity>
 {
     @Contract(pure = true) @Override public @NotNull String toString()
     {

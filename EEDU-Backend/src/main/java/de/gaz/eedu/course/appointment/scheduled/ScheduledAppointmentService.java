@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class ScheduledAppointmentService extends EntityService<ScheduledAppointmentRepository, ScheduledAppointmentEntity, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
+public class ScheduledAppointmentService extends EntityService<Long, ScheduledAppointmentRepository, ScheduledAppointmentEntity, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
 {
     private final ScheduledAppointmentRepository repository;
     private final CourseService courseService;

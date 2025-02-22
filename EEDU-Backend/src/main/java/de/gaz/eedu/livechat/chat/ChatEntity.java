@@ -12,9 +12,9 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity @AllArgsConstructor @NoArgsConstructor @Getter @Setter @Table(name = "chat_entity")
-public class ChatEntity implements EntityObject, EntityModelRelation<ChatModel>
+public class ChatEntity implements EntityModelRelation<Long, ChatModel>
 {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long chatId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     private Long timeOfCreation;
 
     @ElementCollection @Column(name = "user_id")
@@ -29,7 +29,7 @@ public class ChatEntity implements EntityObject, EntityModelRelation<ChatModel>
     @Override
     public ChatModel toModel()
     {
-        return new ChatModel(chatId, "", timeOfCreation, users.toArray(Long[]::new),
+        return new ChatModel(id, "", timeOfCreation, users.toArray(Long[]::new),
                 messages.toArray(Long[]::new));
     }
 }

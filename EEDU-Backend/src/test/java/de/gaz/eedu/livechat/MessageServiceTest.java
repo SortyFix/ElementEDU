@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
-public class MessageServiceTest extends ServiceTest<MessageService, MessageEntity, MessageModel, MessageCreateModel>
+public class MessageServiceTest extends ServiceTest<Long, MessageService, MessageEntity, MessageModel, MessageCreateModel>
 {
     @Autowired private MessageService service;
 
@@ -40,7 +40,7 @@ public class MessageServiceTest extends ServiceTest<MessageService, MessageEntit
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities()
+    protected @NotNull TestData<Long, Boolean>[] deleteEntities()
     {
         return new TestData[] {new TestData<>(4, true)};
     }

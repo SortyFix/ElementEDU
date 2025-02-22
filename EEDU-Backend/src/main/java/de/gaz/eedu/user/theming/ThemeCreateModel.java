@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public record ThemeCreateModel(String name, byte[] backgroundColor, byte[] widgetColor) implements CreationModel<ThemeEntity>
+public record ThemeCreateModel(String name, byte[] backgroundColor, byte[] widgetColor) implements CreationModel<Long, ThemeEntity>
 {
 
     @Override

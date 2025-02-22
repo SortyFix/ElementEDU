@@ -32,7 +32,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 @Slf4j
-public class GroupController extends EntityController<GroupService, GroupModel, GroupCreateModel>
+public class GroupController extends EntityController<Long, GroupService, GroupModel, GroupCreateModel>
 {
     private final GroupService service;
 

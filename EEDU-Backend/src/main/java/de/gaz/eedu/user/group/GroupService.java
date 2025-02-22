@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService extends EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
+public class GroupService extends EntityService<Long, GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
 
     @Getter(AccessLevel.NONE)
     private final GroupRepository groupRepository;

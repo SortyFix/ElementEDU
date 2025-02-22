@@ -10,9 +10,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
-public record ScheduledAppointmentCreateModel(@NotNull Long start, @NotNull Long duration, @NotNull Long period,
-                                              @NotNull Long course) implements CreationModel<ScheduledAppointmentEntity>
-{
+public record ScheduledAppointmentCreateModel(
+        @NotNull Long start,
+        @NotNull Long duration,
+        @NotNull Long period,
+        @NotNull Long course
+) implements CreationModel<Long, ScheduledAppointmentEntity> {
 
     @Override public @NotNull ScheduledAppointmentEntity toEntity(@NotNull ScheduledAppointmentEntity entity)
     {

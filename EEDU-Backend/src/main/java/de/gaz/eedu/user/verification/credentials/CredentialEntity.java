@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CredentialEntity implements EntityModelRelation<CredentialModel>
+public class CredentialEntity implements EntityModelRelation<Long, CredentialModel>
 {
     @Id @Setter(AccessLevel.NONE) private Long id;
     @Enumerated private CredentialMethod method;

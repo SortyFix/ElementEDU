@@ -3,27 +3,19 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.verification.JwtTokenType;
-import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j @AllArgsConstructor
-public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
+public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>, M extends EntityModel<P>, C extends CreationModel<P, ?>> extends AbstractFunctionality
 {
     protected abstract @NotNull S getService();
 
@@ -50,6 +42,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
         try
         {
             List<M> created = getService().create(Set.of(model));
+            //noinspection unchecked
             M[] models = created.toArray((M[]) Array.newInstance(created.getFirst().getClass(), created.size()));
             return ResponseEntity.status(HttpStatus.CREATED).body(models);
         }
@@ -67,7 +60,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
-    public @NotNull Boolean delete(@NotNull Long id)
+    public @NotNull Boolean delete(@NotNull P id)
     {
         log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
         return getService().delete(id);
@@ -86,7 +79,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * If no entity with the given id exists, it returns a ResponseEntity
      * with HTTP status 404 (Not Found), and its body is null.
      */
-    public @NotNull ResponseEntity<M> getData(@NotNull Long id)
+    public @NotNull ResponseEntity<M> getData(@NotNull P id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
         return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
@@ -101,28 +94,5 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
-    }
-
-    protected boolean isAuthorized(@NotNull String authority)
-    {
-        return isAuthorized(authority, SimpleGrantedAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull JwtTokenType jwtTokenType)
-    {
-        return isAuthorized(jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
-    {
-        return getAuthentication().getAuthorities()
-                                  .stream()
-                                  .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
-                                  .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
-    }
-
-    protected @NotNull Authentication getAuthentication()
-    {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record SubjectModel(@NotNull Long id, @NotNull String name) implements EntityModel
+public record SubjectModel(@NotNull Long id, @NotNull String name) implements EntityModel<Long>
 {
     @Contract(pure = true)
     @Override
