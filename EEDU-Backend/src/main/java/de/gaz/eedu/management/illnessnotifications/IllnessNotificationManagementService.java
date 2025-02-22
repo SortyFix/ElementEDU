@@ -5,6 +5,7 @@ import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
 import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationService;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationStatus;
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class IllnessNotificationManagementService
 
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfUserByStatus(@NotNull Long userId, @NotNull IllnessNotificationStatus status)
     {
+        Cookie cookie = new Cookie("mein-name", "Yonas");
         return ResponseEntity.ok(userService.loadEntityById(userId).orElseThrow(() -> new ResponseStatusException(
                                                     HttpStatus.NOT_FOUND))
                                             .getIllnessNotificationEntities()
