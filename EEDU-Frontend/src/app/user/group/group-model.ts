@@ -2,16 +2,14 @@ import {GenericPrivilegeModel, PrivilegeModel} from "./privilege-model";
 
 export interface GenericGroupModel
 {
-    id: bigint;
-    name: string;
+    id: string;
     privileges: GenericPrivilegeModel[];
 }
 
 export class GroupModel
 {
     constructor(
-        private readonly _id: bigint,
-        private readonly _name: string,
+        private readonly _id: string,
         private readonly _privileges: PrivilegeModel[]
     ) { }
 
@@ -22,19 +20,15 @@ export class GroupModel
             return PrivilegeModel.fromObject(privilege);
         });
 
-        return new GroupModel(BigInt(obj.id), obj.name, models);
+        return new GroupModel(obj.id, models);
     }
 
     public hasPrivilege(privilege: string): boolean {
         return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.name === privilege);
     }
 
-    public get id(): bigint {
+    public get id(): string {
         return this._id;
-    }
-
-    public get name(): string {
-        return this._name;
     }
 
     public get privileges(): PrivilegeModel[] {
