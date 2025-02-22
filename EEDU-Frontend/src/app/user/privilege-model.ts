@@ -1,11 +1,13 @@
 export class PrivilegeModel
 {
-    constructor(public readonly id: bigint,
-                public readonly name: string) { }
+    constructor(private readonly _id: string) { }
 
-    public static fromObject(object: any): PrivilegeModel
+    public static fromObject(object: { id: string }): PrivilegeModel
     {
-        return new PrivilegeModel(object.id, object.name);
+        return new PrivilegeModel(object.id);
     }
 
+    public get id(): string {
+        return this._id;
+    }
 }

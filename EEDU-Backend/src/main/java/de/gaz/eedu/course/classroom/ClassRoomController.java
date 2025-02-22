@@ -78,7 +78,7 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long[] id)
+    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

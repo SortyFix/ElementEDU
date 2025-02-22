@@ -15,6 +15,6 @@ export class GroupModel
     }
 
     public hasPrivilege(privilege: string): boolean {
-        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.name === privilege);
+        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.id === privilege);
     }
 }

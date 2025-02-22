@@ -131,34 +131,26 @@ CREATE TABLE IF NOT EXISTS class_room_users
     FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS group_entity
-(
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name                VARCHAR(255) NULL
-);
+CREATE TABLE IF NOT EXISTS group_entity(id VARCHAR(25) PRIMARY KEY NOT NULL);
+
+CREATE TABLE IF NOT EXISTS privilege_entity(id VARCHAR(50) PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS user_groups
 (
-    group_id BIGINT NOT NULL,
+    group_id VARCHAR(25) NOT NULL,
     user_id  BIGINT NOT NULL,
     PRIMARY KEY (group_id, user_id),
     FOREIGN KEY (group_id) REFERENCES group_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
-CREATE TABLE IF NOT EXISTS privilege_entity
-(
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NULL
-);
-
 CREATE TABLE IF NOT EXISTS group_privileges
 (
-    group_id     BIGINT NOT NULL,
-    privilege_id BIGINT NOT NULL,
+    group_id     VARCHAR(25) NOT NULL,
+    privilege_id VARCHAR(50) NOT NULL,
     PRIMARY KEY (group_id, privilege_id),
-    FOREIGN KEY (privilege_id) REFERENCES privilege_entity (id),
-    FOREIGN KEY (group_id) REFERENCES group_entity (id)
+    FOREIGN KEY (group_id) REFERENCES group_entity (id),
+    FOREIGN KEY (privilege_id) REFERENCES privilege_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS illness_notification_entity

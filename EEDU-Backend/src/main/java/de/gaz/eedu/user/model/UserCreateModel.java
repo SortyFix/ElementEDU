@@ -19,7 +19,7 @@ public record UserCreateModel(
         @NotNull Boolean locked,
         @NotNull UserStatus status,
         @NotNull Long theme,
-        @NotNull Long[] groups
+        @NotNull String[] groups
 ) implements CreationModel<Long, UserEntity> {
 
     @Override public @NotNull UserEntity toEntity(@NotNull UserEntity userEntity)

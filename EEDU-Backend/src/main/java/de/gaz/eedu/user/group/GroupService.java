@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService extends EntityService<Long, GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
+public class GroupService extends EntityService<String, GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
 
     @Getter(AccessLevel.NONE)
     private final GroupRepository groupRepository;
@@ -42,17 +42,20 @@ public class GroupService extends EntityService<Long, GroupRepository, GroupEnti
 
     @Override public @NotNull List<GroupEntity> createEntity(@NotNull Set<GroupCreateModel> createModel) throws CreationException
     {
-        if (getRepository().existsByNameIn(createModel.stream().map(GroupCreateModel::name).toList()))
+        if (getRepository().existsByIdIn(createModel.stream().map(GroupCreateModel::id).toList()))
         {
             throw new OccupiedException();
         }
 
-        return getRepository().saveAll(createModel.stream().map(current -> current.toEntity(new GroupEntity(), group ->
-        {
-            List<Long> ids = Arrays.asList(current.privileges());
-            group.grantPrivilege(getPrivilegeRepository().findAllById(ids).toArray(PrivilegeEntity[]::new));
-            return group;
-        })).toList());
+        return getRepository().saveAll(createModel.stream().map(current -> {
+            GroupEntity groupEntity = new GroupEntity(current.id());
+            return current.toEntity(groupEntity, group ->
+            {
+                List<String> ids = Arrays.asList(current.privileges());
+                group.grantPrivilege(getPrivilegeRepository().findAllById(ids).toArray(PrivilegeEntity[]::new));
+                return group;
+            });
+        }).toList());
     }
 
     @Override public void deleteRelations(@NotNull GroupEntity entry)

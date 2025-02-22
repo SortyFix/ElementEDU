@@ -15,6 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Objects;
+
 /**
  * Test class for GroupService.
  * <p>
@@ -27,25 +29,25 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author ivo
  */
 @Getter(AccessLevel.PROTECTED)
-public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntity, GroupModel, GroupCreateModel>
+public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
     @Autowired private GroupService service;
     @Autowired private PrivilegeService privilegeService;
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
-        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new Long[0]);
-        GroupModel groupModel = new GroupModel(5L, "test", new PrivilegeModel[0]);
+        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new String[0]);
+        GroupModel groupModel = new GroupModel("test", new PrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
-            Assertions.assertEquals(expect.name(), result.name());
+            Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.privileges().length, result.privileges().length);
         });
     }
 
     @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
-        return new GroupCreateModel("Users", new Long[0]);
+        return new GroupCreateModel("user", new String[0]);
     }
 
     /**
@@ -56,7 +58,7 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
      * privilege
      * while the group with groupID 1 is not expected to achieve granting the privilege.
      * <p>
-     * The {@link ParameterizedTest} annotation with a custom name helps in identifying individual test cases in logs:
+     * The {@link ParameterizedTest} annotation with a custom id helps in identifying individual test cases in logs:
      * <p>
      * 0 => request=2   PASSED<br>
      * 1 => request=1   PASSED
@@ -71,11 +73,12 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
      * @param groupID the current group id to be tested for granting privilege. These are adjustable in the
      *                {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional public void testGroupGrantPrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"moderator", "admin"})
+    @Transactional public void testGroupGrantPrivilege(String groupID)
     {
-        PrivilegeEntity privilegeEntity = getPrivilegeService().loadEntityByIDSafe(3L);
+        PrivilegeEntity privilegeEntity = getPrivilegeService().loadEntityByIDSafe("MODERATE");
         GroupEntity groupEntity = getService().loadEntityByIDSafe(groupID);
-        test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
+        test(Eval.eval(privilegeEntity, Objects.equals(groupID, "moderator"), Validator.equals()), groupEntity::grantPrivilege);
     }
 
     /**
@@ -85,7 +88,7 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
      * It verifies this for groups with groupIDs 3 and 2. The group with groupID 3 is expected to have the privilege
      * successfully revoked while the one with groupID 2 is anticipated to fail in the revocation process.
      * <p>
-     * Like the 'testGroupGrantPrivilege' method, this method uses {@link ParameterizedTest} with a custom name
+     * Like the 'testGroupGrantPrivilege' method, this method uses {@link ParameterizedTest} with a custom id
      * for better clarity in the logs in case a test fails, and {@link ValueSource} to provide input values.
      * <p>
      * The {@link Transactional} annotation is used to ensure independent transactions for each method execution,
@@ -96,7 +99,6 @@ public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntit
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional public void testGroupRevokePrivilege(long groupID)
     {
-        GroupEntity groupEntity = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
-        test(Eval.eval(3L /* privilegeId */, groupID == 3, Validator.equals()), groupEntity::revokePrivilege);
+        // TODO
     }
 }

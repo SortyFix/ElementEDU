@@ -24,17 +24,9 @@ VALUES (1, 'Hey, wie geht es?', 1702672064, 0),
        (3, 'hals maul', 1702675064, 0),
        (4, 'dummy', 1802672064, 0);
 
-INSERT INTO group_entity (name)
-VALUES ('Users'),
-       ('Moderators'),
-       ('Admin'),
-       ('Dummy');
+INSERT INTO group_entity (id) VALUES ('user'),('moderator'),('admin'),('dummy');
 
-INSERT INTO privilege_entity (name)
-VALUES ('READ'),
-       ('WRITE'),
-       ('MODERATE'),
-       ('DUMMY');
+INSERT INTO privilege_entity (id) VALUES ('READ'), ('WRITE'), ('MODERATE'), ('DUMMY');
 
 /* 0 = PASSWORD, 1 = EMAIL, 2 = SMS, 3 = TOTP */
 INSERT INTO credential_entity(method, data, secret, enabled, user_id)
@@ -87,9 +79,16 @@ MERGE INTO chat_entity_messages (chat_id, message_id) VALUES (1, 1), (2, 2), (3,
 
 MERGE INTO chat_entity_users (chat_id, user_id) VALUES (1, 1), (1, 3), (2, 2), (2, 4), (3, 2), (3, 3), (4, 1), (4, 4);
 
-MERGE INTO user_groups (user_id, group_id) VALUES (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (3, 3), (4, 4);
+MERGE INTO user_groups (user_id, group_id) VALUES (1, 'user'), (2, 'user'), (2, 'moderator'), (3, 'user'), (3, 'moderator'), (3, 'admin'), (4, 'dummy');
 
-MERGE INTO group_privileges (group_id, privilege_id) VALUES (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (3, 3), (4, 4);
+MERGE INTO group_privileges (group_id, privilege_id)
+VALUES ('user', 'READ'),
+       ('moderator', 'READ'),
+       ('moderator', 'WRITE'),
+       ('admin', 'READ'),
+       ('admin', 'WRITE'),
+       ('admin', 'MODERATE'),
+       ('dummy', 'DUMMY');
 
 MERGE INTO course_users (course_id, user_id) VALUES (2, 2), (3, 1), (4, 4);
 

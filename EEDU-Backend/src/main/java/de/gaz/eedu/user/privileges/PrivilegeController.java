@@ -26,12 +26,12 @@ import java.util.Arrays;
  *
  * @author Ivo Quiring
  */
-@RestController
-@RequestMapping("/api/v1/user/group/privilege")
-@RequiredArgsConstructor
 @Slf4j
+@RestController
+@RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class PrivilegeController extends EntityController<Long, PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
+@RequestMapping("/api/v1/user/group/privilege")
+public class PrivilegeController extends EntityController<String, PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
     private final PrivilegeService service;
 
@@ -69,7 +69,7 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
      * @return {@code true} if the privilege was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('PRIVILEGE_DELETE')") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
+    public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull String[] id)
     {
         return super.delete(id);
     }
@@ -88,7 +88,7 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
      * @return a {@link ResponseEntity} containing the {@link PrivilegeModel} of the specified privilege.
      */
     @PreAuthorize("hasAuthority('PRIVILEGE_GET')") @GetMapping("/get/{id}") @Override
-    public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull Long id)
+    public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull String id)
     {
         return super.getData(id);
     }
@@ -107,8 +107,8 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
      * @param privileges an array of privilege IDs to grant to the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_GRANT')") @PostMapping("/{group}/grant")
-    public @NotNull HttpStatus grantPrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_GRANT')") @PutMapping("/{group}/grant/{privileges}")
+    public @NotNull ResponseEntity<Void> grantPrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
 
@@ -116,7 +116,7 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
         GroupService groupService = getService().getGroupService();
 
         boolean modified = groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
     /**
@@ -133,13 +133,13 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
      * @param privileges an array of privilege IDs to revoke from the specified group, provided in the request body.
      *                   Must not be null.
      */
-    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_REVOKE')") @PostMapping("/{group}/revoke")
-    public @NotNull HttpStatus revokePrivileges(@PathVariable long group, @RequestBody @NotNull Long... privileges)
+    @PreAuthorize("hasAuthority('GROUP_PRIVILEGE_REVOKE')") @DeleteMapping("/{group}/revoke/{privileges}")
+    public @NotNull ResponseEntity<Void> revokePrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
     {
         log.info("Received incoming request for revoking privilege(s) {} to group {}.", privileges, group);
 
         GroupService groupService = getService().getGroupService();
         boolean modified = groupService.loadEntityByIDSafe(group).revokePrivilege(groupService, privileges);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 }

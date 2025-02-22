@@ -53,7 +53,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * Creates a new user utilizing the provided {@link UserCreateModel}.
      * <p>
      * This method invokes {@code entityServices} to execute {@link UserService#create(java.util.Set)}.
-     * If a user with the same longin name already exists, an {@link OccupiedException} is thrown.
+     * If a user with the same longin id already exists, an {@link OccupiedException} is thrown.
      * <p>
      * Note that the invoking user must possess the "privilege.user.create" privilege,
      * which should be configured in the application's properties, to perform this action.
@@ -81,7 +81,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }
@@ -151,7 +151,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
     @PostMapping("/login")
     public @NotNull ResponseEntity<@Nullable String> requestNormalLogin(@NotNull @RequestBody UserLoginModel model)
     {
-        log.info("The server has recognized an incoming normal login request login name {}.", model.loginName());
+        log.info("The server has recognized an incoming normal login request login id {}.", model.loginName());
         return getService().requestLogin(model).map((token) ->
         {
             String jwt = token.jwt();

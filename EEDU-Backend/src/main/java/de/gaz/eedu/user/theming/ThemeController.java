@@ -29,7 +29,7 @@ public class ThemeController
     private final ThemeRepository themeRepository;
 
     /**
-     * Loads User Entity by given ID and sets its Theme Entity to the one that is holding the given name.
+     * Loads User Entity by given ID and sets its Theme Entity to the one that is holding the given id.
      * Returns the Theme Entity as a model.
      * @param theme_id ID of the theme to set
      * @return ThemeModel
@@ -78,7 +78,7 @@ public class ThemeController
 
     /**
      * Create theme with given <code>ThemeEntity</code> data in request body.
-     * Will throw a NameOccupiedException if name is already used by another Theme Entity.
+     * Will throw a NameOccupiedException if id is already used by another Theme Entity.
      * @param themeCreateModel template of the theme to be created
      * @return ThemeEntity
      */

@@ -50,7 +50,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
         return super.create(model);
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long[] id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

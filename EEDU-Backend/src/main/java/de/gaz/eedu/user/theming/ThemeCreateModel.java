@@ -32,7 +32,7 @@ public record ThemeCreateModel(String name, byte[] backgroundColor, byte[] widge
     public @NotNull String toString()
     {
         return "ThemeCreateModel[" +
-                "name=" + name + ", " +
+                "id=" + name + ", " +
                 "backgroundColor=" + Arrays.toString(backgroundColor) + ", " +
                 "widgetColor=" + Arrays.toString(widgetColor) + ']';
     }
