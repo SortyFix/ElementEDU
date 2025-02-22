@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j @AllArgsConstructor
-public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends AbstractEntityFunctionality
+public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>, M extends EntityModel<P>, C extends CreationModel<P, ?>> extends AbstractFunctionality
 {
     protected abstract @NotNull S getService();
 
@@ -61,7 +61,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
-    public @NotNull HttpStatus delete(@NotNull Long... id)
+    public @NotNull HttpStatus delete(@NotNull P[] id)
     {
         log.info("Received an incoming delete request from class {} with id(s) {}.", getClass().getSuperclass(), id);
         return getService().delete(id) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
@@ -80,7 +80,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
      * If no entity with the given id exists, it returns a ResponseEntity
      * with HTTP status 404 (Not Found), and its body is null.
      */
-    public @NotNull ResponseEntity<M> getData(@NotNull Long id)
+    public @NotNull ResponseEntity<M> getData(@NotNull P id)
     {
         log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
         return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));

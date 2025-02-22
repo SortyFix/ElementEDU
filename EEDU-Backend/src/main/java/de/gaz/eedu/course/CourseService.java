@@ -29,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 @RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
-public class CourseService extends EntityService<CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
+public class CourseService extends EntityService<Long, CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     private final CourseRepository repository;
     private final SubjectService subjectService;
@@ -68,7 +68,7 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
         return saveEntity(courseEntities);
     }
 
-    private @NotNull CreationFactory<CourseEntity> courseFactory(@NotNull CourseCreateModel createModel)
+    private @NotNull CreationFactory<Long, CourseEntity> courseFactory(@NotNull CourseCreateModel createModel)
     {
         return (entity) ->
         {

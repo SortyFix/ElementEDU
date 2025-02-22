@@ -25,7 +25,7 @@ import java.util.Set;
  *
  * @author SortyFix (Yonas Nieder Fernández)
  */
-@Entity @AllArgsConstructor @NoArgsConstructor @Setter @Getter @Builder @Table(name = "file_entity") public class FileEntity implements EntityModelRelation<FileModel>
+@Entity @AllArgsConstructor @NoArgsConstructor @Setter @Getter @Builder @Table(name = "file_entity") public class FileEntity implements EntityModelRelation<Long, FileModel>
 {
     public static final String BASE_DIRECTORY = "data";
 

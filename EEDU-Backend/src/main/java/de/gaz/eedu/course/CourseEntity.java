@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  * @author ivo
  */
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "course_entity")
-public class CourseEntity implements EntityModelRelation<CourseModel>
+public class CourseEntity implements EntityModelRelation<Long, CourseModel>
 {
     @ManyToMany @JsonManagedReference
     @JoinTable(name = "course_users", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))

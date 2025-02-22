@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @Getter(AccessLevel.PROTECTED)
-public class PrivilegeController extends EntityController<PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
+public class PrivilegeController extends EntityController<Long, PrivilegeService, PrivilegeModel, PrivilegeCreateModel>
 {
     private final PrivilegeService service;
 

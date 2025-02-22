@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<MessageEntity, Long>
 {
-    MessageEntity findMessageEntityByMessageId(Long id);
+
 }

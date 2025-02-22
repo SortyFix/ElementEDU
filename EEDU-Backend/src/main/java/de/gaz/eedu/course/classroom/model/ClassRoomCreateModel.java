@@ -13,7 +13,7 @@ public record ClassRoomCreateModel (
         @NotNull Long tutor,
         @NotNull Long[] students,
         @NotNull Long[] courses
-) implements CreationModel<ClassRoomEntity> {
+) implements CreationModel<Long, ClassRoomEntity> {
 
     @Override
     public @NotNull ClassRoomEntity toEntity(@NotNull ClassRoomEntity entity)

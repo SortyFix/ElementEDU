@@ -19,7 +19,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-public class RoomEntity implements EntityModelRelation<RoomModel>
+public class RoomEntity implements EntityModelRelation<Long, RoomModel>
 {
     @Setter(AccessLevel.NONE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

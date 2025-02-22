@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public interface GroupEntityRepository extends EntityRepository<GroupEntity>
+public interface GroupEntityRepository extends EntityRepository<Long, GroupEntity>
 {
 
     @NotNull Optional<GroupEntity> findEntityByName(@NotNull String name);

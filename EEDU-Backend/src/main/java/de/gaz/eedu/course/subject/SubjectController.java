@@ -20,7 +20,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/course/subject")
 @RequiredArgsConstructor
-public class SubjectController extends EntityController<SubjectService, SubjectModel, SubjectCreateModel>
+public class SubjectController extends EntityController<Long, SubjectService, SubjectModel, SubjectCreateModel>
 {
     private final SubjectService subjectService;
 

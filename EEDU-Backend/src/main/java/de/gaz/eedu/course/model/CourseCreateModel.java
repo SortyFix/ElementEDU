@@ -14,7 +14,7 @@ public record CourseCreateModel(
         @NotNull Long teacher,
         @NotNull Long[] students,
         @Nullable Long classroom
-) implements CreationModel<CourseEntity> {
+) implements CreationModel<Long,CourseEntity> {
 
     @Override
     public @NotNull CourseEntity toEntity(@NotNull CourseEntity entity)

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
-public class RoomService extends EntityService<RoomRepository, RoomEntity, RoomModel, RoomCreateModel>
+public class RoomService extends EntityService<Long, RoomRepository, RoomEntity, RoomModel, RoomCreateModel>
 {
     private final RoomRepository repository;
 

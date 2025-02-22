@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService extends EntityService<GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
+public class GroupService extends EntityService<Long, GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
 
     private final GroupRepository repository;
     private final UserService userService; // managed by

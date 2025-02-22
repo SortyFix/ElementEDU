@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record ChatCreateModel(@NotNull Long[] users, @NotNull Long timeOfCreation) implements CreationModel<ChatEntity>
+public record ChatCreateModel(@NotNull Long[] users, @NotNull Long timeOfCreation) implements CreationModel<Long, ChatEntity>
 {
 
     @Override

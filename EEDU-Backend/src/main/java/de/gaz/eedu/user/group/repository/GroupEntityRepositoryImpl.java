@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
-public class GroupEntityRepositoryImpl extends AbstractEntityRepository<GroupEntity> implements GroupEntityRepository
+public class GroupEntityRepositoryImpl extends AbstractEntityRepository<Long, GroupEntity> implements GroupEntityRepository
 {
     @Getter(AccessLevel.PROTECTED)
     private final PrivilegeRepository privilegeRepository;

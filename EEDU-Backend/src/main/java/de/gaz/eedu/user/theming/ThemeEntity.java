@@ -13,8 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-@Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EntityObject,
-        EntityModelRelation<ThemeModel>
+@Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EntityModelRelation<Long, ThemeModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(value = AccessLevel.NONE) private Long id;
     private String name;

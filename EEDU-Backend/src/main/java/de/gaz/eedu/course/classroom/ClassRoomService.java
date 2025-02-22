@@ -52,7 +52,7 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @RequiredArgsConstructor @Service @Getter
-public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
+public class ClassRoomService extends EntityService<Long, ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final ClassRoomRepository repository;
     private final CourseService courseService;

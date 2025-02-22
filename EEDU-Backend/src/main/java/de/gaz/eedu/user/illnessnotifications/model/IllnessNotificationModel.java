@@ -11,7 +11,7 @@ import java.util.Objects;
 public record IllnessNotificationModel(@NotNull Long id, @NotNull Long userId,
                                        @NotNull IllnessNotificationStatus status, @NotNull String reason,
                                        @NotNull Long timestamp, @NotNull Long expirationTime,
-                                       @Nullable FileModel fileModel) implements EntityModel
+                                       @Nullable FileModel fileModel) implements EntityModel<Long>
 {
     @Override public boolean equals(Object o)
     {

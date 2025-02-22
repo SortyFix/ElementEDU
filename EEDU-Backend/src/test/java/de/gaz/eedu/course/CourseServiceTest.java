@@ -8,7 +8,6 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.user.UserEntity;
-import de.gaz.eedu.user.model.UserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,29 +21,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
-public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, CourseModel, CourseCreateModel>
+public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEntity, CourseModel, CourseCreateModel>
 {
     @Autowired private CourseService service;
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUserData()
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUserData()
     {
-        return Stream.of(new ArrayTestData<>(1L, 1L), // comes from class
+        return Stream.of(
+                new ArrayTestData<>(1L, 1L), // comes from class
                 new ArrayTestData<>(2L, 1L, 2L), // 1 comes from class, 2 is in course
-                new ArrayTestData<>(3, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
+                new ArrayTestData<>(3L, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
         );
     }
 
     @Override
     protected @NotNull Eval<CourseCreateModel, CourseModel> successEval()
     {
-        CourseCreateModel create = new CourseCreateModel("7b-German", 1L, null, new Long[0]);
+        CourseCreateModel create = new CourseCreateModel("7b-German", 1L, 1L, new Long[0], null);
 
         CourseModel courseModel = new CourseModel(
                 5L,
                 "7b-German",
                 new SubjectModel(1L, "German"),
                 new AppointmentEntryModel[0],
-                new FrequentAppointmentModel[0]
+                new FrequentAppointmentModel[0],
+                null
         );
 
         return Eval.eval(create, courseModel, (request, expect, result) ->
@@ -58,11 +59,11 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
     @Override
     protected @NotNull CourseCreateModel occupiedCreateModel()
     {
-        return new CourseCreateModel("Q1-German", 2L, null, new Long[0]);
+        return new CourseCreateModel("Q1-German", 2L, 1L, new Long[0], null);
     }
 
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")
-    public void testGetUsers(@NotNull ArrayTestData<Long> data)
+    public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
     {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->
         {

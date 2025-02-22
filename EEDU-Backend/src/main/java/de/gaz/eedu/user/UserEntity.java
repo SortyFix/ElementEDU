@@ -46,7 +46,7 @@ import java.util.stream.Stream;
  */
 @Entity @Table(name = "user_entity")
 @Slf4j @NoArgsConstructor @AllArgsConstructor @Getter @Setter
-public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
+public class UserEntity implements UserDetails, EntityModelRelation<Long, UserModel>
 {
     @Enumerated UserStatus status;
     //finish this line and the sql
@@ -120,7 +120,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
                 getClassRoom().map(ClassRoomEntity::toModel).orElse(null)
         );
     }
-    
+
     public @NotNull ReducedUserModel toReducedModel()
     {
         return new ReducedUserModel(this.getId(), this.getFirstName(), this.getLastName(), this.getAccountType());

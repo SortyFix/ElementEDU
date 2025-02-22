@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public record FileCreateModel(@NotNull String dataDirectory,
                               @NotEmpty String[] privilege,
-                              String[] tags) implements CreationModel<FileEntity>
+                              String[] tags) implements CreationModel<Long, FileEntity>
 {
     @Contract(pure = true)
     @Override public String toString()

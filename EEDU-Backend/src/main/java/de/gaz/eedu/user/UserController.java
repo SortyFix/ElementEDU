@@ -45,7 +45,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api/v1/user")
 @RequiredArgsConstructor
-public class UserController extends EntityController<UserService, UserModel, UserCreateModel>
+public class UserController extends EntityController<Long, UserService, UserModel, UserCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final UserService service;
     @Value("${development}") private final boolean development = false;

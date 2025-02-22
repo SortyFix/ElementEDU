@@ -42,7 +42,7 @@ public record UserModel(
         @NotNull UserStatus status,
         @NotNull GroupModel[] groups,
         @NotNull ThemeModel theme,
-        @Nullable ClassRoomModel classroom) implements EntityModel
+        @Nullable ClassRoomModel classroom) implements EntityModel<Long>
 {
 
     @Contract(pure = true) @Override public @NotNull String toString()

@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Setter @Entity @Getter @NoArgsConstructor
-public class FrequentAppointmentEntity implements EntityModelRelation<FrequentAppointmentModel>
+public class FrequentAppointmentEntity implements EntityModelRelation<Long, FrequentAppointmentModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private long id;
     @JsonBackReference @ManyToOne(optional = false) @JoinColumn(name = "course_id", referencedColumnName = "id")

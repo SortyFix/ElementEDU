@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record SubjectCreateModel(@NotNull String name) implements CreationModel<SubjectEntity>
+public record SubjectCreateModel(@NotNull String name) implements CreationModel<Long, SubjectEntity>
 {
     @Override
     public @NotNull SubjectEntity toEntity(@NotNull SubjectEntity entity)

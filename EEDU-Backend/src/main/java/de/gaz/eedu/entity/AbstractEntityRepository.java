@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Getter(AccessLevel.PROTECTED)
-public abstract class AbstractEntityRepository<T extends EntityObject> implements EntityRepository<T>
+public abstract class AbstractEntityRepository<P, T extends EntityObject<P>> implements EntityRepository<P, T>
 {
     @PersistenceContext
     private final EntityManager entityManager;
@@ -25,11 +25,11 @@ public abstract class AbstractEntityRepository<T extends EntityObject> implement
         this.entityManager = entityManager;
     }
 
-    protected abstract @NonNull TypedQuery<T> findEntityQuery(@NonNull Long id);
+    protected abstract @NonNull TypedQuery<T> findEntityQuery(@NonNull P id);
 
     protected abstract @NonNull TypedQuery<T> findAllEntitiesQuery();
 
-    @Override public @NonNull Optional<T> findEntity(@NonNull Long id)
+    @Override public @NonNull Optional<T> findEntity(@NonNull P id)
     {
         return findEntityQuery(id).getResultList().stream().findFirst().map(this::interceptLoading);
     }

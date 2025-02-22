@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @see ClassRoomModel
  */
 @Entity @Getter @Setter @NoArgsConstructor @Table(name = "class_room_entity")
-public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
+public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) private Long id;
@@ -46,8 +46,8 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
         return new ClassRoomModel(
                 getId(),
                 getName(),
-                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
-                getTutor().toReducedModel()
+                getTutor().toReducedModel(),
+                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new)
         );
     }
 

@@ -18,7 +18,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/course/room")
 @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
-public class RoomController extends EntityController<RoomService, RoomModel, RoomCreateModel>
+public class RoomController extends EntityController<Long, RoomService, RoomModel, RoomCreateModel>
 {
     private final RoomService service;
 

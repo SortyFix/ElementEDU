@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record PostCreateModel(@NotNull String author, @NotNull String title, @Nullable String thumbnailURL, @NotNull String body,
-                              @NotNull String[] editPrivileges, @NotNull String[] tags) implements CreationModel<PostEntity>
+                              @NotNull String[] editPrivileges, @NotNull String[] tags) implements CreationModel<Long, PostEntity>
 {
 
     @Override

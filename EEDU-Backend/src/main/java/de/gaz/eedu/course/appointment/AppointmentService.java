@@ -14,6 +14,7 @@ import de.gaz.eedu.course.room.RoomRepository;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -36,7 +37,7 @@ import java.util.stream.Stream;
 @Service
 @Getter(AccessLevel.PROTECTED)
 @RequiredArgsConstructor
-public class AppointmentService extends EntityService<FrequentAppointmentRepository, FrequentAppointmentEntity, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class AppointmentService extends EntityService<Long, FrequentAppointmentRepository, FrequentAppointmentEntity, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
     private final FrequentAppointmentRepository repository;
     @Getter(AccessLevel.PUBLIC)
@@ -66,16 +67,16 @@ public class AppointmentService extends EntityService<FrequentAppointmentReposit
     public @NotNull List<AssignmentInsightModel> getInsight(long appointment)
     {
         return getEntryRepository().findById(appointment).map(entry -> {
-            return entry.getCourse().getUsers().stream().map(entry::getInsight).toList();
+            Set<UserEntity> userEntities = entry.getCourse().getUsers();
+            return userEntities.stream().map(entry::getInsight).toList();
         }).orElse(Collections.emptyList());
     }
 
     public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
     {
         return getEntryRepository().findById(appointment).map(entry -> {
-            return entry.getInsight(getUserRepository().findEntity(user).orElseThrow(
-                    () -> new EntityUnknownException(user))
-            );
+            UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(() -> new EntityUnknownException(user));
+            return entry.getInsight(userEntity);
         });
     }
 

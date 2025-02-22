@@ -16,7 +16,7 @@ public record AppointmentEntryCreateModel(
         @Nullable Long room,
         @Nullable String description,
         @Nullable AssignmentCreateModel assignment
-) implements CreationModel<AppointmentEntryEntity> {
+) implements CreationModel<Long,AppointmentEntryEntity> {
 
     public AppointmentEntryCreateModel(@NotNull Long timeStamp)
     {

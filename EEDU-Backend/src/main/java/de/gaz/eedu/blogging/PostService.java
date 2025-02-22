@@ -29,7 +29,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class PostService extends EntityService<PostRepository, PostEntity, PostModel, PostCreateModel>
+public class PostService extends EntityService<Long, PostRepository, PostEntity, PostModel, PostCreateModel>
 {
     @Getter private final PostRepository repository;
     @Getter private final UserService userService;

@@ -20,7 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.io.IOException;
 
 @Getter(AccessLevel.PROTECTED)
-public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificationService, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
+public class IllnessNotificationServiceTest extends ServiceTest<Long, IllnessNotificationService, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
     @Autowired private IllnessNotificationService service;
     @Autowired private FileService fileService;
@@ -71,7 +71,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<IllnessNotificat
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities() {
+    protected @NotNull TestData<Long, Boolean>[] deleteEntities() {
         return new TestData[] {new TestData<>(3, true) };
     }
 }

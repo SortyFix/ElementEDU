@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public record FileModel(@NotNull Long id,
                         @NotNull String dataDirectory,
                         @NotNull String[] privileges,
-                        String[] tags) implements EntityModel
+                        String[] tags) implements EntityModel<Long>
 {
 
     @Contract(pure = true)

@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class PrivilegeService extends EntityService<PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
+@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED)
+public class PrivilegeService extends EntityService<Long, PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
 
     @Getter(AccessLevel.PROTECTED)

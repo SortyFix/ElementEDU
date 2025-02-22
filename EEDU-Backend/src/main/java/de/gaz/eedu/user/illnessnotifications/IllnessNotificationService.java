@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
-@Service public class IllnessNotificationService extends EntityService<IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
+@Service public class IllnessNotificationService extends EntityService<Long, IllnessNotificationRepository, IllnessNotificationEntity, IllnessNotificationModel, IllnessNotificationCreateModel>
 {
     private final IllnessNotificationRepository illnessNotificationRepository;
     private final UserService userService;

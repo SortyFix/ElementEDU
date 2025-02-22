@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface EntityRepository<T extends EntityObject>
+public interface EntityRepository<P, T extends EntityObject<P>>
 {
-    @NonNull Optional<T> findEntity(@NonNull Long id);
+    @NonNull Optional<T> findEntity(@NonNull P id);
 
     @NonNull @Unmodifiable Set<T> findAllEntities();
 

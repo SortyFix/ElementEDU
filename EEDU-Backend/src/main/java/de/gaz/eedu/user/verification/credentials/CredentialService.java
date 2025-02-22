@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 @Service
 @AllArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class CredentialService extends EntityService<CredentialRepository, CredentialEntity, CredentialModel, CredentialCreateModel>
+public class CredentialService extends EntityService<Long, CredentialRepository, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
     @Getter(AccessLevel.NONE) private final CredentialRepository credentialRepository;
     private final UserService userService;
@@ -141,7 +141,7 @@ public class CredentialService extends EntityService<CredentialRepository, Crede
     @Transactional
     protected void deleteTemporary(long id, @NotNull CredentialEntity credential)
     {
-        if (delete(id))
+        if (delete(new Long[] { id }))
         {
             return;
         }

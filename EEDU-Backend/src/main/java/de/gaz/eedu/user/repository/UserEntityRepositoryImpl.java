@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository @Transactional
-public class UserEntityRepositoryImpl extends AbstractEntityRepository<UserEntity> implements UserEntityRepository
+public class UserEntityRepositoryImpl extends AbstractEntityRepository<Long, UserEntity> implements UserEntityRepository
 {
     private static final String QUERY_TEMPLATE;
     @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Getter(AccessLevel.PROTECTED)
-public class SubjectServiceTest extends ServiceTest<SubjectService, SubjectEntity, SubjectModel, SubjectCreateModel>
+public class SubjectServiceTest extends ServiceTest<Long, SubjectService, SubjectEntity, SubjectModel, SubjectCreateModel>
 {
     @Autowired private SubjectService service;
 

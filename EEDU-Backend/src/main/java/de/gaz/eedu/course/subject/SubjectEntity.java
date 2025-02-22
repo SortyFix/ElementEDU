@@ -19,7 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "subject_entity")
-public class SubjectEntity implements EntityModelRelation<SubjectModel>
+public class SubjectEntity implements EntityModelRelation<Long, SubjectModel>
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
