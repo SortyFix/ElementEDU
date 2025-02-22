@@ -1,7 +1,6 @@
 package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @Entity @Getter @Setter
-public class PostEntity implements EntityObject, EntityModelRelation<PostModel>
+public class PostEntity implements EntityModelRelation<Long, PostModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
     private String author;

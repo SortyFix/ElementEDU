@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Getter(AccessLevel.PROTECTED)
-public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatModel, ChatCreateModel>
+public class ChatServiceTest extends ServiceTest<Long, ChatService, ChatEntity, ChatModel, ChatCreateModel>
 {
     @Autowired private ChatService service;
 
@@ -43,7 +43,7 @@ public class ChatServiceTest extends ServiceTest<ChatService, ChatEntity, ChatMo
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities()
+    protected @NotNull TestData<Long, Boolean>[] deleteEntities()
     {
         return new TestData[]{new TestData<>(4, true)};
     }

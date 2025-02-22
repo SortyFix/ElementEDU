@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS illness_notification_entity
 
 CREATE TABLE IF NOT EXISTS chat_entity
 (
-    chat_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     time_of_creation BIGINT NOT NULL
 );
 
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS chat_entity_users
     chat_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     PRIMARY KEY (chat_id, user_id),
-    FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
+    FOREIGN KEY (chat_id) REFERENCES chat_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS chat_entity_messages
@@ -194,12 +194,12 @@ CREATE TABLE IF NOT EXISTS chat_entity_messages
     chat_id    BIGINT NOT NULL,
     message_id BIGINT NOT NULL,
     PRIMARY KEY (chat_id, message_id),
-    FOREIGN KEY (chat_id) REFERENCES chat_entity (chat_id)
+    FOREIGN KEY (chat_id) REFERENCES chat_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS message_entity
 (
-    message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     author_id  BIGINT       NOT NULL,
     body       VARCHAR(1500) NOT NULL,
     timestamp  BIGINT       NOT NULL,

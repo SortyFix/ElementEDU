@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public record MessageModel(@NotNull Long id, @NotNull Long authorId, @NotNull String body,
-                           @NotNull Long timeStamp) implements EntityModel
+                           @NotNull Long timeStamp) implements EntityModel<Long>
 {
     @Override public boolean equals(Object o)
     {

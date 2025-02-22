@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter(AccessLevel.PROTECTED)
-public class PostServiceTest extends ServiceTest<PostService, PostEntity, PostModel, PostCreateModel>
+public class PostServiceTest extends ServiceTest<Long, PostService, PostEntity, PostModel, PostCreateModel>
 {
 
     @Autowired private PostService postService;
