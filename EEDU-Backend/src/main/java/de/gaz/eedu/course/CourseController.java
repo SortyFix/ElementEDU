@@ -57,7 +57,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('COURSE_DELETE')")
-    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

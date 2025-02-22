@@ -34,13 +34,12 @@ public class SubjectController extends EntityController<Long, SubjectService, Su
     @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
     @Override public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model) throws CreationException
     {
-        log.info("WORK???");
         return super.create(model);
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
-    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

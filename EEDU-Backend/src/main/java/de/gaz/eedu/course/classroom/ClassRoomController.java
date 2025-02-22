@@ -65,7 +65,7 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
     }
 
     @PreAuthorize("hasAuthority('CLASS_DELETE')")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

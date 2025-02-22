@@ -62,10 +62,10 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
-    public @NotNull HttpStatus delete(@NotNull P[] id)
+    public @NotNull ResponseEntity<Void> delete(@NotNull P[] id)
     {
-        log.info("Received an incoming delete request from class {} with id(s) {}.", getClass().getSuperclass(), id);
-        return getService().delete(Arrays.asList(id)) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
+        return getService().delete(List.of(id)) ? empty(HttpStatus.OK) : empty(HttpStatus.NOT_MODIFIED);
     }
 
     /**
@@ -96,5 +96,10 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
+    }
+
+    protected @NotNull ResponseEntity<Void> empty(@NotNull HttpStatus status)
+    {
+        return ResponseEntity.status(status).build();
     }
 }
