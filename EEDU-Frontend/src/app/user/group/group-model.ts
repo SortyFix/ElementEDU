@@ -15,16 +15,13 @@ export class GroupModel
 
     public static fromObject(obj: GenericGroupModel): GroupModel
     {
-        const models: PrivilegeModel[] = obj.privileges.map((privilege: any): PrivilegeModel =>
-        {
-            return PrivilegeModel.fromObject(privilege);
-        });
-
-        return new GroupModel(obj.id, models);
+        return new GroupModel(obj.id, obj.privileges.map((privilege: GenericPrivilegeModel): PrivilegeModel =>
+            PrivilegeModel.fromObject(privilege)
+        ));
     }
 
     public hasPrivilege(privilege: string): boolean {
-        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.name === privilege);
+        return this.privileges.some((privilegeModel: PrivilegeModel): boolean => privilegeModel.id === privilege);
     }
 
     public get id(): string {

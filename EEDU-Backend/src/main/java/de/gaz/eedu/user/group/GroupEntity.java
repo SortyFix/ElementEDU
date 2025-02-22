@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity")
 public class GroupEntity implements EntityModelRelation<String, GroupModel>
 {
-    @Id @Setter(AccessLevel.NONE) private String id;
+    @Id @Column(length = 25) @Setter(AccessLevel.NONE) private String id;
 
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY) @JsonBackReference
     private final Set<UserEntity> users = new HashSet<>();

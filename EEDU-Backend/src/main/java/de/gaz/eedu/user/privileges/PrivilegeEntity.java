@@ -62,9 +62,7 @@ public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeMod
         return PROTECTED_PRIVILEGES;
     }
 
-    @Id @Setter(AccessLevel.NONE)
-    private String id;
-
+    @Id @Setter(AccessLevel.NONE) @Column(length = 50) private String id;
     @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
     private final Set<GroupEntity> groupEntities = new HashSet<>();
 

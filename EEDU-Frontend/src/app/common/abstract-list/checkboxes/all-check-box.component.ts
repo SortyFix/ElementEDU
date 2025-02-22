@@ -9,6 +9,8 @@ import {NgIf} from "@angular/common";
             <mat-checkbox [checked]="checked()" [indeterminate]="indeterminate()" *ngIf="show()">
                 Select All
             </mat-checkbox>
+
+            <ng-content></ng-content>
         </div>
     `,
     imports: [

@@ -34,7 +34,6 @@ export class UserModel
     public static fromObject(object: GenericUserModel): UserModel
     {
         const themeModel: ThemeModel = ThemeModel.fromObject(object.theme);
-        const groupModel: GroupModel[] = object.groups.map((value: any): GroupModel => GroupModel.fromObject(value));
         return new UserModel(
             object.id,
             object.firstName,
@@ -42,14 +41,14 @@ export class UserModel
             object.loginName,
             AccountType[object.accountType as keyof typeof AccountType],
             UserStatus[object.status as keyof typeof UserStatus],
-            groupModel,
+            object.groups.map((value: any): GroupModel => GroupModel.fromObject(value)),
             themeModel,
             !!object.classroom ? ClassRoomModel.fromObject(object.classroom) : undefined,
         );
     }
 
     public inGroup(name: string): boolean {
-        return this.groups.map((value: GroupModel): string => value.name).includes(name);
+        return this.groups.map((value: GroupModel): string => value.id).includes(name);
     }
 
     public hasPrivilege(privilege: string): boolean {

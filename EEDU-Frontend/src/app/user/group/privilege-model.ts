@@ -1,26 +1,18 @@
 export interface GenericPrivilegeModel
 {
-    id: bigint;
-    name: string;
+    id: string;
 }
 
 export class PrivilegeModel
 {
-    constructor(
-        private readonly _id: bigint,
-        private readonly _name: string
-    ) { }
+    constructor(private readonly _id: string) { }
 
     public static fromObject(obj: GenericPrivilegeModel): PrivilegeModel
     {
-        return new PrivilegeModel(BigInt(obj.id), obj.name);
+        return new PrivilegeModel(obj.id);
     }
 
-    public get id(): bigint {
+    public get id(): string {
         return this._id;
-    }
-
-    public get name(): string {
-        return this._name;
     }
 }

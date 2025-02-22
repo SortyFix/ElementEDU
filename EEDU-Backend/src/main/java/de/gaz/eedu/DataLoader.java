@@ -29,7 +29,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,8 +97,8 @@ import java.util.stream.Stream;
 
     private void createDefaultPrivileges()
     {
-        Set<String> privileges = PrivilegeEntity.getProtectedPrivileges();
-        getPrivilegeService().createEntity(privileges.stream().map(PrivilegeCreateModel::new).collect(Collectors.toSet()));
+        Stream<String> privileges = PrivilegeEntity.getProtectedPrivileges().stream();
+        getPrivilegeService().createEntity(privileges.map(PrivilegeCreateModel::new).collect(Collectors.toSet()));
     }
 
     private void createDefaultGroup()
