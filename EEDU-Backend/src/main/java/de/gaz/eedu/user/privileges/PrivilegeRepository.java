@@ -4,13 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
-import java.util.Optional;
 
-public interface PrivilegeRepository extends JpaRepository<PrivilegeEntity, Long> {
-    @NotNull Optional<PrivilegeEntity> findByName(@NotNull String name);
+public interface PrivilegeRepository extends JpaRepository<PrivilegeEntity, String> {
 
-    boolean existsByName(@NotNull String name);
-
-    boolean existsByNameIn(@NotNull Collection<String> name);
-
+    boolean existsByIdIn(@NotNull Collection<String> id);
 }

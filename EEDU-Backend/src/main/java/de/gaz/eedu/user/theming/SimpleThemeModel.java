@@ -11,7 +11,7 @@ public record SimpleThemeModel(@NotNull Long id, @NotNull String name)
     {
         return "SimpleThemeModel{" +
                 "id=" + id +
-                ", name='" + name;
+                ", id='" + name;
     }
 
     @Override public boolean equals(Object o)

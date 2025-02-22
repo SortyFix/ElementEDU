@@ -17,22 +17,24 @@ import java.util.List;
 import java.util.Set;
 
 @Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class PrivilegeService extends EntityService<Long, PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
+public class PrivilegeService extends EntityService<String, PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
-
-    @Getter(AccessLevel.PROTECTED)
     private final PrivilegeRepository repository;
     private final GroupService groupService;
 
     @Transactional
     @Override public @NotNull List<PrivilegeEntity> createEntity(@NotNull Set<PrivilegeCreateModel> createModel) throws CreationException
     {
-        if (getRepository().existsByNameIn(createModel.stream().map(PrivilegeCreateModel::name).toList()))
+        if (getRepository().existsByIdIn(createModel.stream().map(PrivilegeCreateModel::id).toList()))
         {
             throw new OccupiedException();
         }
 
-        return saveEntity(createModel.stream().map(privilege -> privilege.toEntity(new PrivilegeEntity())).toList());
+        return saveEntity(createModel.stream().map(privilege ->
+        {
+            PrivilegeEntity privilegeEntity = new PrivilegeEntity(privilege.id());
+            return privilege.toEntity(privilegeEntity);
+        }).toList());
     }
 
     @Override public void deleteRelations(@NotNull PrivilegeEntity entry)

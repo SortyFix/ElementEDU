@@ -14,7 +14,7 @@ public record ThemeModel(@NotNull Long id, @NotNull String name,
     {
         return "ThemeModel{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", id='" + name + '\'' +
                 ", backgroundColor_r=" + backgroundColorR +
                 ", backgroundColor_g=" + backgroundColorG +
                 ", backgroundColor_b=" + backgroundColorB +

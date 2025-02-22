@@ -105,7 +105,7 @@ import java.util.stream.Stream;
     private void createDefaultGroup()
     {
         getGroupService().createEntity(AccountType.groupSet().stream().map(
-                (currentGroup) -> new GroupCreateModel(currentGroup, new Long[0])
+                (currentGroup) -> new GroupCreateModel(currentGroup, new String[0])
         ).collect(Collectors.toSet()));
     }
 
@@ -128,15 +128,15 @@ import java.util.stream.Stream;
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity)
     {
         return getUserService().saveEntity(getUserService().createEntity(Set.of(new UserCreateModel(
-                "root", // first name
-                "root", // last name
-                "root", // login name
+                "root", // first id
+                "root", // last id
+                "root", // login id
                 AccountType.ADMINISTRATOR,
                 true, // enabled
                 false, // locked
                 UserStatus.PROSPECTIVE,
                 themeEntity.getId(),
-                new Long[] {} // groups
+                new String[] {  } // groups
         ))).getFirst());
     }
 

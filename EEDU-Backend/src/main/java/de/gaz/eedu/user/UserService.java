@@ -82,7 +82,7 @@ public class UserService extends EntityService<Long, UserRepository, UserEntity,
         {
             entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
 
-            List<Long> ids = Arrays.asList(current.groups());
+            List<String> ids = Arrays.asList(current.groups());
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
         })).toList());

@@ -53,7 +53,6 @@ export class UserModel
     }
 
     public hasPrivilege(privilege: string): boolean {
-        console.log(this.groups);
         return this.groups && this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
     }
 
