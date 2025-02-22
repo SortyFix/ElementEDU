@@ -104,7 +104,7 @@ import java.io.IOException;
     {
         if(postService.userHasEditAuthority(userId, postId))
         {
-            return ResponseEntity.ok(postService.editThumbnail(userId, postId, newThumbnail));
+            return ResponseEntity.ok(postService.editThumbnail(userId, newThumbnail));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

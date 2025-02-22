@@ -104,7 +104,7 @@ public class PostService extends EntityService<Long, PostRepository, PostEntity,
      *
      * @throws IOException if the image could not be found on the file system
      */
-    public @NotNull PostModel editThumbnail(@NotNull Long userId, @NotNull Long postId, @NotNull MultipartFile newThumbnail) throws IOException
+    public @NotNull PostModel editThumbnail(@NotNull Long postId, @NotNull MultipartFile newThumbnail) throws IOException
     {
         PostEntity postEntity = getRepository().getReferenceById(postId);
         FileUtils.deleteDirectory(new File(postEntity.getThumbnailURL()));

@@ -6,9 +6,7 @@ import de.gaz.eedu.exception.NameOccupiedException;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.context.Theme;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
