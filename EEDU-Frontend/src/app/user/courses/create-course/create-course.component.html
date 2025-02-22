@@ -13,16 +13,31 @@
                 formControlName="subject">
             </general-selection-input>
 
-            <!--public constructor(-->
-            <!--private readonly _name: string,-->
-            <!--private readonly _subjectId: number,-->
-            <!--private readonly _classId?: number,-->
-            <!--private readonly _users: number[] = []-->
-            <!--) {}-->
+            <general-selection-input
+                [values]="teacher"
+                label="Teacher"
+                formControlName="teacher">
+            </general-selection-input>
+
+            <general-selection-input
+                [values]="students"
+                [multiple]="true"
+                [allowNull]="true"
+                label="Students"
+                formControlName="students">
+            </general-selection-input>
+
+            <general-selection-input
+                [values]="classrooms"
+                [allowNull]="true"
+                label="Classroom"
+                formControlName="students">
+            </general-selection-input>
+
         </mat-card-content>
         <mat-card-actions align="end">
             <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
-            <button mat-stroked-button type="submit">Submit</button>
+            <button mat-stroked-button type="submit" [disabled]="!canSubmit">Submit</button>
         </mat-card-actions>
     </app-general-create>
 </form>

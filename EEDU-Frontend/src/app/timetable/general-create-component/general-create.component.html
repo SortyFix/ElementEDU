@@ -7,5 +7,7 @@
             <mat-icon>close</mat-icon>
         </button>
     </mat-card-header>
-    <ng-content></ng-content>
+    <div *ngIf="!loading()">
+        <ng-content></ng-content>
+    </div>
 </mat-card>

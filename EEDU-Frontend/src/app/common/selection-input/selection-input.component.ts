@@ -213,6 +213,11 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
      */
     public validate(): { invalidSelection: true } | { unset: true } | null {
 
+        if(this.allowNull())
+        {
+            return null;
+        }
+
         if(this.multiple() && this.selectedValues().length == 0)
         {
             return { invalidSelection: true };
