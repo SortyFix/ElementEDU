@@ -24,7 +24,7 @@ public abstract class EntityService<
         E extends EntityModelRelation<P, M>, // Entity
         M extends EntityModel<P>, // Model
         C extends CreationModel<P, E> // Create Model
-> extends EntityExceptionHandler
+> extends AbstractFunctionality
 {
     @NotNull protected abstract R getRepository();
 

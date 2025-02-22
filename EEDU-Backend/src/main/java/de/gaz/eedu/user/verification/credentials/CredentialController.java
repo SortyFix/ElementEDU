@@ -5,6 +5,7 @@ import de.gaz.eedu.user.verification.GeneratedToken;
 import de.gaz.eedu.user.verification.JwtTokenType;
 import de.gaz.eedu.user.verification.TokenData;
 import de.gaz.eedu.user.verification.VerificationService;
+import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import de.gaz.eedu.user.verification.credentials.model.CredentialCreateModel;
 import de.gaz.eedu.user.verification.credentials.model.CredentialModel;
@@ -114,7 +115,8 @@ public class CredentialController extends EntityController<Long, CredentialServi
     {
         validate(getService().enable(method, code, token), unauthorizedThrowable());
 
-        if (isAuthorized(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
+        // return login token after user has set up the credential
+        if (hasAuthority(JwtTokenType.CREDENTIAL_CREATION_PENDING.getAuthority().getAuthority(), VerificationAuthority.class))
         {
             return authorizeToken(getService().verify(method, code, token), response);
         }

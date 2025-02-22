@@ -3,17 +3,11 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.verification.JwtTokenType;
-import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.List;
@@ -21,7 +15,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j @AllArgsConstructor
-public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>, M extends EntityModel<P>, C extends CreationModel<P, ?>> extends EntityExceptionHandler
+public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>, M extends EntityModel<P>, C extends CreationModel<P, ?>> extends AbstractFunctionality
 {
     protected abstract @NotNull S getService();
 
@@ -100,28 +94,5 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
-    }
-
-    protected boolean isAuthorized(@NotNull String authority)
-    {
-        return isAuthorized(authority, SimpleGrantedAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull JwtTokenType jwtTokenType)
-    {
-        return isAuthorized(jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
-    {
-        return getAuthentication().getAuthorities()
-                                  .stream()
-                                  .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
-                                  .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
-    }
-
-    protected @NotNull Authentication getAuthentication()
-    {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }
