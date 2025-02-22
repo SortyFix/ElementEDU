@@ -1,7 +1,6 @@
 package de.gaz.eedu.user.theming;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import de.gaz.eedu.entity.model.EntityObject;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
