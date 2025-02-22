@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -56,7 +57,7 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
 
-        GroupEntity[] entities = getService().loadEntityById(groups).toArray(GroupEntity[]::new);
+        GroupEntity[] entities = getService().loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
         UserService userService = getService().getUserService();
 
         boolean modified = userService.loadEntityByIDSafe(user).attachGroups(userService, entities);
@@ -123,7 +124,7 @@ public class GroupController extends EntityController<Long, GroupService, GroupM
      * @return {@code true} if the group was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('GROUP_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }

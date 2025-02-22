@@ -10,7 +10,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.function.Function;
@@ -77,12 +79,12 @@ public abstract class EntityService<
      *
      * @param id an array of all ids that should be loaded.
      * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
-     * @see #loadById(P[])
+     * @see #loadById(Iterable)
      * @see Transactional
      */
-    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull P[] id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Iterable<P> id)
     {
-        return Set.copyOf(getRepository().findAllById(List.of(id)));
+        return Set.copyOf(getRepository().findAllById(id));
     }
 
     /**
@@ -132,6 +134,11 @@ public abstract class EntityService<
      */
     @Transactional public abstract @NotNull List<E> createEntity(@NotNull Set<C> model) throws CreationException;
 
+    @Transactional public boolean delete(@NotNull P entity)
+    {
+        return delete(List.of(entity));
+    }
+
     /**
      * Deletes an {@link E} from the database.
      * <p>
@@ -160,25 +167,37 @@ public abstract class EntityService<
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional public boolean delete(P id)
+    @Transactional public boolean delete(Iterable<P> id)
     {
-        return getRepository().findById(id).map(entry ->
+        Collection<E> entities = getRepository().findAllById(id);
+        if(entities.isEmpty())
         {
-            validate(entry.isDeletable(), unauthorizedThrowable());
+            return false;
+        }
 
+        List<E> systemEntities = entities.stream().filter(entity -> !entity.isDeletable()).toList();
+        if(!systemEntities.isEmpty())
+        {
+            String error = "The entities/entity " + systemEntities + " can not be deleted.";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, error);
+        }
+
+        for (E entry : entities)
+        {
             String entityName = entry.getClass().getSimpleName();
             log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
             {
-                save(entry);
+                getRepository().save(entry);
             }
 
             deleteRelations(entry);
 
-            getRepository().deleteById(id);
             log.info("The deletion process of the entity {} {} has been successfully executed.", entityName, id);
-            return true;
-        }).orElse(false);
+        }
+
+        getRepository().deleteAll(entities);
+        return true;
     }
 
     public void deleteRelations(@NotNull E entry) { }
@@ -372,8 +391,7 @@ public abstract class EntityService<
         return loadEntityById(id).map(toModel());
     }
 
-    @Transactional(readOnly = true)
-    public @NotNull @Unmodifiable Set<M> loadById(@NotNull P[] id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> loadById(@NotNull Iterable<P> id)
     {
         return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }

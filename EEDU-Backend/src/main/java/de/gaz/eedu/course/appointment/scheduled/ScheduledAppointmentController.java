@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Set;
 
 @Slf4j @RestController @RequestMapping("/api/v1/course/appointment") @RequiredArgsConstructor
@@ -28,8 +29,7 @@ public class ScheduledAppointmentController extends EntityController<Long, Sched
         log.info("Received incoming request for scheduling appointment(s) {} in course {}.", appointments, course);
 
         CourseEntity courseEntity = getService().getCourseService().loadEntityByIDSafe(course);
-        ScheduledAppointmentEntity[] entities = getService().loadEntityById(appointments)
-                                                            .toArray(ScheduledAppointmentEntity[]::new);
+        ScheduledAppointmentEntity[] entities = getService().loadEntityById(Arrays.asList(appointments)).toArray(ScheduledAppointmentEntity[]::new);
         boolean modified = courseEntity.scheduleRepeating(getService().getCourseService(), entities);
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
@@ -49,7 +49,7 @@ public class ScheduledAppointmentController extends EntityController<Long, Sched
         return super.create(model);
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }
