@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, inject, input, Input, InputSignal, Output, Type} from '@angular/core';
+import {Component, EventEmitter, forwardRef, inject, input, InputSignal, Output, Type} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {NgIf} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
