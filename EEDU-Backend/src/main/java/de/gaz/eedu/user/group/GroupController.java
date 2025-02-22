@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -52,31 +51,18 @@ public class GroupController extends EntityController<String, GroupService, Grou
      * @param groups an array of group IDs to attach to the specified user, provided in the request body.
      *               Must not be null.
      */
-    @PostMapping("/{user}/attach")
+    @PutMapping("/{user}/attach/{groups}")
     @PreAuthorize("hasAuthority('USER_GROUP_ATTACH')")
-    public @NotNull ResponseEntity<Void> attachGroups(@PathVariable long user, @RequestBody @NotNull Long... groups)
+    public @NotNull ResponseEntity<Void> attachGroups(@PathVariable long user, @PathVariable @NotNull String... groups)
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
         return empty(getService().attachGroups(user, groups) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
-    /**
-     * Handles the detachment of groups from a specified user.
-     * <p>
-     * This method processes requests to detach one or more groups from a specified user, identified by the
-     * provided {@code userid}. The groupIds are provided in the request body, and the specified groups are
-     * detached from the user upon successful processing. This endpoint is restricted to users with appropriate privileges.
-     * <p>
-     * This endpoint is accessible only to users with any of the following authorities: {@code ${privilege.user.group.detach}}
-     * or {@code ${privilege.user.all}}.
-     *
-     * @param user   the unique identifier of the target user, provided as a path variable.
-     * @param groups an array of group IDs to detach from the specified user, provided in the request body.
-     *               Must not be null.
-     */
+
+    @DeleteMapping("/{user}/detach/{groups}")
     @PreAuthorize("hasAuthority('USER_GROUP_DETACH')")
-    @PostMapping("/{user}/detach")
-    public @NotNull ResponseEntity<Void> detachGroups(@PathVariable long user, @RequestBody @NotNull String... groups)
+    public @NotNull ResponseEntity<Void> detachGroups(@PathVariable long user, @PathVariable @NotNull String... groups)
     {
         log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
 

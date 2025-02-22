@@ -43,12 +43,12 @@ public class GroupService extends EntityService<String, GroupRepository, GroupEn
         Set<String> specialGroups = AccountType.groupSet();
         for (GroupEntity entity : entities)
         {
-            if(!specialGroups.contains(entity.getName()))
+            if(!specialGroups.contains(entity.getId()))
             {
                 continue;
             }
 
-            String message = String.format("Group %s cannot be attached.", entity.getName());
+            String message = String.format("Group %s cannot be attached.", entity.getId());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
     }
@@ -80,7 +80,7 @@ public class GroupService extends EntityService<String, GroupRepository, GroupEn
     }
 
     @Transactional
-    public boolean attachGroups(long userId, @NotNull Long[] groups)
+    public boolean attachGroups(long userId, @NotNull String[] groups)
     {
         GroupEntity[] entities = loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
 

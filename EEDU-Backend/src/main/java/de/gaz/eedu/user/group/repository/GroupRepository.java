@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 
 @Repository
-public interface GroupRepository extends JpaRepository<GroupEntity, Long>, GroupEntityRepository
+public interface GroupRepository extends JpaRepository<GroupEntity, String>, GroupEntityRepository
 {
-    boolean existsByNameIn(@NotNull Collection<String> name);
+    boolean existsByIdIn(@NotNull Collection<String> ids);
 }

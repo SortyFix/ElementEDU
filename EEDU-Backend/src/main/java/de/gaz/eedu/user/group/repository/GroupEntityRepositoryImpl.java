@@ -13,10 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Repository
-public class GroupEntityRepositoryImpl extends AbstractEntityRepository<Long, GroupEntity> implements GroupEntityRepository
+public class GroupEntityRepositoryImpl extends AbstractEntityRepository<String, GroupEntity> implements GroupEntityRepository
 {
     @Getter(AccessLevel.PROTECTED)
     private final PrivilegeRepository privilegeRepository;
@@ -27,7 +26,7 @@ public class GroupEntityRepositoryImpl extends AbstractEntityRepository<Long, Gr
         this.privilegeRepository = privilegeRepository;
     }
 
-    @Override protected @NonNull TypedQuery<GroupEntity> findEntityQuery(@NonNull Long id)
+    @Override protected @NonNull TypedQuery<GroupEntity> findEntityQuery(@NonNull String id)
     {
         String sql = "SELECT g FROM GroupEntity g LEFT JOIN FETCH g.privileges p WHERE g.id = :groupId";
         return getEntityManager().createQuery(sql, GroupEntity.class).setParameter("groupId", id);
@@ -39,16 +38,9 @@ public class GroupEntityRepositoryImpl extends AbstractEntityRepository<Long, Gr
         return getEntityManager().createQuery(sql, GroupEntity.class);
     }
 
-    @Override public @NotNull Optional<GroupEntity> findEntityByName(@NotNull String name)
-    {
-        String sql = "SELECT g FROM GroupEntity g LEFT JOIN FETCH g.privileges p WHERE g.name = :name";
-        TypedQuery<GroupEntity> query = getEntityManager().createQuery(sql, GroupEntity.class).setParameter("name", name);
-        return query.getResultList().stream().findFirst().map(this::interceptLoading);
-    }
-
     @Override protected @NonNull GroupEntity interceptLoading(@NonNull GroupEntity entity)
     {
-        if(!Objects.equals(entity.getName(), AccountType.ADMINISTRATOR.toString()))
+        if(!Objects.equals(entity.getId(), AccountType.ADMINISTRATOR.toString()))
         {
             return super.interceptLoading(entity);
         }

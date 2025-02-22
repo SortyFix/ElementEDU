@@ -49,7 +49,7 @@ public class UserEntityRepositoryImpl extends AbstractEntityRepository<Long, Use
     @Override protected @NonNull UserEntity interceptLoading(@NonNull UserEntity entity)
     {
         String groupName = entity.getAccountType().toString();
-        Optional<GroupEntity> groupEntity = getGroupRepository().findEntityByName(groupName);
+        Optional<GroupEntity> groupEntity = getGroupRepository().findById(groupName);
         groupEntity.ifPresent(entity::setTypeGroup);
         return super.interceptLoading(entity);
     }

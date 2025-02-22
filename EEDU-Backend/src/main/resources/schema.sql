@@ -246,7 +246,7 @@ VALUES ('Mathematics'),
        ('History'),
        ('Computer Science');
 
-INSERT INTO group_entity (name) VALUES ('parent'), ('girl'), ('boys');
+INSERT INTO group_entity (id) VALUES ('parent'), ('girl'), ('boys');
 
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
 VALUES ('dark', 120, 120, 120, 100, 100, 100);
