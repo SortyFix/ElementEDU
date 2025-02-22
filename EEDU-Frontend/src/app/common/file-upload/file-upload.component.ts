@@ -1,8 +1,10 @@
-import {Component, EventEmitter, inject, input, Input, InputSignal, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, inject, input, Input, InputSignal, Output, Type} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {NgIf} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {ControlValueAccessor} from "@angular/forms";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+
+const type: Type<FileUploadComponent> = forwardRef((): typeof FileUploadComponent => FileUploadComponent);
 
 @Component({
     standalone: true,
@@ -10,6 +12,9 @@ import {ControlValueAccessor} from "@angular/forms";
     imports: [
         MatIcon,
         NgIf
+    ],
+    providers: [
+        { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true }
     ],
     templateUrl: './file-upload.component.html',
     styleUrl: './file-upload.component.scss'
