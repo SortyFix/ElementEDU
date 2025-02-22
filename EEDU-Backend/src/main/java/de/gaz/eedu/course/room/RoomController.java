@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class RoomController extends EntityController<Long, RoomService, RoomMode
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ROOM_DELETE')")
-    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }
