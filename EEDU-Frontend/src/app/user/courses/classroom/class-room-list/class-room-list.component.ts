@@ -23,7 +23,7 @@ import {AbstractCourseComponentList} from "../../abstract-course-components/list
     templateUrl: '../../abstract-course-components/list/abstract-course-components-list.html',
     styleUrl: '../../abstract-course-components/list/abstract-course-components-list.scss'
 })
-export class ClassRoomListComponent extends AbstractCourseComponentList<ClassRoomModel> {
+export class ClassRoomListComponent extends AbstractCourseComponentList<bigint, ClassRoomModel> {
 
     public constructor(service: ClassRoomService, dialog: MatDialog) {
         super(service, dialog, CreateClassRoomComponent, {

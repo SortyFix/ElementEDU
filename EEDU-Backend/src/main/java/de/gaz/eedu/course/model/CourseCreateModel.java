@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public record CourseCreateModel(
         @NotNull String name,
-        @NotNull Long subject,
+        @NotNull String subject,
         @NotNull Long teacher,
         @NotNull Long[] students,
         @Nullable Long classroom

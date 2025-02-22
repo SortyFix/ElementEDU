@@ -18,7 +18,6 @@ import {ClassRoomModel} from "../classroom/class-room-model";
 import {ClassRoomService} from "../classroom/class-room.service";
 import {UserService} from "../../user.service";
 import {AccountType} from "../../account-type";
-import {NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-create-course',

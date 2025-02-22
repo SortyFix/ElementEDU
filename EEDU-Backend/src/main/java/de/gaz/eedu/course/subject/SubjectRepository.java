@@ -5,16 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Repository
-public interface SubjectRepository extends JpaRepository<SubjectEntity, Long>
+public interface SubjectRepository extends JpaRepository<SubjectEntity, String>
 {
 
-    @NotNull Optional<SubjectEntity> findByName(@NotNull String name);
-
-    boolean existsByName(@NotNull String name);
-
-    boolean existsByNameIn(@NotNull Collection<String> name);
+    boolean existsByIdIn(@NotNull Collection<String> name);
 
 }

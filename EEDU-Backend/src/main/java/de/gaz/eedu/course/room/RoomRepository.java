@@ -7,9 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 
 @Repository
-public interface RoomRepository extends JpaRepository<RoomEntity, Long>
+public interface RoomRepository extends JpaRepository<RoomEntity, String>
 {
-
-    boolean existsByNameIn(@NotNull Collection<String> name);
+    boolean existsByIdIn(@NotNull Collection<String> id);
 
 }

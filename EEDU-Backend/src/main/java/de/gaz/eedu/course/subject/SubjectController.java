@@ -4,10 +4,11 @@ import de.gaz.eedu.course.subject.model.SubjectCreateModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +21,9 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/course/subject")
 @RequiredArgsConstructor
-public class SubjectController extends EntityController<Long, SubjectService, SubjectModel, SubjectCreateModel>
+public class SubjectController extends EntityController<String, SubjectService, SubjectModel, SubjectCreateModel>
 {
-    private final SubjectService subjectService;
-
-    @Override
-    protected @NotNull SubjectService getService()
-    {
-        return subjectService;
-    }
+    @Getter(AccessLevel.PROTECTED) private final SubjectService service;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
@@ -39,15 +34,14 @@ public class SubjectController extends EntityController<Long, SubjectService, Su
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
-    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable String[] id)
     {
         return super.delete(id);
     }
 
     //@PreAuthorize("isAuthenticated()")
     @GetMapping("/get/{id}")
-    @Override
-    public @NotNull ResponseEntity<SubjectModel> getData(@NotNull @PathVariable Long id)
+    @Override public @NotNull ResponseEntity<SubjectModel> getData(@NotNull @PathVariable String id)
     {
         return super.getData(id);
     }

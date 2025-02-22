@@ -58,10 +58,10 @@ VALUES ('German'),
        ('Dummy');
 
 INSERT INTO course_entity(name, subject_id, repository_id, class_room_id)
-VALUES ('Q1-German', 1, 1, 1),
-       ('5e-Math', 2, 2, 1),
-       ('2e-Informatics', 3, 3, 3),
-       ('Dummy', 4, 4, 4);
+VALUES ('Q1-German', 'German', 1, 1),
+       ('5e-Math', 'Mathematics', 2, 1),
+       ('2e-Informatics', 'Informatics', 3, 3),
+       ('Dummy', 'Dummy', 4, 4);
 
 INSERT INTO chat_entity (time_of_creation)
 VALUES (90234802),

@@ -13,7 +13,7 @@ import java.time.Period;
 public record FrequentAppointmentCreateModel(
         @NotNull Long start,
         @NotNull Long until,
-        @NotNull Long room,
+        @NotNull String room,
         @NotNull Long duration,
         @NotNull Long frequency
 ) implements CreationModel<Long, FrequentAppointmentEntity> {

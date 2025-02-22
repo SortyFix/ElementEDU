@@ -23,9 +23,9 @@ import {AbstractCourseComponentList} from "../../abstract-course-components/list
     templateUrl: '../../abstract-course-components/list/abstract-course-components-list.html',
     styleUrl: '../../abstract-course-components/list/abstract-course-components-list.scss'
 })
-export class RoomListComponent extends AbstractCourseComponentList<RoomModel>{
+export class RoomListComponent extends AbstractCourseComponentList<string, RoomModel>{
 
     public constructor(service: RoomService, dialog: MatDialog) {
-        super(service, dialog, CreateRoomComponent, { title: (value: RoomModel): string => value.name });
+        super(service, dialog, CreateRoomComponent, { title: (value: RoomModel): string => value.id });
     }
 }

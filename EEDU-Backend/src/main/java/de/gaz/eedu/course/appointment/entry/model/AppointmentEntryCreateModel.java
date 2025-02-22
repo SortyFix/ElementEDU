@@ -13,7 +13,7 @@ import java.util.Objects;
 public record AppointmentEntryCreateModel(
         @NotNull Long start,
         @Nullable Long duration,
-        @Nullable Long room,
+        @Nullable String room,
         @Nullable String description,
         @Nullable AssignmentCreateModel assignment
 ) implements CreationModel<Long,AppointmentEntryEntity> {

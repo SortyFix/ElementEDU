@@ -25,14 +25,14 @@ import {CourseListItemComponent} from "./course-list-item/course-list-item.compo
     templateUrl: '../abstract-course-components/list/abstract-course-components-list.html',
     styleUrl: '../abstract-course-components/list/abstract-course-components-list.scss'
 })
-export class CourseListComponent extends AbstractCourseComponentList<CourseModel> {
+export class CourseListComponent extends AbstractCourseComponentList<bigint, CourseModel> {
 
     public constructor(service: CourseService, dialog: MatDialog)
     {
         super(service, dialog, CreateCourseComponent, {
             title: (value: CourseModel): string => value.name,
             chips: (value: CourseModel): string[] => [
-                value.subject.name,
+                value.subject.id,
                 `${value.appointmentEntries.length} Appointments`,
                 `${value.frequentAppointments.length} Frequent Appointments`
             ]

@@ -8,11 +8,11 @@ import {icons} from "../../../../environment/styles";
 @Injectable({
     providedIn: 'root'
 })
-export class RoomService extends AbstractCourseComponentsService<RoomModel, { name: string }> {
+export class RoomService extends AbstractCourseComponentsService<string, RoomModel, { id: string }> {
 
     public constructor(http: HttpClient) { super(http, icons.room); }
 
-    protected createValue(createModels: { name: string }[]): Observable<RoomModel[]>
+    protected createValue(createModels: { id: string }[]): Observable<RoomModel[]>
     {
         return this.http.post<any[]>(`${this.BACKEND_URL}/course/room/create`, createModels, { withCredentials: true });
     }
@@ -22,12 +22,12 @@ export class RoomService extends AbstractCourseComponentsService<RoomModel, { na
         return this.http.get<any[]>(`${this.BACKEND_URL}/course/room/get/all`, { withCredentials: true });
     }
 
-    protected override deleteValue(id: number[]): Observable<void> {
+    protected override deleteValue(id: string[]): Observable<void> {
         const url: string = `${this.BACKEND_URL}/course/room/delete/${id.toString()}`;
         return this.http.delete<void>(url, { withCredentials: true });
     }
 
-    public  override get translate(): OperatorFunction<any[], RoomModel[]>
+    public override get translate(): OperatorFunction<any[], RoomModel[]>
     {
         return map((response: any[]): RoomModel[] =>
             response.map((item: any): RoomModel => RoomModel.fromObject(item))

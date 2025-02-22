@@ -277,7 +277,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         return getCourseRepository().findById(courseId).orElseThrow(() -> new EntityUnknownException(courseId));
     }
 
-    private @NotNull RoomEntity getRoom(@NotNull Long roomId) throws EntityUnknownException
+    private @NotNull RoomEntity getRoom(@NotNull String roomId) throws EntityUnknownException
     {
         return getRoomRepository().findById(roomId).orElseThrow(() -> new EntityUnknownException(roomId));
     }

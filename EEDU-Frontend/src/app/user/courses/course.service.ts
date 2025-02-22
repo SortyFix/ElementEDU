@@ -18,7 +18,7 @@ import {icons} from "../../../environment/styles";
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService extends AbstractCourseComponentsService<CourseModel, GenericCourseCreateModel> {
+export class CourseService extends AbstractCourseComponentsService<bigint, CourseModel, GenericCourseCreateModel> {
 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
@@ -110,7 +110,7 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
         return this.http.post<any[]>(url, createModels, { withCredentials: true });
     }
 
-    protected override deleteValue(id: number[]): Observable<void> {
+    protected override deleteValue(id: bigint[]): Observable<void> {
         const url: string = `${this.BACKEND_URL}/course/delete/${id.toString()}`;
         return this.http.delete<void>(url, { withCredentials: true });
     }

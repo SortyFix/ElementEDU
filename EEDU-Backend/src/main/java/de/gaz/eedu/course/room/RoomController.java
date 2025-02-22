@@ -17,7 +17,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/course/room")
 @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
-public class RoomController extends EntityController<Long, RoomService, RoomModel, RoomCreateModel>
+public class RoomController extends EntityController<String, RoomService, RoomModel, RoomCreateModel>
 {
     private final RoomService service;
 
@@ -28,7 +28,7 @@ public class RoomController extends EntityController<Long, RoomService, RoomMode
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ROOM_DELETE')")
-    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable String[] id)
     {
         return super.delete(id);
     }

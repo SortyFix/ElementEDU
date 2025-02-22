@@ -25,7 +25,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
 {
     private final CourseService service;
 
-    @GetMapping("/{course}/subject/{subject}") public void setSubject(@PathVariable long course, @PathVariable long subject)
+    @GetMapping("/{course}/subject/{subject}") public void setSubject(@PathVariable long course, @PathVariable String subject)
     {
         CourseEntity courseEntity = getService().loadEntityByIDSafe(course);
         courseEntity.setSubject(getService(), getService().getSubjectService().loadEntityByIDSafe(subject));

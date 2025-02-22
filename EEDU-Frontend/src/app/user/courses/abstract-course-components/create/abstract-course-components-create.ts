@@ -11,7 +11,7 @@ export abstract class AbstractCourseComponentsCreate<T> {
 
     protected constructor
     (
-        private _service: AbstractCourseComponentsService<any, any>,
+        private _service: AbstractCourseComponentsService<any, any, any>,
         private _dialogRef: DialogRef, formBuilder: FormBuilder,
         title: string
     ) {

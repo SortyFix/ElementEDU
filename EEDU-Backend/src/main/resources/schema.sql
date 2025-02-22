@@ -29,15 +29,18 @@ CREATE TABLE IF NOT EXISTS class_room_entity
 
 CREATE TABLE IF NOT EXISTS subject_entity
 (
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    id VARCHAR(50) PRIMARY KEY NOT NULL
+);
+CREATE TABLE IF NOT EXISTS room_entity
+(
+    id VARCHAR(20) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS course_entity
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
     name          VARCHAR(255) NOT NULL,
-    subject_id    BIGINT       NOT NULL,
+    subject_id    VARCHAR(50)  NOT NULL,
     repository_id BIGINT       NOT NULL,
     class_room_id BIGINT       NULL,
     FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
@@ -45,37 +48,32 @@ CREATE TABLE IF NOT EXISTS course_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
-CREATE TABLE IF NOT EXISTS room_entity
-(
-    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(20) NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS frequent_appointment_entity
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    course_id        BIGINT NOT NULL,
-    room_id          BIGINT NOT NULL,
-    start_time_stamp BIGINT NOT NULL,
-    until_time_stamp   BIGINT NOT NULL,
-    duration         BIGINT NOT NULL,
-    frequency           INT    NOT NULL,
+    course_id        BIGINT      NOT NULL,
+    room_id          VARCHAR(20) NOT NULL,
+    start_time_stamp BIGINT      NOT NULL,
+    until_time_stamp BIGINT      NOT NULL,
+    duration         BIGINT      NOT NULL,
+    frequency        INT         NOT NULL,
     FOREIGN KEY (course_id) REFERENCES course_entity (id),
-    FOREIGN KEY (room_id) REFERENCES room_entity(id)
+    FOREIGN KEY (room_id) REFERENCES room_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS appointment_entry_entity
 (
-    id                       BIGINT PRIMARY KEY,
-    duration                 BIGINT         NOT NULL,
-    publish                  BIGINT         NOT NULL,
-    description              VARCHAR(1000)   NULL,
-    assignment_description   VARCHAR(255)   NULL,
-    publish_assignment       BIGINT         NULL,
-    submit_assignment_until  BIGINT         NULL,
-    room_id                  BIGINT         NULL,
-    course_appointment_id    BIGINT         NOT NULL,
-    frequent_appointment_id BIGINT         NULL,
+    id                      BIGINT PRIMARY KEY,
+    duration                BIGINT        NOT NULL,
+    publish                 BIGINT        NOT NULL,
+    description             VARCHAR(1000) NULL,
+    assignment_description  VARCHAR(255)  NULL,
+    publish_assignment      BIGINT        NULL,
+    submit_assignment_until BIGINT        NULL,
+    room_id                 VARCHAR(20)   NULL,
+    course_appointment_id   BIGINT        NOT NULL,
+    frequent_appointment_id BIGINT        NULL,
     FOREIGN KEY (room_id) REFERENCES room_entity (id),
     FOREIGN KEY (course_appointment_id) REFERENCES course_entity (id),
     FOREIGN KEY (frequent_appointment_id) REFERENCES frequent_appointment_entity (id)
@@ -84,14 +82,14 @@ CREATE TABLE IF NOT EXISTS appointment_entry_entity
 -- User --
 CREATE TABLE IF NOT EXISTS theme_entity
 (
-    background_color_r   TINYINT     NOT NULL,
-    background_color_g   TINYINT     NOT NULL,
-    background_color_b   TINYINT     NOT NULL,
-    widget_color_r       TINYINT     NOT NULL,
-    widget_color_g       TINYINT     NOT NULL,
-    widget_color_b       TINYINT     NOT NULL,
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name             VARCHAR(255) NULL
+    background_color_r TINYINT      NOT NULL,
+    background_color_g TINYINT      NOT NULL,
+    background_color_b TINYINT      NOT NULL,
+    widget_color_r     TINYINT      NOT NULL,
+    widget_color_g     TINYINT      NOT NULL,
+    widget_color_b     TINYINT      NOT NULL,
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name               VARCHAR(255) NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_entity
@@ -113,13 +111,13 @@ CREATE TABLE IF NOT EXISTS user_entity
 
 CREATE TABLE IF NOT EXISTS credential_entity
 (
-    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id        BIGINT       NOT NULL,
-    enabled        BIT          NOT NULL,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT       NOT NULL,
+    enabled         BIT          NOT NULL,
     allowed_methods INT          NULL,
-    data           VARCHAR(255) NULL,
-    method         TINYINT      NULL,
-    secret         VARCHAR(255) NULL,
+    data            VARCHAR(255) NULL,
+    method          TINYINT      NULL,
+    secret          VARCHAR(255) NULL,
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
@@ -141,14 +139,20 @@ CREATE TABLE IF NOT EXISTS class_room_users
     FOREIGN KEY (user_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS group_entity(id VARCHAR(25) PRIMARY KEY NOT NULL);
+CREATE TABLE IF NOT EXISTS group_entity
+(
+    id VARCHAR(25) PRIMARY KEY NOT NULL
+);
 
-CREATE TABLE IF NOT EXISTS privilege_entity(id VARCHAR(50) PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS privilege_entity
+(
+    id VARCHAR(50) PRIMARY KEY
+);
 
 CREATE TABLE IF NOT EXISTS user_groups
 (
     group_id VARCHAR(25) NOT NULL,
-    user_id  BIGINT NOT NULL,
+    user_id  BIGINT      NOT NULL,
     PRIMARY KEY (group_id, user_id),
     FOREIGN KEY (group_id) REFERENCES group_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)
@@ -179,7 +183,7 @@ CREATE TABLE IF NOT EXISTS illness_notification_entity
 
 CREATE TABLE IF NOT EXISTS chat_entity
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
     time_of_creation BIGINT NOT NULL
 );
 
@@ -201,57 +205,62 @@ CREATE TABLE IF NOT EXISTS chat_entity_messages
 
 CREATE TABLE IF NOT EXISTS message_entity
 (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    author_id  BIGINT       NOT NULL,
-    body       VARCHAR(1500) NOT NULL,
-    timestamp  BIGINT       NOT NULL,
-    status     TINYINT,
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    author_id BIGINT        NOT NULL,
+    body      VARCHAR(1500) NOT NULL,
+    timestamp BIGINT        NOT NULL,
+    status    TINYINT,
     FOREIGN KEY (author_id) REFERENCES user_entity (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_entity
 (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    author VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    thumbnailurl VARCHAR(255),
-    body VARCHAR(65000) NOT NULL,
-    time_of_creation BIGINT NOT NULL
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT,
+    author           VARCHAR(255)   NOT NULL,
+    title            VARCHAR(255)   NOT NULL,
+    thumbnailurl     VARCHAR(255),
+    body             VARCHAR(65000) NOT NULL,
+    time_of_creation BIGINT         NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS post_user_read_privileges
 (
-    post_id BIGINT NOT NULL,
+    post_id         BIGINT       NOT NULL,
     read_privileges VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_user_edit_privileges
 (
-    post_id BIGINT NOT NULL,
+    post_id         BIGINT       NOT NULL,
     edit_privileges VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_tags
 (
-    post_id BIGINT NOT NULL,
-    tags VARCHAR(255) NOT NULL,
+    post_id BIGINT       NOT NULL,
+    tags    VARCHAR(255) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
-INSERT INTO subject_entity (name)
+INSERT INTO subject_entity (id)
 VALUES ('Mathematics'),
        ('Physics'),
        ('History'),
        ('Computer Science');
 
-INSERT INTO group_entity (id) VALUES ('parent'), ('girl'), ('boys');
+INSERT INTO group_entity (id)
+VALUES ('parent'),
+       ('girl'),
+       ('boys');
 
-INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r, widget_color_g, widget_color_b)
+INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r,
+                          widget_color_g, widget_color_b)
 VALUES ('dark', 120, 120, 120, 100, 100, 100);
 
-INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
+INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id,
+                         status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    -- PRESENT Student
        ('John', 'Zimmermann', 'john.zimmermann', 2, FALSE, TRUE, FALSE, 1, 1),  -- EXCUSED Student
        ('Martin', 'Hansen', 'martin.hansen', 2, FALSE, TRUE, FALSE, 1, 2),      -- UNEXCUSED Student
@@ -267,23 +276,26 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    
        ('Mia', 'Hoffmann', 'mia.hoffmann', 2, TRUE, TRUE, FALSE, 1, 0),         -- PRESENT Student
        ('Ethan', 'Schwarz', 'ethan.schwarz', 2, TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE Student
        ('Charlotte', 'Zimmer', 'charlotte.zimmer', 2, FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED Student
-       ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1);        -- EXCUSED Student
+       ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1); -- EXCUSED Student
 
 INSERT INTO file_entity (data_directory)
-VALUES ('/repo/algebra/101'),   -- File for Algebra 101
+VALUES ('/repo/algebra/101'),  -- File for Algebra 101
        ('/repo/calculus/101'), -- File for Calculus 101
-       ('/repo/physics/101'),   -- File for Physics 101
-       ('/repo/history/101'),   -- File for History 101
+       ('/repo/physics/101'),  -- File for Physics 101
+       ('/repo/history/101'),  -- File for History 101
        ('/repo/programming'); -- File for Introduction to Programming
 
 INSERT INTO course_entity (name, subject_id, repository_id, class_room_id)
-VALUES ('Algebra 101', 1, 1, NULL),  -- Mathematics (Algebra), Room 101
-       ('Calculus 101', 1, 2, NULL), -- Mathematics (Calculus), Room 101
-       ('Physics 101', 2, 3, NULL),  -- Physics, Room 102
-       ('History 101', 3, 4, NULL),  -- History, Room 103
-       ('Introduction to Programming', 4, 5, NULL); -- Computer Science, Room 102
+VALUES ('Algebra 101', 'Mathematics', 1, NULL),  -- Mathematics (Algebra), Room 101
+       ('Calculus 101', 'Mathematics', 2, NULL), -- Mathematics (Calculus), Room 101
+       ('Physics 101', 'Physics', 3, NULL),      -- Physics, Room 102
+       ('History 101', 'History', 4, NULL),      -- History, Room 103
+       ('Introduction to Programming', 'Computer Science', 5, NULL); -- Computer Science, Room 102
 
-INSERT INTO room_entity (name) VALUES ('403'), ('504'), ('204');
+INSERT INTO room_entity (id)
+VALUES ('403'),
+       ('504'),
+       ('204');
 
 INSERT INTO course_users (course_id, user_id)
 VALUES (1, 5), -- Sara Müller to Algebra 101

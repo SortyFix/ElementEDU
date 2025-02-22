@@ -84,7 +84,7 @@ public class FrequentAppointmentEntity implements EntityModelRelation<Long, Freq
         if (this == object) {return true;}
         if (object == null || getClass() != object.getClass()) {return false;}
         FrequentAppointmentEntity that = (FrequentAppointmentEntity) object;
-        return getId() == that.getId();
+        return getId().equals(that.getId());
     }
 
     @Override public int hashCode()

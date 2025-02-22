@@ -1,26 +1,18 @@
-
-export interface GenericSubject {
-    id: number;
-    name: string;
-}
+export interface GenericSubject {id: string;}
 
 export class SubjectModel {
-    constructor(
-        private readonly _id: number,
-        // This can be saved a number as it won't ever exceed 1.7976931348623157e+308. I am already overwhelmed with the
-        // current amount of subjects in school. No need to create over 1.7976931348623157e+308
-        private readonly _name: string
-    ) {}
+
+    constructor(private readonly _id: string) {}
 
     public static fromObject(object: GenericSubject): SubjectModel {
-        return new SubjectModel(object.id, object.name);
+        return new SubjectModel(object.id);
     }
 
-    public get id(): number {
+    public get id(): string {
         return this._id;
     }
 
     public get name(): string {
-        return this._name;
+        return this._id;
     }
 }

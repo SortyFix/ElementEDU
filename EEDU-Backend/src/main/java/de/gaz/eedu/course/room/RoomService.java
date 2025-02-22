@@ -16,18 +16,22 @@ import java.util.List;
 import java.util.Set;
 
 @Service @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
-public class RoomService extends EntityService<Long, RoomRepository, RoomEntity, RoomModel, RoomCreateModel>
+public class RoomService extends EntityService<String, RoomRepository, RoomEntity, RoomModel, RoomCreateModel>
 {
     private final RoomRepository repository;
 
     @Transactional @Override
     public @NotNull List<RoomEntity> createEntity(@NotNull Set<RoomCreateModel> model) throws CreationException
     {
-        if (getRepository().existsByNameIn(model.stream().map(RoomCreateModel::name).toList()))
+        if (getRepository().existsByIdIn(model.stream().map(RoomCreateModel::id).toList()))
         {
             throw new OccupiedException();
         }
 
-        return saveEntity(model.stream().map(current -> current.toEntity(new RoomEntity())).toList());
+        return saveEntity(model.stream().map(current ->
+        {
+            RoomEntity room = new RoomEntity(current.id());
+            return current.toEntity(room);
+        }).toList());
     }
 }

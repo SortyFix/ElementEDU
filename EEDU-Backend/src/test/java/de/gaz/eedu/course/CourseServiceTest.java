@@ -37,12 +37,12 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     @Override
     protected @NotNull Eval<CourseCreateModel, CourseModel> successEval()
     {
-        CourseCreateModel create = new CourseCreateModel("7b-German", 1L, 1L, new Long[0], null);
+        CourseCreateModel create = new CourseCreateModel("7b-German", "German", 1L, new Long[0], null);
 
         CourseModel courseModel = new CourseModel(
                 5L,
                 "7b-German",
-                new SubjectModel(1L, "German"),
+                new SubjectModel("German"),
                 new AppointmentEntryModel[0],
                 new FrequentAppointmentModel[0],
                 null
@@ -59,7 +59,7 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     @Override
     protected @NotNull CourseCreateModel occupiedCreateModel()
     {
-        return new CourseCreateModel("Q1-German", 2L, 1L, new Long[0], null);
+        return new CourseCreateModel("Q1-German", "German", 1L, new Long[0], null);
     }
 
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")

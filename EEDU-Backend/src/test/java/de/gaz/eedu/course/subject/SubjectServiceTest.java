@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Getter(AccessLevel.PROTECTED)
-public class SubjectServiceTest extends ServiceTest<Long, SubjectService, SubjectEntity, SubjectModel, SubjectCreateModel>
+public class SubjectServiceTest extends ServiceTest<String, SubjectService, SubjectEntity, SubjectModel, SubjectCreateModel>
 {
     @Autowired private SubjectService service;
 
@@ -18,12 +18,11 @@ public class SubjectServiceTest extends ServiceTest<Long, SubjectService, Subjec
     protected @NotNull Eval<SubjectCreateModel, SubjectModel> successEval()
     {
         SubjectCreateModel subjectCreateModel = new SubjectCreateModel("Ethics");
-        SubjectModel subjectModel = new SubjectModel(5L, "Ethics");
+        SubjectModel subjectModel = new SubjectModel("Ethics");
 
         return Eval.eval(subjectCreateModel, subjectModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
-            Assertions.assertEquals(expect.name(), result.name());
         });
     }
 

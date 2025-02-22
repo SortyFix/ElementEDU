@@ -5,14 +5,14 @@ import {AbstractCourseComponentsService} from "../abstract-course-components-ser
 import {ListItemContent} from "../../../../common/abstract-list/list-item-content";
 import {Type} from "@angular/core";
 
-export abstract class AbstractCourseComponentList<T extends { id: number | bigint }> {
+export abstract class AbstractCourseComponentList<P, T extends { id: P }> {
 
     private _values: readonly T[] = [];
 
     protected readonly SelectionType: typeof SelectionType = SelectionType;
 
     protected constructor(
-        private readonly _service: AbstractCourseComponentsService<T, any>,
+        private readonly _service: AbstractCourseComponentsService<P, T, any>,
         private readonly _dialog: MatDialog,
         private readonly _componentType: ComponentType<any>,
         private readonly _listData: ListItemInfo<T>)
@@ -40,7 +40,7 @@ export abstract class AbstractCourseComponentList<T extends { id: number | bigin
 
     protected delete(selectedValues: T[]): void
     {
-        this._service.delete(selectedValues.map((value: T): number | bigint => value.id)).subscribe();
+        this._service.delete(selectedValues.map((value: T): P => value.id)).subscribe();
     }
 
     protected subscribe(): void
@@ -61,7 +61,7 @@ export abstract class AbstractCourseComponentList<T extends { id: number | bigin
         return this.service.fetched;
     }
 
-    protected get service(): AbstractCourseComponentsService<T, any> {
+    protected get service(): AbstractCourseComponentsService<P, T, any> {
         return this._service;
     }
 

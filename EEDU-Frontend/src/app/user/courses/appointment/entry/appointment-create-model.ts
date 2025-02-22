@@ -2,7 +2,7 @@
 export interface GenericAppointmentCreateModel {
     start: Date,
     duration: number,
-    room?: { id: number },
+    room?: { id: string },
     description?: string,
     assignment?: AppointmentCreateModel
 }
@@ -20,7 +20,7 @@ export class AppointmentCreateModel
     public constructor(
         private readonly _start: Date,
         private readonly _duration: number,
-        private readonly _room?: number,
+        private readonly _room: string | null,
         private readonly _description?: string,
         private readonly _assignment?: AppointmentCreateModel
     ) {}
@@ -30,7 +30,7 @@ export class AppointmentCreateModel
         return new AppointmentCreateModel(
             obj.start,
             obj.duration,
-            obj.room?.id,
+            obj.room?.id || null,
             obj.description,
             obj.assignment
         );
@@ -58,7 +58,7 @@ export class AppointmentCreateModel
         return this._assignment;
     }
 
-    public get room(): number | undefined {
+    public get room(): string | null {
         return this._room;
     }
 
