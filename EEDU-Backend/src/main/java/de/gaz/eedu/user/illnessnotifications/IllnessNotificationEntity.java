@@ -26,7 +26,7 @@ public class IllnessNotificationEntity implements EntityModelRelation<Long, Illn
     public IllnessNotificationModel toModel()
     {
         return new IllnessNotificationModel(id,
-                user.getId(),
+                user.toReducedModel(),
                 status,
                 reason,
                 getTimeStamp(),

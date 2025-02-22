@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController @RequestMapping(value = "/api/v1/illness/management") @AllArgsConstructor
 public class IllnessNotificationManagementController
 {
@@ -26,6 +28,12 @@ public class IllnessNotificationManagementController
     @PreAuthorize("hasAuthority('ADMINISTRATOR')") @GetMapping("/{date}")
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfDate(@NotNull @PathVariable Long date){
         return illnessNotificationManagementService.getNotificationsOfDate(date);
+    }
+
+    @GetMapping("/get-pending")
+    public ResponseEntity<List<IllnessNotificationModel>> getPendingNotifications()
+    {
+        return illnessNotificationManagementService.getPendingNotfications();
     }
 
     @PreAuthorize("hasAuthority('ADMINISTRATOR')") @PostMapping("/respond/{notificationId}/{status}")

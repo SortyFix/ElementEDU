@@ -12,7 +12,7 @@ import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
-import {IllnessNotificationModel} from "./model/illness-notification-model";
+import {ReducedIllnessNotificationModel} from "./model/reduced-illness-notification-model";
 import {Observable, Subscription} from "rxjs";
 import {IllnessNotificationStatus} from "./illness-notification-status";
 import {FileUploadComponent} from "../common/file-upload/file-upload.component";
@@ -47,7 +47,7 @@ export class IllnessNotificationComponent implements OnInit {
     reason!: string;
     until!: Date | null;
 
-    illnessNotifications!: IllnessNotificationModel[];
+    illnessNotifications!: ReducedIllnessNotificationModel[];
 
     constructor(private http: HttpClient) {}
 
@@ -58,8 +58,8 @@ export class IllnessNotificationComponent implements OnInit {
         })
     }
 
-    getOwnSickNotes(): Observable<IllnessNotificationModel[]> {
-        return this.http.get<IllnessNotificationModel[]>(`${this.prefix}/my-notifications`, {
+    getOwnSickNotes(): Observable<ReducedIllnessNotificationModel[]> {
+        return this.http.get<ReducedIllnessNotificationModel[]>(`${this.prefix}/my-notifications`, {
             withCredentials: true
         });
     }

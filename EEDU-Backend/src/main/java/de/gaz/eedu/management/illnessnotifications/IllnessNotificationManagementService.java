@@ -5,6 +5,7 @@ import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
 import de.gaz.eedu.user.illnessnotifications.model.IllnessNotificationModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationService;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationStatus;
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service @AllArgsConstructor
 public class IllnessNotificationManagementService
@@ -21,6 +24,7 @@ public class IllnessNotificationManagementService
 
     public ResponseEntity<IllnessNotificationModel[]> getNotificationsOfUserByStatus(@NotNull Long userId, @NotNull IllnessNotificationStatus status)
     {
+        Cookie cookie = new Cookie("mein-name", "Yonas");
         return ResponseEntity.ok(userService.loadEntityById(userId).orElseThrow(() -> new ResponseStatusException(
                                                     HttpStatus.NOT_FOUND))
                                             .getIllnessNotificationEntities()
@@ -44,6 +48,11 @@ public class IllnessNotificationManagementService
                                                            .stream()
                                                            .map(IllnessNotificationEntity::toModel)
                                                            .toArray(IllnessNotificationModel[]::new));
+    }
+
+    public ResponseEntity<List<IllnessNotificationModel>> getPendingNotfications()
+    {
+        return illnessNotificationService.getPendingNotifications();
     }
 
     public ResponseEntity<Boolean> respondToNotification(@NotNull @PathVariable Long notificationId, @NotNull IllnessNotificationStatus status)

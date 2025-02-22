@@ -41,6 +41,7 @@ import java.util.function.Function;
         Function<FileEntity, Boolean> access = file ->
         {
             UserEntity userEntity = userService.loadEntityByIDSafe(userId);
+            System.out.println(file.hasAccess(userEntity));
             return file.hasAccess(userEntity);
         };
         if (fileService.getRepository().findById(fileId).map(access).orElse(false))

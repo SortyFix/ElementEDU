@@ -1,14 +1,6 @@
 import {Component, OnInit, Type} from '@angular/core';
 import { UserModel } from '../user/user-model';
 import {UserService} from "../user/user.service";
-import {MatTab, MatTabContent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
-import {CourseListComponent} from "../user/courses/course-list/course-list.component";
-import {ClassRoomListComponent} from "../user/courses/classroom/class-room-list/class-room-list.component";
-import {RoomListComponent} from "../user/courses/room/room-list/room-list.component";
-import {SubjectListComponent} from "../user/courses/subject/subject-list/subject-list.component";
-import {MatIcon} from "@angular/material/icon";
-import {NgComponentOutlet, NgForOf} from "@angular/common";
-import {icons} from "../../environment/styles";
 
 export interface CourseTab
 {
@@ -20,6 +12,16 @@ export interface CourseTab
 @Component({
     selector: 'app-management',
     imports: [
+        UserListComponent,
+        MatAccordion,
+        MatExpansionPanel,
+        MatExpansionPanelHeader,
+        MatExpansionPanelHeader,
+        MatExpansionPanelTitle,
+        MatExpansionPanelDescription,
+        NgForOf,
+        MatButton,
+        NgIf,
         MatTab,
         MatTabGroup,
         MatTabContent,
@@ -42,13 +44,37 @@ export class ManagementComponent implements OnInit {
 
     userList: UserModel[] = [];
 
-    public constructor(protected userService: UserService) {}
+    illnessNotifications: IllnessNotificationModel[] = []
+
+    PREFIX: string = "http://localhost:8080/api/v1";
+
+    public constructor(protected userService: UserService, , protected fileService: FileService, private http: HttpClient) {}
 
     public ngOnInit(): void {
+        this.getPendingNotifications();
         this.userService.fetchAll.subscribe((users: UserModel[]): void => { this.userList = users });
     }
 
     protected get courseComponentTabs(): CourseTab[] {
         return this._courseComponentsTabs;
     }
+
+    private getPendingNotifications(): void
+    {
+        this.http.get<GenericIllnessNotificationModel[]>(`${this.PREFIX}/illness/management/get-pending`, {
+            withCredentials: true
+        }).subscribe((list: GenericIllnessNotificationModel[]): void => {
+            list.forEach((obj: GenericIllnessNotificationModel): void => {
+                let model: IllnessNotificationModel = IllnessNotificationModel.fromObject(obj);
+                this.illnessNotifications.push(model);
+            })
+            console.log(this.illnessNotifications);
+        })
+    }
+
+    public downloadFile(id: bigint)
+    {
+        this.fileService.downloadFile(id);
+    }
 }
+

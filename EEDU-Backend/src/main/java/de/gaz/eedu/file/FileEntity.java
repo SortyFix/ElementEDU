@@ -2,6 +2,7 @@ package de.gaz.eedu.file;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.exception.MaliciousFileException;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -82,7 +83,6 @@ import java.util.Set;
      * </p>
      *
      * @param batch The batch to be uploaded.
-     * @return True if the upload is successful, false otherwise.
      * @throws IOException           If an I/O error occurs during the upload or file copying.
      * @throws IllegalStateException If the ClamAV client encounters an illegal state during the scan.
      */
@@ -142,7 +142,7 @@ import java.util.Set;
      */
     public boolean hasAccess(@NotNull UserEntity userEntity)
     {
-        return userEntity.hasAnyAuthority(getPrivilege());
+        return userEntity.hasAnyAuthority(getPrivilege()) || userEntity.getAccountType().equals(AccountType.ADMINISTRATOR);
     }
 
     /**
