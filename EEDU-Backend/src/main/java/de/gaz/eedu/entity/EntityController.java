@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +65,7 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
     public @NotNull HttpStatus delete(@NotNull P[] id)
     {
         log.info("Received an incoming delete request from class {} with id(s) {}.", getClass().getSuperclass(), id);
-        return getService().delete(id) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return getService().delete(Arrays.asList(id)) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
     /**

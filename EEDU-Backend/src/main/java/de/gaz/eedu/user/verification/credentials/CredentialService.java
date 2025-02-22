@@ -141,7 +141,7 @@ public class CredentialService extends EntityService<Long, CredentialRepository,
     @Transactional
     protected void deleteTemporary(long id, @NotNull CredentialEntity credential)
     {
-        if (delete(new Long[] { id }))
+        if (delete(id))
         {
             return;
         }

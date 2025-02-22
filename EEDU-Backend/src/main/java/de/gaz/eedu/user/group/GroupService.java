@@ -79,7 +79,7 @@ public class GroupService extends EntityService<Long, GroupRepository, GroupEnti
     @Transactional
     public boolean attachGroups(long userId, @NotNull Long[] groups)
     {
-        GroupEntity[] entities = loadEntityById(groups).toArray(GroupEntity[]::new);
+        GroupEntity[] entities = loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
 
         validateGroups(entities);
 

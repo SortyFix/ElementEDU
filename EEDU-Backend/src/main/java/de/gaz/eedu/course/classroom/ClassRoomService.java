@@ -97,7 +97,7 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
             UserEntity tutor = fetchTutor(current.tutor());
             List<UserEntity> fetchedUsers = getUserRepository().findAllById(List.of(current.students()));
             Collection<UserEntity> users = Stream.concat(Stream.of(tutor), fetchedUsers.stream()).toList();
-            Collection<CourseEntity> courses = getCourseService().loadEntityById(current.courses());
+            Collection<CourseEntity> courses = getCourseService().loadEntityById(Arrays.asList(current.courses()));
 
             ClassRoomEntity classRoomEntity = new ClassRoomEntity(courses, users);
             tutor.setClassRoom(classRoomEntity);
