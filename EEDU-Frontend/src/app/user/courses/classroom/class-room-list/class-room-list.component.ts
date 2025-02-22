@@ -30,8 +30,7 @@ export class ClassRoomListComponent extends AbstractCourseComponentList<ClassRoo
             title: (value: ClassRoomModel): string => value.name,
             chips: (value: ClassRoomModel): string[] => [
                 `Tutor: ${value.tutor.name}`,
-                `${value.students.length} Users`,
-                `${value.courses.length} Courses`
+                `${value.students.length} Users`
             ]
         });
     }

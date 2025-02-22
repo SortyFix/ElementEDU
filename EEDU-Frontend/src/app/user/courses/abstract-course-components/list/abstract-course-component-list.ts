@@ -2,6 +2,8 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {ListItemInfo, SelectionType} from "../../../../common/abstract-list/abstract-list.component";
 import {AbstractCourseComponentsService} from "../abstract-course-components-service";
+import {ListItemContent} from "../../../../common/abstract-list/list-item-content";
+import {Type} from "@angular/core";
 
 export abstract class AbstractCourseComponentList<T extends { id: number | bigint }> {
 
@@ -23,6 +25,8 @@ export abstract class AbstractCourseComponentList<T extends { id: number | bigin
 
         this.subscribe();
     }
+
+    protected get content(): Type<ListItemContent<T>> | null { return null; }
 
     protected openDialog(): MatDialogRef<any>
     {

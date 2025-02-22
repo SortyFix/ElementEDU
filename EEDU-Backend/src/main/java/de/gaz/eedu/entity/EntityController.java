@@ -3,17 +3,11 @@ package de.gaz.eedu.entity;
 import de.gaz.eedu.entity.model.CreationModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.verification.JwtTokenType;
-import de.gaz.eedu.user.verification.authority.VerificationAuthority;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.Array;
 import java.util.HashSet;
@@ -22,7 +16,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 @Slf4j @AllArgsConstructor
-public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends EntityExceptionHandler
+public abstract class EntityController<S extends EntityService<?, ?, M, C>, M extends EntityModel, C extends CreationModel<?>> extends AbstractEntityFunctionality
 {
     protected abstract @NotNull S getService();
 
@@ -49,6 +43,7 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
         try
         {
             List<M> created = getService().create(new HashSet<>(List.of(model)));
+            //noinspection unchecked
             M[] models = created.toArray((M[]) Array.newInstance(created.getFirst().getClass(), created.size()));
             return ResponseEntity.status(HttpStatus.CREATED).body(models);
         }
@@ -100,28 +95,5 @@ public abstract class EntityController<S extends EntityService<?, ?, M, C>, M ex
     {
         log.info("Received an incoming get all request from class {}.", getClass().getSuperclass());
         return ResponseEntity.ok(getService().findAll(predicate));
-    }
-
-    protected boolean isAuthorized(@NotNull String authority)
-    {
-        return isAuthorized(authority, SimpleGrantedAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull JwtTokenType jwtTokenType)
-    {
-        return isAuthorized(jwtTokenType.getAuthority().getAuthority(), VerificationAuthority.class);
-    }
-
-    protected boolean isAuthorized(@NotNull String authority, @NotNull Class<? extends GrantedAuthority> parent)
-    {
-        return getAuthentication().getAuthorities()
-                                  .stream()
-                                  .filter(grantedAuthority -> parent.isAssignableFrom(grantedAuthority.getClass()))
-                                  .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authority));
-    }
-
-    protected @NotNull Authentication getAuthentication()
-    {
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

@@ -1,4 +1,4 @@
-<mat-form-field appearance="outline" *ngIf="filteredValues.length != 0 && filter()">
+<mat-form-field appearance="outline" *ngIf="filteredValues.length != 0 && generalListInfo()">
     <mat-label>Search</mat-label>
     <input name="search"
            type="search"
@@ -72,6 +72,8 @@
                 -->
             </mat-panel-description>
         </mat-expansion-panel-header>
-        <p>Hi</p>
+        <ng-container *ngIf="hasContent">
+            <ng-container *ngComponentOutlet="content; inputs: { entry: value }"></ng-container>
+        </ng-container>
     </mat-expansion-panel>
 </mat-accordion>

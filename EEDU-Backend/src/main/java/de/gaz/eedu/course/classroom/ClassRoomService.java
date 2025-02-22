@@ -4,6 +4,7 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
+import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -102,6 +104,16 @@ public class ClassRoomService extends EntityService<ClassRoomRepository, ClassRo
             courses.forEach(course -> course.linkClassRoom(classRoomEntity));
             return current.toEntity(classRoomEntity);
         };
+    }
+
+    public @NotNull @Unmodifiable Set<CourseModel> getCourses(long user, long classroomId)
+    {
+        if(hasRole("ADMINISTRATOR") || getRepository().existsUserInCourse(user, classroomId))
+        {
+            return getRepository().findAllCoursesById(classroomId);
+        }
+
+        throw unauthorizedThrowable();
     }
 
     /**

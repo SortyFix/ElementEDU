@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -114,7 +113,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     {
         validate(getService().enable(method, code, token), unauthorizedThrowable());
 
-        if (isAuthorized(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
+        if (hasAuthority(JwtTokenType.CREDENTIAL_CREATION_PENDING)) // return login token after user has setup two factor
         {
             return authorizeToken(getService().verify(method, code, token), response);
         }
@@ -136,6 +135,7 @@ public class CredentialController extends EntityController<CredentialService, Cr
     @PostMapping("/verify")
     public @NotNull ResponseEntity<String> verify(@NotNull @RequestBody String code, @RequestAttribute @NotNull TokenData token, @NotNull HttpServletResponse response)
     {
+        //noinspection unchecked
         List<String> credentials = token.get("available", List.class);
         CredentialMethod method = CredentialMethod.valueOf(credentials.getFirst());
 

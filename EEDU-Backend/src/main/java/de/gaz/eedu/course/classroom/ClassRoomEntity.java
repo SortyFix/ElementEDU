@@ -3,7 +3,6 @@ package de.gaz.eedu.course.classroom;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
-import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
@@ -48,7 +47,6 @@ public class ClassRoomEntity implements EntityModelRelation<ClassRoomModel>
                 getId(),
                 getName(),
                 getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
-                getCourses().stream().map(CourseEntity::toModel).toArray(CourseModel[]::new),
                 getTutor().toReducedModel()
         );
     }

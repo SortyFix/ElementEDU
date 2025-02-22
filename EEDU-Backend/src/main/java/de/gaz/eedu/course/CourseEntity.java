@@ -10,6 +10,7 @@ import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -62,15 +63,27 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
 
     @Override public CourseModel toModel()
     {
-        Stream<AppointmentEntryEntity> entries = Arrays.stream(getEntries());
-        Stream<AppointmentEntryModel> entryModels = entries.map(AppointmentEntryEntity::toModel);
-        AppointmentEntryModel[] entryArray = entryModels.toArray(AppointmentEntryModel[]::new);
-
         Stream<FrequentAppointmentEntity> scheduled = getFrequentAppointments().stream();
-        Stream<FrequentAppointmentModel> scheduledModels = scheduled.map(FrequentAppointmentEntity::toModel);
-        FrequentAppointmentModel[] scheduledArray = scheduledModels.toArray(FrequentAppointmentModel[]::new);
 
-        return new CourseModel(getId(), getName(), getSubject().toModel(), entryArray, scheduledArray);
+        return new CourseModel(
+                getId(),
+                getName(),
+                getSubject().toModel(),
+                Arrays.stream(getEntries()).map(AppointmentEntryEntity::toModel).toArray(AppointmentEntryModel[]::new),
+                scheduled.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new),
+                getClassRoom().map(ClassRoomEntity::toModel).orElse(null)
+        );
+    }
+
+    public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher)
+    {
+        return saveEntityIfPredicateTrue(courseService, teacher, this::setTeacher);
+    }
+
+    public boolean setTeacher(@NotNull UserEntity teacher)
+    {
+        this.users.removeIf(user -> Objects.equals(user.getAccountType(), AccountType.TEACHER));
+        return this.users.add(teacher);
     }
 
     public void setSubject(@NotNull CourseService service, SubjectEntity subject)
@@ -331,7 +344,7 @@ public class CourseEntity implements EntityModelRelation<CourseModel>
      * @param <T>           the type of the test entity and the predicate
      * @return whether this entity has been saved.
      */
-    private <T> boolean saveEntityIfPredicateTrue(@NotNull CourseService courseService, @NotNull T test, @NotNull Predicate<T> predicate)
+    private <T> boolean saveEntityIfPredicateTrue(@NotNull CourseService courseService, @Nullable T test, @NotNull Predicate<T> predicate)
     {
         if (predicate.test(test))
         {

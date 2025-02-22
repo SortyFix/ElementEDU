@@ -31,7 +31,7 @@ export class SubjectService extends AbstractCourseComponentsService<SubjectModel
         super.postDelete(id);
     }
 
-    protected override get translate(): OperatorFunction<any[], SubjectModel[]> {
+    public override get translate(): OperatorFunction<any[], SubjectModel[]> {
         return map((response: any[]): SubjectModel[] =>
             response.map((item: any): SubjectModel => SubjectModel.fromObject(item))
         );

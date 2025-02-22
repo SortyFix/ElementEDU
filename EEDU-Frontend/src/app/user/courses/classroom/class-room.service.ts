@@ -5,16 +5,29 @@ import {ClassRoomCreateModel, ClassRoomCreatePacket} from "./class-room-create-m
 import {HttpClient} from "@angular/common/http";
 import {AbstractCourseComponentsService} from "../abstract-course-components/abstract-course-components-service";
 import {icons} from "../../../../environment/styles";
+import {CourseModel} from "../course-model";
+import {CourseService} from "../course.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClassRoomService extends AbstractCourseComponentsService<ClassRoomModel, ClassRoomCreateModel> {
 
-    public constructor(http: HttpClient) { super(http, icons.classroom); }
+    private readonly _translateCourses: OperatorFunction<any[], CourseModel[]>;
 
-    protected override get fetchAllValues(): Observable<ClassRoomModel[]> {
-        return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, {withCredentials: true});
+    public constructor(http: HttpClient, courseService: CourseService) {
+        super(http, icons.classroom);
+        this._translateCourses = courseService.translate;
+    }
+
+    public fetchCourses(classRoom: bigint): Observable<CourseModel[]>
+    {
+        const url: string = `${this.BACKEND_URL}/course/classroom/get/courses/${classRoom}`;
+        return this.http.get<any[]>(url, { withCredentials: true }).pipe(this._translateCourses);
+    }
+
+    protected override get fetchAllValues(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, { withCredentials: true });
     }
 
     protected override createValue(createModels: ClassRoomCreateModel[]): Observable<any[]> {
@@ -27,7 +40,7 @@ export class ClassRoomService extends AbstractCourseComponentsService<ClassRoomM
         return this.http.delete<void>(url, {withCredentials: true});
     }
 
-    protected override get translate(): OperatorFunction<any[], ClassRoomModel[]>
+    public override get translate(): OperatorFunction<any[], ClassRoomModel[]>
     {
         return map((response: any[]): ClassRoomModel[] => response.map((item: any): ClassRoomModel =>
             ClassRoomModel.fromObject(item))

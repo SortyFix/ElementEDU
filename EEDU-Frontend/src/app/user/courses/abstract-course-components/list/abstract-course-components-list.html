@@ -11,6 +11,7 @@
     <list
         *ngIf="loaded && values.length > 0"
         [itemInfo]="itemInfo"
+        [componentContent]="content"
         [values]="values"
         [height]="300"
         [selectionType]="SelectionType.MULTIPLE" #list>

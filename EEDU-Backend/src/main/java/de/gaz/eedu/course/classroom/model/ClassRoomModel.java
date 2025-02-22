@@ -1,6 +1,5 @@
 package de.gaz.eedu.course.classroom.model;
 
-import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import lombok.NonNull;
@@ -14,7 +13,6 @@ public record ClassRoomModel(
         @NonNull Long id,
         @NonNull String name,
         @NonNull ReducedUserModel[] students,
-        @NonNull CourseModel[] courses,
         @Nullable ReducedUserModel tutor
 ) implements EntityModel {
 
@@ -24,7 +22,6 @@ public record ClassRoomModel(
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", students=" + Arrays.toString(students) +
-                ", courses=" + Arrays.toString(courses) +
                 ", tutor=" + tutor +
                 '}';
     }

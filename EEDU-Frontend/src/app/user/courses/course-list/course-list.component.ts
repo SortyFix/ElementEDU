@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Type} from '@angular/core';
 import {AbstractList} from "../../../common/abstract-list/abstract-list.component";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
@@ -9,6 +9,8 @@ import {CreateCourseComponent} from "../create-course/create-course.component";
 import {NgIf} from "@angular/common";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {AbstractCourseComponentList} from "../abstract-course-components/list/abstract-course-component-list";
+import {ListItemContent} from "../../../common/abstract-list/list-item-content";
+import {CourseListItemComponent} from "./course-list-item/course-list-item.component";
 
 @Component({
     selector: 'app-course-list',
@@ -35,6 +37,10 @@ export class CourseListComponent extends AbstractCourseComponentList<CourseModel
                 `${value.frequentAppointments.length} Frequent Appointments`
             ]
         });
+    }
+
+    protected override get content(): Type<ListItemContent<CourseModel>> | null {
+        return CourseListItemComponent;
     }
 
     protected override get loaded(): boolean

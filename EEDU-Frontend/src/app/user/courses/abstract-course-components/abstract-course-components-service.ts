@@ -29,7 +29,7 @@ export abstract class AbstractCourseComponentsService<T extends { id: number | b
         this._fetched = false;
     }
 
-    protected abstract get translate(): OperatorFunction<any[], T[]>
+    public abstract get translate(): OperatorFunction<any[], T[]>
 
     protected abstract createValue(createModels: C[]): Observable<any[]>;
 

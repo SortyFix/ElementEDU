@@ -27,7 +27,7 @@ export class RoomService extends AbstractCourseComponentsService<RoomModel, { na
         return this.http.delete<void>(url, { withCredentials: true });
     }
 
-    protected override get translate(): OperatorFunction<any[], RoomModel[]>
+    public  override get translate(): OperatorFunction<any[], RoomModel[]>
     {
         return map((response: any[]): RoomModel[] =>
             response.map((item: any): RoomModel => RoomModel.fromObject(item))

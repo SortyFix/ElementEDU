@@ -50,8 +50,9 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
         return formBuilder.group({
             name: ['', Validators.required],
             subject: [null, Validators.required],
-            clazz: [null],
-            users: [null]
+            teacher: [null],
+            students: [null],
+            classroom: [null],
         });
     }
 

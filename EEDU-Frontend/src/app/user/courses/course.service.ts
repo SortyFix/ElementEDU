@@ -115,7 +115,7 @@ export class CourseService extends AbstractCourseComponentsService<CourseModel, 
         return this.http.delete<void>(url, { withCredentials: true });
     }
 
-    protected override get translate(): OperatorFunction<any[], CourseModel[]> {
+    public override get translate(): OperatorFunction<any[], CourseModel[]> {
         return map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item)));
     }
 }

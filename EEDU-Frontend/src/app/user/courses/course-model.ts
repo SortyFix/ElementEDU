@@ -1,23 +1,26 @@
 import {AppointmentEntryModel, GenericAppointmentEntry} from "./appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel, GenericFrequentAppointment} from "./appointment/frequent/frequent-appointment-model";
 import {GenericSubject, SubjectModel} from "./subject/subject-model";
+import {ClassRoomModel, GenericClassRoomModel} from "./classroom/class-room-model";
 
 export interface GenericCourse {
     id: bigint;
     name: string;
-    subject: GenericSubject,
-    appointmentEntries: GenericAppointmentEntry[],
-    frequentAppointments: GenericFrequentAppointment[]
+    subject: GenericSubject;
+    appointmentEntries: GenericAppointmentEntry[];
+    frequentAppointments: GenericFrequentAppointment[];
+    classRoom?: GenericClassRoomModel;
 }
 
 export class CourseModel {
 
-    constructor(
+    public constructor(
         private readonly _id: bigint,
         private readonly _name: string,
         private readonly _subject: SubjectModel,
         private _appointmentEntries: readonly AppointmentEntryModel[],
-        private _frequentAppointments: readonly FrequentAppointmentModel[]
+        private _frequentAppointments: readonly FrequentAppointmentModel[],
+        private readonly _classRoom: GenericClassRoomModel | null,
     ) {}
 
     private static getEntries(obj: GenericAppointmentEntry[]): AppointmentEntryModel[]
@@ -39,7 +42,8 @@ export class CourseModel {
                 // and can therefore safely be returned here
 
                 return FrequentAppointmentModel.fromObject(entry, (): CourseModel => course);
-            })
+            }),
+            object.classRoom ? ClassRoomModel.fromObject(object.classRoom) : null
         );
         return course;
     }
@@ -96,5 +100,9 @@ export class CourseModel {
 
     public get frequentAppointments(): readonly FrequentAppointmentModel[] {
         return this._frequentAppointments;
+    }
+
+    public get classRoom(): GenericClassRoomModel | null {
+        return this._classRoom;
     }
 }

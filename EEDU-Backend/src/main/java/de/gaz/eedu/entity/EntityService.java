@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 
 //Entity, Model, Create Model
 @Slf4j
-public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
+public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends AbstractEntityFunctionality
 {
     @NotNull protected abstract R getRepository();
 
@@ -408,5 +410,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
     @Transactional public @NotNull M save(@NotNull E entity)
     {
         return toModel().apply(saveEntity(entity));
+    }
+
+    protected final @NotNull Authentication getAuthentication()
+    {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }

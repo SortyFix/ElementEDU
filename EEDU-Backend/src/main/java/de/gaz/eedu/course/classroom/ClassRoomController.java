@@ -3,6 +3,7 @@ package de.gaz.eedu.course.classroom;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
+import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.user.UserService;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -48,6 +50,12 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
 
+    @GetMapping("/get/courses/{classroom}")
+    public @NotNull ResponseEntity<CourseModel[]> getCourses(@AuthenticationPrincipal long user, @PathVariable long classroom)
+    {
+        return ResponseEntity.ok(getService().getCourses(user, classroom).toArray(new CourseModel[0]));
+    }
+
     @PreAuthorize("hasAuthority('CLASS_CREATE')")
     @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
     {
@@ -60,13 +68,13 @@ public class ClassRoomController extends EntityController<ClassRoomService, Clas
         return super.delete(id);
     }
 
-    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<ClassRoomModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
     }
 
-    @PreAuthorize("@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).AUTHORIZED)")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @GetMapping("/get/all")
     @Override public @NotNull ResponseEntity<Set<ClassRoomModel>> fetchAll()
     {

@@ -5,12 +5,14 @@ import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
+import de.gaz.eedu.entity.model.CreationFactory;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.repository.UserRepository;
@@ -20,7 +22,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -50,40 +54,54 @@ public class CourseService extends EntityService<CourseRepository, CourseEntity,
             throw new OccupiedException();
         }
 
-        Set<FileEntity> repositories = new HashSet<>(model.size());
-        List<CourseEntity> courseEntities = model.stream().map(clazzModel ->
+        List<CourseEntity> courseEntities = model.stream().map(courseModel ->
         {
-            //TODO Yonas: please add a way of creating entities without instantly saving them
-            FileCreateModel file = new FileCreateModel("", new String[0], new String[0]);
-            FileEntity fileEntity = file.toEntity(new FileEntity());
-            repositories.add(fileEntity);
-
-            return clazzModel.toEntity(new CourseEntity(fileEntity), (entity) ->
-            {
-                // attach users
-                if (clazzModel.users().length > 0)
-                {
-                    List<UserEntity> userEntities = getUserRepository().findAllById(List.of(clazzModel.users()));
-                    entity.attachUsers(userEntities.toArray(UserEntity[]::new));
-                }
-
-                // assign class
-                if (clazzModel.classId() != null)
-                {
-                    getClassRepository().findById(clazzModel.classId()).ifPresentOrElse(entity::linkClassRoom, () ->
-                    {
-                        throw new EntityUnknownException(clazzModel.classId());
-                    });
-                }
-
-                // add to subject
-                entity.setSubject(getSubjectService().loadEntityByIDSafe(clazzModel.subjectId()));
-                return entity;
-            });
+            CourseEntity course = new CourseEntity(new FileCreateModel("",
+                    new String[0],
+                    new String[0]).toEntity(new FileEntity()
+            ));
+            return courseModel.toEntity(course, this.courseFactory(courseModel));
         }).toList();
 
         // create repositories first
-        getFileService().getRepository().saveAll(repositories);
+        getFileService().getRepository().saveAll(courseEntities.stream().map(CourseEntity::getRepository).toList());
         return saveEntity(courseEntities);
+    }
+
+    private @NotNull CreationFactory<CourseEntity> courseFactory(@NotNull CourseCreateModel createModel)
+    {
+        return (entity) ->
+        {
+            UserEntity teacher = fetchTeacher(createModel.teacher());
+            entity.setTeacher(teacher);
+            if (createModel.students().length > 0)
+            {
+                List<UserEntity> students = getUserRepository().findAllById(List.of(createModel.students()));
+                entity.attachUsers(students.toArray(UserEntity[]::new));
+            }
+
+            if (Objects.nonNull(createModel.classroom()))
+            {
+                long classroom = createModel.classroom();
+                getClassRepository().findById(classroom).ifPresentOrElse(entity::linkClassRoom, () ->
+                {
+                    throw new EntityUnknownException(classroom);
+                });
+            }
+
+            entity.setSubject(getSubjectService().loadEntityByIDSafe(createModel.subject()));
+            return entity;
+        };
+    }
+
+    private @NotNull UserEntity fetchTeacher(long teacherId) throws ResponseStatusException
+    {
+        UserEntity tutor = getUserRepository().findById(teacherId).orElseThrow(() -> new EntityUnknownException(teacherId));
+        if(!tutor.getAccountType().equals(AccountType.TEACHER))
+        {
+            String error = "The given user's id %s does not represent a teachers account.";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, teacherId));
+        }
+        return tutor;
     }
 }
