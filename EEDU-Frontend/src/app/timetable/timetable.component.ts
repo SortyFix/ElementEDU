@@ -23,13 +23,9 @@ import {MatDialog} from "@angular/material/dialog";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/frequent-appointment-model";
-import {CreateCourseComponent} from "../user/courses/create-course/create-course.component";
-import {CreateSubjectComponent} from "../user/courses/subject/create-subject/create-subject.component";
-import {CreateRoomComponent} from "../user/courses/room/create-room/create-room.component";
 import {EventDataComponent} from "./event-data/event-data.component";
 import {AppointmentService} from "../user/courses/appointment/appointment.service";
 import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointment-create-model";
-import {CreateClassRoomComponent} from "../user/courses/classroom/create-class-room/create-class-room.component";
 
 
 @Component({
@@ -133,37 +129,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
         return this.events.filter((event: CalendarEvent): boolean => event.start > refDate)
             .sort((a: CalendarEvent, b: CalendarEvent): number => a.start.getTime() - b.start.getTime())
             .slice(0, 3);
-    }
-
-    protected createCourse()
-    {
-        this._dialogRef.open(CreateCourseComponent, {
-            width: '600px',
-            disableClose: true
-        })
-    }
-
-    protected createSubject()
-    {
-        this._dialogRef.open(CreateSubjectComponent, {
-            width: '600px',
-            disableClose: true
-        })
-    }
-
-    protected createRoom()
-    {
-        this._dialogRef.open(CreateRoomComponent, {
-            width: '600px',
-            disableClose: true
-        })
-    }
-
-    protected createClassRoom() {
-        this._dialogRef.open(CreateClassRoomComponent, {
-            width: '600px',
-            disableClose: true
-        })
     }
 
     /**
