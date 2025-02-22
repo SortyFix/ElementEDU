@@ -34,8 +34,7 @@ public class SubjectController extends EntityController<Long, SubjectService, Su
 
     //@PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    @Override
-    public @NotNull Boolean delete(@NotNull @PathVariable Long[] id)
+    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

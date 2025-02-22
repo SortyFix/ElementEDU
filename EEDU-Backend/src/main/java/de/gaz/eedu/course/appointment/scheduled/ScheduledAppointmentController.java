@@ -49,7 +49,7 @@ public class ScheduledAppointmentController extends EntityController<Long, Sched
         return super.create(model);
     }
 
-    @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }
