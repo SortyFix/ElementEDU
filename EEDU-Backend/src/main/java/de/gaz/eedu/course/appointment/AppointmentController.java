@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 @RequestMapping("/api/v1/course/appointment")
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class AppointmentController extends EntityController<AppointmentService, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
+public class AppointmentController extends EntityController<Long, AppointmentService, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
     private final AppointmentService service;
 

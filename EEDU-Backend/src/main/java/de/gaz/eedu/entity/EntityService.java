@@ -75,10 +75,10 @@ public abstract class EntityService<
      *
      * @param id an array of all ids that should be loaded.
      * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
-     * @see #loadById(P[])
+     * @see #loadById(P...)
      * @see Transactional
      */
-    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull P[] id)
+    @SafeVarargs public final @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull P... id)
     {
         return Set.copyOf(getRepository().findAllById(List.of(id)));
     }
@@ -163,7 +163,7 @@ public abstract class EntityService<
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional public boolean delete(P[] id)
+    @SafeVarargs public final boolean delete(P... id)
     {
         Collection<E> entities = getRepository().findAllById(List.of(id));
         if(entities.isEmpty())
@@ -184,7 +184,7 @@ public abstract class EntityService<
             log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
             {
-                save(entry);
+                getRepository().save(entry);
             }
 
             deleteRelations(entry);
@@ -392,8 +392,8 @@ public abstract class EntityService<
         return loadEntityById(id).map(toModel());
     }
 
-    @Transactional(readOnly = true)
-    public @NotNull @Unmodifiable Set<M> loadById(@NotNull P[] id)
+    @SafeVarargs
+    public final @NotNull @Unmodifiable Set<M> loadById(@NotNull P... id)
     {
         return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }

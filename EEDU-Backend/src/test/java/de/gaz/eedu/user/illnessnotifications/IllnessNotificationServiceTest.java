@@ -37,7 +37,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<Long, IllnessNot
                 29312392L,
                 fileEntity.getId());
         IllnessNotificationModel model = new IllnessNotificationModel(5L,
-                2L,
+                null,
                 IllnessNotificationStatus.PENDING,
                 "maiau",
                 timestamp,
@@ -47,7 +47,6 @@ public class IllnessNotificationServiceTest extends ServiceTest<Long, IllnessNot
         return Eval.eval(createModel, model, ((request, expect, result) -> {
             Assertions.assertEquals(expect.id(), result.id());
             Assertions.assertEquals(expect.status(), result.status());
-            Assertions.assertEquals(expect.userId(), result.userId());
             Assertions.assertEquals(expect.timestamp(), result.timestamp());
             Assertions.assertEquals(expect.reason(), result.reason());
             Assertions.assertEquals(expect.expirationTime(), result.expirationTime());

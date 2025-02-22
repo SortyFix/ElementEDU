@@ -23,7 +23,7 @@ public class RoomEntity implements EntityModelRelation<Long, RoomModel>
 {
     @Setter(AccessLevel.NONE)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id private long id;
+    @Id private Long id;
 
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
