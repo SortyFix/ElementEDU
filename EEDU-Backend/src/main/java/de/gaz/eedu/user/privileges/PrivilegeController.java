@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 /**
  * Controller for managing privilege-related operations for user groups.
  * <p>
@@ -67,7 +69,7 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
      * @return {@code true} if the privilege was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('PRIVILEGE_DELETE')") @DeleteMapping("/delete/{id}") @Override
-    public @NotNull HttpStatus delete(@PathVariable @NotNull Long... id)
+    public @NotNull HttpStatus delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }
@@ -110,7 +112,7 @@ public class PrivilegeController extends EntityController<Long, PrivilegeService
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
 
-        PrivilegeEntity[] entities = getService().loadEntityById(privileges).toArray(PrivilegeEntity[]::new);
+        PrivilegeEntity[] entities = getService().loadEntityById(Arrays.asList(privileges)).toArray(PrivilegeEntity[]::new);
         GroupService groupService = getService().getGroupService();
 
         boolean modified = groupService.loadEntityByIDSafe(group).grantPrivilege(groupService, entities);

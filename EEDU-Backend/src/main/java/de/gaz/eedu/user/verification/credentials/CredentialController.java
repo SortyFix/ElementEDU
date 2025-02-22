@@ -54,7 +54,7 @@ public class CredentialController extends EntityController<Long, CredentialServi
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
     @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or (@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and #id == authentication.principal))")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

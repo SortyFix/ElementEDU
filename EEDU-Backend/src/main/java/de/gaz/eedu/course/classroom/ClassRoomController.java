@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 import java.util.Set;
 
 //TODO manage access
@@ -63,7 +65,7 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
     }
 
     @PreAuthorize("hasAuthority('CLASS_DELETE')")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @DeleteMapping("/delete/{id}") @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

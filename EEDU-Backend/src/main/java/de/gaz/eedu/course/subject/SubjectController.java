@@ -40,7 +40,7 @@ public class SubjectController extends EntityController<Long, SubjectService, Su
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
-    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long... id)
+    @Override public @NotNull HttpStatus delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

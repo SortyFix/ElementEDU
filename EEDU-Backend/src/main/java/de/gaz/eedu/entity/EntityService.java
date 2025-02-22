@@ -75,12 +75,12 @@ public abstract class EntityService<
      *
      * @param id an array of all ids that should be loaded.
      * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
-     * @see #loadById(P...)
+     * @see #loadById(Iterable)
      * @see Transactional
      */
-    @SafeVarargs public final @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull P... id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Iterable<P> id)
     {
-        return Set.copyOf(getRepository().findAllById(List.of(id)));
+        return Set.copyOf(getRepository().findAllById(id));
     }
 
     /**
@@ -135,6 +135,11 @@ public abstract class EntityService<
      */
     @Transactional public abstract @NotNull List<E> createEntity(@NotNull Set<C> model) throws CreationException;
 
+    @Transactional public boolean delete(@NotNull P entity)
+    {
+        return delete(List.of(entity));
+    }
+
     /**
      * Deletes an {@link E} from the database.
      * <p>
@@ -163,9 +168,9 @@ public abstract class EntityService<
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @SafeVarargs public final boolean delete(P... id)
+    @Transactional public boolean delete(Iterable<P> id)
     {
-        Collection<E> entities = getRepository().findAllById(List.of(id));
+        Collection<E> entities = getRepository().findAllById(id);
         if(entities.isEmpty())
         {
             return false;
@@ -392,8 +397,7 @@ public abstract class EntityService<
         return loadEntityById(id).map(toModel());
     }
 
-    @SafeVarargs
-    public final @NotNull @Unmodifiable Set<M> loadById(@NotNull P... id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> loadById(@NotNull Iterable<P> id)
     {
         return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }
