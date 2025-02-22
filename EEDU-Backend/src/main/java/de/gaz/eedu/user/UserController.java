@@ -81,7 +81,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
     @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
-    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long id)
+    @Override public @NotNull Boolean delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
     }

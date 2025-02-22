@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
                 return entity;
             }));
 
-            Set<CourseEntity> courseEntities = getCourseService().loadEntityById(current.courses());
+            Set<CourseEntity> courseEntities = getCourseService().loadEntityById(Arrays.asList(current.courses()));
             courses.addAll(courseEntities);
             courseEntities.forEach(courseEntity -> courseEntity.linkClassRoom(classRoom));
             return classRoom;

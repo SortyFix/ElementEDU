@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 //TODO manage access
 
 @RestController @RequestMapping("/api/v1/course/classroom") @RequiredArgsConstructor @Slf4j
@@ -58,7 +60,7 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
         log.info("Received incoming request for attaching user(s) {} to classroom {}.", users, classId);
 
         ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classId);
-        UserEntity[] userArray = getUserService().loadEntityById(users).toArray(UserEntity[]::new);
+        UserEntity[] userArray = getUserService().loadEntityById(Arrays.asList(users)).toArray(UserEntity[]::new);
 
         return classRoom.attachStudents(getService(), userArray) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
     }
@@ -76,7 +78,7 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
         return super.create(model);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long id)
+    @PreAuthorize("hasAuthority('ADMIN')") @DeleteMapping("/delete/{id}") @Override public @NotNull Boolean delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }

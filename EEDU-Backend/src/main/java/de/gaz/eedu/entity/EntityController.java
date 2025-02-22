@@ -60,10 +60,10 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
      * @return A Boolean value. If the deletion is successful, the method returns true.
      * Otherwise, it returns false (e.g. if no entity with the given id exists).
      */
-    public @NotNull Boolean delete(@NotNull P id)
+    public @NotNull Boolean delete(@NotNull P[] id)
     {
         log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
-        return getService().delete(id);
+        return getService().delete(List.of(id));
     }
 
     /**
