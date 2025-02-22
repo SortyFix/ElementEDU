@@ -1,6 +1,28 @@
 import {Component, OnInit, Type} from '@angular/core';
 import { UserModel } from '../user/user-model';
 import {UserService} from "../user/user.service";
+import {
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelDescription,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle
+} from '@angular/material/expansion';
+import {NgComponentOutlet, NgForOf, NgIf} from "@angular/common";
+import {MatButton} from "@angular/material/button";
+import {MatTab, MatTabContent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
+import {MatIcon} from "@angular/material/icon";
+import {icons} from "../../environment/styles";
+import {
+    GenericIllnessNotificationModel,
+    IllnessNotificationModel
+} from "../illness-notification/model/illness-notification-model";
+import {SubjectListComponent} from "../user/courses/subject/subject-list/subject-list.component";
+import {RoomListComponent} from "../user/courses/room/room-list/room-list.component";
+import {ClassRoomListComponent} from "../user/courses/classroom/class-room-list/class-room-list.component";
+import {CourseListComponent} from "../user/courses/course-list/course-list.component";
+import {FileService} from "../file/file.service";
+import {HttpClient} from "@angular/common/http";
 
 export interface CourseTab
 {
@@ -12,10 +34,8 @@ export interface CourseTab
 @Component({
     selector: 'app-management',
     imports: [
-        UserListComponent,
         MatAccordion,
         MatExpansionPanel,
-        MatExpansionPanelHeader,
         MatExpansionPanelHeader,
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
@@ -48,7 +68,7 @@ export class ManagementComponent implements OnInit {
 
     PREFIX: string = "http://localhost:8080/api/v1";
 
-    public constructor(protected userService: UserService, , protected fileService: FileService, private http: HttpClient) {}
+    public constructor(protected userService: UserService, protected fileService: FileService, private http: HttpClient) {}
 
     public ngOnInit(): void {
         this.getPendingNotifications();
