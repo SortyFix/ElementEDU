@@ -18,7 +18,7 @@ import java.util.Set;
 //TODO manage access. Yes, I'll do it later
 
 @Slf4j @RestController @RequestMapping("/api/v1/course") @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
-public class CourseController extends EntityController<CourseService, CourseModel, CourseCreateModel>
+public class CourseController extends EntityController<Long, CourseService, CourseModel, CourseCreateModel>
 {
     private final CourseService service;
 
