@@ -17,9 +17,14 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-//Entity, Model, Create Model
 @Slf4j
-public abstract class EntityService<R extends JpaRepository<E, Long>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>> extends EntityExceptionHandler
+public abstract class EntityService<
+        P, // Primary Key
+        R extends JpaRepository<E, P>, // Repository
+        E extends EntityModelRelation<P, M>, // Entity
+        M extends EntityModel<P>, // Model
+        C extends CreationModel<P, E> // Create Model
+> extends EntityExceptionHandler
 {
     @NotNull protected abstract R getRepository();
 
@@ -39,7 +44,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * <p>
      * This method is an abstract method loading an entity portrayed by the generic type {@link E}.
      * <p>
-     * Note that this entity can be ported into a {@link M} model using {@link #loadById(long)}.
+     * Note that this entity can be ported into a {@link M} model using {@link #loadById(P)}.
      * This {@link M} most likely represents a model of the actual entity which is json friendly.
      *
      * <p>
@@ -49,10 +54,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      *
      * @param id of the entity to load.
      * @return an optional containing the {@link E} object or an empty one.
-     * @see #loadById(long)
+     * @see #loadById(P)
      * @see Transactional
      */
-    @Transactional(readOnly = true) public @NotNull Optional<E> loadEntityById(long id)
+    @Transactional(readOnly = true) public @NotNull Optional<E> loadEntityById(P id)
     {
         return getRepository().findById(id);
     }
@@ -72,10 +77,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      *
      * @param id an array of all ids that should be loaded.
      * @return a {@link Set} containing all {@link E} that were found. Empty when no {@link E} were found. Never {@code null}
-     * @see #loadById(Long...)
+     * @see #loadById(P[])
      * @see Transactional
      */
-    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull Long... id)
+    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<E> loadEntityById(@NotNull P[] id)
     {
         return Set.copyOf(getRepository().findAllById(List.of(id)));
     }
@@ -155,7 +160,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @return whether an {@link E} has been deleted.
      * @see Transactional
      */
-    @Transactional public boolean delete(long id)
+    @Transactional public boolean delete(P id)
     {
         return getRepository().findById(id).map(entry ->
         {
@@ -299,7 +304,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
     /**
      * Loads an {@link E} by its id.
      * <p>
-     * Unlike the method {@link #loadEntityById(long)} this method does not return an {@link Optional}.
+     * Unlike the method {@link #loadEntityById(P)} this method does not return an {@link Optional}.
      * If the given id does not exist, this method will instead throw an {@link EntityUnknownException}.
      * <p>
      * Example Usage:
@@ -316,10 +321,10 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @param id the id of the entry to load.
      * @return the entity from the database.
      * @throws EntityUnknownException is thrown when the entity with the provided id is not present in the database.
-     * @see #loadByIdSafe(long)
-     * @see #loadEntityById(long)
+     * @see #loadByIdSafe(P)
+     * @see #loadEntityById(P)
      */
-    @Transactional(readOnly = true) public @NotNull E loadEntityByIDSafe(long id) throws EntityUnknownException
+    @Transactional(readOnly = true) public @NotNull E loadEntityByIDSafe(P id) throws EntityUnknownException
     {
         return loadEntityById(id).orElseThrow(() -> new EntityUnknownException(id));
     }
@@ -327,15 +332,15 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
     /**
      * Loads a {@link M} by its id.
      * <p>
-     * This method loads {@link M} by its id. It does this by using {@link #loadEntityByIDSafe(long)} and translates the result into a {@link M} using the {@link #toModel()} {@link Function}
+     * This method loads {@link M} by its id. It does this by using {@link #loadEntityByIDSafe(P)} and translates the result into a {@link M} using the {@link #toModel()} {@link Function}
      *
      * @param id the id of the entity to load and transform.
      * @return the transformed entity loaded from the database.
      * @throws EntityUnknownException is thrown when the entity with the provided id is not present in the database.
-     * @see #loadEntityByIDSafe(long)
-     * @see #loadById(long)
+     * @see #loadEntityByIDSafe(P)
+     * @see #loadById(P)
      */
-    @Transactional(readOnly = true) public @NotNull M loadByIdSafe(long id) throws EntityUnknownException
+    @Transactional(readOnly = true) public @NotNull M loadByIdSafe(P id) throws EntityUnknownException
     {
         return toModel().apply(loadEntityByIDSafe(id));
     }
@@ -343,7 +348,7 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
     /**
      * Loads a {@link M} by its id.
      * <p>
-     * This method load a {@link M} by its id. Unlike {@link #loadByIdSafe(long)} this method does not throw an exception when the entity does not exist.
+     * This method load a {@link M} by its id. Unlike {@link #loadByIdSafe(P)} this method does not throw an exception when the entity does not exist.
      * Instead, it will return an empty {@link Optional}.
      * <p>
      * If the entity exists it will then be transformed into a {@link M} using the {@link #toModel()} {@link Function}
@@ -362,12 +367,13 @@ public abstract class EntityService<R extends JpaRepository<E, Long>, E extends 
      * @param id of the entity to load.
      * @return an {@link Optional} containing the {@link M} if it exists or a {@link Optional#empty()}.
      */
-    @Transactional(readOnly = true) public @NotNull Optional<M> loadById(long id)
+    @Transactional(readOnly = true) public @NotNull Optional<M> loadById(P id)
     {
         return loadEntityById(id).map(toModel());
     }
 
-    @Transactional(readOnly = true) public @NotNull @Unmodifiable Set<M> loadById(@NotNull Long... id)
+    @Transactional(readOnly = true)
+    public @NotNull @Unmodifiable Set<M> loadById(@NotNull P[] id)
     {
         return loadEntityById(id).stream().map(toModel()).collect(Collectors.toUnmodifiableSet());
     }

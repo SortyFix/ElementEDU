@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author ivo
  */
 @Getter(AccessLevel.PROTECTED)
-public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
+public class PrivilegeServiceTest extends ServiceTest<Long, PrivilegeService, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
     @Autowired private PrivilegeService service;
 
@@ -28,9 +28,8 @@ public class PrivilegeServiceTest extends ServiceTest<PrivilegeService, Privileg
         PrivilegeCreateModel privilegeCreateModel = new PrivilegeCreateModel("test");
         PrivilegeModel privilegeModel = new PrivilegeModel(5L, "TEST");
         return Eval.eval(privilegeCreateModel, privilegeModel, (request, expect, result) ->
-        {
-            Assertions.assertEquals(expect.name(), result.name());
-        });
+            Assertions.assertEquals(expect.name(), result.name())
+        );
     }
 
     @Override protected @NotNull PrivilegeCreateModel occupiedCreateModel()

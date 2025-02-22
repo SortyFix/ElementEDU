@@ -21,15 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
-public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, CourseModel, CourseCreateModel>
+public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEntity, CourseModel, CourseCreateModel>
 {
     @Autowired private CourseService service;
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long>> getUserData()
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUserData()
     {
-        return Stream.of(new ArrayTestData<>(1L, 1L), // comes from class
+        return Stream.of(
+                new ArrayTestData<>(1L, 1L), // comes from class
                 new ArrayTestData<>(2L, 1L, 2L), // 1 comes from class, 2 is in course
-                new ArrayTestData<>(3, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
+                new ArrayTestData<>(3L, 1L, 2L, 3L) // 1 is in course, 2 and 3 come from class
         );
     }
 
@@ -56,7 +57,7 @@ public class CourseServiceTest extends ServiceTest<CourseService, CourseEntity, 
     }
 
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")
-    public void testGetUsers(@NotNull ArrayTestData<Long> data)
+    public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
     {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->
         {

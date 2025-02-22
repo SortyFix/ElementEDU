@@ -9,8 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record CourseCreateModel(@NotNull String name, @NotNull Long subjectId, @Nullable Long classId, @NotNull Long[] users) implements CreationModel<CourseEntity>
-{
+public record CourseCreateModel(
+        @NotNull String name,
+        @NotNull Long subjectId,
+        @Nullable Long classId,
+        @NotNull Long[] users
+) implements CreationModel<Long, CourseEntity> {
+
     @Override
     public @NotNull CourseEntity toEntity(@NotNull CourseEntity entity)
     {

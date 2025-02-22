@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class SubjectService extends EntityService<SubjectRepository, SubjectEntity, SubjectModel, SubjectCreateModel>
+public class SubjectService extends EntityService<Long, SubjectRepository, SubjectEntity, SubjectModel, SubjectCreateModel>
 {
     private final SubjectRepository subjectRepository;
 

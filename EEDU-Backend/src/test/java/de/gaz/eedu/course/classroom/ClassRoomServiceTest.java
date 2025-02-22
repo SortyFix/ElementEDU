@@ -20,13 +20,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.stream.Stream;
 
 @Getter(AccessLevel.PROTECTED)
-public class ClassRoomServiceTest extends ServiceTest<ClassRoomService, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel> {
+public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel> {
 
     @Autowired private ClassRoomService service;
 
     @Contract(pure = true, value = "-> new")
-    private static @NotNull Stream<ArrayTestData<Long>> getUser() {
-        return Stream.of(new ArrayTestData<>(1, new Long[]{1L}), new ArrayTestData<>(2, new Long[]{2L, 3L}), new ArrayTestData<>(3, new Long[]{}));
+    private static @NotNull Stream<ArrayTestData<Long, Long>> getUser() {
+        return Stream.of(
+                new ArrayTestData<>(1L, 1L),
+                new ArrayTestData<>(2L, 2L, 3L),
+                new ArrayTestData<>(3L, new Long[]{})
+        );
     }
 
     @Override
@@ -50,7 +54,7 @@ public class ClassRoomServiceTest extends ServiceTest<ClassRoomService, ClassRoo
     @Transactional
     @ParameterizedTest(name = "{index} => data={0}")
     @MethodSource("getUser")
-    public void testGetUsers(@NotNull ArrayTestData<Long> data) {
+    public void testGetUsers(@NotNull ArrayTestData<Long, Long> data) {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request -> {
             Stream<UserEntity> userEntities = getService().loadEntityByIDSafe(data.entityID()).getStudents().stream();
             return userEntities.map(UserEntity::getId).toArray(Long[]::new);

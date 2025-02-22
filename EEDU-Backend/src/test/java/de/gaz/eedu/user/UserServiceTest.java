@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see GroupService
  */
 @Getter(AccessLevel.PROTECTED)
-public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserModel, UserCreateModel> {
+public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, UserModel, UserCreateModel> {
 
     @Autowired private UserService service;
     @Autowired private GroupService groupService;
@@ -72,7 +72,8 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     }
 
     @Override
-    protected @NotNull TestData<Boolean>[] deleteEntities() {
+    protected @NotNull TestData<Long, Boolean>[] deleteEntities() {
+        //noinspection unchecked
         return new TestData[] { new TestData<>(4, true) };
     }
 
@@ -115,7 +116,7 @@ public class UserServiceTest extends ServiceTest<UserService, UserEntity, UserMo
     @ValueSource(longs = {2, 3})
     @ParameterizedTest(name = "{index} => request={0}")
     public void testAttachGroup(long userID) {
-        GroupEntity groupEntity = getGroupService().loadEntityById(3).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getGroupService().loadEntityById(3L).orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
         Runnable test = () -> test(Eval.eval(groupEntity, true, Validator.equals()), userEntity::attachGroups);

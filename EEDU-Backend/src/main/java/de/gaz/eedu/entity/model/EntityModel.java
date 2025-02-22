@@ -2,8 +2,7 @@ package de.gaz.eedu.entity.model;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface EntityModel extends Model
+public interface EntityModel<T> extends Model<T>
 {
-    @NotNull
-    Long id();
+    @NotNull T id();
 }

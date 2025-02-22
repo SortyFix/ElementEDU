@@ -8,14 +8,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Getter
 public class EntityUnknownException extends ResponseStatusException
 {
-    private final long id;
+    private final Object id;
 
-    public EntityUnknownException(long id)
+    public EntityUnknownException(Object id)
     {
         this(HttpStatus.NOT_FOUND, id);
     }
 
-    public EntityUnknownException(@NotNull HttpStatus status, long id)
+    public EntityUnknownException(@NotNull HttpStatus status, Object id)
     {
         super(status);
         this.id = id;

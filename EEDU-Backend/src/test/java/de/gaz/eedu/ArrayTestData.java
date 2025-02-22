@@ -2,6 +2,4 @@ package de.gaz.eedu;
 
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("unchecked") public record ArrayTestData<T>(long entityID, T @NotNull ... expected)
-{
-}
+@SuppressWarnings("unchecked") public record ArrayTestData<P, T>(P entityID, T @NotNull ... expected) {}

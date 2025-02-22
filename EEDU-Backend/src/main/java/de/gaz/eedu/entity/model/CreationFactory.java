@@ -1,11 +1,6 @@
 package de.gaz.eedu.entity.model;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.function.Function;
 
 @FunctionalInterface
-public interface CreationFactory<E extends EntityObject>
-{
-
-    @NotNull E transform(@NotNull E entity);
-
-}
+public interface CreationFactory<P, E extends EntityObject<P>> extends Function<E, E> {}

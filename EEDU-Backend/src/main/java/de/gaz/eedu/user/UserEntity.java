@@ -51,7 +51,7 @@ import java.util.stream.Stream;
 @Setter
 @Table(name = "user_entity")
 @Slf4j
-public class UserEntity implements UserDetails, EntityModelRelation<UserModel>
+public class UserEntity implements UserDetails, EntityModelRelation<Long, UserModel>
 {
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY) @JsonBackReference @Getter(AccessLevel.NONE)
     private final Set<CourseEntity> courses = new HashSet<>();

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record GroupCreateModel(@NotNull String name, @NotNull Long[] privileges) implements CreationModel<GroupEntity>
+public record GroupCreateModel(@NotNull String name, @NotNull Long[] privileges) implements CreationModel<Long, GroupEntity>
 {
     @Override public @NotNull GroupEntity toEntity(@NotNull GroupEntity groupEntity)
     {

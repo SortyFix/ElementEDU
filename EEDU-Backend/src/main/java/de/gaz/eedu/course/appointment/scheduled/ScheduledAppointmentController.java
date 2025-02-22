@@ -17,7 +17,7 @@ import java.util.Set;
 
 @Slf4j @RestController @RequestMapping("/api/v1/course/appointment") @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public class ScheduledAppointmentController extends EntityController<ScheduledAppointmentService, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
+public class ScheduledAppointmentController extends EntityController<Long, ScheduledAppointmentService, ScheduledAppointmentModel, ScheduledAppointmentCreateModel>
 {
     // TODO ?? What is this class about?
     private final ScheduledAppointmentService service;

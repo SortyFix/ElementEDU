@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject
+@Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityObject<Long>
 {
     @Setter(AccessLevel.NONE) @Id private long id;
     private Instant timeStamp;

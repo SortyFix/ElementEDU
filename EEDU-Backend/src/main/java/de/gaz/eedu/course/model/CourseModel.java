@@ -10,9 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record CourseModel(@NotNull Long id, @NotNull String name, @NotNull SubjectModel subject,
-                          @NotNull UserModel[] users, @NotNull ScheduledAppointmentModel[] appointments) implements EntityModel
-{
+public record CourseModel(
+        @NotNull Long id,
+        @NotNull String name,
+        @NotNull SubjectModel subject,
+        @NotNull UserModel[] users,
+        @NotNull ScheduledAppointmentModel[] appointments
+) implements EntityModel<Long> {
 
     @Contract(pure = true)
     @Override

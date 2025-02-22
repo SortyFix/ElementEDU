@@ -11,10 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.Objects;
 
-public record AppointmentEntryCreateModel(@NotNull Long timeStamp, @Nullable Long duration, @Nullable String description,
-                                          @Nullable String homework, @Nullable Boolean submitHomework,
-                                          @Nullable Long submitUntil) implements CreationModel<AppointmentEntryEntity>
-{
+public record AppointmentEntryCreateModel(
+        @NotNull Long timeStamp,
+        @Nullable Long duration,
+        @Nullable String description,
+        @Nullable String homework,
+        @Nullable Boolean submitHomework,
+        @Nullable Long submitUntil
+) implements CreationModel<Long, AppointmentEntryEntity> {
 
     public AppointmentEntryCreateModel(@NotNull Long timeStamp)
     {

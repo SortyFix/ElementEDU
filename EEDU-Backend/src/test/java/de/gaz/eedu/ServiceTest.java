@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  * @author ivo
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) @SpringBootTest @ActiveProfiles("test")
-public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends EntityModelRelation<M>, M extends EntityModel, C extends CreationModel<E>>
+public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E extends EntityModelRelation<P, M>, M extends EntityModel<P>, C extends CreationModel<P, E>>
 {
 
     protected abstract @NotNull S getService();
@@ -171,20 +171,21 @@ public abstract class ServiceTest<S extends EntityService<?, E, M, C>, E extends
     @Test
     public void testDeleteEntitySuccess()
     {
-        TestData<Boolean>[] deleteData = deleteEntities();
+        TestData<P, Boolean>[] deleteData = deleteEntities();
         if(deleteData.length == 0)
         {
             Assumptions.abort();
         }
 
-        for(TestData<Boolean> current : deleteData)
+        for(TestData<P, Boolean> current : deleteData)
         {
             test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
         }
     }
 
-    @Contract(pure = true, value = "-> new") protected @NotNull TestData<Boolean>[] deleteEntities()
+    @Contract(pure = true, value = "-> new") protected @NotNull TestData<P, Boolean>[] deleteEntities()
     {
+        //noinspection unchecked
         return new TestData[0];
     }
 

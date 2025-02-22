@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author ivo
  */
 @Getter(AccessLevel.PROTECTED)
-public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, GroupModel, GroupCreateModel>
+public class GroupServiceTest extends ServiceTest<Long, GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
     @Autowired private GroupService service;
     @Autowired private PrivilegeService privilegeService;
@@ -73,7 +73,7 @@ public class GroupServiceTest extends ServiceTest<GroupService, GroupEntity, Gro
      */
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {2, 3}) @Transactional public void testGroupGrantPrivilege(long groupID)
     {
-        PrivilegeEntity privilegeEntity = privilegeService.loadEntityByIDSafe(3);
+        PrivilegeEntity privilegeEntity = getPrivilegeService().loadEntityByIDSafe(3L);
         GroupEntity groupEntity = getService().loadEntityByIDSafe(groupID);
         test(Eval.eval(privilegeEntity, groupID == 2, Validator.equals()), groupEntity::grantPrivilege);
     }
