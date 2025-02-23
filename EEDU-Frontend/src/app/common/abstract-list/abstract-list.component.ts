@@ -97,7 +97,7 @@ export class AbstractList<T> {
                 return;
             }
 
-            this.filteredValues.forEach((item: T): Set<T> => this.selected.add(item));
+            this.filteredValues.forEach((item: T): Set<T> => this._selected.add(item));
             return;
         }
 
@@ -129,15 +129,12 @@ export class AbstractList<T> {
         return this.itemInfo()?.icon ? this.itemInfo()!.icon!(value) : undefined;
     }
 
-    protected loadChips(value: T): string[] { return this.itemInfo()!.chips!(value); }
-
-    protected valueInjector(value: T): Injector {
-        return Injector.create({
-            providers: [{provide: 'entry', useValue: value}]
-        });
+    protected loadChips(value: T): string[]
+    {
+        return this.itemInfo()!.chips!(value);
     }
 
     protected unselectAll(): void {
-        this.selected.clear();
+        this._selected.clear();
     }
 }

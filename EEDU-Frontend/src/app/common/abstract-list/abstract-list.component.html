@@ -50,13 +50,17 @@
 -->
 
 <mat-accordion>
-    <all-checkbox [checked]="isSelected('all')" [indeterminate]="partiallySelected">
+    <all-checkbox
+        [checked]="isSelected('all')"
+        [indeterminate]="partiallySelected"
+        (onToggle)="toggle('all')">
         <ng-content></ng-content>
     </all-checkbox>
     <mat-expansion-panel *ngFor="let value of filteredValues" >
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
-                <single-checkbox [checked]="isSelected(value)" [icon]="loadIcon(value)" [title]="loadTitle(value)"
+                <single-checkbox
+                    [checked]="isSelected(value)" [icon]="loadIcon(value)" [title]="loadTitle(value)"
                     (keyboardEvent)="handleKeyDown($event, value)"
                     (onToggle)="toggle(value)">
                 </single-checkbox>

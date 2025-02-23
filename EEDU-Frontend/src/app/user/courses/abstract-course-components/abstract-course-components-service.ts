@@ -36,9 +36,12 @@ export abstract class AbstractCourseComponentsService<P, T extends { id: P }, C>
     protected abstract deleteValue(id: P[]): Observable<void>;
 
     public create(models: C[]): Observable<T[]> {
-        return this.createValue(models).pipe(
-            this.translate, tap((response: T[]): void => this._subject.next([...this.value, ...response]))
-        );
+        return this.createValue(models).pipe(this.translate, tap((response: T[]): void => this.pushCreated(response)));
+    }
+
+    protected pushCreated(response: T[]): void
+    {
+        this._subject.next([...this.value, ...response]);
     }
 
     public delete(id: P[]): Observable<void>

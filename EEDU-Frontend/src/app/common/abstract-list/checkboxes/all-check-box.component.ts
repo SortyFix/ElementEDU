@@ -1,4 +1,4 @@
-import {Component, input, InputSignal} from '@angular/core';
+import {Component, EventEmitter, input, InputSignal, Output} from '@angular/core';
 import {MatCheckbox} from "@angular/material/checkbox";
 import {NgIf} from "@angular/common";
 
@@ -6,7 +6,11 @@ import {NgIf} from "@angular/common";
     selector: 'all-checkbox',
     template: `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <mat-checkbox [checked]="checked()" [indeterminate]="indeterminate()" *ngIf="show()">
+            <mat-checkbox
+                [checked]="checked()"
+                [indeterminate]="indeterminate()"
+                *ngIf="show()"
+                (change)="this.onToggle.emit()">
                 Select All
             </mat-checkbox>
 
@@ -19,6 +23,8 @@ import {NgIf} from "@angular/common";
     ]
 })
 export class AllCheckBoxComponent {
+    @Output() public readonly onToggle: EventEmitter<void> = new EventEmitter<void>;
+
     public readonly checked: InputSignal<boolean> = input<boolean>(false);
     public readonly indeterminate: InputSignal<boolean> = input<boolean>(false);
     public readonly show: InputSignal<boolean> = input<boolean>(true);

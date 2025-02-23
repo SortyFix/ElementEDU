@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {CourseModel} from "./course-model";
-import {GenericCourseCreateModel} from "./course-create-model";
+import {CourseCreateModel, CourseCreatePacket} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
 import {AbstractCourseComponentsService} from "./abstract-course-components/abstract-course-components-service";
@@ -18,7 +18,7 @@ import {icons} from "../../../environment/styles";
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService extends AbstractCourseComponentsService<bigint, CourseModel, GenericCourseCreateModel> {
+export class CourseService extends AbstractCourseComponentsService<bigint, CourseModel, CourseCreateModel> {
 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
@@ -100,14 +100,19 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
         return courses.find((course: CourseModel): boolean => course.id === id);
     }
 
+    protected override pushCreated(response: CourseModel[]): void {
+        super.pushCreated(response);
+        this._allSubject.next([...this._allSubject.value, ...response]);
+    }
+
     protected override get fetchAllValues(): Observable<any[]> {
         const url: string = `${this.BACKEND_URL}/course/get/courses`;
         return this.http.get<any[]>(url, { withCredentials: true });
     }
 
-    protected override createValue(createModels: GenericCourseCreateModel[]): Observable<CourseModel[]> {
+    protected override createValue(createModels: CourseCreateModel[]): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/create`;
-        return this.http.post<any[]>(url, createModels, { withCredentials: true });
+        return this.http.post<any[]>(url, this.toPackets(createModels), { withCredentials: true });
     }
 
     protected override deleteValue(id: bigint[]): Observable<void> {
@@ -117,5 +122,10 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
 
     public override get translate(): OperatorFunction<any[], CourseModel[]> {
         return map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item)));
+    }
+
+    private toPackets(createModels: CourseCreateModel[]): CourseCreatePacket[]
+    {
+        return createModels.map((createModels: CourseCreateModel): CourseCreatePacket => createModels.toPacket);
     }
 }

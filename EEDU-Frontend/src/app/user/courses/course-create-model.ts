@@ -1,42 +1,49 @@
-import {SubjectModel} from "./subject/subject-model";
-
 export interface GenericCourseCreateModel
 {
     name: string;
     subject: { id: number };
-    clazz?: { id: number };
-    users?: { id: bigint }[];
+    teacher: { id: bigint }
+    students: { id: bigint }[];
+    classroom?: { id: number };
 }
 
 export interface CourseCreatePacket
 {
     name: string;
-    subjectId: number;
-    classId?: number;
-    users?: bigint[];
+    subject: number;
+    teacher: number;
+    students: number[];
+    classroom: number | null;
 }
 
 export class CourseCreateModel {
 
     public constructor(
         private readonly _name: string,
-        private readonly _subjectId: number,
-        private readonly _classId?: number,
-        private readonly _users: bigint[] = []
+        private readonly _subject: number,
+        private readonly _teacher: bigint,
+        private readonly _students: bigint[] = [],
+        private readonly _classroom: number | null,
     ) {}
 
     public static fromObject(obj: GenericCourseCreateModel): CourseCreateModel {
         return new CourseCreateModel(
             obj.name,
             obj.subject.id,
-            obj.clazz?.id,
-            obj.users?.map((current: {id: bigint}): bigint => { return current.id; }) || []);
+            obj.teacher.id,
+            obj.students?.map((current: {id: bigint}): bigint => { return current.id; }) || [],
+            obj.classroom?.id || null
+        );
     }
 
     public get toPacket(): CourseCreatePacket
     {
         return {
-            name: this.name, subjectId: this.subjectId, classId: this.classId, users: this.users
+            name: this.name,
+            subject: this.subject,
+            teacher: Number(this.teacher),
+            students: this.students.map((userId: bigint): number => Number(userId)),
+            classroom: this.classroom
         }
     }
 
@@ -44,15 +51,19 @@ export class CourseCreateModel {
         return this._name;
     }
 
-    public get subjectId(): number {
-        return this._subjectId;
+    public get subject(): number {
+        return this._subject;
     }
 
-    public get classId(): number | undefined {
-        return this._classId;
+    public get teacher(): bigint {
+        return this._teacher;
     }
 
-    public get users(): bigint[] {
-        return this._users;
+    public get classroom(): number | null {
+        return this._classroom;
+    }
+
+    public get students(): bigint[] {
+        return this._students;
     }
 }

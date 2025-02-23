@@ -18,6 +18,7 @@ import {ClassRoomModel} from "../classroom/class-room-model";
 import {ClassRoomService} from "../classroom/class-room.service";
 import {UserService} from "../../user.service";
 import {AccountType} from "../../account-type";
+import {CourseCreateModel, GenericCourseCreateModel} from "../course-create-model";
 
 @Component({
   selector: 'app-create-course',
@@ -57,7 +58,6 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
             this._users.push(...users);
         });
 
-
         this.subjects = this._subjectService.value;
         this._subjectService.value$.subscribe((subjects: SubjectModel[]): void => { this.subjects = subjects; });
 
@@ -85,6 +85,10 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
             students: [null],
             classroom: [null],
         });
+    }
+
+    protected override get createModel(): any[] {
+        return [CourseCreateModel.fromObject(this.form.value)];
     }
 
     protected get teacher(): ReducedUserModel[]
