@@ -93,16 +93,14 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
     {
         return getEntryRepository().findById(appointment).map(entry ->
         {
-            UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(() -> new EntityUnknownException(
-                    user));
+            UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(entityUnknown(user));
             return entry.getInsight(userEntity);
         });
     }
 
     public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
     {
-        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(
-                appointmentId));
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(entityUnknown(appointmentId));
 
         int hash = entity.hashCode();
         entity.setDescription(updateModel.description());
@@ -113,8 +111,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         {
             entity.setRoom(
                     Objects.isNull(updateModel.room()) ? null :
-                            roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(
-                                    updateModel.room()))
+                            roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
             );
         }
 
@@ -198,7 +195,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
     public void submitAssignment(long user, long assignment, @NotNull MultipartFile[] files)
     {
         Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
-        AppointmentEntryEntity entry = entryReference.orElseThrow(() -> new EntityUnknownException(assignment));
+        AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));
         entry.submitAssignment(user, files);
     }
 
@@ -280,11 +277,11 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
 
     private @NotNull CourseEntity getCourse(@NotNull Long courseId) throws EntityUnknownException
     {
-        return getCourseRepository().findById(courseId).orElseThrow(() -> new EntityUnknownException(courseId));
+        return getCourseRepository().findById(courseId).orElseThrow(entityUnknown(courseId));
     }
 
     private @NotNull RoomEntity getRoom(@NotNull String roomId) throws EntityUnknownException
     {
-        return getRoomRepository().findById(roomId).orElseThrow(() -> new EntityUnknownException(roomId));
+        return getRoomRepository().findById(roomId).orElseThrow(entityUnknown(roomId));
     }
 }

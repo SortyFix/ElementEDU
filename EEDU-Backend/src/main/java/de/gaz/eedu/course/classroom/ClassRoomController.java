@@ -35,23 +35,23 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
     }
 
     @PostMapping("{course}/link/{classroom}")
-    public @NotNull HttpStatus linkClass(@PathVariable long course, @PathVariable long classroom)
+    public @NotNull ResponseEntity<Void> linkClass(@PathVariable long course, @PathVariable long classroom)
     {
         log.info("Received incoming request for linking the class {} to course {}.", classroom, course);
 
         ClassRoomEntity classRoom = getService().loadEntityByIDSafe(classroom);
         CourseService courseService = getService().getCourseService();
         boolean modified = courseService.loadEntityByIDSafe(course).linkClassRoom(courseService, classRoom);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
-    @PostMapping("{course}/unlink") public @NotNull HttpStatus unlinkClass(@PathVariable long course)
+    @PostMapping("{course}/unlink") public @NotNull ResponseEntity<Void> unlinkClass(@PathVariable long course)
     {
         log.info("Received incoming request for unlinking the current class from course {}.", course);
 
         CourseService courseService = getService().getCourseService();
         boolean modified = courseService.loadEntityByIDSafe(course).unlinkClassRoom(courseService);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
     @GetMapping("/get/courses/{classroom}")

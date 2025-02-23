@@ -6,8 +6,8 @@ import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.entity.model.CreationFactory;
+import de.gaz.eedu.exception.AccountTypeMismatch;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
@@ -22,7 +22,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -89,11 +88,9 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
             if (Objects.nonNull(createModel.classroom()))
             {
                 long classroom = createModel.classroom();
-                getClassRepository().findById(classroom).ifPresentOrElse(
-                        entity::linkClassRoom, () ->
-                        {
-                            throw new EntityUnknownException(classroom);
-                        });
+                getClassRepository().findById(classroom).ifPresentOrElse(entity::linkClassRoom, () -> {
+                    throw entityUnknown(classroom).get();
+                });
             }
 
             entity.setSubject(getSubjectService().loadEntityByIDSafe(createModel.subject()));
@@ -103,13 +100,11 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
 
     private @NotNull UserEntity fetchTeacher(long teacherId) throws ResponseStatusException
     {
-        UserEntity tutor = getUserRepository().findById(teacherId).orElseThrow(() -> new EntityUnknownException(
-                teacherId));
-        if (!tutor.getAccountType().equals(AccountType.TEACHER))
+        UserEntity teacher = getUserRepository().findById(teacherId).orElseThrow(entityUnknown(teacherId));
+        if (!Objects.equals(teacher.getAccountType(), AccountType.TEACHER))
         {
-            String error = "The given user's id %s does not represent a teachers account.";
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, teacherId));
+            throw new AccountTypeMismatch(AccountType.TEACHER, teacher.getAccountType());
         }
-        return tutor;
+        return teacher;
     }
 }

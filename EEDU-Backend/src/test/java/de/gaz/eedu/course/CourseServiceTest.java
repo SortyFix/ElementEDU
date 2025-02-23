@@ -9,8 +9,12 @@ import de.gaz.eedu.course.classroom.ClassRoomService;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
+import de.gaz.eedu.course.subject.SubjectService;
 import de.gaz.eedu.course.subject.model.SubjectModel;
+import de.gaz.eedu.exception.AccountTypeMismatch;
 import de.gaz.eedu.user.AccountType;
+import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.UserService;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -20,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -30,6 +35,8 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
 {
     @Autowired private CourseService service;
     @Autowired private ClassRoomService classRoomService;
+    @Autowired private UserService userService;
+    @Autowired private SubjectService subjectService;
 
     @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUserData()
     {
@@ -82,10 +89,26 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")
     public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
     {
-        test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request ->
+        test(Eval.eval(data.entityID(), data.expected(), Validator.exactArrayEquals()), request ->
         {
             Set<ReducedUserModel> reducedUserModels = getService().loadReducedModelsByCourse(request);
             return reducedUserModels.stream().map(ReducedUserModel::id).toArray(Long[]::new);
         });
+    }
+
+    @ParameterizedTest(name = "{index} => data={0}") @ValueSource(longs = {5, 6})
+    public void testSetTeacher(long userId)
+    {
+        UserEntity userEntity = getUserService().loadEntityByIDSafe(userId);
+        CourseEntity courseEntity = getService().loadEntityByIDSafe(6L);
+
+        if(userId == 5)
+        {
+            Assertions.assertThrowsExactly(AccountTypeMismatch.class, () -> courseEntity.setTeacher(userEntity));
+            return;
+        }
+
+        test(Eval.eval(userEntity, true, Validator.equals()), courseEntity::setTeacher);
+        test(Eval.eval(userEntity, false, Validator.equals()), courseEntity::setTeacher);
     }
 }

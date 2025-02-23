@@ -1,5 +1,6 @@
 package de.gaz.eedu.entity;
 
+import de.gaz.eedu.exception.EntityUnknownException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,12 @@ import java.util.stream.Stream;
 
 public class AbstractFunctionality
 {
+
+    protected static @NotNull Supplier<EntityUnknownException> entityUnknown(@NotNull Object primaryKey)
+    {
+        return () -> new EntityUnknownException(primaryKey);
+    }
+
     protected boolean hasAuthority(@NotNull String authority)
     {
         return hasAuthority(authority, SimpleGrantedAuthority.class);

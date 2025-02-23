@@ -6,6 +6,7 @@ import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityService;
+import de.gaz.eedu.exception.AccountTypeMismatch;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
@@ -21,14 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -89,29 +86,13 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
     {
         // remove this classroom from all courses and users
         getCourseService().saveEntity(entry.getCourses().stream().peek(CourseEntity::unlinkClassRoom).toList());
-        getUserRepository().saveAllEntities(getUsers(entry, true).peek(user -> user.setClassRoom(null)).toList());
+        getUserRepository().saveAllEntities(getUsers(entry).peek(user -> user.setClassRoom(null)).toList());
     }
 
     private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom)
     {
-        return getUsers(classRoom, false);
-    }
-
-    private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom, boolean ignoreMissingTutor)
-    {
-        Stream<UserEntity> tutor = Stream.empty();
-
-        try
-        {
-            tutor = Stream.of(classRoom.getTutor());
-        }
-        catch (Exception exception)
-        {
-            if(!ignoreMissingTutor) { throw exception; }
-        }
-
         Stream<UserEntity> students = classRoom.getStudents().stream();
-        return Stream.concat(students, tutor);
+        return Stream.concat(students, classRoom.getTutor().stream());
     }
 
     @Contract(pure = true, value = "-> new")
@@ -165,11 +146,10 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
      */
     private @NotNull UserEntity fetchTutor(long tutorId) throws ResponseStatusException
     {
-        UserEntity tutor = getUserRepository().findById(tutorId).orElseThrow(() -> new EntityUnknownException(tutorId));
-        if (!tutor.getAccountType().equals(AccountType.TEACHER))
+        UserEntity tutor = getUserRepository().findById(tutorId).orElseThrow(entityUnknown(tutorId));
+        if (!Objects.equals(tutor.getAccountType(), AccountType.TEACHER))
         {
-            String error = "The given user's id %s does not represent a teachers account.";
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, tutorId));
+            throw new AccountTypeMismatch(AccountType.TEACHER, tutor.getAccountType());
         }
         return tutor;
     }

@@ -9,6 +9,7 @@ import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.exception.AccountTypeMismatch;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
@@ -78,14 +79,27 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
         );
     }
 
-    public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher)
+    public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher) throws AccountTypeMismatch
     {
         return saveEntityIfPredicateTrue(courseService, teacher, this::setTeacher);
     }
 
-    public boolean setTeacher(@NotNull UserEntity teacher)
+    public boolean setTeacher(@NotNull UserEntity teacher) throws AccountTypeMismatch
     {
-        this.users.removeIf(user -> Objects.equals(user.getAccountType(), AccountType.TEACHER));
+        if (!Objects.equals(teacher.getAccountType(), AccountType.TEACHER))
+        {
+            throw new AccountTypeMismatch(AccountType.TEACHER, teacher.getAccountType());
+        }
+
+        this.users.removeIf(user ->
+        {
+            if(user.equals(teacher))
+            {
+                return false;
+            }
+            return Objects.equals(user.getAccountType(), AccountType.TEACHER);
+        });
+
         return this.users.add(teacher);
     }
 
@@ -95,12 +109,12 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
         service.saveEntity(this);
     }
 
-    public boolean scheduleRepeating(@NotNull CourseService courseService, @NotNull FrequentAppointmentEntity... frequentAppointmentEntity)
+    public boolean scheduleFrequent(@NotNull CourseService courseService, @NotNull FrequentAppointmentEntity... frequentAppointmentEntity)
     {
-        return saveEntityIfPredicateTrue(courseService, frequentAppointmentEntity, this::scheduleRepeating);
+        return saveEntityIfPredicateTrue(courseService, frequentAppointmentEntity, this::scheduleFrequent);
     }
 
-    public boolean scheduleRepeating(@NotNull FrequentAppointmentEntity... frequentAppointmentEntity)
+    public boolean scheduleFrequent(@NotNull FrequentAppointmentEntity... frequentAppointmentEntity)
     {
         Predicate<FrequentAppointmentEntity> notPart = current -> !Objects.equals(this, current.getCourse());
         return frequentAppointments.addAll(Arrays.stream(frequentAppointmentEntity).filter(notPart).toList());

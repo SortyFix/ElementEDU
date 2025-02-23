@@ -6,6 +6,7 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.user.AccountType;
+import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -52,7 +53,7 @@ public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, Cl
 
         return Eval.eval(
                 new ClassRoomCreateModel("classroom10", teacher.id(), new Long[0], new Long[0]),
-                new ClassRoomModel(11L, "classroom10", teacher, new ReducedUserModel[0]),
+                new ClassRoomModel(11L, "classroom10", new ReducedUserModel[0], teacher),
                 (request, expect, result) ->
                 {
                     Assertions.assertEquals(expect, result);
@@ -70,11 +71,21 @@ public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, Cl
     @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
     public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
     {
-        test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request -> {
+        test(Eval.eval(data.entityID(), data.expected(), Validator.exactArrayEquals()), request -> {
 
             Set<ReducedUserModel> reducedUserModels = getService().loadReducedModelsByClass(request);
-            log.info(reducedUserModels.toString());
             return reducedUserModels.stream().map(ReducedUserModel::id).toArray(Long[]::new);
+        });
+    }
+
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
+    public void testGetUsersByEntity(@NotNull ArrayTestData<Long, Long> data)
+    {
+        test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request -> {
+            ClassRoomEntity classRoom = getService().loadEntityByIDSafe(request);
+            Stream<UserEntity> students = classRoom.getStudents().stream();
+
+            return Stream.concat(students, classRoom.getTutor().stream()).map(UserEntity::getId).toArray(Long[]::new);
         });
     }
 }

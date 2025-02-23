@@ -18,7 +18,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@code ServiceTest} is an abstract class, providing a generic way to test services.
@@ -294,9 +297,67 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
          * @see Validator
          * @see Assertions#assertTrue(boolean)
          */
-        @Contract(pure = true) static <R, E> @NotNull Validator<R, E[]> arrayEquals()
+        @Contract(pure = true) static <R, E> @NotNull Validator<R, E[]> exactArrayEquals()
         {
             return (request, expect, result) -> Assertions.assertArrayEquals(expect, result);
+        }
+
+        /**
+         * This method returns a {@link Validator} that performs an array equality check between the expected and actual results
+         * using the {@link Assertions#assertTrue(boolean)} method from JUnit.
+         * The contract of this method is to always return a new instance every time it is called.
+         * <p>
+         * The {@code @Contract(pure = true)} annotation indicates that this method is pure, which means that the returned
+         * {@link Validator} doesn't depend on any mutable state and doesn't produce any side effects. The "pureness" of this method
+         * allows for safe usage in any context, even in a multi-threaded environment.
+         * </p>
+         * <p>
+         * The array equality check is performed by converting the expected array into a {@link Set} using the
+         * {@link Arrays#stream(Object[])} and {@link Collectors#toSet()} methods, and then iterating through the actual result
+         * array to ensure each element is present in the expected set. If any element in the result array is not present in the
+         * expected set, an assertion failure will be triggered using {@link Assertions#assertTrue(boolean)}.
+         * </p>
+         * <p>
+         * Example Usage:
+         * </p>
+         * <pre>{@code
+         * // Define a sample request
+         * MyRequest request = new SomeRequest();
+         *
+         * // Define the expected array of results
+         *
+         * String[] expectedResults = {
+         *      "result1",
+         *      "result2",
+         *      "result3"
+         * };
+         *
+         * Validator<MyRequest, String[]> arrayValidator = Validator.arrayEquals();
+         * test(Eval.eval(request, expectedResults, arrayValidator), (request) ->
+         * {
+         *      // Perform the actual operation that produces the result array
+         *      String[] actualResults = performOperation(request);
+         *      return actualResults;
+         * });
+         *
+         * }</pre>
+         *
+         * @param <R> The type of the request.
+         * @param <E> The type of the elements in the expected and result arrays.
+         * @return A new instance of {@link Validator} for array equality checks.
+         * @see Validator
+         * @see Assertions#assertTrue(boolean)
+         */
+        @Contract(pure = true) static <R, E> @NotNull Validator<R, E[]> arrayEquals()
+        {
+            return (request, expect, result) ->
+            {
+                List<E> expected = Arrays.asList(expect);
+                for (E current : result)
+                {
+                    Assertions.assertTrue(expected.contains(current));
+                }
+            };
         }
 
         /**

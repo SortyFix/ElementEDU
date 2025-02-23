@@ -53,8 +53,8 @@ public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel
         return new ClassRoomModel(
                 getId(),
                 getName(),
-                getTutor().toReducedModel(),
-                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new)
+                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
+                getTutor().map(UserEntity::toReducedModel).orElse(null)
         );
     }
 
@@ -65,9 +65,9 @@ public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel
      *
      * @return an {@link Optional} containing the tutor for the classroom if one exists.
      */
-    public @NotNull UserEntity getTutor()
+    public @NotNull Optional<UserEntity> getTutor()
     {
-        return getUsers().stream().filter(teacherPredicate(true)).findFirst().orElseThrow();
+        return getUsers().stream().filter(teacherPredicate(true)).findFirst();
     }
 
     /**

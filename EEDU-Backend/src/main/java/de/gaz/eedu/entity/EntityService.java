@@ -282,7 +282,7 @@ public abstract class EntityService<
      */
     @Contract(pure = true, value = "-> new") @Transactional(readOnly = true) public @NotNull Function<M, E> toEntity()
     {
-        return model -> getRepository().findById(model.id()).orElseThrow(() -> new EntityUnknownException(model.id()));
+        return model -> getRepository().findById(model.id()).orElseThrow(entityUnknown(model.id()));
     }
 
     @Contract(pure = true, value = "-> new") public @NotNull Function<E, M> toModel()
@@ -351,7 +351,7 @@ public abstract class EntityService<
      */
     @Transactional(readOnly = true) public @NotNull E loadEntityByIDSafe(P id) throws EntityUnknownException
     {
-        return loadEntityById(id).orElseThrow(() -> new EntityUnknownException(id));
+        return loadEntityById(id).orElseThrow(entityUnknown(id));
     }
 
     /**
