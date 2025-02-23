@@ -11,8 +11,4 @@ export class SubjectModel {
     public get id(): string {
         return this._id;
     }
-
-    public get name(): string {
-        return this._id;
-    }
 }

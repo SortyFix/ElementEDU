@@ -7,8 +7,4 @@ export class RoomModel {
     public static fromObject(obj: GenericRoom): RoomModel { return new RoomModel(obj.id); }
 
     public get id(): string { return this._id; }
-
-    public get name(): string {
-        return this._id;
-    }
 }

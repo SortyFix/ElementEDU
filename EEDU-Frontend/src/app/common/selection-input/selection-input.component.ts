@@ -93,7 +93,7 @@ const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => 
     templateUrl: './selection-input.component.html',
     styleUrl: './selection-input.component.scss'
 })
-export class SelectionInput<T extends {name: string}> implements ControlValueAccessor, Validator {
+export class SelectionInput<T extends {name: string} | { id: string }> implements ControlValueAccessor, Validator {
 
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
@@ -142,9 +142,24 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
 
         return this.accessibleValues().filter((value: T): boolean =>
         {
-            return value.name.toLowerCase().includes(currentValue)
+            return this.toName(value).toLowerCase().includes(currentValue);
         });
     });
+
+    protected toName(value: T): string
+    {
+        if('name' in value && typeof value.name === 'string')
+        {
+            return value.name;
+        }
+
+        if('id' in value && typeof value.id === 'string')
+        {
+            return value.id;
+        }
+
+        throw new Error("Unknown value name");
+    }
 
 
     public onChange: (value: T[] | T) => void = (): void => {};
@@ -165,7 +180,7 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
             return;
         }
 
-        this.currentValue.set(value.name);
+        this.currentValue.set(this.toName(value));
     }
 
     /**
@@ -258,7 +273,7 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
         const loweredInput: string = input.toLowerCase();
         return this.accessibleValues().filter((current: T): boolean =>
         {
-            const loweredCurrent: string = current.name.toLowerCase();
+            const loweredCurrent: string = this.toName(current).toLowerCase();
             return loweredCurrent.includes(loweredInput);
         });
     }
@@ -273,7 +288,7 @@ export class SelectionInput<T extends {name: string}> implements ControlValueAcc
             return;
         }
 
-        this.currentValue.set(value.name);
+        this.currentValue.set(this.toName(value));
         this.onChange(value);
     }
 
