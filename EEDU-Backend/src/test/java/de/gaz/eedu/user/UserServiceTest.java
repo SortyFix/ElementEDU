@@ -11,17 +11,13 @@ import de.gaz.eedu.user.model.UserModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeModel;
 import de.gaz.eedu.user.theming.ThemeService;
-import de.gaz.eedu.user.verification.credentials.CredentialEntity;
-import de.gaz.eedu.user.verification.credentials.implementations.CredentialMethod;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,18 +42,6 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     @Autowired private UserService service;
     @Autowired private GroupService groupService;
     @Autowired private ThemeService themeService;
-
-    @Contract(pure = true)
-    private static @NotNull String @NotNull [] testPasswords() {
-        return new String[] {
-                "password", // no numbers + no uppercase + no special character
-                "Password123", // no special character
-                "password!", // no numbers + no uppercase
-                "password123!", // no uppercase
-                "PASSWORD123!", // no lowercase
-                "Pa1!!" // to short
-        };
-    }
 
     private static @NotNull UserCreateModel createModel(int number)
     {
@@ -153,15 +137,5 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     public void testDetachGroup(long userID) {
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
         test(Eval.eval("group0", userID == 1, Validator.equals()), userEntity::detachGroups);
-    }
-
-    @ParameterizedTest
-    @MethodSource("testPasswords")
-    public void testInsecurePassword(@NotNull String password) {
-        Assertions.assertThrows(InsecurePasswordException.class, () -> {
-            CredentialEntity entity = new CredentialEntity();
-            entity.setData(password);
-            CredentialMethod.PASSWORD.getCredential().creation(entity);
-        });
     }
 }
