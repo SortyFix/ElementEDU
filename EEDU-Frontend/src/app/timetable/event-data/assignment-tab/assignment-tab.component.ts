@@ -1,7 +1,6 @@
 import {Component, Input, input, InputSignal} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {AppointmentService} from "../../../user/courses/appointment/appointment.service";
 import {AppointmentEntryModel} from "../../../user/courses/appointment/entry/appointment-entry-model";
 import {AccountType} from "../../../user/account-type";
 import {UserService} from "../../../user/user.service";
@@ -23,19 +22,14 @@ import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignme
 })
 export class AssignmentTabComponent {
 
+    protected readonly AccountType: typeof AccountType= AccountType;
+
     @Input() public appointment!: AppointmentEntryModel;
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
-    protected isDragging: boolean = false;
-    protected readonly MAX_FILES: 5 = 5;
-    protected readonly AccountType = AccountType;
-    private _uploadedFiles: File[] = [];
-    private readonly _accountType: AccountType;
 
-    public constructor(private readonly _appointmentService: AppointmentService, userService: UserService) {
-        this._accountType = userService.getUserData.accountType;
-    }
+    public constructor(private readonly _userService: UserService) {}
 
     protected get accountType(): AccountType {
-        return this._accountType;
+        return this._userService.getUserData.accountType;
     }
 }
