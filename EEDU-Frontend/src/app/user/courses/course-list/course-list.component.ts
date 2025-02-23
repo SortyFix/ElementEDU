@@ -27,8 +27,7 @@ import {CourseListItemComponent} from "./course-list-item/course-list-item.compo
 })
 export class CourseListComponent extends AbstractCourseComponentList<bigint, CourseModel> {
 
-    public constructor(service: CourseService, dialog: MatDialog)
-    {
+    public constructor(service: CourseService, dialog: MatDialog) {
         super(service, dialog, CreateCourseComponent, {
             title: (value: CourseModel): string => value.name,
             chips: (value: CourseModel): string[] => [
@@ -43,8 +42,7 @@ export class CourseListComponent extends AbstractCourseComponentList<bigint, Cou
         return CourseListItemComponent;
     }
 
-    protected override get loaded(): boolean
-    {
+    protected override get loaded(): boolean {
         return (super.service as CourseService).fetchedAdmin;
     }
 

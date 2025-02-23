@@ -14,9 +14,10 @@ import {MatIcon} from "@angular/material/icon";
 import {
     AbstractCourseComponentsCreateMultiple
 } from "../../abstract-course-components/create/abstract-course-components-create-multiple";
+
 @Component({
-  selector: 'app-create-subject',
-  standalone: true,
+    selector: 'app-create-subject',
+    standalone: true,
     imports: [
         MatCardContent,
         MatCardActions,
@@ -33,7 +34,7 @@ import {
         MatChipInput,
         MatChipRemove
     ],
-  templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
+    templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
 })
 export class CreateSubjectComponent extends AbstractCourseComponentsCreateMultiple<SubjectModel> {
     public constructor(subjectService: SubjectService, dialogRef: DialogRef, formBuilder: FormBuilder) {

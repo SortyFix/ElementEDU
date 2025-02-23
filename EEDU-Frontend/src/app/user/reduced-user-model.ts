@@ -16,16 +16,6 @@ export class ReducedUserModel {
         private readonly _accountType: AccountType
     ) {}
 
-    public static fromObject(obj: GenericReducedUserModel): ReducedUserModel
-    {
-        return new ReducedUserModel(
-            obj.id,
-            obj.firstName,
-            obj.lastName,
-            AccountType[obj.accountType as keyof typeof AccountType]
-        );
-    }
-
     public get id(): bigint {
         return this._id;
     }
@@ -44,5 +34,14 @@ export class ReducedUserModel {
 
     public get accountType(): AccountType {
         return this._accountType;
+    }
+
+    public static fromObject(obj: GenericReducedUserModel): ReducedUserModel {
+        return new ReducedUserModel(
+            obj.id,
+            obj.firstName,
+            obj.lastName,
+            AccountType[obj.accountType as keyof typeof AccountType]
+        );
     }
 }

@@ -30,13 +30,7 @@ export class FrequentAppointmentCreateModel {
         this._until = until.getTime();
     }
 
-    public static fromObject(obj: GenericFrequentAppointmentCreateModel): FrequentAppointmentCreateModel
-    {
-        return new FrequentAppointmentCreateModel(obj.start, obj.until, obj.room.id, obj.duration, obj.frequency);
-    }
-
-    public get toPacket(): FrequentAppointmentCreatePacket
-    {
+    public get toPacket(): FrequentAppointmentCreatePacket {
         return {
             start: this.start,
             until: this.until,
@@ -60,5 +54,9 @@ export class FrequentAppointmentCreateModel {
 
     public get frequency(): number {
         return this._frequency;
+    }
+
+    public static fromObject(obj: GenericFrequentAppointmentCreateModel): FrequentAppointmentCreateModel {
+        return new FrequentAppointmentCreateModel(obj.start, obj.until, obj.room.id, obj.duration, obj.frequency);
     }
 }

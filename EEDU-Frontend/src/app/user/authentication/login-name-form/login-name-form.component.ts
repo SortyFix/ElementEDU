@@ -38,8 +38,7 @@ export class LoginNameFormComponent extends AbstractLoginForm {
 
     protected override onSubmit(): void {
 
-        if(this.form.invalid)
-        {
+        if (this.form.invalid) {
             return;
         }
 

@@ -1,25 +1,24 @@
-
 <div class="container">
 
-    <mat-progress-bar mode="indeterminate" *ngIf="!loaded"></mat-progress-bar>
+    <mat-progress-bar *ngIf="!loaded" mode="indeterminate"></mat-progress-bar>
 
-    <div class="empty-list-content" *ngIf="loaded && values.length == 0">
+    <div *ngIf="loaded && values.length == 0" class="empty-list-content">
         <mat-icon class="empty-list-icon">folder_open</mat-icon>
-        <button mat-flat-button (click)="openDialog()">Create first entry</button>
+        <button (click)="openDialog()" mat-flat-button>Create first entry</button>
     </div>
 
     <list
+        #list
         *ngIf="loaded && values.length > 0"
-        [itemInfo]="itemInfo"
         [componentContent]="content"
-        [values]="values"
         [height]="300"
-        [selectionType]="SelectionType.MULTIPLE" #list>
+        [itemInfo]="itemInfo"
+        [selectionType]="SelectionType.MULTIPLE" [values]="values">
         <div style="margin-left: auto">
-            <button mat-icon-button *ngIf="list.selected.length > 0" (click)="delete(list.selected)">
+            <button (click)="delete(list.selected)" *ngIf="list.selected.length > 0" mat-icon-button>
                 <mat-icon>delete</mat-icon>
             </button>
-            <button mat-icon-button (click)="openDialog()">
+            <button (click)="openDialog()" mat-icon-button>
                 <mat-icon>add</mat-icon>
             </button>
         </div>

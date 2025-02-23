@@ -22,6 +22,44 @@ export class AppointmentEntryModel {
         public readonly _assignment?: AssignmentModel
     ) {}
 
+    public get id(): bigint {
+        return this._id;
+    }
+
+    public get course(): bigint {
+        // First 16 bits and mask them to get the id
+        return (this.id >> 48n) & 0xFFFFn;
+    }
+
+    public get description(): string {
+        return this._description;
+    }
+
+    public get start(): Date {
+        return new Date(Number(this.timeStamp));
+    }
+
+    public get end(): Date {
+        return new Date(Number(this.timeStamp) + this.duration);
+    }
+
+    public get room(): RoomModel | undefined {
+        return this._room;
+    }
+
+    public get assignment(): AssignmentModel | undefined {
+        return this._assignment;
+    }
+
+    private get duration(): number {
+        return this._duration;
+    }
+
+    private get timeStamp(): bigint {
+        // The upper 48 bits of the id that store the timestamp in 1/10 seconds.
+        return (this.id & 0xFFFFFFFFFFFFn) * 100n;
+    }
+
     public static fromObject(object: GenericAppointmentEntry): AppointmentEntryModel {
         return new AppointmentEntryModel(
             BigInt(object.id),
@@ -33,8 +71,7 @@ export class AppointmentEntryModel {
         );
     }
 
-    public asEvent(name: string): CalendarEvent
-    {
+    public asEvent(name: string): CalendarEvent {
         return {
             id: Number(this.id),
             title: name,
@@ -61,52 +98,11 @@ export class AppointmentEntryModel {
         return this.timeStamp === time;
     }
 
-    public hasAttached(): boolean
-    {
+    public hasAttached(): boolean {
         return !!this._attachedScheduled;
     }
 
     public isPart(id: bigint): boolean {
         return this._attachedScheduled == id;
-    }
-
-    public get id(): bigint {
-        return this._id;
-    }
-
-    public get course(): bigint {
-        // First 16 bits and mask them to get the id
-        return (this.id >> 48n) & 0xFFFFn;
-    }
-
-    public get description(): string {
-        return this._description;
-    }
-
-    public get start(): Date {
-        return new Date(Number(this.timeStamp));
-    }
-
-    private get duration(): number {
-        return this._duration;
-    }
-
-    public get end(): Date
-    {
-        return new Date(Number(this.timeStamp) + this.duration);
-    }
-
-    public get room(): RoomModel | undefined {
-        return this._room;
-    }
-
-    public get assignment(): AssignmentModel | undefined {
-        return this._assignment;
-    }
-
-    private get timeStamp(): bigint
-    {
-        // The upper 48 bits of the id that store the timestamp in 1/10 seconds.
-        return (this.id & 0xFFFFFFFFFFFFn) * 100n;
     }
 }

@@ -65,7 +65,7 @@ import {AccessibilityService} from "../../accessibility.service";
 })
 export class Authentication {
 
-    private readonly _footerLinks: {name: string, link: string, icon: string}[] = [
+    private readonly _footerLinks: { name: string, link: string, icon: string }[] = [
         {name: "Privacy", link: "#", icon: "privacy_tip"},
         {name: "Legal Notice", link: "#", icon: "gavel"},
         {name: "Contact", link: "#", icon: "contact_mail"},
@@ -73,11 +73,11 @@ export class Authentication {
         {name: "Help", link: "#", icon: "help"},
     ];
 
+    constructor(private accessibilityService: AccessibilityService, protected authService: AuthenticationService) {}
+
     protected get footerLinks(): { name: string; link: string; icon: string }[] {
         return this._footerLinks;
     }
-
-    constructor(private accessibilityService: AccessibilityService, protected authService: AuthenticationService) {}
 
     protected get mobile(): boolean {
         return this.accessibilityService.mobile;

@@ -13,8 +13,8 @@ import {AccessibilityService} from "../../../../../accessibility.service";
 import {SelectionInput} from "../../../../../common/selection-input/selection-input.component";
 
 @Component({
-  selector: 'app-create-frequent-appointment',
-  standalone: true,
+    selector: 'app-create-frequent-appointment',
+    standalone: true,
     imports: [
         ReactiveFormsModule,
         MatLabel,
@@ -31,8 +31,8 @@ import {SelectionInput} from "../../../../../common/selection-input/selection-in
         MatSuffix,
         SelectionInput
     ],
-  templateUrl: './create-frequent-appointment.component.html',
-  styleUrl: './create-frequent-appointment.component.scss'
+    templateUrl: './create-frequent-appointment.component.html',
+    styleUrl: './create-frequent-appointment.component.scss'
 })
 export class CreateFrequentAppointmentComponent {
 

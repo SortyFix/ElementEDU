@@ -1,4 +1,4 @@
-import {Component, forwardRef, input, Input, InputSignal} from '@angular/core';
+import {Component, forwardRef, input, InputSignal} from '@angular/core';
 import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
 import {MatInput} from "@angular/material/input";
@@ -21,7 +21,7 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/for
         MatLabel,
         MatSuffix
     ],
-    providers:  [
+    providers: [
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef((): typeof DateTimePickerComponent => DateTimePickerComponent),
@@ -36,10 +36,26 @@ export class DateTimePickerComponent implements ControlValueAccessor {
     public readonly minDate: InputSignal<Date | null> = input<Date | null>(null);
 
     private _date: Date | null = null;
+
+    protected get date(): Date | null {
+        return this._date;
+    }
+
+    protected set date(value: Date | null) {
+        this._date = value;
+        this.updateValue();
+    }
+
     private _time: Date | null = null;
 
-    private onChange: (value: Date | null) => void = () => {};
-    private onTouched: () => void = () => {};
+    protected get time(): Date | null {
+        return this._time;
+    }
+
+    protected set time(value: Date | null) {
+        this._time = value;
+        this.updateValue();
+    }
 
     public updateValue() {
         if (this.date && this.time) {
@@ -64,8 +80,7 @@ export class DateTimePickerComponent implements ControlValueAccessor {
         this.time = date;
     }
 
-    public reset(): void
-    {
+    public reset(): void {
         this.date = null;
         this.time = null;
     }
@@ -82,21 +97,7 @@ export class DateTimePickerComponent implements ControlValueAccessor {
         // Handle disabled state if needed
     }
 
-    protected get date(): Date | null {
-        return this._date;
-    }
+    private onChange: (value: Date | null) => void = () => {};
 
-    protected set date(value: Date | null) {
-        this._date = value;
-        this.updateValue();
-    }
-
-    protected get time(): Date | null {
-        return this._time;
-    }
-
-    protected set time(value: Date | null) {
-        this._time = value;
-        this.updateValue();
-    }
+    private onTouched: () => void = () => {};
 }

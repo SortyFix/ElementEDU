@@ -1,5 +1,5 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <app-general-create title="{{ title }}" [loading]="loading">
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <app-general-create [loading]="loading" title="{{ title }}">
         <mat-card-content>
 
             <mat-form-field appearance="outline">
@@ -7,20 +7,20 @@
                 <mat-chip-grid #reactiveChipGrid aria-label="Enter reactive form keywords" formControlName="id">
                     @for (keyword of chips(); track keyword) {
                         <mat-chip-row (removed)="remove(keyword)">
-                            {{keyword}}
+                            {{ keyword }}
                             <button matChipRemove aria-label="'remove reactive form' + keyword">
                                 <mat-icon>cancel</mat-icon>
                             </button>
                         </mat-chip-row>
                     }
                 </mat-chip-grid>
-                <input type="text" matInput [matChipInputFor]="reactiveChipGrid" (matChipInputTokenEnd)="add($event)"/>
+                <input (matChipInputTokenEnd)="add($event)" [matChipInputFor]="reactiveChipGrid" matInput type="text"/>
             </mat-form-field>
 
         </mat-card-content>
         <mat-card-actions align="end">
-            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
-            <button mat-stroked-button type="submit" [disabled]="!canSubmit">Submit</button>
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
         </mat-card-actions>
     </app-general-create>
 </form>

@@ -1,18 +1,18 @@
 <form [formGroup]="form">
-    <app-date-time-picker label="Start" formControlName="start"></app-date-time-picker>
+    <app-date-time-picker formControlName="start" label="Start"></app-date-time-picker>
 
     <div class="date-room-container">
-        <mat-form-field class="datepicker-input" appearance="outline">
+        <mat-form-field appearance="outline" class="datepicker-input">
             <mat-label>Until Date</mat-label>
-            <input matInput formControlName="until" [matDatepicker]="datepicker">
-            <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+            <input [matDatepicker]="datepicker" formControlName="until" matInput>
+            <mat-datepicker-toggle [for]="datepicker" matSuffix></mat-datepicker-toggle>
             <mat-datepicker #datepicker></mat-datepicker>
         </mat-form-field>
         <general-selection-input
             *ngIf="rooms().length > 0"
-            label="Room"
+            [values]="rooms()"
             formControlName="room"
-            [values]="rooms()" style="flex: 1">
+            label="Room" style="flex: 1">
         </general-selection-input>
     </div>
 
@@ -27,7 +27,7 @@
                     help
                 </mat-icon>
             </p>
-            <app-duration-picker formControlName="frequency" [show]="[DurationType.DAYS]"></app-duration-picker>
+            <app-duration-picker [show]="[DurationType.DAYS]" formControlName="frequency"></app-duration-picker>
         </div>
         <div>
             <p class="mat-h4">Duration

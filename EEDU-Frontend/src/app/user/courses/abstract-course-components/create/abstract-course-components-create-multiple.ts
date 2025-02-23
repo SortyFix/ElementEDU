@@ -2,13 +2,12 @@ import {AbstractCourseComponentsCreate} from "./abstract-course-components-creat
 import {MatChipInputEvent} from "@angular/material/chips";
 import {signal, WritableSignal} from "@angular/core";
 
-export class AbstractCourseComponentsCreateMultiple<T> extends AbstractCourseComponentsCreate<T>
-{
+export class AbstractCourseComponentsCreateMultiple<T> extends AbstractCourseComponentsCreate<T> {
     private readonly _chips: WritableSignal<string[]> = signal([]);
 
     protected override get createModel(): any[] {
         return (
-            this.form.get('id')?.value as string[]).map((item: string): { id: string } => { return { id : item };}
+            this.form.get('id')?.value as string[]).map((item: string): { id: string } => { return {id: item};}
         )
     }
 
@@ -33,12 +32,10 @@ export class AbstractCourseComponentsCreateMultiple<T> extends AbstractCourseCom
         event.chipInput!.clear();
     }
 
-    protected remove(keyword: string): void
-    {
+    protected remove(keyword: string): void {
         this.chips.update((keywords: string[]): string[] => {
             const index: number = keywords.indexOf(keyword);
-            if (index < 0)
-            {
+            if (index < 0) {
                 return keywords;
             }
 

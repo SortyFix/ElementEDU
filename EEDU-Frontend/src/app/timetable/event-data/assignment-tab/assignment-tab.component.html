@@ -1,6 +1,5 @@
-<app-assignment-teacher-view *ngIf="accountType === AccountType.STUDENT">
-    <ng-container *ngIf="editing()">
-        <ng-content></ng-content>
-    </ng-container>
+<app-assignment-teacher-view *ngIf="accountType === AccountType.STUDENT" [editing]="editing()">
+    <ng-content></ng-content>
 </app-assignment-teacher-view>
+
 <app-assignment-student-view *ngIf="accountType === AccountType.STUDENT"></app-assignment-student-view>

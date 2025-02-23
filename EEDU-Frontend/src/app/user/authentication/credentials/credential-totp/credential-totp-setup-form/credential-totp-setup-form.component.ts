@@ -13,8 +13,8 @@ import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-butt
 import {QRCodeComponent} from "angularx-qrcode";
 
 @Component({
-  selector: 'app-credential-totp-setup-form',
-  standalone: true,
+    selector: 'app-credential-totp-setup-form',
+    standalone: true,
     imports: [
         FormsModule,
         MatError,
@@ -27,29 +27,35 @@ import {QRCodeComponent} from "angularx-qrcode";
         FooterButtonsComponent,
         QRCodeComponent,
     ],
-  templateUrl: './credential-totp-setup-form.component.html',
-  styleUrl: './credential-totp-setup-form.component.scss'
+    templateUrl: './credential-totp-setup-form.component.html',
+    styleUrl: './credential-totp-setup-form.component.scss'
 })
-export class CredentialTotpSetupFormComponent extends AbstractCredentialSetupCode implements OnInit
-{
-    private _credentialData?: TotpData;
-
-    constructor(formBuilder: FormBuilder, private readonly authService: AuthenticationService)
-    {
+export class CredentialTotpSetupFormComponent extends AbstractCredentialSetupCode implements OnInit {
+    constructor(formBuilder: FormBuilder, private readonly authService: AuthenticationService) {
         super(formBuilder, authService);
     }
 
-    public ngOnInit(): void
-    {
+    private _credentialData?: TotpData;
+
+    protected get credentialData(): TotpData {
+        if (!this._credentialData) {
+            throw new Error("Credential data is not fetched yet.")
+        }
+        return this._credentialData;
+    }
+
+    protected get doneLoading(): boolean {
+        return !!this._credentialData;
+    }
+
+    public ngOnInit(): void {
         const loginData: LoginData | undefined = this.loginData;
-        if (!loginData)
-        {
+        if (!loginData) {
             throw new Error("Cannot show form without login data.")
         }
 
         this.authService.setupCredential(CredentialMethod.TOTP).subscribe({
-            next: ((value: string): void =>
-            {
+            next: ((value: string): void => {
                 const jsonData: any = JSON.parse(value);
                 this._credentialData = new TotpData(
                     jsonData.loginName,
@@ -62,23 +68,8 @@ export class CredentialTotpSetupFormComponent extends AbstractCredentialSetupCod
         });
     }
 
-    protected get credentialData(): TotpData
-    {
-        if(!this._credentialData)
-        {
-            throw new Error("Credential data is not fetched yet.")
-        }
-        return this._credentialData;
-    }
-
-    protected get doneLoading(): boolean
-    {
-        return !!this._credentialData;
-    }
-
     protected override errorMessage(status: number): string {
-        if(status == 401)
-        {
+        if (status == 401) {
             return "This code is incorrect."
         }
         return super.errorMessage(status);

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {RoomModel} from "../room-model";
 import {RoomService} from "../room.service";
 import {AbstractList} from "../../../../common/abstract-list/abstract-list.component";
@@ -23,9 +23,9 @@ import {AbstractCourseComponentList} from "../../abstract-course-components/list
     templateUrl: '../../abstract-course-components/list/abstract-course-components-list.html',
     styleUrl: '../../abstract-course-components/list/abstract-course-components-list.scss'
 })
-export class RoomListComponent extends AbstractCourseComponentList<string, RoomModel>{
+export class RoomListComponent extends AbstractCourseComponentList<string, RoomModel> {
 
     public constructor(service: RoomService, dialog: MatDialog) {
-        super(service, dialog, CreateRoomComponent, { title: (value: RoomModel): string => value.id });
+        super(service, dialog, CreateRoomComponent, {title: (value: RoomModel): string => value.id});
     }
 }

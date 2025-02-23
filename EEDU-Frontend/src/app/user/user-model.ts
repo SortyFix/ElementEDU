@@ -17,8 +17,7 @@ export interface GenericUserModel {
     classroom?: GenericClassRoomModel
 }
 
-export class UserModel
-{
+export class UserModel {
     constructor(
         private readonly _id: bigint,
         private readonly _firstName: string,
@@ -30,30 +29,6 @@ export class UserModel
         private readonly _theme: ThemeModel,
         private readonly _classroom?: ClassRoomModel
     ) {}
-
-    public static fromObject(object: GenericUserModel): UserModel
-    {
-        const themeModel: ThemeModel = ThemeModel.fromObject(object.theme);
-        return new UserModel(
-            object.id,
-            object.firstName,
-            object.lastName,
-            object.loginName,
-            AccountType[object.accountType as keyof typeof AccountType],
-            UserStatus[object.status as keyof typeof UserStatus],
-            object.groups.map((value: any): GroupModel => GroupModel.fromObject(value)),
-            themeModel,
-            !!object.classroom ? ClassRoomModel.fromObject(object.classroom) : undefined,
-        );
-    }
-
-    public inGroup(name: string): boolean {
-        return this.groups.map((value: GroupModel): string => value.id).includes(name);
-    }
-
-    public hasPrivilege(privilege: string): boolean {
-        return this.groups && this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
-    }
 
     public get id(): bigint {
         return this._id;
@@ -93,5 +68,28 @@ export class UserModel
 
     public get classroom(): ClassRoomModel | undefined {
         return this._classroom;
+    }
+
+    public static fromObject(object: GenericUserModel): UserModel {
+        const themeModel: ThemeModel = ThemeModel.fromObject(object.theme);
+        return new UserModel(
+            object.id,
+            object.firstName,
+            object.lastName,
+            object.loginName,
+            AccountType[object.accountType as keyof typeof AccountType],
+            UserStatus[object.status as keyof typeof UserStatus],
+            object.groups.map((value: any): GroupModel => GroupModel.fromObject(value)),
+            themeModel,
+            !!object.classroom ? ClassRoomModel.fromObject(object.classroom) : undefined,
+        );
+    }
+
+    public inGroup(name: string): boolean {
+        return this.groups.map((value: GroupModel): string => value.id).includes(name);
+    }
+
+    public hasPrivilege(privilege: string): boolean {
+        return this.groups && this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
     }
 }

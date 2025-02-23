@@ -15,10 +15,6 @@ export abstract class AbstractLoginForm {
         this._form = form;
     }
 
-    protected registerField(@Inject(String) fieldName: string): void {
-        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessage(fieldName));
-    }
-
     protected get errorMessageSignal(): WritableSignal<string | undefined> {
         return this._errorMessageSignal;
     }
@@ -27,19 +23,29 @@ export abstract class AbstractLoginForm {
         return this._form;
     }
 
-    protected exceptionHandler(fieldName: string) {
-        return {error: (error: any): void => {
-            let status: number = 0;
-            if(typeof error === 'object' && 'status' in error && typeof error.status === 'number')
-            {
-                status = error.status;
-            }
-            this.error = {field: fieldName, serverError: this.errorMessage(status)}
-        }}
+    protected set error(data: { field: string, serverError: string }) {
+        const field: string = data.field;
+        const serverError: string = data.serverError;
+        this.form.get(field)!.setErrors({serverError});
     }
 
-    protected errorMessage(status: number): string
-    {
+    protected registerField(@Inject(String) fieldName: string): void {
+        merge(this.form.get(fieldName)!.statusChanges, this.form.get(fieldName)!.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessage(fieldName));
+    }
+
+    protected exceptionHandler(fieldName: string) {
+        return {
+            error: (error: any): void => {
+                let status: number = 0;
+                if (typeof error === 'object' && 'status' in error && typeof error.status === 'number') {
+                    status = error.status;
+                }
+                this.error = {field: fieldName, serverError: this.errorMessage(status)}
+            }
+        }
+    }
+
+    protected errorMessage(status: number): string {
         return "An unknown error occurred."
     }
 
@@ -57,12 +63,6 @@ export abstract class AbstractLoginForm {
         }
 
         this.errorMessageSignal.set(undefined);
-    }
-
-    protected set error(data: { field: string, serverError: string }) {
-        const field: string = data.field;
-        const serverError: string = data.serverError;
-        this.form.get(field)!.setErrors({serverError});
     }
 
     protected abstract onSubmit(): void;

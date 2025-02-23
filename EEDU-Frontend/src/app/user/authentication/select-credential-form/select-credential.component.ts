@@ -9,8 +9,8 @@ import {LoginData} from "../login-data/login-data";
 import {FormTitleComponent} from "../common/form-title/form-title.component";
 
 @Component({
-  selector: 'app-select-credential',
-  standalone: true,
+    selector: 'app-select-credential',
+    standalone: true,
     imports: [
         MatSelectionList,
         MatListOption,
@@ -19,37 +19,34 @@ import {FormTitleComponent} from "../common/form-title/form-title.component";
         MatIcon,
         FormTitleComponent
     ],
-  templateUrl: './select-credential.component.html',
-  styleUrl: './select-credential.component.scss'
+    templateUrl: './select-credential.component.html',
+    styleUrl: './select-credential.component.scss'
 })
 export class SelectCredentialComponent {
 
-    @ViewChild('selectionList') private readonly _selectionList!: MatSelectionList;
     protected readonly credentialDisplayName = credentialDisplayName;
+    @ViewChild('selectionList') private readonly _selectionList!: MatSelectionList;
 
     constructor(private _authenticationService: AuthenticationService) {
-    }
-
-    protected onSubmit()
-    {
-        const value: MatListOption = this.selectionList.selectedOptions.selected[0];
-        if (!value)
-        {
-            return;
-        }
-        this._authenticationService.selectCredential(value.value).subscribe();
-    }
-
-    private get selectionList(): MatSelectionList {
-        return this._selectionList;
     }
 
     protected get loginData(): LoginData | undefined {
         return this._authenticationService.loginData;
     }
 
-    protected onCancel()
-    {
+    private get selectionList(): MatSelectionList {
+        return this._selectionList;
+    }
+
+    protected onSubmit() {
+        const value: MatListOption = this.selectionList.selectedOptions.selected[0];
+        if (!value) {
+            return;
+        }
+        this._authenticationService.selectCredential(value.value).subscribe();
+    }
+
+    protected onCancel() {
         this._authenticationService.reset();
     }
 }

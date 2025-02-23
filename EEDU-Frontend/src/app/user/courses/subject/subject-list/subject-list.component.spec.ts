@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { SubjectListComponent } from './subject-list.component';
+import {SubjectListComponent} from './subject-list.component';
 
 describe('SubjectListComponent', () => {
-  let component: SubjectListComponent;
-  let fixture: ComponentFixture<SubjectListComponent>;
+    let component: SubjectListComponent;
+    let fixture: ComponentFixture<SubjectListComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [SubjectListComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [SubjectListComponent]
+        })
+            .compileComponents();
 
-    fixture = TestBed.createComponent(SubjectListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(SubjectListComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -20,19 +20,24 @@ export class ClassRoomService extends AbstractCourseComponentsService<bigint, Cl
         this._translateCourses = courseService.translate;
     }
 
-    public fetchCourses(classRoom: bigint): Observable<CourseModel[]>
-    {
-        const url: string = `${this.BACKEND_URL}/course/classroom/get/courses/${classRoom}`;
-        return this.http.get<any[]>(url, { withCredentials: true }).pipe(this._translateCourses);
+    public override get translate(): OperatorFunction<any[], ClassRoomModel[]> {
+        return map((response: any[]): ClassRoomModel[] => response.map((item: any): ClassRoomModel =>
+            ClassRoomModel.fromObject(item))
+        );
     }
 
     protected override get fetchAllValues(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, { withCredentials: true });
+        return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, {withCredentials: true});
+    }
+
+    public fetchCourses(classRoom: bigint): Observable<CourseModel[]> {
+        const url: string = `${this.BACKEND_URL}/course/classroom/get/courses/${classRoom}`;
+        return this.http.get<any[]>(url, {withCredentials: true}).pipe(this._translateCourses);
     }
 
     protected override createValue(createModels: ClassRoomCreateModel[]): Observable<any[]> {
         const url: string = `${this.BACKEND_URL}/course/classroom/create`;
-        return this.http.post<any[]>(url, this.toPackets(createModels), { withCredentials: true });
+        return this.http.post<any[]>(url, this.toPackets(createModels), {withCredentials: true});
     }
 
     protected override deleteValue(id: bigint[]): Observable<void> {
@@ -40,15 +45,7 @@ export class ClassRoomService extends AbstractCourseComponentsService<bigint, Cl
         return this.http.delete<void>(url, {withCredentials: true});
     }
 
-    public override get translate(): OperatorFunction<any[], ClassRoomModel[]>
-    {
-        return map((response: any[]): ClassRoomModel[] => response.map((item: any): ClassRoomModel =>
-            ClassRoomModel.fromObject(item))
-        );
-    }
-
-    private toPackets(createModels: ClassRoomCreateModel[]): ClassRoomCreatePacket[]
-    {
+    private toPackets(createModels: ClassRoomCreateModel[]): ClassRoomCreatePacket[] {
         return createModels.map((createModels: ClassRoomCreateModel): ClassRoomCreatePacket => createModels.toPacket);
     }
 }

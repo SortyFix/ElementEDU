@@ -1,5 +1,4 @@
-export interface GenericCourseCreateModel
-{
+export interface GenericCourseCreateModel {
     name: string;
     subject: { id: number };
     teacher: { id: bigint }
@@ -7,8 +6,7 @@ export interface GenericCourseCreateModel
     classroom?: { id: number };
 }
 
-export interface CourseCreatePacket
-{
+export interface CourseCreatePacket {
     name: string;
     subject: number;
     teacher: number;
@@ -26,18 +24,7 @@ export class CourseCreateModel {
         private readonly _classroom: number | null,
     ) {}
 
-    public static fromObject(obj: GenericCourseCreateModel): CourseCreateModel {
-        return new CourseCreateModel(
-            obj.name,
-            obj.subject.id,
-            obj.teacher.id,
-            obj.students?.map((current: {id: bigint}): bigint => { return current.id; }) || [],
-            obj.classroom?.id || null
-        );
-    }
-
-    public get toPacket(): CourseCreatePacket
-    {
+    public get toPacket(): CourseCreatePacket {
         return {
             name: this.name,
             subject: this.subject,
@@ -65,5 +52,15 @@ export class CourseCreateModel {
 
     public get students(): bigint[] {
         return this._students;
+    }
+
+    public static fromObject(obj: GenericCourseCreateModel): CourseCreateModel {
+        return new CourseCreateModel(
+            obj.name,
+            obj.subject.id,
+            obj.teacher.id,
+            obj.students?.map((current: { id: bigint }): bigint => { return current.id; }) || [],
+            obj.classroom?.id || null
+        );
     }
 }

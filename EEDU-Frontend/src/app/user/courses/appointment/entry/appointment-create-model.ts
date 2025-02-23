@@ -1,4 +1,3 @@
-
 export interface GenericAppointmentCreateModel {
     start: Date,
     duration: number,
@@ -14,8 +13,7 @@ export interface AppointmentCreatePacket {
     assignment?: AppointmentCreateModel
 }
 
-export class AppointmentCreateModel
-{
+export class AppointmentCreateModel {
 
     public constructor(
         private readonly _start: Date,
@@ -25,19 +23,7 @@ export class AppointmentCreateModel
         private readonly _assignment?: AppointmentCreateModel
     ) {}
 
-    public static fromObject(obj: GenericAppointmentCreateModel): AppointmentCreateModel
-    {
-        return new AppointmentCreateModel(
-            obj.start,
-            obj.duration,
-            obj.room?.id || null,
-            obj.description,
-            obj.assignment
-        );
-    }
-
-    public get toPacket(): AppointmentCreatePacket
-    {
+    public get toPacket(): AppointmentCreatePacket {
         return {
             start: this.start.getTime(),
             duration: this.duration,
@@ -64,5 +50,15 @@ export class AppointmentCreateModel
 
     public get description(): string | undefined {
         return this._description;
+    }
+
+    public static fromObject(obj: GenericAppointmentCreateModel): AppointmentCreateModel {
+        return new AppointmentCreateModel(
+            obj.start,
+            obj.duration,
+            obj.room?.id || null,
+            obj.description,
+            obj.assignment
+        );
     }
 }

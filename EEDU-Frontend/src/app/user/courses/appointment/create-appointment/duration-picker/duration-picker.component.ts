@@ -1,12 +1,6 @@
 import {Component, forwardRef, input, InputSignal, Type} from '@angular/core';
 import {MatInput} from "@angular/material/input";
-import {
-    ControlValueAccessor,
-    FormsModule,
-    NG_VALIDATORS,
-    NG_VALUE_ACCESSOR,
-    Validator
-} from "@angular/forms";
+import {ControlValueAccessor, FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR, Validator} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 
@@ -49,8 +43,8 @@ const type: Type<DurationPickerComponent> = forwardRef((): typeof DurationPicker
  * @author Ivo Quiring
  */
 @Component({
-  selector: 'app-duration-picker',
-  standalone: true,
+    selector: 'app-duration-picker',
+    standalone: true,
     imports: [
         MatInput,
         MatLabel,
@@ -59,28 +53,241 @@ const type: Type<DurationPickerComponent> = forwardRef((): typeof DurationPicker
         NgIf
     ],
     providers: [
-        { provide: NG_VALUE_ACCESSOR, useExisting: type,  multi: true },
-        { provide: NG_VALIDATORS, useExisting: type, multi: true }
+        {provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true},
+        {provide: NG_VALIDATORS, useExisting: type, multi: true}
     ],
-  templateUrl: './duration-picker.component.html',
-  styleUrl: './duration-picker.component.scss'
+    templateUrl: './duration-picker.component.html',
+    styleUrl: './duration-picker.component.scss'
 })
 export class DurationPickerComponent implements ControlValueAccessor, Validator {
 
-    protected readonly DurationType: typeof DurationType = DurationType;
     public show: InputSignal<DurationType[]> = input<DurationType[]>([DurationType.HOURS, DurationType.MINUTES]);
     public allowNegative: InputSignal<boolean> = input<boolean>(false);
-
-    protected onChange: (value: number) => void = (): void => {};
-    protected onTouched: () => void = (): void => {};
+    protected readonly DurationType: typeof DurationType = DurationType;
 
     private _years: number = 0;
+
+    /**
+     * Represents the number of years
+     *
+     * This accessor provides access to the private {@link _years} property, allowing the retrieval and
+     * update of the years value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of years
+     * @protected
+     * @see notifyChange
+     */
+    protected get years(): number {
+        return this._years;
+    }
+
+    /**
+     * Sets the number of years and triggers a change notification
+     *
+     * Updates the {@link _years} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the years' property.
+     * @protected
+     * @see notifyChange
+     */
+    protected set years(value: number) {
+        this._years = value;
+        this.notifyChange();
+    }
+
     private _months: number = 0;
+
+    /**
+     * Represents the number of months
+     *
+     * This accessor provides access to the private {@link _months} property, allowing the retrieval and
+     * update of the months value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of months
+     * @protected
+     * @see notifyChange
+     */
+    protected get months(): number {
+        return this._months;
+    }
+
+    /**
+     * Sets the number of months and triggers a change notification
+     *
+     * Updates the {@link _months} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the months' property.
+     * @protected
+     * @see notifyChange
+     */
+    protected set months(value: number) {
+        this._months = value;
+        this.notifyChange();
+    }
+
     private _weeks: number = 0;
+
+    /**
+     * Represents the number of weeks
+     *
+     * This accessor provides access to the private {@link _weeks} property, allowing the retrieval and
+     * update of the weeks value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of weeks
+     * @protected
+     * @see notifyChange
+     */
+    protected get weeks(): number {
+        return this._weeks;
+    }
+
+    /**
+     * Sets the number of weeks and triggers a change notification
+     *
+     * Updates the {@link _weeks} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the weeks' property
+     * @protected
+     * @see notifyChange
+     */
+    protected set weeks(value: number) {
+        this._weeks = value;
+        this.notifyChange();
+    }
+
     private _days: number = 0;
+
+    /**
+     * Represents the number of days
+     *
+     * This accessor provides access to the private {@link _days} property, allowing the retrieval and
+     * update of the days value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of days
+     * @protected
+     * @see notifyChange
+     */
+    protected get days(): number {
+        return this._days;
+    }
+
+    /**
+     * Sets the number of days and triggers a change notification
+     *
+     * Updates the {@link _days} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the days' property
+     * @protected
+     * @see notifyChange
+     */
+    protected set days(value: number) {
+        this._days = value;
+        this.notifyChange();
+    }
+
     private _hours: number = 0;
+
+    /**
+     * Represents the number of hours
+     *
+     * This accessor provides access to the private {@link _hours} property, allowing the retrieval and
+     * update of the hours value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of hours
+     * @protected
+     * @see notifyChange
+     */
+    protected get hours(): number {
+        return this._hours;
+    }
+
+    /**
+     * Sets the number of hours and triggers a change notification
+     *
+     * Updates the {@link _hours} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the hours' property
+     * @protected
+     * @see notifyChange
+     */
+    protected set hours(value: number) {
+        this._hours = value;
+        this.notifyChange();
+    }
+
     private _minutes: number = 0;
+
+    /**
+     * Represents the number of minutes
+     *
+     * This accessor provides access to the private {@code _minutes} property, allowing the retrieval and
+     * update of the minutes value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of minutes
+     * @protected
+     * @see notifyChange
+     */
+    protected get minutes(): number {
+        return this._minutes;
+    }
+
+    /**
+     * Sets the number of minutes and triggers a change notification
+     *
+     * Updates the {@code _minutes} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the minutes' property.
+     * @protected
+     * @see notifyChange
+     */
+    protected set minutes(value: number) {
+        this._minutes = value;
+        this.notifyChange();
+    }
+
     private _seconds: number = 0;
+
+    /**
+     * Represents the number of seconds
+     *
+     * This accessor provides access to the private {@code _seconds} property, allowing the retrieval and
+     * update of the seconds value. When the value is updated, the {@link notifyChange} method is
+     * automatically invoked to propagate changes.
+     *
+     * @return the number of seconds
+     * @protected
+     * @see notifyChange
+     */
+    protected get seconds(): number {
+        return this._seconds;
+    }
+
+    /**
+     * Sets the number of seconds and triggers a change notification
+     *
+     * Updates the {@code _seconds} property with the provided value and invokes the {@link notifyChange} method
+     * to propagate the change.
+     *
+     * @param value the new value for the seconds' property.
+     * @protected
+     * @see notifyChange
+     */
+    protected set seconds(value: number) {
+        this._seconds = value;
+        this.notifyChange();
+    }
 
     /**
      * Calculates the total time in milliseconds based on the stored time components
@@ -214,6 +421,32 @@ export class DurationPickerComponent implements ControlValueAccessor, Validator 
         //TODO
     }
 
+    public validate(): { invalidTime: boolean } | null {
+        if (this.allowNegative()) {
+            return null;
+        }
+
+        if // I hate everything in this class
+        (
+            this.years < 0 ||
+            this.months < 0 ||
+            this.weeks < 0 ||
+            this.months < 0 ||
+            this.weeks < 0 ||
+            this.days < 0 ||
+            this.hours < 0 ||
+            this.minutes < 0 ||
+            this.seconds < 0
+        ) {
+            return {invalidTime: true};
+        }
+        return null;
+    }
+
+    protected onChange: (value: number) => void = (): void => {};
+
+    protected onTouched: () => void = (): void => {};
+
     /**
      * Notifies the change listener of updates to the time values
      *
@@ -224,8 +457,7 @@ export class DurationPickerComponent implements ControlValueAccessor, Validator 
      * @private
      */
     private notifyChange(): void {
-        if (!(this.onChange))
-        {
+        if (!(this.onChange)) {
             return;
         }
         this.onChange(this.toMilliseconds);
@@ -256,239 +488,5 @@ export class DurationPickerComponent implements ControlValueAccessor, Validator 
         this._hours = 0;
         this._minutes = 0;
         this._seconds = 0;
-    }
-
-    /**
-     * Represents the number of years
-     *
-     * This accessor provides access to the private {@link _years} property, allowing the retrieval and
-     * update of the years value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of years
-     * @protected
-     * @see notifyChange
-     */
-    protected get years(): number {
-        return this._years;
-    }
-
-    /**
-     * Sets the number of years and triggers a change notification
-     *
-     * Updates the {@link _years} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the years' property.
-     * @protected
-     * @see notifyChange
-     */
-    protected set years(value: number) {
-        this._years = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of months
-     *
-     * This accessor provides access to the private {@link _months} property, allowing the retrieval and
-     * update of the months value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of months
-     * @protected
-     * @see notifyChange
-     */
-    protected get months(): number {
-        return this._months;
-    }
-
-    /**
-     * Sets the number of months and triggers a change notification
-     *
-     * Updates the {@link _months} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the months' property.
-     * @protected
-     * @see notifyChange
-     */
-    protected set months(value: number) {
-        this._months = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of weeks
-     *
-     * This accessor provides access to the private {@link _weeks} property, allowing the retrieval and
-     * update of the weeks value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of weeks
-     * @protected
-     * @see notifyChange
-     */
-    protected get weeks(): number {
-        return this._weeks;
-    }
-
-    /**
-     * Sets the number of weeks and triggers a change notification
-     *
-     * Updates the {@link _weeks} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the weeks' property
-     * @protected
-     * @see notifyChange
-     */
-    protected set weeks(value: number) {
-        this._weeks = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of days
-     *
-     * This accessor provides access to the private {@link _days} property, allowing the retrieval and
-     * update of the days value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of days
-     * @protected
-     * @see notifyChange
-     */
-    protected get days(): number {
-        return this._days;
-    }
-
-    /**
-     * Sets the number of days and triggers a change notification
-     *
-     * Updates the {@link _days} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the days' property
-     * @protected
-     * @see notifyChange
-     */
-    protected set days(value: number) {
-        this._days = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of hours
-     *
-     * This accessor provides access to the private {@link _hours} property, allowing the retrieval and
-     * update of the hours value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of hours
-     * @protected
-     * @see notifyChange
-     */
-    protected get hours(): number {
-        return this._hours;
-    }
-
-    /**
-     * Sets the number of hours and triggers a change notification
-     *
-     * Updates the {@link _hours} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the hours' property
-     * @protected
-     * @see notifyChange
-     */
-    protected set hours(value: number) {
-        this._hours = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of minutes
-     *
-     * This accessor provides access to the private {@code _minutes} property, allowing the retrieval and
-     * update of the minutes value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of minutes
-     * @protected
-     * @see notifyChange
-     */
-    protected get minutes(): number {
-        return this._minutes;
-    }
-
-    /**
-     * Sets the number of minutes and triggers a change notification
-     *
-     * Updates the {@code _minutes} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the minutes' property.
-     * @protected
-     * @see notifyChange
-     */
-    protected set minutes(value: number) {
-        this._minutes = value;
-        this.notifyChange();
-    }
-
-    /**
-     * Represents the number of seconds
-     *
-     * This accessor provides access to the private {@code _seconds} property, allowing the retrieval and
-     * update of the seconds value. When the value is updated, the {@link notifyChange} method is
-     * automatically invoked to propagate changes.
-     *
-     * @return the number of seconds
-     * @protected
-     * @see notifyChange
-     */
-    protected get seconds(): number {
-        return this._seconds;
-    }
-
-    /**
-     * Sets the number of seconds and triggers a change notification
-     *
-     * Updates the {@code _seconds} property with the provided value and invokes the {@link notifyChange} method
-     * to propagate the change.
-     *
-     * @param value the new value for the seconds' property.
-     * @protected
-     * @see notifyChange
-     */
-    protected set seconds(value: number) {
-        this._seconds = value;
-        this.notifyChange();
-    }
-
-    public validate(): { invalidTime: boolean } | null {
-        if(this.allowNegative())
-        {
-            return null;
-        }
-
-        if // I hate everything in this class
-        (
-            this.years < 0 ||
-            this.months < 0 ||
-            this.weeks < 0 ||
-            this.months < 0 ||
-            this.weeks < 0 ||
-            this.days < 0 ||
-            this.hours < 0 ||
-            this.minutes < 0 ||
-            this.seconds < 0
-        )
-        {
-            return {invalidTime: true};
-        }
-        return null;
     }
 }

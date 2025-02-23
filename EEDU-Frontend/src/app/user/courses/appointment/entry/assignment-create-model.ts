@@ -10,8 +10,7 @@ export interface AssignmentCreatePacket {
     publish: number
 }
 
-export class AssignmentCreateModel
-{
+export class AssignmentCreateModel {
     private readonly _submitUntil: number;
     private readonly _publish: number;
 
@@ -20,6 +19,18 @@ export class AssignmentCreateModel
         this._publish = publish.getTime();
 
         //TODO validate millis
+    }
+
+    public get submitUntil(): number {
+        return this._submitUntil;
+    }
+
+    public get publish(): number {
+        return this._publish;
+    }
+
+    public get description(): string {
+        return this._description;
     }
 
     public static fromObject(obj: GenericAssignmentCreateModel): AssignmentCreateModel {
@@ -36,17 +47,5 @@ export class AssignmentCreateModel
             submitUntil: this.submitUntil,
             publish: this.publish
         };
-    }
-
-    public get submitUntil(): number {
-        return this._submitUntil;
-    }
-
-    public get publish(): number {
-        return this._publish;
-    }
-
-    public get description(): string {
-        return this._description;
     }
 }

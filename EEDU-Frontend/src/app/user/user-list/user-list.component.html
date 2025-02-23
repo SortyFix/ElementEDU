@@ -1,37 +1,38 @@
 <mat-form-field appearance="outline">
     <mat-label>User Search</mat-label>
-    <input name="search"
-           type="search"
-           placeholder="Filter..."
+    <input (input)="unselectAll()"
            [(ngModel)]="filteredString"
-           (input)="unselectAll()"
-           autofocus matInput>
+           autofocus
+           matInput
+           name="search"
+           placeholder="Filter..." type="search">
 </mat-form-field>
 <mat-accordion>
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <mat-checkbox [checked]="isSelected('all')"
-                      [indeterminate]="partiallySelected"
-                      (change)="toggle('all')"
+        <mat-checkbox (change)="toggle('all')"
                       *ngIf="users.length != 0"
+                      [checked]="isSelected('all')"
+                      [indeterminate]="partiallySelected"
                       class="text-color">
             Select All
         </mat-checkbox>
 
-        <button mat-button  style="text-align: right;" (click)="openFilterMenu($event)">
+        <button (click)="openFilterMenu($event)" mat-button style="text-align: right;">
             Filter
         </button>
     </div>
-    <mat-expansion-panel *ngFor="let user of users" (closed)="editGroup = undefined">
+    <mat-expansion-panel (closed)="editGroup = undefined" *ngFor="let user of users">
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
                 <a matListItemTitle>
                     <mat-checkbox
-                        [checked]="isSelected(user)"
                         (change)="toggle(user)"
                         (click)="$event.stopPropagation()"
-                        (keydown)="handleKeyDown($event, user)">
+                        (keydown)="handleKeyDown($event, user)"
+                        [checked]="isSelected(user)">
                     </mat-checkbox>
-                    <mat-icon class="icon">{{ icon(user) }}</mat-icon><a [style.color]="getTheme.getTextColor('background', false)">
+                    <mat-icon class="icon">{{ icon(user) }}</mat-icon>
+                    <a [style.color]="getTheme.getTextColor('background', false)">
                         {{ user.loginName }}
                     </a>
                 </a>
@@ -48,9 +49,9 @@
                     <span></span> <!-- required so the icon is not placed in the middle -->
                 }
 
-                <mat-icon class="icon"
+                <mat-icon *ngIf="accessibilityService.dimensions.width > 450"
                           [matTooltip]="user.status"
-                          *ngIf="accessibilityService.dimensions.width > 450">
+                          class="icon">
                     {{ status(user) }}
                 </mat-icon>
             </mat-panel-description>
@@ -74,11 +75,11 @@
                 <mat-list>
                     <mat-list-item *ngFor="let group of user.groups">
                         <mat-icon class="icon">group</mat-icon>
-                        <span mat-line>{{ group.name }}</span>
+                        <span mat-line>{{ group.id }}</span>
                         <span mat-line *ngIf="group.privileges.length > 0">
                         <strong>Privileges:</strong>
                         <span *ngFor="let privilege of group.privileges; let isLast = last">
-                            {{ privilege.name }}<span *ngIf="!isLast">, </span>
+                            {{ privilege.id }}<span *ngIf="!isLast">, </span>
                         </span>
                     </span>
                     </mat-list-item>

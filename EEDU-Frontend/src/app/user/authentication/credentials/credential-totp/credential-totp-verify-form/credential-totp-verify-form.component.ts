@@ -25,8 +25,7 @@ import {FormTitleComponent} from "../../../common/form-title/form-title.componen
 export class CredentialTotpVerifyFormComponent extends AbstractCredentialVerifyCode {
 
     protected override errorMessage(status: number): string {
-        if(status == 401)
-        {
+        if (status == 401) {
             return "This code is incorrect."
         }
         return super.errorMessage(status);

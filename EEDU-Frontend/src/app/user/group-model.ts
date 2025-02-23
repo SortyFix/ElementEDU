@@ -1,13 +1,11 @@
 import {PrivilegeModel} from "./privilege-model";
 
-export class GroupModel
-{
+export class GroupModel {
     constructor(public readonly id: bigint,
                 public readonly name: string,
                 public readonly privileges: PrivilegeModel[]) { }
 
-    public static fromObject(object: any): GroupModel
-    {
+    public static fromObject(object: any): GroupModel {
         const privilegeModel: PrivilegeModel[] = object.privileges.map((value: any): PrivilegeModel =>
             PrivilegeModel.fromObject(value)
         );

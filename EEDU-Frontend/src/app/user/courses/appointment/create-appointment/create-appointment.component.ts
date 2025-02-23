@@ -7,9 +7,7 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {
     CreateStandaloneAppointmentComponent
 } from "./create-standalone-appointment/create-standalone-appointment.component";
-import {
-    CreateFrequentAppointmentComponent
-} from "./create-frequent-appointment/create-frequent-appointment.component";
+import {CreateFrequentAppointmentComponent} from "./create-frequent-appointment/create-frequent-appointment.component";
 import {DialogRef} from "@angular/cdk/dialog";
 import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {CourseModel} from "../../course-model";
@@ -18,9 +16,7 @@ import {RoomService} from "../../room/room.service";
 import {AppointmentService} from "../appointment.service";
 import {CourseService} from "../../course.service";
 import {AppointmentCreateModel} from "../entry/appointment-create-model";
-import {
-    FrequentAppointmentCreateModel,
-} from "../frequent/frequent-appointment-create-model";
+import {FrequentAppointmentCreateModel,} from "../frequent/frequent-appointment-create-model";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 
 /**
@@ -34,8 +30,8 @@ import {SelectionInput} from "../../../../common/selection-input/selection-input
  * @author Ivo Quiring
  */
 @Component({
-  selector: 'app-create-appointment',
-  standalone: true,
+    selector: 'app-create-appointment',
+    standalone: true,
     imports: [
         MatCardContent,
         FormsModule,
@@ -50,18 +46,15 @@ import {SelectionInput} from "../../../../common/selection-input/selection-input
         GeneralCreateComponent,
         SelectionInput,
     ],
-  templateUrl: './create-appointment.component.html',
-  styleUrl: './create-appointment.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    templateUrl: './create-appointment.component.html',
+    styleUrl: './create-appointment.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateAppointmentComponent {
 
     @ViewChild('standalone') private _standalone!: CreateStandaloneAppointmentComponent;
     @ViewChild('frequent') private _frequent!: CreateFrequentAppointmentComponent;
     private readonly _form: FormGroup;
-    private _courses!: CourseModel[];
-    private _loading: boolean = true;
-    private _rooms: RoomModel[] = [];
 
     /**
      * Initializes the component and its dependencies
@@ -93,95 +86,14 @@ export class CreateAppointmentComponent {
             selected: [0, Validators.required],
         });
 
-        this._roomService.value$.subscribe((value: RoomModel[]): void =>
-        {
+        this._roomService.value$.subscribe((value: RoomModel[]): void => {
             this._rooms = value;
             //TODO get rid of loading var and replace with service fetched status
             this.loading = false;
         })
     }
 
-    /**
-     * Handles the submission of the form
-     *
-     * This method validates the form and, if it is valid, starts the creation of either
-     * a standalone or frequent appointment based on the user's selection. The component enters
-     * a loading state during the submission process.
-     *
-     * - If the selected form value is 0, it creates a standalone appointment using {@link createStandalone}.
-     * - If the selected form value is 1, it creates a frequent appointment using {@link createFrequent}.
-     *
-     * @protected
-     */
-    protected onSubmit(): void {
-        if(this.canSubmit())
-        {
-            this.loading = true;
-            const course: CourseModel = this.form.get('course')!.value;
-            switch (this.form.get('selected')?.value)
-            {
-                case 0:
-                    this.createStandalone(course.id);
-                    return
-
-                case 1:
-                    this.createFrequent(course.id);
-                    return;
-            }
-        }
-    }
-
-    /**
-     * Determines whether the form can be submitted
-     *
-     * This method checks the validity of the form and additional conditions to ensure
-     * that the submission can proceed:
-     * - The _standalone and _frequent objects must be defined.
-     * - The overall form must be valid.
-     * - Depending on the selected type (standalone or frequent), the corresponding sub-form
-     *   must also be valid.
-     *
-     * @returns true if the form can be submitted, otherwise, false.
-     * @protected
-     */
-    protected canSubmit(): boolean {
-        if(!this._standalone || !this._frequent || this.form.invalid)
-        {
-            return false;
-        }
-
-        switch (this.form.get('selected')?.value)
-        {
-            case 0: return this._standalone.form.valid;
-            case 1: return this._frequent.form.valid;
-            default: return false;
-        }
-    }
-
-    /**
-     * Retrieves the AppointmentService instance used by the component
-     *
-     * This accessor provides the instance of {@link AppointmentService} used for managing appointment operations.
-     *
-     * @returns the {@link AppointmentService} instance associated with the component.
-     * @protected
-     */
-    protected get appointmentService(): AppointmentService {
-        return this._appointmentService;
-    }
-
-    /**
-     * Retrieves the list of available rooms managed by the component
-     *
-     * This accessor provides an array of {@link RoomModel} objects representing the rooms
-     * that can be used within the component's context.
-     *
-     * @returns an array of {@link RoomModel} instances.
-     * @protected
-     */
-    protected get rooms(): RoomModel[] {
-        return this._rooms;
-    }
+    private _courses!: CourseModel[];
 
     /**
      * Retrieves the list of available courses managed by the component
@@ -196,18 +108,7 @@ export class CreateAppointmentComponent {
         return this._courses;
     }
 
-    /**
-     * Retrieves the form group managed by the component
-     *
-     * This accessor provides the {@link FormGroup} instance that contains the form controls
-     * and their current state for the component.
-     *
-     * @returns the {@link FormGroup} instance associated with the component.
-     * @protected
-     */
-    protected get form(): FormGroup {
-        return this._form;
-    }
+    private _loading: boolean = true;
 
     /**
      * Retrieves the current loading state of the component
@@ -234,6 +135,102 @@ export class CreateAppointmentComponent {
         this._loading = value;
     }
 
+    private _rooms: RoomModel[] = [];
+
+    /**
+     * Retrieves the list of available rooms managed by the component
+     *
+     * This accessor provides an array of {@link RoomModel} objects representing the rooms
+     * that can be used within the component's context.
+     *
+     * @returns an array of {@link RoomModel} instances.
+     * @protected
+     */
+    protected get rooms(): RoomModel[] {
+        return this._rooms;
+    }
+
+    /**
+     * Retrieves the AppointmentService instance used by the component
+     *
+     * This accessor provides the instance of {@link AppointmentService} used for managing appointment operations.
+     *
+     * @returns the {@link AppointmentService} instance associated with the component.
+     * @protected
+     */
+    protected get appointmentService(): AppointmentService {
+        return this._appointmentService;
+    }
+
+    /**
+     * Retrieves the form group managed by the component
+     *
+     * This accessor provides the {@link FormGroup} instance that contains the form controls
+     * and their current state for the component.
+     *
+     * @returns the {@link FormGroup} instance associated with the component.
+     * @protected
+     */
+    protected get form(): FormGroup {
+        return this._form;
+    }
+
+    /**
+     * Handles the submission of the form
+     *
+     * This method validates the form and, if it is valid, starts the creation of either
+     * a standalone or frequent appointment based on the user's selection. The component enters
+     * a loading state during the submission process.
+     *
+     * - If the selected form value is 0, it creates a standalone appointment using {@link createStandalone}.
+     * - If the selected form value is 1, it creates a frequent appointment using {@link createFrequent}.
+     *
+     * @protected
+     */
+    protected onSubmit(): void {
+        if (this.canSubmit()) {
+            this.loading = true;
+            const course: CourseModel = this.form.get('course')!.value;
+            switch (this.form.get('selected')?.value) {
+                case 0:
+                    this.createStandalone(course.id);
+                    return
+
+                case 1:
+                    this.createFrequent(course.id);
+                    return;
+            }
+        }
+    }
+
+    /**
+     * Determines whether the form can be submitted
+     *
+     * This method checks the validity of the form and additional conditions to ensure
+     * that the submission can proceed:
+     * - The _standalone and _frequent objects must be defined.
+     * - The overall form must be valid.
+     * - Depending on the selected type (standalone or frequent), the corresponding sub-form
+     *   must also be valid.
+     *
+     * @returns true if the form can be submitted, otherwise, false.
+     * @protected
+     */
+    protected canSubmit(): boolean {
+        if (!this._standalone || !this._frequent || this.form.invalid) {
+            return false;
+        }
+
+        switch (this.form.get('selected')?.value) {
+            case 0:
+                return this._standalone.form.valid;
+            case 1:
+                return this._frequent.form.valid;
+            default:
+                return false;
+        }
+    }
+
     /**
      * Creates a standalone appointment for a specific course
      *
@@ -247,11 +244,10 @@ export class CreateAppointmentComponent {
      * @param courseId the id of the course for which the standalone appointment is being created.
      * @private
      */
-    private createStandalone(courseId: bigint): void
-    {
+    private createStandalone(courseId: bigint): void {
         this.appointmentService.createAppointment(courseId,
             [AppointmentCreateModel.fromObject(this._standalone.form.value)]
-        ).subscribe({ next: (): void => this.dialogReference.close() });
+        ).subscribe({next: (): void => this.dialogReference.close()});
     }
 
     /**
@@ -268,10 +264,9 @@ export class CreateAppointmentComponent {
      * @param courseId the id of the course for which the frequent appointment is being created.
      * @private
      */
-    private createFrequent(courseId: bigint): void
-    {
+    private createFrequent(courseId: bigint): void {
         this.appointmentService.createFrequent(courseId,
             [FrequentAppointmentCreateModel.fromObject(this._frequent.form.value)]
-        ).subscribe({ next: (): void => this.dialogReference.close() });
+        ).subscribe({next: (): void => this.dialogReference.close()});
     }
 }

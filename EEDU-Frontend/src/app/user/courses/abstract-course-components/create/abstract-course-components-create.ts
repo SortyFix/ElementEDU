@@ -28,21 +28,25 @@ export abstract class AbstractCourseComponentsCreate<T> {
         return this._form;
     }
 
+    protected get values(): T[] {
+        return this._values;
+    }
+
     private set values(value: T[]) {
         this._values.length = 0;
         this._values.push(...value);
-    }
-
-    protected get values(): T[] {
-        return this._values;
     }
 
     protected get loading(): boolean {
         return !this._service.fetched;
     }
 
+    protected get createModel(): any[] { return [this.form.value]; }
+
+    protected get canSubmit(): boolean { return this.form.valid; }
+
     protected getForm(formBuilder: FormBuilder): FormGroup {
-        return formBuilder.group({ id: [null, Validators.required]});
+        return formBuilder.group({id: [null, Validators.required]});
     }
 
     protected onSubmit(): void {
@@ -52,8 +56,4 @@ export abstract class AbstractCourseComponentsCreate<T> {
 
         this._service.create(this.createModel).subscribe((): void => { this._dialogRef.close(); })
     }
-
-    protected get createModel(): any[] { return [this.form.value]; }
-
-    protected get canSubmit(): boolean { return this.form.valid; }
 }

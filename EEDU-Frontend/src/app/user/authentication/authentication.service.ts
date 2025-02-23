@@ -26,8 +26,6 @@ export class AuthenticationService {
 
     private readonly BACKEND_URL: string = environment.backendUrl;
 
-    private _loginData: LoginData | undefined;
-
     /**
      * Constructs a new instance of this class and injects the required services.
      *
@@ -35,6 +33,22 @@ export class AuthenticationService {
      * @param userService  The {@link UserService} used to manage and load user-specific data.
      */
     constructor(private http: HttpClient, private userService: UserService) {
+    }
+
+    private _loginData: LoginData | undefined;
+
+    /**
+     * Retrieves the current login data.
+     * This might be null. It must be populated by {@link requestAuthorization}.
+     *
+     * @returns The current {@link LoginData}, or {@code undefined} if no login data is present.
+     */
+    public get loginData(): LoginData | undefined {
+        return this._loginData;
+    }
+
+    private get tokenValidator(): OperatorFunction<any, any> {
+        return tap({next: this.validateToken.bind(this)});
     }
 
     /**
@@ -129,6 +143,12 @@ export class AuthenticationService {
         }).pipe(this.tokenValidator);
     }
 
+    /**
+     * Resets the current login data, clearing any authorization flow
+     */
+    public reset(): void {
+        this._loginData = undefined;
+    }
 
     /**
      * Completes the login process by loading the user's data and setting the login state.
@@ -142,27 +162,6 @@ export class AuthenticationService {
         if (!this.userService.isLoggedIn) {
             this.userService.loadData().subscribe({next: (): void => this._loginData = undefined});
         }
-    }
-
-    /**
-     * Retrieves the current login data.
-     * This might be null. It must be populated by {@link requestAuthorization}.
-     *
-     * @returns The current {@link LoginData}, or {@code undefined} if no login data is present.
-     */
-    public get loginData(): LoginData | undefined {
-        return this._loginData;
-    }
-
-    /**
-     * Resets the current login data, clearing any authorization flow
-     */
-    public reset(): void {
-        this._loginData = undefined;
-    }
-
-    private get tokenValidator(): OperatorFunction<any, any> {
-        return tap({next: this.validateToken.bind(this)});
     }
 
     private validateToken(value: any): void {

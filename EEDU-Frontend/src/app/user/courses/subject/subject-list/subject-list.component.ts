@@ -26,6 +26,6 @@ import {AbstractCourseComponentList} from "../../abstract-course-components/list
 export class SubjectListComponent extends AbstractCourseComponentList<string, SubjectModel> {
 
     public constructor(service: SubjectService, dialog: MatDialog) {
-        super(service, dialog, CreateSubjectComponent, { title: (value: SubjectModel): string => value.id });
+        super(service, dialog, CreateSubjectComponent, {title: (value: SubjectModel): string => value.id});
     }
 }

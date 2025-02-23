@@ -3,10 +3,10 @@
 
     <general-selection-input
         *ngIf="rooms().length > 0"
-        label="Room (Optional)"
-        formControlName="room"
-        [values]="rooms()"
         [allowNull]="true"
+        [values]="rooms()"
+        formControlName="room"
+        label="Room (Optional)"
     >
     </general-selection-input>
 
@@ -14,17 +14,17 @@
         <mat-tab label="Duration">
             <div class="duration-container">
                 <app-duration-picker
-                    formControlName="duration"
-                    [show]="[DurationType.MINUTES, DurationType.HOURS]">
+                    [show]="[DurationType.MINUTES, DurationType.HOURS]"
+                    formControlName="duration">
                 </app-duration-picker>
             </div>
         </mat-tab>
         <mat-tab label="End Date">
             <div class="duration-container">
                 <app-date-time-picker
-                    label="Until"
                     [minDate]="(form.get('start')?.value)"
-                    formControlName="end">
+                    formControlName="end"
+                    label="Until">
                 </app-date-time-picker>
             </div>
         </mat-tab>

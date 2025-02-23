@@ -1,43 +1,43 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <app-general-create title="{{ title }}" [loading]="loading">
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <app-general-create [loading]="loading" title="{{ title }}">
         <mat-card-content>
 
             <mat-form-field appearance="outline">
                 <mat-label>Class Name</mat-label>
                 <input
-                    type="text"
-                    matInput
                     formControlName="name"
+                    matInput
+                    type="text"
                 />
             </mat-form-field>
 
             <general-selection-input
                 [values]="teacher"
+                formControlName="tutor"
                 label="Select Tutor"
-                placeholder="Enter the tutor you wish to set for this class"
-                formControlName="tutor">
+                placeholder="Enter the tutor you wish to set for this class">
             </general-selection-input>
 
             <general-selection-input
+                [multiple]="true"
                 [values]="students"
-                [multiple]="true"
+                formControlName="students"
                 label="Select Students"
-                placeholder="Enter a students name and press enter"
-                formControlName="students">
+                placeholder="Enter a students name and press enter">
             </general-selection-input>
 
             <general-selection-input
-                [values]="courses"
                 [multiple]="true"
+                [values]="courses"
+                formControlName="courses"
                 label="Select Courses"
-                placeholder="Enter a course this class should be added to and press enter"
-                formControlName="courses">
+                placeholder="Enter a course this class should be added to and press enter">
             </general-selection-input>
 
         </mat-card-content>
         <mat-card-actions align="end">
-            <button class="close-button" mat-button type="button" mat-dialog-close>Cancel</button>
-            <button mat-stroked-button type="submit" [disabled]="!canSubmit">Submit</button>
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
         </mat-card-actions>
     </app-general-create>
 </form>

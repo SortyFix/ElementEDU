@@ -9,7 +9,8 @@ import {FormTitleComponent} from "../../../common/form-title/form-title.componen
 import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-buttons.component";
 
 @Component({
-    selector: 'app-credential-password-verify-form', standalone: true,
+    selector: 'app-credential-password-verify-form',
+    standalone: true,
     imports: [
         MatFormField,
         MatIcon,
@@ -22,26 +23,24 @@ import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-butt
         MatError,
         FormTitleComponent,
         FooterButtonsComponent,
-    ], templateUrl: './credential-password-verify-form.component.html', styleUrl: './credential-password-verify-form.component.scss'
+    ],
+    templateUrl: './credential-password-verify-form.component.html',
+    styleUrl: './credential-password-verify-form.component.scss'
 })
-export class CredentialPasswordVerifyFormComponent extends AbstractCredentialVerifyCode
-{
+export class CredentialPasswordVerifyFormComponent extends AbstractCredentialVerifyCode {
     private _showPassword: boolean = false;
 
-    protected onShowPassword(): void
-    {
-        this._showPassword = !this._showPassword;
+    protected get showPassword(): boolean {
+        return this._showPassword;
     }
 
-    protected get showPassword(): boolean
-    {
-        return this._showPassword;
+    protected onShowPassword(): void {
+        this._showPassword = !this._showPassword;
     }
 
     protected override errorMessage(error: number): string {
 
-        if(error == 403)
-        {
+        if (error == 403) {
             return 'Either the username or the password is incorrect.'
         }
         return super.errorMessage(error);

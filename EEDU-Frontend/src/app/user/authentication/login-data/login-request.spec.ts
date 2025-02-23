@@ -1,7 +1,7 @@
-import { LoginRequest } from './login-request';
+import {LoginRequest} from './login-request';
 
 describe('LoginRequest', () => {
-  it('should create an instance', () => {
-    expect(new LoginRequest("test", false)).toBeTruthy();
-  });
+    it('should create an instance', () => {
+        expect(new LoginRequest("test", false)).toBeTruthy();
+    });
 });

@@ -3,13 +3,13 @@ import {MatButton} from "@angular/material/button";
 import {AuthenticationService} from "../../authentication.service";
 
 @Component({
-  selector: 'app-footer-buttons',
-  standalone: true,
+    selector: 'app-footer-buttons',
+    standalone: true,
     imports: [
         MatButton
     ],
-  templateUrl: './footer-buttons.component.html',
-  styleUrl: './footer-buttons.component.scss'
+    templateUrl: './footer-buttons.component.html',
+    styleUrl: './footer-buttons.component.scss'
 })
 export class FooterButtonsComponent {
 

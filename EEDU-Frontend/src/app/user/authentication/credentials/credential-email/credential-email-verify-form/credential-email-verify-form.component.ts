@@ -7,7 +7,8 @@ import {FooterButtonsComponent} from "../../../common/footer-buttons/footer-butt
 import {FormTitleComponent} from "../../../common/form-title/form-title.component";
 
 @Component({
-    selector: 'app-credential-email-verify-form', standalone: true,
+    selector: 'app-credential-email-verify-form',
+    standalone: true,
     imports: [
         FormsModule,
         MatError,
@@ -17,6 +18,8 @@ import {FormTitleComponent} from "../../../common/form-title/form-title.componen
         ReactiveFormsModule,
         FooterButtonsComponent,
         FormTitleComponent,
-    ], templateUrl: './credential-email-verify-form.component.html', styleUrl: './credential-email-verify-form.component.scss'
+    ],
+    templateUrl: './credential-email-verify-form.component.html',
+    styleUrl: './credential-email-verify-form.component.scss'
 })
 export class CredentialEmailVerifyFormComponent extends AbstractCredentialVerifyCode {}

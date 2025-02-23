@@ -114,9 +114,7 @@ export class CredentialPasswordSetupFormComponent extends AbstractCredentialForm
     protected override errorMessage(status: number): string {
         if (status === 406) {
             return "This password does not match the requirements."
-        }
-        else if(status === 400)
-        {
+        } else if (status === 400) {
             return "You cannot use the same password again!"
         }
 

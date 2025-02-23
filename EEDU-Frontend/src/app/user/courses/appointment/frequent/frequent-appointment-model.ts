@@ -48,33 +48,6 @@ export class FrequentAppointmentModel {
     ) {}
 
     /**
-     * Creates a new instance of {@link FrequentAppointmentModel} from a given object.
-     *
-     * This method converts a {@link GenericFrequentAppointment} into a {@link FrequentAppointmentModel}
-     * by extracting and transforming its properties, including parsing the room and linking
-     * the course through a provided function.
-     *
-     * @param object containing the generic frequent appointment data.
-     * @param course a function that returns a {@link CourseModel} instance associated with the appointment.
-     * @returns a new instance of {@link FrequentAppointmentModel} with the provided data.
-     * @public
-     */
-    public static fromObject(
-        object: GenericFrequentAppointment,
-        course: () => CourseModel
-    ): FrequentAppointmentModel {
-        return new FrequentAppointmentModel(
-            BigInt(object.id),
-            object.start,
-            object.end,
-            object.duration,
-            object.frequency,
-            RoomModel.fromObject(object.room),
-            course,
-        );
-    }
-
-    /**
      * Retrieves the id of the frequent appointment.
      *
      * This getter method returns the unique identifier (_id) of the frequent appointment.
@@ -172,10 +145,36 @@ export class FrequentAppointmentModel {
      * @private
      */
     private get attachedEntries(): AppointmentEntryModel[] {
-        return this.course.appointmentEntries.filter(((entity: AppointmentEntryModel): boolean =>
-        {
+        return this.course.appointmentEntries.filter(((entity: AppointmentEntryModel): boolean => {
             return entity.isPart(this.id);
         }))
+    }
+
+    /**
+     * Creates a new instance of {@link FrequentAppointmentModel} from a given object.
+     *
+     * This method converts a {@link GenericFrequentAppointment} into a {@link FrequentAppointmentModel}
+     * by extracting and transforming its properties, including parsing the room and linking
+     * the course through a provided function.
+     *
+     * @param object containing the generic frequent appointment data.
+     * @param course a function that returns a {@link CourseModel} instance associated with the appointment.
+     * @returns a new instance of {@link FrequentAppointmentModel} with the provided data.
+     * @public
+     */
+    public static fromObject(
+        object: GenericFrequentAppointment,
+        course: () => CourseModel
+    ): FrequentAppointmentModel {
+        return new FrequentAppointmentModel(
+            BigInt(object.id),
+            object.start,
+            object.end,
+            object.duration,
+            object.frequency,
+            RoomModel.fromObject(object.room),
+            course,
+        );
     }
 
     /**
@@ -196,7 +195,7 @@ export class FrequentAppointmentModel {
 
             const startDate: Date = new Date(i);
 
-            if(this.attachedEntries.some((current: AppointmentEntryModel): boolean =>
+            if (this.attachedEntries.some((current: AppointmentEntryModel): boolean =>
                 current.start.getUTCFullYear() == startDate.getUTCFullYear() &&
                 current.start.getUTCDate() == startDate.getUTCDate() &&
                 current.start.getUTCMonth() == startDate.getUTCMonth() &&

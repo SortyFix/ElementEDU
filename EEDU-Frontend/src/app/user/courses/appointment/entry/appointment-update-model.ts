@@ -20,16 +20,7 @@ export class AppointmentUpdateModel {
         private readonly _assignment?: AssignmentCreateModel
     ) {}
 
-    public static fromObject(obj: GenericAppointmentUpdate): AppointmentUpdateModel {
-        return new AppointmentUpdateModel(
-            obj.description,
-            obj.room?.id,
-            obj.assignment ? AssignmentCreateModel.fromObject(obj.assignment) : undefined
-        );
-    }
-
-    public get toPacket(): AppointmentUpdatePacket
-    {
+    public get toPacket(): AppointmentUpdatePacket {
         return {
             description: this.description,
             room: this.room,
@@ -47,5 +38,13 @@ export class AppointmentUpdateModel {
 
     public get room(): number | undefined {
         return this._room;
+    }
+
+    public static fromObject(obj: GenericAppointmentUpdate): AppointmentUpdateModel {
+        return new AppointmentUpdateModel(
+            obj.description,
+            obj.room?.id,
+            obj.assignment ? AssignmentCreateModel.fromObject(obj.assignment) : undefined
+        );
     }
 }

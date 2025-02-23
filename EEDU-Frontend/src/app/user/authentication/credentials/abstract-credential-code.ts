@@ -12,6 +12,10 @@ export abstract class AbstractCredentialCode extends AbstractCredentialForm {
         this.registerField('secret');
     }
 
+    protected get secret(): string | undefined {
+        return this.form.get('secret')?.value;
+    }
+
     protected override onSubmit(): void {
 
         const secret: string | undefined = this.secret;
@@ -23,8 +27,4 @@ export abstract class AbstractCredentialCode extends AbstractCredentialForm {
     }
 
     protected abstract executeRequest(secret: string, loginData: LoginData): void;
-
-    protected get secret(): string | undefined {
-        return this.form.get('secret')?.value;
-    }
 }

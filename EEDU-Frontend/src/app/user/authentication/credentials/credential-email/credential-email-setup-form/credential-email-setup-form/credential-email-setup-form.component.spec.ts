@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CredentialEmailSetupFormComponent } from './credential-email-setup-form.component';
+import {CredentialEmailSetupFormComponent} from './credential-email-setup-form.component';
 
 describe('CredentialSetupEmailFormComponent', () => {
-  let component: CredentialEmailSetupFormComponent;
-  let fixture: ComponentFixture<CredentialEmailSetupFormComponent>;
+    let component: CredentialEmailSetupFormComponent;
+    let fixture: ComponentFixture<CredentialEmailSetupFormComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [CredentialEmailSetupFormComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [CredentialEmailSetupFormComponent]
+        })
+            .compileComponents();
 
-    fixture = TestBed.createComponent(CredentialEmailSetupFormComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(CredentialEmailSetupFormComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

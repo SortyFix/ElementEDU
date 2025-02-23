@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
@@ -16,8 +16,8 @@ import {
 } from "../../abstract-course-components/create/abstract-course-components-create-multiple";
 
 @Component({
-  selector: 'app-create-room',
-  standalone: true,
+    selector: 'app-create-room',
+    standalone: true,
     imports: [
         GeneralCreateComponent,
         MatCardContent,
@@ -34,12 +34,11 @@ import {
         MatChipInput,
         MatChipRemove
     ],
-  templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
+    templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
 })
 export class CreateRoomComponent extends AbstractCourseComponentsCreateMultiple<RoomModel> {
 
-    public constructor(roomService: RoomService, dialogRef: DialogRef, formBuilder: FormBuilder)
-    {
+    public constructor(roomService: RoomService, dialogRef: DialogRef, formBuilder: FormBuilder) {
         super(roomService, dialogRef, formBuilder, "Create Room");
     }
 }

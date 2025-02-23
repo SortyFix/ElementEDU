@@ -5,8 +5,7 @@ export interface GenericClassRoomCreateModel {
     tutor?: { id: bigint },
 }
 
-export interface ClassRoomCreatePacket
-{
+export interface ClassRoomCreatePacket {
     name: string;
     students: number[];
     courses: number[];
@@ -22,18 +21,7 @@ export class ClassRoomCreateModel {
         private readonly _tutor?: bigint,
     ) {}
 
-    public static fromObject(obj: GenericClassRoomCreateModel): ClassRoomCreateModel {
-
-        return new ClassRoomCreateModel(
-            obj.name,
-            obj.students?.map((item: { id: bigint }): bigint => { return item.id }) || [],
-            obj.courses?.map((item: { id: bigint }): bigint => { return item.id }) || [],
-            obj.tutor?.id
-        )
-    }
-
-    public get toPacket(): ClassRoomCreatePacket
-    {
+    public get toPacket(): ClassRoomCreatePacket {
         return {
             name: this.name,
             tutor: Number(this.tutor),
@@ -56,5 +44,15 @@ export class ClassRoomCreateModel {
 
     public get courses(): bigint[] {
         return this._courses;
+    }
+
+    public static fromObject(obj: GenericClassRoomCreateModel): ClassRoomCreateModel {
+
+        return new ClassRoomCreateModel(
+            obj.name,
+            obj.students?.map((item: { id: bigint }): bigint => { return item.id }) || [],
+            obj.courses?.map((item: { id: bigint }): bigint => { return item.id }) || [],
+            obj.tutor?.id
+        )
     }
 }

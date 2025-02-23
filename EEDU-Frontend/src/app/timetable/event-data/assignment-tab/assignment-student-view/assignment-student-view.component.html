@@ -1,9 +1,6 @@
 {{ assignment?.description || 'No assignment given' }}
 
-<div
-    *ngIf="!assignment?.description"
-    class="placeholder"
-    style="">
+<div class="placeholder" *ngIf="!assignment?.description">
     <mat-icon svgIcon>done_all</mat-icon>
 </div>
 
@@ -16,7 +13,7 @@
     </mat-list>
 </div>
 
-<form (ngSubmit)="onSubmit()" [formGroup]="form" ]="form">
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
     <app-file-upload formControlName="files"></app-file-upload>
     <button mat-flat-button type="submit">Submit</button>
 </form>
