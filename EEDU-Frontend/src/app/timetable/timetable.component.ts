@@ -24,7 +24,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel} from "../user/courses/appointment/frequent/frequent-appointment-model";
-import {EventDataComponent} from "./event-data/event-data.component";
+import {EventDataDialogComponent} from "./event-data/event-data-dialog.component";
 import {AppointmentService} from "../user/courses/appointment/appointment.service";
 import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointment-create-model";
 
@@ -49,7 +49,6 @@ import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointm
         MatButton,
         NgForOf,
         ReactiveFormsModule,
-        EventDataComponent
     ],
     providers: [
         {
@@ -63,7 +62,7 @@ import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointm
 export class TimetableComponent implements OnInit, OnDestroy {
 
     @ViewChild('controls') controls!: CalendarControlsComponent;
-    @ViewChild('eventComponent') eventComponent!: EventDataComponent;
+    @ViewChild('eventComponent') eventComponent!: EventDataDialogComponent;
     protected readonly AppointmentEntryModel = AppointmentEntryModel;
     protected readonly FrequentAppointmentModel = FrequentAppointmentModel;
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
@@ -100,10 +99,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     private set selectedEvent(value: CalendarEvent | undefined) {
         this._selectedEvent = value;
-    }
-
-    protected get selectedAppointment(): AppointmentEntryModel {
-        return this.selectedEvent?.meta.eventData;
     }
 
     protected get nextEvents(): CalendarEvent[] {
@@ -204,6 +199,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
     protected onEventClicked(event: CalendarEvent): void {
         this.selectedEvent = event;
+        const size: number = Math.min(1300, Math.max(this._accessibilityService.dimensions.width, 600));
+        this._dialogRef.open(EventDataDialogComponent, {
+            width: `${size}px`,
+            data: {title: event.title, appointment: this.selectedEvent?.meta.eventData }
+        });
     }
 
     protected dateToString(date: Date): string {

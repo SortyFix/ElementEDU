@@ -68,13 +68,16 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
         AppointmentEntryModel[] appointments = new AppointmentEntryModel[0];
 
         CourseCreateModel create = new CourseCreateModel(name, subject.id(), teacher.id(), new Long[0], classRoom.id());
-        CourseModel courseModel = new CourseModel(11L, name, subject, appointments, frequent, classRoom);
+        CourseModel courseModel = new CourseModel(11L, name, subject, new ReducedUserModel[0], appointments, frequent, teacher, classRoom);
         return Eval.eval(create, courseModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect, result);
             Assertions.assertEquals(expect.name(), result.name());
             Assertions.assertEquals(expect.subject(), result.subject());
             Assertions.assertEquals(expect.classRoom(), result.classRoom());
+            Assertions.assertEquals(expect.teacher(), result.teacher());
+
+            Assertions.assertArrayEquals(expect.students(), result.students());
             Assertions.assertArrayEquals(expect.appointmentEntries(), result.appointmentEntries());
             Assertions.assertArrayEquals(expect.frequentAppointments(), result.frequentAppointments());
         });

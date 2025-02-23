@@ -2,13 +2,16 @@ import {AppointmentEntryModel, GenericAppointmentEntry} from "./appointment/entr
 import {FrequentAppointmentModel, GenericFrequentAppointment} from "./appointment/frequent/frequent-appointment-model";
 import {GenericSubject, SubjectModel} from "./subject/subject-model";
 import {ClassRoomModel, GenericClassRoomModel} from "./classroom/class-room-model";
+import {GenericReducedUserModel, ReducedUserModel} from "../reduced-user-model";
 
 export interface GenericCourse {
     id: bigint;
     name: string;
     subject: GenericSubject;
+    students: GenericReducedUserModel[],
     appointmentEntries: GenericAppointmentEntry[];
     frequentAppointments: GenericFrequentAppointment[];
+    teacher?: GenericReducedUserModel,
     classRoom?: GenericClassRoomModel;
 }
 
@@ -18,9 +21,11 @@ export class CourseModel {
         private readonly _id: bigint,
         private readonly _name: string,
         private readonly _subject: SubjectModel,
+        private _students: readonly ReducedUserModel[],
         private _appointmentEntries: readonly AppointmentEntryModel[],
         private _frequentAppointments: readonly FrequentAppointmentModel[],
-        private readonly _classRoom: GenericClassRoomModel | null,
+        private readonly _teacher: ReducedUserModel | null,
+        private readonly _classRoom: ClassRoomModel | null,
     ) {}
 
     public get id(): bigint {
@@ -35,12 +40,20 @@ export class CourseModel {
         return this._subject;
     }
 
+    public get students(): readonly ReducedUserModel[] {
+        return this._students;
+    }
+
     public get appointmentEntries(): readonly AppointmentEntryModel[] {
         return this._appointmentEntries;
     }
 
     public get frequentAppointments(): readonly FrequentAppointmentModel[] {
         return this._frequentAppointments;
+    }
+
+    public get teacher(): ReducedUserModel | null {
+        return this._teacher;
     }
 
     public get classRoom(): GenericClassRoomModel | null {
@@ -52,6 +65,9 @@ export class CourseModel {
             BigInt(object.id),
             object.name,
             SubjectModel.fromObject(object.subject),
+            (object.students || []).map(
+                (student: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(student)
+            ),
             this.getEntries(object.appointmentEntries),
             object.frequentAppointments.map((entry: any): FrequentAppointmentModel => {
                 // when this method is called,
@@ -60,6 +76,7 @@ export class CourseModel {
 
                 return FrequentAppointmentModel.fromObject(entry, (): CourseModel => course);
             }),
+            object.teacher ? ReducedUserModel.fromObject(object.teacher) : null,
             object.classRoom ? ClassRoomModel.fromObject(object.classRoom) : null
         );
         return course;

@@ -106,7 +106,7 @@ public class UserService extends EntityService<Long, UserRepository, UserEntity,
     {
         // detach user from courses
         Set<CourseEntity> courses = entry.getCourses();
-        courses.forEach(courseEntity -> courseEntity.detachUsers(entry.getId()));
+        courses.forEach(courseEntity -> courseEntity.detachStudents(entry.getId()));
         getClassRoomService().getCourseService().saveEntity(courses);
     }
 

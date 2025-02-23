@@ -1,0 +1,87 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <mat-dialog-content>
+        <div class="data-container">
+            <mat-grid-list cols="6" gutterSize="5px" rowHeight="150px">
+                <!-- Description -->
+                <mat-grid-tile colspan="3" rowspan="2">
+                    <app-event-tile-content #description title="Description">
+                        @if (description.editing) {
+                            <mat-form-field class="form-field" appearance="outline">
+                                        <textarea
+                                            matInput
+                                            style="height: 180px;"
+                                            formControlName="description"
+                                            maxlength="1000"
+                                            #descriptionInput></textarea>
+                                <mat-hint align="end">{{ descriptionInput.textLength }}/1000</mat-hint>
+                            </mat-form-field>
+                        } @else {
+                            <div class="description-content">
+                                {{ this.form.get('description')?.value || 'No description provided for this appointment' }}
+                            </div>
+                        }
+                    </app-event-tile-content>
+                </mat-grid-tile>
+
+                <!-- Assignments -->
+                <mat-grid-tile colspan="3" rowspan="3">
+                    <app-event-tile-content #appointment title="Assignment">
+                        <app-assignment-tab [appointment]="event" [editing]="appointment.editing">
+
+                            <mat-form-field appearance="outline" class="form-field">
+                                <textarea formControlName="assignment" matInput style="height: 120px;"></textarea>
+                            </mat-form-field>
+
+                            <div *ngIf="form.get('assignment')?.value">
+                                <app-date-time-picker formControlName="publish"
+                                                      label="publish"></app-date-time-picker>
+                                <app-date-time-picker formControlName="submitUntil"
+                                                      label="deadline"></app-date-time-picker>
+                            </div>
+                        </app-assignment-tab>
+                    </app-event-tile-content>
+                </mat-grid-tile>
+
+                <!-- Room -->
+                <mat-grid-tile colspan="3" rowspan="1">
+                    <app-event-tile-content #room title="Room">
+                        <app-room-tab [editing]="room.editing" [room]="form.get('room')?.value">
+                            <general-selection-input
+                                *ngIf="rooms.length > 0"
+                                [label]="null"
+                                [values]="rooms"
+                                class="form-field"
+                                formControlName="room" placeholder="Enter Room">
+                            </general-selection-input>
+                        </app-room-tab>
+                    </app-event-tile-content>
+                </mat-grid-tile>
+                <!--
+                                    <mat-grid-tile rowspan="1" colspan="2">
+                                        <mat-card>
+                                            <mat-card-header>
+                                                <mat-card-subtitle>Resources</mat-card-subtitle>
+                                            </mat-card-header>
+                                            <mat-card-content style="text-align: center">
+                                                <mat-icon>upload_file</mat-icon>
+                                            </mat-card-content>
+                                        </mat-card>
+                                    </mat-grid-tile>-->
+            </mat-grid-list>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions style="display: flex; justify-content: space-between">
+        <span></span>
+
+        <p>Teacher: {{ course }}</p>
+
+        <button [disabled]="appointment.editing || room.editing || description.editing" mat-flat-button
+                type="submit">Save Changes
+        </button>
+
+    </mat-dialog-actions>
+</form>
+

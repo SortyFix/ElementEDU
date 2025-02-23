@@ -84,7 +84,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
     {
         return getEntryRepository().findById(appointment).map(entry ->
         {
-            Set<UserEntity> userEntities = entry.getCourse().getUsers();
+            Set<UserEntity> userEntities = entry.getCourse().getStudents();
             return userEntities.stream().map(entry::getInsight).toList();
         }).orElse(Collections.emptyList());
     }

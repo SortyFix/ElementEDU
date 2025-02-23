@@ -87,7 +87,7 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
      * @returns the matching {@link CourseModel} if found, otherwise undefined.
      * @public
      */
-    public findCourseLazily(id: bigint): CourseModel | undefined {
+    public findCourseLazily(id: bigint): CourseModel | null {
         return this.findCourse(this.value, id);
     }
 
@@ -102,8 +102,8 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
      * @returns the matching {@link CourseModel} if found, otherwise undefined.
      * @public
      */
-    public findCourse(courses: CourseModel[], id: bigint): CourseModel | undefined {
-        return courses.find((course: CourseModel): boolean => course.id === id);
+    public findCourse(courses: CourseModel[], id: bigint): CourseModel | null {
+        return courses.find((course: CourseModel): boolean => course.id === id) || null;
     }
 
     protected override pushCreated(response: CourseModel[]): void {

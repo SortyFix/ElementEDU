@@ -13,6 +13,7 @@ import de.gaz.eedu.exception.AccountTypeMismatch;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
@@ -73,10 +74,17 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
                 getId(),
                 getName(),
                 getSubject().toModel(),
+                getStudents().stream().map(UserEntity::toReducedModel).toArray(ReducedUserModel[]::new),
                 Arrays.stream(getEntries()).map(AppointmentEntryEntity::toModel).toArray(AppointmentEntryModel[]::new),
                 scheduled.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new),
+                getTeacher().map(UserEntity::toReducedModel).orElse(null),
                 getClassRoom().map(ClassRoomEntity::toModel).orElse(null)
         );
+    }
+
+    public @NotNull Optional<UserEntity> getTeacher()
+    {
+        return getStudents().stream().filter(user -> Objects.equals(user.getAccountType(), AccountType.TEACHER)).findFirst();
     }
 
     public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher) throws AccountTypeMismatch
@@ -162,11 +170,11 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * @param courseService the {@link CourseService} instance to be used for persisting changes if needed.
      * @param user          the array of {@link UserEntity} instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
-     * @see #attachUsers(UserEntity...)
+     * @see #attachStudents(UserEntity...)
      */
-    public boolean attachUsers(@NotNull CourseService courseService, @NonNull UserEntity... user)
+    public boolean attachStudents(@NotNull CourseService courseService, @NonNull UserEntity... user)
     {
-        return saveEntityIfPredicateTrue(courseService, user, this::attachUsers);
+        return saveEntityIfPredicateTrue(courseService, user, this::attachStudents);
     }
 
     /**
@@ -176,18 +184,18 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * It ensures that only unique, non-duplicate users are added.
      * <p>
      * Note that this method does not persist the changes.
-     * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachUsers(CourseService, UserEntity...)},
+     * In order for the changes to be permanent this object needs be saved which can be archived by {@link #attachStudents(CourseService, UserEntity...)},
      * or {@link CourseService#saveEntity(Iterable)}
      *
      * @param user The array of UserEntity instances to be attached to the group.
      * @return true if the users were successfully attached, false otherwise.
-     * @see #attachUsers(CourseService, UserEntity...)
+     * @see #attachStudents(CourseService, UserEntity...)
      * @see CourseService#saveEntity(Iterable)
      */
-    public boolean attachUsers(@NonNull UserEntity... user)
+    public boolean attachStudents(@NonNull UserEntity... user)
     {
         // Filter already attached users out
-        Predicate<UserEntity> predicate = present -> getUsers().stream().noneMatch(presentUser -> Objects.equals(
+        Predicate<UserEntity> predicate = present -> getStudents().stream().noneMatch(presentUser -> Objects.equals(
                 presentUser,
                 present));
         return this.users.addAll(Arrays.stream(user).filter(predicate).collect(Collectors.toSet()));
@@ -203,11 +211,11 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * @param courseService The {@link CourseService} instance to be used for saving the changes if necessary.
      * @param ids           The array of IDs corresponding to {@link UserEntity} instances to be detached from the group.
      * @return true if the users were successfully detached, false otherwise.
-     * @see #detachUsers(Long...)
+     * @see #detachStudents(Long...)
      */
-    public boolean detachUsers(@NotNull CourseService courseService, @NonNull Long... ids)
+    public boolean detachStudents(@NotNull CourseService courseService, @NonNull Long... ids)
     {
-        return saveEntityIfPredicateTrue(courseService, ids, this::detachUsers);
+        return saveEntityIfPredicateTrue(courseService, ids, this::detachStudents);
     }
 
     /**
@@ -216,15 +224,15 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * This method detaches users from this course based on their IDs.
      * Note that only users which are part of this course are removed.
      * <p>
-     * To make the changes permanent, the object needs to be saved. This can be achieved by calling {@link #detachUsers(CourseService, Long...)}
+     * To make the changes permanent, the object needs to be saved. This can be achieved by calling {@link #detachStudents(CourseService, Long...)}
      * or {@link CourseService#saveEntity(Iterable)} after detaching the users.
      *
      * @param ids The array of IDs corresponding to {@link UserEntity} instances to be detached from the group.
      * @return true if the users were successfully detached, false otherwise.
-     * @see #detachUsers(Long...)
+     * @see #detachStudents(Long...)
      * @see CourseService#saveEntity(Iterable)
      */
-    public boolean detachUsers(@NonNull Long... ids)
+    public boolean detachStudents(@NonNull Long... ids)
     {
         List<Long> detachGroupIds = Arrays.asList(ids);
         return this.users.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
@@ -234,7 +242,7 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * Assigns a {@link ClassRoomEntity} to this course and saves the changes using the provided {@link CourseService}..
      * <p>
      * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
-     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getUsers()}.
+     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getStudents()}.
      * <p>
      * It's important to note that this method uses the {@link CourseService} to persist changes.
      *
@@ -251,7 +259,7 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * Assigns a {@link ClassRoomEntity} to this course.
      * <p>
      * This method adds a {@link ClassRoomEntity} to the current course. It combines the users from the
-     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getUsers()}.
+     * {@link ClassRoomEntity#getStudents()} with the local {@code users}, accessible through {@link #getStudents()}.
      *
      * @param classRoom The {@link ClassRoomEntity} to be associated with this course.
      * @return {@code true} if the association was successful, and changes were saved; false otherwise.
@@ -334,11 +342,12 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      *
      * @return An unmodifiable set of {@link UserEntity} representing the users associated with this course.
      */
-    public @NotNull @Unmodifiable Set<UserEntity> getUsers()
+    public @NotNull @Unmodifiable Set<UserEntity> getStudents()
     {
         // add users from class if class is present
-        Stream<UserEntity> userStream = getClassRoom().stream().flatMap(clazz -> clazz.getStudents().stream());
-        return Stream.concat(users.stream(), userStream).collect(Collectors.toUnmodifiableSet());
+        Stream<UserEntity> clazzStream = getClassRoom().stream().flatMap(clazz -> clazz.getStudents().stream());
+        Stream<UserEntity> userStream = getUsers().stream().filter(user -> !Objects.equals(user.getAccountType(), AccountType.TEACHER));
+        return Stream.concat(userStream, clazzStream).collect(Collectors.toUnmodifiableSet());
     }
 
     public @NotNull @Unmodifiable Set<FrequentAppointmentEntity> getFrequentAppointments()

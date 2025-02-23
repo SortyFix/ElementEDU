@@ -118,7 +118,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     public boolean hasSubmitted(@NotNull UserEntity user)
     {
-        if (!getCourse().getUsers().contains(user))
+        if (!getCourse().getStudents().contains(user))
         {
             return false;
         }

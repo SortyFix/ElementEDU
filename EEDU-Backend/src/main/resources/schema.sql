@@ -235,7 +235,6 @@ CREATE TABLE IF NOT EXISTS post_tags
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
-/*
 INSERT INTO subject_entity (id)
 VALUES ('Mathematics'),
        ('Physics'),
@@ -306,4 +305,4 @@ VALUES (1, 5), -- Sara Müller to Algebra 101
        (4, 3), -- Martin Hansen to History 101
        (4, 4), -- Lora Schmidt to History 101
        (5, 2), -- John Zimmermann to Introduction to Programming
-       (5, 10); -- Liam Schneider to Introduction to Programming*/
+       (5, 10); -- Liam Schneider to Introduction to Programming

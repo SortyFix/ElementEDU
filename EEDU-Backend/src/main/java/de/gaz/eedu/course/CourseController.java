@@ -42,7 +42,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
         log.info("Received incoming request for attaching user(s) {} to course {}.", users, course);
 
         UserEntity[] entities = getService().getUserRepository().findAllById(Set.of(users)).toArray(UserEntity[]::new);
-        boolean modified = getService().loadEntityByIDSafe(course).attachUsers(getService(), entities);
+        boolean modified = getService().loadEntityByIDSafe(course).attachStudents(getService(), entities);
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
@@ -51,7 +51,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     {
         log.info("Received incoming request for detaching user(s) {} from course {}.", users, course);
 
-        boolean modified = getService().loadEntityByIDSafe(course).detachUsers(getService(), users);
+        boolean modified = getService().loadEntityByIDSafe(course).detachStudents(getService(), users);
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 

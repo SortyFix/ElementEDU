@@ -82,7 +82,7 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
             if (createModel.students().length > 0)
             {
                 List<UserEntity> students = getUserRepository().findAllById(List.of(createModel.students()));
-                entity.attachUsers(students.toArray(UserEntity[]::new));
+                entity.attachStudents(students.toArray(UserEntity[]::new));
             }
 
             if (Objects.nonNull(createModel.classroom()))
