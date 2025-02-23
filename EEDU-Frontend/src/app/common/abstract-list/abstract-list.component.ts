@@ -1,4 +1,4 @@
-import {Component, Injector, input, InputSignal, Type} from '@angular/core';
+import {Component, Input, input, InputSignal, Type} from '@angular/core';
 import {NgComponentOutlet, NgForOf, NgIf} from "@angular/common";
 import {
     MatAccordion,
@@ -26,8 +26,7 @@ export interface ListItemInfo<T> {
     chips?: (value: T) => string[];
 }
 
-export interface GeneralListInfo<T>
-{
+export interface GeneralListInfo<T> {
     filter: ((input: string, values: readonly T[]) => readonly T[]);
 }
 
@@ -43,15 +42,31 @@ export class AbstractList<T> {
 
     public readonly componentContent: InputSignal<Type<ListItemContent<T>> | null> = input<Type<ListItemContent<T>> | null>(null);
     public readonly generalListInfo: InputSignal<GeneralListInfo<T> | null> = input<GeneralListInfo<T> | null>(null);
-    public readonly values: InputSignal<readonly T[]> = input<readonly T[]>([]);
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
-
     public readonly height: InputSignal<number | undefined> = input<number | undefined>();
     protected filteredString: string = '';
-    private readonly _selected: Set<T> = new Set<T>();
+    private readonly _selection: Set<T> = new Set<T>();
 
-    public get currentSelected(): T[] {
-        return Array.from(this.selected.values());
+    private _values: readonly T[] = [];
+
+    @Input() public set values(value: readonly T[]) {
+        this._values = value as readonly T[];
+
+        for (const item of this.selection) {
+            if (value.includes(item)) {
+                continue;
+            }
+
+            this.selection.delete(item);
+        }
+    }
+
+    public get selected(): T[] {
+        return Array.from(this.selection.values());
+    }
+
+    protected get valueArray(): readonly T[] {
+        return this._values;
     }
 
     protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
@@ -65,29 +80,28 @@ export class AbstractList<T> {
     }
 
     protected get partiallySelected(): boolean {
-        return this.selected.size > 0 && !this.isSelected('all');
+        return this.selection.size > 0 && !this.isSelected('all');
     }
 
     protected get filteredValues(): readonly T[] {
-        if(!this.generalListInfo())
-        {
-            return this.values();
+        if (!this.generalListInfo()) {
+            return this.valueArray;
         }
 
-        return this.generalListInfo()!.filter(this.filteredString, this.values());
+        return this.generalListInfo()!.filter(this.filteredString, this.valueArray);
     }
 
-    private get selected(): Set<T> {
-        return this._selected;
+    private get selection(): Set<T> {
+        return this._selection;
     }
 
     public isSelected(value: T | 'all'): boolean {
         if (value === 'all') {
             const valueLength: number = this.filteredValues.length;
-            return valueLength != 0 && this.selected.size === valueLength;
+            return valueLength != 0 && this.selection.size === valueLength;
         }
 
-        return this.selected.has(value);
+        return this.selection.has(value);
     }
 
     public toggle(value: T | 'all'): void {
@@ -97,15 +111,15 @@ export class AbstractList<T> {
                 return;
             }
 
-            this.filteredValues.forEach((item: T): Set<T> => this._selected.add(item));
+            this.filteredValues.forEach((item: T): Set<T> => this._selection.add(item));
             return;
         }
 
         if (this.isSelected(value)) {
-            this._selected.delete(value);
+            this._selection.delete(value);
             return;
         }
-        this._selected.add(value);
+        this._selection.add(value);
     }
 
     protected handleKeyDown(event: KeyboardEvent, value: T): void {
@@ -129,12 +143,11 @@ export class AbstractList<T> {
         return this.itemInfo()?.icon ? this.itemInfo()!.icon!(value) : undefined;
     }
 
-    protected loadChips(value: T): string[]
-    {
+    protected loadChips(value: T): string[] {
         return this.itemInfo()!.chips!(value);
     }
 
     protected unselectAll(): void {
-        this._selected.clear();
+        this._selection.clear();
     }
 }

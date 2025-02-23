@@ -16,7 +16,7 @@
         [height]="300"
         [selectionType]="SelectionType.MULTIPLE" #list>
         <div style="margin-left: auto">
-            <button mat-icon-button *ngIf="list.currentSelected.length > 0" (click)="delete(list.currentSelected)">
+            <button mat-icon-button *ngIf="list.selected.length > 0" (click)="delete(list.selected)">
                 <mat-icon>delete</mat-icon>
             </button>
             <button mat-icon-button (click)="openDialog()">
