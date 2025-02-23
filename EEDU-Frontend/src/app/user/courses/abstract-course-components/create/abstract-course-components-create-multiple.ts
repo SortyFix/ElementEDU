@@ -8,7 +8,7 @@ export class AbstractCourseComponentsCreateMultiple<T> extends AbstractCourseCom
 
     protected override get createModel(): any[] {
         return (
-            this.form.get('name')?.value as string[]).map((item: string): { name: string } => {return { name : item };}
+            this.form.get('id')?.value as string[]).map((item: string): { id: string } => { return { id : item };}
         )
     }
 

@@ -42,7 +42,7 @@ export abstract class AbstractCourseComponentsCreate<T> {
     }
 
     protected getForm(formBuilder: FormBuilder): FormGroup {
-        return formBuilder.group({name: [null, Validators.required]});
+        return formBuilder.group({ id: [null, Validators.required]});
     }
 
     protected onSubmit(): void {

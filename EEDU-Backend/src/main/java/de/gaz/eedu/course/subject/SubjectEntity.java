@@ -13,14 +13,18 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+@Entity @NoArgsConstructor
 public class SubjectEntity implements EntityModelRelation<String, SubjectModel>
 {
-    @Id @Setter(AccessLevel.NONE) @Column(length = 50, nullable = false) private String id;
+    @Id @Getter @Setter(AccessLevel.NONE) private String id;
 
     @JsonBackReference @OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE) // delete courses if subject is deleted.
     private final Set<CourseEntity> courses = new HashSet<>();
+
+    public SubjectEntity(@NotNull String id)
+    {
+        this.id = id;
+    }
 
     @Override
     public @NotNull SubjectModel toModel()

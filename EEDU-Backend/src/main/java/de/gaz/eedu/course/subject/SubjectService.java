@@ -29,10 +29,11 @@ public class SubjectService extends EntityService<String, SubjectRepository, Sub
             throw new OccupiedException();
         }
 
-        return saveEntity(model.stream().map(current ->
+        List<SubjectEntity> subjectEntities = model.stream().map(current ->
         {
             SubjectEntity subject = new SubjectEntity(current.id());
             return current.toEntity(subject);
-        }).toList());
+        }).toList();
+        return saveEntity(subjectEntities);
     }
 }
