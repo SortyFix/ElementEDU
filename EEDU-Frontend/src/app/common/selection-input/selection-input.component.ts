@@ -95,6 +95,8 @@ const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => 
 })
 export class SelectionInput<T extends {name: string} | { id: string }> implements ControlValueAccessor, Validator {
 
+    protected readonly ENTER: 13 = ENTER;
+
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
 
@@ -300,11 +302,9 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
                 return values;
             }
 
-            const update: readonly T[] = values.slice(index, 1);
-            this.onChange(update);
-            return [...update];
+            const updatedValues: T[] = values.filter((_: T, i: number): boolean => i !== index);
+            this.onChange(updatedValues);
+            return updatedValues;
         });
     }
-
-    protected readonly ENTER = ENTER;
 }
