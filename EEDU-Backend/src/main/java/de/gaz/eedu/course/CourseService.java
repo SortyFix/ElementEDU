@@ -60,11 +60,7 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
 
         List<CourseEntity> courseEntities = model.stream().map(courseModel ->
         {
-            CourseEntity course = new CourseEntity(new FileCreateModel(
-                    "",
-                    new String[0],
-                    new String[0]).toEntity(new FileEntity()
-            ));
+            CourseEntity course = new CourseEntity(new FileCreateModel("", new String[0], new String[0]).toEntity(new FileEntity()));
             return courseModel.toEntity(course, this.courseFactory(courseModel));
         }).toList();
 
@@ -77,8 +73,7 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
     {
         return (entity) ->
         {
-            UserEntity teacher = fetchTeacher(createModel.teacher());
-            entity.setTeacher(teacher);
+            entity.setTeacher(fetchTeacher(createModel.teacher()));
             if (createModel.students().length > 0)
             {
                 List<UserEntity> students = getUserRepository().findAllById(List.of(createModel.students()));
@@ -100,7 +95,7 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
 
     private @NotNull UserEntity fetchTeacher(long teacherId) throws ResponseStatusException
     {
-        UserEntity teacher = getUserRepository().findById(teacherId).orElseThrow(entityUnknown(teacherId));
+        UserEntity teacher = getUserRepository().findEntity(teacherId).orElseThrow(entityUnknown(teacherId));
         if (!Objects.equals(teacher.getAccountType(), AccountType.TEACHER))
         {
             throw new AccountTypeMismatch(AccountType.TEACHER, teacher.getAccountType());

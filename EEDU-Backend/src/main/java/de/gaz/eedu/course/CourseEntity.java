@@ -84,7 +84,11 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
 
     public @NotNull Optional<UserEntity> getTeacher()
     {
-        return getStudents().stream().filter(user -> Objects.equals(user.getAccountType(), AccountType.TEACHER)).findFirst();
+        return getUsers().stream().filter(user ->
+        {
+            AccountType accountType = user.getAccountType();
+            return Objects.equals(accountType, AccountType.TEACHER);
+        }).findFirst();
     }
 
     public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher) throws AccountTypeMismatch

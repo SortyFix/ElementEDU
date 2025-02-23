@@ -130,9 +130,7 @@ VALUES ('User', '0', 'user.0', 0, FALSE, TRUE, FALSE, 1, 0, 1),      -- Regular 
        ('User', '17', 'user.17', 1, FALSE, TRUE, FALSE, 1, 0, 9)     -- Test user for deletion case (in group0)
 ;
 
-INSERT INTO course_users(user_id, course_id) VALUES
-(1, 1),
-(1, 2);
+INSERT INTO course_users(user_id, course_id) VALUES (1, 1), (1, 2);
 
 INSERT INTO credential_entity(id, method, data, secret, enabled, user_id)
 VALUES (962, 0, '', '', true, 1),
