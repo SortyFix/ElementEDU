@@ -36,7 +36,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j @Entity @NoArgsConstructor @Getter @Setter public class AppointmentEntryEntity implements EntityModelRelation<Long, AppointmentEntryModel>
+@Slf4j
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
+public class AppointmentEntryEntity implements EntityModelRelation<Long, AppointmentEntryModel>
 {
     @Setter(AccessLevel.NONE) @Id private Long id;
     private Duration duration;
@@ -59,16 +64,6 @@ import java.util.Optional;
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id")
     private @Nullable RoomEntity room;
 
-    public @NotNull Optional<RoomEntity> getRoom()
-    {
-        FrequentAppointmentEntity frequentAppointment = getFrequentAppointment();
-        if(Objects.nonNull(frequentAppointment) && Objects.isNull(room))
-        {
-            return Optional.of(frequentAppointment.getRoom());
-        }
-        return Optional.ofNullable(room);
-    }
-
     /**
      * This constructor creates a new instance of this entity.
      * <p>
@@ -83,12 +78,22 @@ import java.util.Optional;
         this.id = id;
     }
 
+    public @NotNull Optional<RoomEntity> getRoom()
+    {
+        FrequentAppointmentEntity frequentAppointment = getFrequentAppointment();
+        if (Objects.nonNull(frequentAppointment) && Objects.isNull(room))
+        {
+            return Optional.of(frequentAppointment.getRoom());
+        }
+        return Optional.ofNullable(room);
+    }
+
     public @NotNull AssignmentInsightModel getInsight(@NotNull UserEntity user)
     {
         String uploadPath = uploadPath(user.getId());
         File file = new File(uploadPath);
         File[] files = file.listFiles();
-        if(!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
+        if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
         {
             return new AssignmentInsightModel(user.getLoginName(), false, new String[0]);
         }
@@ -102,7 +107,7 @@ import java.util.Optional;
     // bad request when
     public void submitAssignment(long user, @NotNull MultipartFile... files) throws ResponseStatusException
     {
-        if(!this.isAssignmentValid())
+        if (!this.isAssignmentValid())
         {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -113,7 +118,7 @@ import java.util.Optional;
 
     public boolean hasSubmitted(@NotNull UserEntity user)
     {
-        if(!getCourse().getUsers().contains(user))
+        if (!getCourse().getUsers().contains(user))
         {
             return false;
         }
@@ -129,7 +134,7 @@ import java.util.Optional;
     @Override public @NotNull AppointmentEntryModel toModel()
     {
         Long attachedScheduled = null;
-        if(Objects.nonNull(getFrequentAppointment()))
+        if (Objects.nonNull(getFrequentAppointment()))
         {
             attachedScheduled = getFrequentAppointment().getId();
         }
@@ -168,7 +173,7 @@ import java.util.Optional;
     public boolean isAssignmentValid()
     {
         Optional<AssignmentModel> assignmentModel = getAssignment();
-        if(assignmentModel.isEmpty())
+        if (assignmentModel.isEmpty())
         {
             return false;
         }
@@ -195,7 +200,7 @@ import java.util.Optional;
      * If the assignment is valid and successfully set, the entity is saved to the database using the provided {@link CourseService}.
      *
      * @param appointmentService the {@link AppointmentService} instance used to persist the entity; must not be {@code null}.
-     * @param assignment    the {@link AssignmentCreateModel} containing the assignment details to validate and save, must not be {@code null}.
+     * @param assignment         the {@link AssignmentCreateModel} containing the assignment details to validate and save, must not be {@code null}.
      * @return {@code true} if the assignment passes validation, is successfully set, and the entity is persisted.{@code false} otherwise.
      * @throws NullPointerException if either {@code courseService} or {@code assignment} is {@code null}.
      */
@@ -211,7 +216,7 @@ import java.util.Optional;
 
     public boolean unsetAssignment()
     {
-        if(!this.hasAssignment())
+        if (!this.hasAssignment())
         {
             return false;
         }
@@ -239,7 +244,8 @@ import java.util.Optional;
             return false;
         }
 
-        var hash = new Object() {
+        var hash = new Object()
+        {
             private int generateHash()
             {
                 return Objects.hash(assignmentDescription, publishAssignment, submitAssignmentUntil);
@@ -276,14 +282,14 @@ import java.util.Optional;
      *                              without a null check.
      *                              Example usage:
      *                              <pre>
-     *                              {@code
-     *                              Optional<AssignmentModel> assignment = entity.getAssignment();
-     *                              assignment.ifPresent(a -> {
-     *                                  System.out.println("Assignment Description: " + a.getDescription());
-     *                                  System.out.println("Submission Deadline: " + a.getSubmitUntil());
-     *                              });
-     *                              }
-     *                              </pre>
+     *                                                           {@code
+     *                                                           Optional<AssignmentModel> assignment = entity.getAssignment();
+     *                                                           assignment.ifPresent(a -> {
+     *                                                               System.out.println("Assignment Description: " + a.getDescription());
+     *                                                               System.out.println("Submission Deadline: " + a.getSubmitUntil());
+     *                                                           });
+     *                                                           }
+     *                                                           </pre>
      */
     public @NotNull Optional<AssignmentModel> getAssignment()
     {
@@ -299,7 +305,7 @@ import java.util.Optional;
         String description = this.getAssignmentDescription();
 
         boolean invalid = Objects.isNull(description) || Objects.isNull(publish) || Objects.isNull(until);
-        if(invalid || (publish.isBefore(Instant.now()) && isStudent))
+        if (invalid || (publish.isBefore(Instant.now()) && isStudent))
         {
             return Optional.empty();
         }

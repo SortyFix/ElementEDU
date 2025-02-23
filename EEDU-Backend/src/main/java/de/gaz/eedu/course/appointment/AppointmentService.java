@@ -64,23 +64,6 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
     }
 
-    public @NotNull List<AssignmentInsightModel> getInsight(long appointment)
-    {
-        return getEntryRepository().findById(appointment).map(entry -> {
-            Set<UserEntity> userEntities = entry.getCourse().getUsers();
-            return userEntities.stream().map(entry::getInsight).toList();
-        }).orElse(Collections.emptyList());
-    }
-
-    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
-    {
-        return getEntryRepository().findById(appointment).map(entry -> {
-            UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(() -> new EntityUnknownException(user));
-            return entry.getInsight(userEntity);
-        });
-    }
-
-
     @Contract(pure = true)
     private static boolean setAssignment(@NotNull AppointmentEntryEntity entity, @Nullable AssignmentCreateModel assignment)
     {
@@ -97,20 +80,41 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         return entity.setAssignment(assignment);
     }
 
+    public @NotNull List<AssignmentInsightModel> getInsight(long appointment)
+    {
+        return getEntryRepository().findById(appointment).map(entry ->
+        {
+            Set<UserEntity> userEntities = entry.getCourse().getUsers();
+            return userEntities.stream().map(entry::getInsight).toList();
+        }).orElse(Collections.emptyList());
+    }
+
+    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
+    {
+        return getEntryRepository().findById(appointment).map(entry ->
+        {
+            UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(() -> new EntityUnknownException(
+                    user));
+            return entry.getInsight(userEntity);
+        });
+    }
+
     public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
     {
-        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(appointmentId));
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(() -> new EntityUnknownException(
+                appointmentId));
 
         int hash = entity.hashCode();
         entity.setDescription(updateModel.description());
 
         // doesn't the id match the room id, or is the room id not null
         Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
-        if(entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
+        if (entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
         {
             entity.setRoom(
                     Objects.isNull(updateModel.room()) ? null :
-                    roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(updateModel.room()))
+                            roomRepository.findById(updateModel.room()).orElseThrow(() -> new EntityUnknownException(
+                                    updateModel.room()))
             );
         }
 
@@ -119,7 +123,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Assignment could not be updated");
         }
 
-        if(Objects.equals(hash, entity.hashCode()))
+        if (Objects.equals(hash, entity.hashCode()))
         {
             getEntryRepository().save(entity);
         }
@@ -141,13 +145,14 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         return saveEntity(model.stream().map(current ->
         {
             CourseEntity courseEntity = getCourse(current.courseId());
-            return current.toEntity(new FrequentAppointmentEntity(), (entity) ->
-            {
-                RoomEntity room = getRoom(current.data().room());
-                entity.setRoom(room);
-                entity.setCourse(courseEntity);
-                return entity;
-            });
+            return current.toEntity(
+                    new FrequentAppointmentEntity(), (entity) ->
+                    {
+                        RoomEntity room = getRoom(current.data().room());
+                        entity.setRoom(room);
+                        entity.setCourse(courseEntity);
+                        return entity;
+                    });
         }).toList());
     }
 
@@ -216,43 +221,44 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         {
             long id = generateId(course, currentModel.start());
 
-            return currentModel.toEntity(new AppointmentEntryEntity(id), (entity) ->
-            {
-                Instant time = Instant.ofEpochMilli(currentModel.start());
-                for (FrequentAppointmentEntity frequentAppointment : course.getFrequentAppointments())
-                {
-                    if (frequentAppointment.inFrequency(time))
+            return currentModel.toEntity(
+                    new AppointmentEntryEntity(id), (entity) ->
                     {
-                        entity.setFrequentAppointment(frequentAppointment);
+                        Instant time = Instant.ofEpochMilli(currentModel.start());
+                        for (FrequentAppointmentEntity frequentAppointment : course.getFrequentAppointments())
+                        {
+                            if (frequentAppointment.inFrequency(time))
+                            {
+                                entity.setFrequentAppointment(frequentAppointment);
 
-                        // these two below might get overridden by custom values
-                        entity.setDuration(frequentAppointment.getDuration());
-                        entity.setRoom(frequentAppointment.getRoom());
+                                // these two below might get overridden by custom values
+                                entity.setDuration(frequentAppointment.getDuration());
+                                entity.setRoom(frequentAppointment.getRoom());
 
-                        break;
-                    }
-                }
+                                break;
+                            }
+                        }
 
-                if (Objects.nonNull(currentModel.duration()))
-                {
-                    entity.setDuration(Duration.ofMillis(currentModel.duration()));
-                }
+                        if (Objects.nonNull(currentModel.duration()))
+                        {
+                            entity.setDuration(Duration.ofMillis(currentModel.duration()));
+                        }
 
-                if (Objects.isNull(entity.getDuration()))
-                {
-                    // duration MUST be set here already
-                    throw new CreationException(HttpStatus.BAD_REQUEST);
-                }
+                        if (Objects.isNull(entity.getDuration()))
+                        {
+                            // duration MUST be set here already
+                            throw new CreationException(HttpStatus.BAD_REQUEST);
+                        }
 
-                if (Objects.nonNull(currentModel.room()))
-                {
-                    RoomEntity room = getRoom(currentModel.room());
-                    entity.setRoom(room);
-                }
+                        if (Objects.nonNull(currentModel.room()))
+                        {
+                            RoomEntity room = getRoom(currentModel.room());
+                            entity.setRoom(room);
+                        }
 
-                entity.setCourse(course);
-                return entity;
-            });
+                        entity.setCourse(course);
+                        return entity;
+                    });
         }).toList();
     }
 

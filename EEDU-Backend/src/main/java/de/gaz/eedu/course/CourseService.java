@@ -26,9 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
-@RequiredArgsConstructor @Service @Getter(AccessLevel.PROTECTED)
+@RequiredArgsConstructor
+@Service
+@Getter(AccessLevel.PROTECTED)
 public class CourseService extends EntityService<Long, CourseRepository, CourseEntity, CourseModel, CourseCreateModel>
 {
     private final CourseRepository repository;
@@ -47,16 +51,18 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
         return getRepository().findAllReducedUsersByCourse(course);
     }
 
-    @Transactional @Override public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException
+    @Transactional @Override
+    public @NotNull List<CourseEntity> createEntity(@NotNull Set<CourseCreateModel> model) throws CreationException
     {
-        if(getRepository().existsByNameIn(model.stream().map(CourseCreateModel::name).toList()))
+        if (getRepository().existsByNameIn(model.stream().map(CourseCreateModel::name).toList()))
         {
             throw new OccupiedException();
         }
 
         List<CourseEntity> courseEntities = model.stream().map(courseModel ->
         {
-            CourseEntity course = new CourseEntity(new FileCreateModel("",
+            CourseEntity course = new CourseEntity(new FileCreateModel(
+                    "",
                     new String[0],
                     new String[0]).toEntity(new FileEntity()
             ));
@@ -83,10 +89,11 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
             if (Objects.nonNull(createModel.classroom()))
             {
                 long classroom = createModel.classroom();
-                getClassRepository().findById(classroom).ifPresentOrElse(entity::linkClassRoom, () ->
-                {
-                    throw new EntityUnknownException(classroom);
-                });
+                getClassRepository().findById(classroom).ifPresentOrElse(
+                        entity::linkClassRoom, () ->
+                        {
+                            throw new EntityUnknownException(classroom);
+                        });
             }
 
             entity.setSubject(getSubjectService().loadEntityByIDSafe(createModel.subject()));
@@ -96,8 +103,9 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
 
     private @NotNull UserEntity fetchTeacher(long teacherId) throws ResponseStatusException
     {
-        UserEntity tutor = getUserRepository().findById(teacherId).orElseThrow(() -> new EntityUnknownException(teacherId));
-        if(!tutor.getAccountType().equals(AccountType.TEACHER))
+        UserEntity tutor = getUserRepository().findById(teacherId).orElseThrow(() -> new EntityUnknownException(
+                teacherId));
+        if (!tutor.getAccountType().equals(AccountType.TEACHER))
         {
             String error = "The given user's id %s does not represent a teachers account.";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, teacherId));

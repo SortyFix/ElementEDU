@@ -16,7 +16,8 @@ public record FrequentAppointmentCreateModel(
         @NotNull String room,
         @NotNull Long duration,
         @NotNull Long frequency
-) implements CreationModel<Long, FrequentAppointmentEntity> {
+) implements CreationModel<Long, FrequentAppointmentEntity>
+{
 
     @Override public @NotNull FrequentAppointmentEntity toEntity(@NotNull FrequentAppointmentEntity entity)
     {

@@ -8,7 +8,10 @@ import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -24,16 +27,20 @@ import java.util.stream.Collectors;
  * @see EntityModelRelation
  * @see ClassRoomModel
  */
-@Entity @Getter @Setter @NoArgsConstructor @Table(name = "class_room_entity")
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "class_room_entity")
 public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel>
 {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter(AccessLevel.NONE) private Long id;
-    private String name;
     @OneToMany(mappedBy = "classRoom") @JsonBackReference @Getter(AccessLevel.PRIVATE)
     private final Set<UserEntity> users = new HashSet<>();
     @OneToMany(mappedBy = "classRoom") @JsonBackReference
     private final Set<CourseEntity> courses = new HashSet<>();
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE) private Long id;
+    private String name;
 
     public ClassRoomEntity(@NotNull Collection<CourseEntity> courses, @NotNull Collection<UserEntity> users)
     {
@@ -77,7 +84,7 @@ public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel
 
     @Override public boolean deleteManagedRelations()
     {
-        if(this.users.isEmpty())
+        if (this.users.isEmpty())
         {
 
             return false;

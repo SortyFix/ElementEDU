@@ -20,18 +20,24 @@ import java.util.Set;
 
 //TODO manage access. Yes, I'll do it later
 
-@Slf4j @RestController @RequestMapping("/api/v1/course") @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/course")
+@RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class CourseController extends EntityController<Long, CourseService, CourseModel, CourseCreateModel>
 {
     private final CourseService service;
 
-    @GetMapping("/{course}/subject/{subject}") public void setSubject(@PathVariable long course, @PathVariable String subject)
+    @GetMapping("/{course}/subject/{subject}")
+    public void setSubject(@PathVariable long course, @PathVariable String subject)
     {
         CourseEntity courseEntity = getService().loadEntityByIDSafe(course);
         courseEntity.setSubject(getService(), getService().getSubjectService().loadEntityByIDSafe(subject));
     }
 
-    @PostMapping("/{course}/attach") public @NotNull HttpStatus attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    @PostMapping("/{course}/attach")
+    public @NotNull HttpStatus attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for attaching user(s) {} to course {}.", users, course);
 
@@ -40,7 +46,8 @@ public class CourseController extends EntityController<Long, CourseService, Cour
         return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
     }
 
-    @GetMapping("{course}/detach") public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    @GetMapping("{course}/detach")
+    public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for detaching user(s) {} from course {}.", users, course);
 

@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
-@Service @Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
+@Service
+@Getter(AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class RoomService extends EntityService<String, RoomRepository, RoomEntity, RoomModel, RoomCreateModel>
 {
     private final RoomRepository repository;

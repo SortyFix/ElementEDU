@@ -7,14 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository public interface AppointmentEntryRepository extends JpaRepository<AppointmentEntryEntity, Long>
+@Repository
+public interface AppointmentEntryRepository extends JpaRepository<AppointmentEntryEntity, Long>
 {
 
     @Query(
             "SELECT a FROM AppointmentEntryEntity a " +
-            "LEFT JOIN FETCH a.room r " +
-            "LEFT JOIN FETCH a.course c " +
-            "WHERE a.id = :id"
+                    "LEFT JOIN FETCH a.room r " +
+                    "LEFT JOIN FETCH a.course c " +
+                    "WHERE a.id = :id"
     )
     @Override @NotNull Optional<AppointmentEntryEntity> findById(@NotNull Long id);
 }

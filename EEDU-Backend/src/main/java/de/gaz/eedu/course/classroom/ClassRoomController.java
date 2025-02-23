@@ -17,13 +17,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-
 import java.util.Set;
 
 //TODO manage access
 
-@RestController @RequestMapping("/api/v1/course/classroom") @RequiredArgsConstructor @Slf4j
+@RestController
+@RequestMapping("/api/v1/course/classroom")
+@RequiredArgsConstructor
+@Slf4j
 public class ClassRoomController extends EntityController<Long, ClassRoomService, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final UserService userService;
@@ -33,7 +34,8 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
         return userService.getClassRoomService();
     }
 
-    @PostMapping("{course}/link/{classroom}") public @NotNull HttpStatus linkClass(@PathVariable long course, @PathVariable long classroom)
+    @PostMapping("{course}/link/{classroom}")
+    public @NotNull HttpStatus linkClass(@PathVariable long course, @PathVariable long classroom)
     {
         log.info("Received incoming request for linking the class {} to course {}.", classroom, course);
 
@@ -59,19 +61,22 @@ public class ClassRoomController extends EntityController<Long, ClassRoomService
     }
 
     @PreAuthorize("hasAuthority('CLASS_CREATE')")
-    @PostMapping("/create") @Override public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
+    @PostMapping("/create") @Override
+    public @NotNull ResponseEntity<ClassRoomModel[]> create(@NotNull @RequestBody ClassRoomCreateModel[] model)
     {
         return super.create(model);
     }
 
     @PreAuthorize("hasAuthority('CLASS_DELETE')")
-    @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
+    @DeleteMapping("/delete/{id}") @Override
+    public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }
 
     @PreAuthorize("@verificationService.isFullyAuthenticated()")
-    @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<ClassRoomModel> getData(@NotNull @PathVariable Long id)
+    @GetMapping("/get/{id}") @Override
+    public @NotNull ResponseEntity<ClassRoomModel> getData(@NotNull @PathVariable Long id)
     {
         return super.getData(id);
     }

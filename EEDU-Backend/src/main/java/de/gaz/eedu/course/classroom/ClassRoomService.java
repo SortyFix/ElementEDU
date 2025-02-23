@@ -41,18 +41,20 @@ import java.util.stream.Stream;
  * maintain system integrity, such as the {@link CourseEntity} for linking {@link ClassRoomEntity}s to {@link CourseEntity}s and
  * the {@link UserRepository} for attaching {@link UserEntity} to {@link ClassRoomEntity}.
  * <p>
- Directly implementing {@link de.gaz.eedu.user.UserService} is not possible due to a circular dependency:
- {@link de.gaz.eedu.user.UserService} depends on this service, which in turn provides functions required by {@link de.gaz.eedu.user.UserService}.
+ * Directly implementing {@link de.gaz.eedu.user.UserService} is not possible due to a circular dependency:
+ * {@link de.gaz.eedu.user.UserService} depends on this service, which in turn provides functions required by {@link de.gaz.eedu.user.UserService}.
  *
+ * @author Ivo Quiring
  * @see ClassRoomRepository
  * @see ClassRoomEntity
  * @see ClassRoomModel
  * @see ClassRoomCreateModel
  * @see EntityService
- * @author Ivo Quiring
  */
 @Slf4j
-@RequiredArgsConstructor @Service @Getter
+@RequiredArgsConstructor
+@Service
+@Getter
 public class ClassRoomService extends EntityService<Long, ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final ClassRoomRepository repository;
@@ -60,7 +62,8 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
     private final UserRepository userRepository;
 
     @Transactional
-    @Override public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException
+    @Override
+    public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException
     {
         if (getRepository().existsByNameIn(model.stream().map(ClassRoomCreateModel::name).toList()))
         {
@@ -109,7 +112,7 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
 
     public @NotNull @Unmodifiable Set<CourseModel> getCourses(long user, long classroomId)
     {
-        if(hasRole("ADMINISTRATOR") || getRepository().existsUserInCourse(user, classroomId))
+        if (hasRole("ADMINISTRATOR") || getRepository().existsUserInCourse(user, classroomId))
         {
             return getRepository().findAllCoursesById(classroomId);
         }
@@ -125,24 +128,23 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
      *
      * @param tutorId id of the {@link UserEntity} to load.
      * @return the fetched and validated {@link UserEntity}
-     * @throws ResponseStatusException
-     *      <ul>
-     *          <li>
-     *              {@link EntityUnknownException} is thrown when the given tutorId
-     *              does not represent any existing {@link UserEntity} in the {@link #getUserRepository()}
-     *          </li>
-     *          <li>
-     *              {@link ResponseStatusException} is thrown when the fetches user's {@link AccountType} is not
-     *              equal to {@link AccountType#TEACHER}.
-     *          </li>
-     *      </ul>
+     * @throws ResponseStatusException <ul>
+     *                                          <li>
+     *                                              {@link EntityUnknownException} is thrown when the given tutorId
+     *                                              does not represent any existing {@link UserEntity} in the {@link #getUserRepository()}
+     *                                          </li>
+     *                                          <li>
+     *                                              {@link ResponseStatusException} is thrown when the fetches user's {@link AccountType} is not
+     *                                              equal to {@link AccountType#TEACHER}.
+     *                                          </li>
+     *                                      </ul>
      * @see #getUserRepository()
      * @see UserEntity#getAccountType()
      */
     private @NotNull UserEntity fetchTutor(long tutorId) throws ResponseStatusException
     {
         UserEntity tutor = getUserRepository().findById(tutorId).orElseThrow(() -> new EntityUnknownException(tutorId));
-        if(!tutor.getAccountType().equals(AccountType.TEACHER))
+        if (!tutor.getAccountType().equals(AccountType.TEACHER))
         {
             String error = "The given user's id %s does not represent a teachers account.";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(error, tutorId));

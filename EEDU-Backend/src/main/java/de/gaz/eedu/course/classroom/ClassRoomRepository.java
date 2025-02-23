@@ -11,7 +11,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-@Repository public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long>
+@Repository
+public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long>
 {
 
     @Query("SELECT c FROM ClassRoomEntity c LEFT JOIN FETCH c.users LEFT JOIN FETCH c.courses WHERE c.id = :id")

@@ -14,16 +14,18 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoomEntity implements EntityModelRelation<String, RoomModel>
 {
-    @Id @Column(length = 20, nullable = false) @Setter(AccessLevel.NONE) private String id;
-
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private final Set<FrequentAppointmentEntity> frequentAppointments = new HashSet<>();
+    @Id @Column(length = 20, nullable = false) @Setter(AccessLevel.NONE) private String id;
 
     @Contract(pure = true, value = "-> new")
     @Override public @NotNull RoomModel toModel()

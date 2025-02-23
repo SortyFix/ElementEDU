@@ -8,12 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record ClassRoomCreateModel (
+public record ClassRoomCreateModel(
         @NonNull String name,
         @NotNull Long tutor,
         @NotNull Long[] students,
         @NotNull Long[] courses
-) implements CreationModel<Long, ClassRoomEntity> {
+) implements CreationModel<Long, ClassRoomEntity>
+{
 
     @Override
     public @NotNull ClassRoomEntity toEntity(@NotNull ClassRoomEntity entity)

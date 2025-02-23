@@ -22,7 +22,10 @@ import java.time.Period;
 import java.util.Objects;
 import java.util.Set;
 
-@Setter @Entity @Getter @NoArgsConstructor
+@Setter
+@Entity
+@Getter
+@NoArgsConstructor
 public class FrequentAppointmentEntity implements EntityModelRelation<Long, FrequentAppointmentModel>
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
@@ -38,7 +41,8 @@ public class FrequentAppointmentEntity implements EntityModelRelation<Long, Freq
 
     @Override public @NotNull FrequentAppointmentModel toModel()
     {
-        return new FrequentAppointmentModel(getId(),
+        return new FrequentAppointmentModel(
+                getId(),
                 getRoom().toModel(),
                 getStartTimeStamp().toEpochMilli(),
                 getUntilTimeStamp().toEpochMilli(),

@@ -16,15 +16,17 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/course/room")
-@Getter(AccessLevel.PROTECTED) @RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class RoomController extends EntityController<String, RoomService, RoomModel, RoomCreateModel>
 {
     private final RoomService service;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ROOM_CREATE')")
-    @Override public @NotNull ResponseEntity<RoomModel[]> create(@NotNull @RequestBody RoomCreateModel[] model) throws CreationException
-    { return super.create(model); }
+    @Override
+    public @NotNull ResponseEntity<RoomModel[]> create(@NotNull @RequestBody RoomCreateModel[] model) throws CreationException
+    {return super.create(model);}
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ROOM_DELETE')")
@@ -34,5 +36,5 @@ public class RoomController extends EntityController<String, RoomService, RoomMo
     }
 
     @GetMapping("/get/all")
-    @Override public @NotNull ResponseEntity<Set<RoomModel>> fetchAll() { return super.fetchAll(); }
+    @Override public @NotNull ResponseEntity<Set<RoomModel>> fetchAll() {return super.fetchAll();}
 }

@@ -16,21 +16,23 @@ public record AppointmentEntryCreateModel(
         @Nullable String room,
         @Nullable String description,
         @Nullable AssignmentCreateModel assignment
-) implements CreationModel<Long,AppointmentEntryEntity> {
+) implements CreationModel<Long, AppointmentEntryEntity>
+{
 
     public AppointmentEntryCreateModel(@NotNull Long timeStamp)
     {
         this(timeStamp, null, null, null, null);
     }
 
-    @Override public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException
+    @Override
+    public @NotNull AppointmentEntryEntity toEntity(@NotNull AppointmentEntryEntity entity) throws ResponseStatusException
     {
         // Duration is set inside the service
 
         entity.setDescription(description());
         entity.setPublish(Instant.now());
 
-        if(Objects.nonNull(this.assignment()) && !this.assignment().assignValues(entity))
+        if (Objects.nonNull(this.assignment()) && !this.assignment().assignValues(entity))
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
