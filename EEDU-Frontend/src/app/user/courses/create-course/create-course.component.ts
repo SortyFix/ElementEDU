@@ -39,21 +39,20 @@ import {CourseCreateModel} from "../course-create-model";
 })
 export class CreateCourseComponent extends AbstractCourseComponentsCreate<CourseModel> {
 
-    private readonly _subjects: SubjectModel[] = [];
-    private readonly _users: ReducedUserModel[] = [];
-    private readonly _classrooms: ClassRoomModel[] = [];
+    private _subjects: readonly SubjectModel[] = [];
+    private _users: readonly ReducedUserModel[] = [];
+    private _classrooms: readonly ClassRoomModel[] = [];
 
 
     public constructor(courseService: CourseService, dialogRef: DialogRef, formBuilder: FormBuilder,
-                       private readonly _subjectService: SubjectService,
-                       private readonly _userService: UserService,
-                       private readonly _classroomService: ClassRoomService
+        private readonly _subjectService: SubjectService,
+        private readonly _userService: UserService,
+        private readonly _classroomService: ClassRoomService,
     ) {
         super(courseService, dialogRef, formBuilder, "Create Course");
 
         this._userService.fetchAllReduced.subscribe((users: ReducedUserModel[]): void => {
-            this._users.length = 0;
-            this._users.push(...users);
+            this._users = users;
         });
 
         this.subjects = this._subjectService.value;
@@ -67,34 +66,32 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
         return [CourseCreateModel.fromObject(this.form.value)];
     }
 
-    protected get teacher(): ReducedUserModel[] {
+    protected get teacher(): readonly ReducedUserModel[] {
         return this.getUsers(AccountType.TEACHER);
     }
 
-    protected get students(): ReducedUserModel[] {
+    protected get students(): readonly  ReducedUserModel[] {
         return this.getUsers(AccountType.STUDENT);
     }
 
-    protected get classrooms(): ClassRoomModel[] {
+    protected get classrooms(): readonly ClassRoomModel[] {
         return this._classrooms;
     }
 
     private set classrooms(classrooms: ClassRoomModel[]) {
-        this._classrooms.length = 0;
-        this._classrooms.push(...classrooms);
+        this._classrooms = classrooms;
     }
 
     protected override get loading(): boolean {
         return super.loading || !this._subjectService.fetched || !this._classroomService.fetched;
     }
 
-    protected get subjects(): SubjectModel[] {
+    protected get subjects(): readonly SubjectModel[] {
         return this._subjects;
     }
 
     private set subjects(subjects: SubjectModel[]) {
-        this._subjects.length = 0;
-        this._subjects.push(...subjects);
+        this._subjects = subjects;
     }
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {
@@ -107,7 +104,7 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
         });
     }
 
-    private getUsers(accountType: AccountType): ReducedUserModel[] {
+    private getUsers(accountType: AccountType): readonly ReducedUserModel[] {
         return this._users.filter((user: ReducedUserModel): boolean => user.accountType === accountType);
     }
 }

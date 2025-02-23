@@ -1,6 +1,6 @@
 import {
     Component, computed,
-    forwardRef,
+    forwardRef, Input,
     input,
     InputSignal,
     model,
@@ -97,7 +97,6 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
 
     public label: InputSignal<string | null> = input<string | null>(null);
     public placeholder: InputSignal<string> = input<string>('');
-    public values: InputSignal<T[]> = input<T[]>([]);
 
     public allowNull: InputSignal<boolean> = input<boolean>(false);
 
@@ -105,7 +104,10 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
     public multiple: InputSignal<boolean> = input<boolean>(false);
 
     protected currentValue: ModelSignal<string> = model<string>('');
-    protected selectedValues: WritableSignal<T[]> = signal<T[]>([]);
+    private _values: WritableSignal<readonly T[]> = signal<readonly T[]>([]);
+    protected selectedValues: WritableSignal<readonly T[]> = signal<readonly T[]>([]);
+
+    @Input() public set values(values: readonly T[]) { this._values.update((): readonly T[] => values); }
 
     /**
      * Returns all accessible values from the list of values.
@@ -117,7 +119,7 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
      * @protected
      */
     protected accessibleValues: Signal<T[]> = computed((): T[] => {
-        return this.values().filter((value: T): boolean =>
+        return this._values().filter((value: T): boolean =>
         {
             return this.allowDuplicates() || !this.selectedValues().includes(value)
         });
@@ -134,7 +136,7 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
      *
      * @protected
      */
-    protected filteredValues: Signal<T[]> = computed((): T[] => {
+    protected filteredValues: Signal<readonly T[]> = computed((): readonly T[] => {
         const currentValue: string | undefined = this.currentValue()?.toLowerCase();
         if(!currentValue) {
             return this.accessibleValues().slice();
@@ -161,8 +163,7 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
         throw new Error("Unknown value name");
     }
 
-
-    public onChange: (value: T[] | T) => void = (): void => {};
+    public onChange: (value: readonly T[] | T) => void = (): void => {};
     public onTouched: () => void = (): void => {};
 
     /**
@@ -282,7 +283,7 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
     {
         if(this.multiple())
         {
-            this.selectedValues.update((values: T[]): T[] => [...values, value]);
+            this.selectedValues.update((values: readonly T[]): readonly T[] => [...values, value]);
             this.onChange(this.selectedValues())
             this.currentValue.set('');
             return;
@@ -293,15 +294,15 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
     }
 
     protected remove(value: T): void {
-        this.selectedValues.update((values: T[]): T[] => {
+        this.selectedValues.update((values: readonly T[]): readonly T[] => {
             const index: number = values.indexOf(value);
             if (index < 0) {
                 return values;
             }
 
-            values.splice(index, 1);
-            this.onChange(values);
-            return [...values];
+            const update: readonly T[] = values.slice(index, 1);
+            this.onChange(update);
+            return [...update];
         });
     }
 
