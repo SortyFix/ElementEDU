@@ -10,6 +10,8 @@ VALUES ('Q1'),
        ('7l'),
        ('dummy');
 
+INSERT INTO room_entity(id) VALUES ('403'), ('404'),('405'),('406');
+
 /* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
 INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status)
 VALUES ('Max', 'Mustermann', 'max.mustermann', 0, FALSE, FALSE, FALSE, 1, 0),
@@ -51,7 +53,7 @@ VALUES ('Sexualkunde_8b'),
        ('other');
 
 --- Courses
-INSERT INTO subject_entity(name)
+INSERT INTO subject_entity(id)
 VALUES ('German'),
        ('Mathematics'),
        ('Informatics'),

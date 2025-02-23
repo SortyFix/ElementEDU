@@ -34,7 +34,7 @@ public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, Cl
 
     @Override
     protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval() {
-        ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b", 1L, new Long[0], new Long[0]);
+        ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b", 2L, new Long[0], new Long[0]);
 
         @SuppressWarnings("DataFlowIssue")
         ClassRoomModel classRoomModel = new ClassRoomModel(5L, "5b", null, new ReducedUserModel[0]);

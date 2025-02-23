@@ -37,7 +37,7 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     @Override
     protected @NotNull Eval<CourseCreateModel, CourseModel> successEval()
     {
-        CourseCreateModel create = new CourseCreateModel("7b-German", "German", 1L, new Long[0], null);
+        CourseCreateModel create = new CourseCreateModel("7b-German", "German", 2L, new Long[0], null);
 
         CourseModel courseModel = new CourseModel(
                 5L,

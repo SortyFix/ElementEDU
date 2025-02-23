@@ -179,11 +179,7 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
 
         for(TestData<P, Boolean> current : deleteData)
         {
-            test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) ->
-            {
-                //TODO
-                return true;
-            });
+            test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
         }
     }
 

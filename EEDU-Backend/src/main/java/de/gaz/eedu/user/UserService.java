@@ -85,7 +85,10 @@ public class UserService extends EntityService<Long, UserRepository, UserEntity,
             List<String> ids = Arrays.asList(current.groups());
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
-        })).toList());
+        })).toList()).stream().peek(user -> {
+            GroupEntity accountType = getGroupRepository().findEntity(user.getAccountType().toString()).orElseThrow();
+            user.setTypeGroup(accountType);
+        }).toList();
     }
 
     @Transactional @Override
