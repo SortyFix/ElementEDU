@@ -32,8 +32,8 @@ export class CourseListComponent extends AbstractCourseComponentList<bigint, Cou
             title: (value: CourseModel): string => value.name,
             chips: (value: CourseModel): string[] => [
                 value.subject.id,
-                `${value.appointmentEntries.length} Appointments`,
-                `${value.frequentAppointments.length} Frequent Appointments`
+                `${value.appointmentEntries.length} Appointment(s)`,
+                `${value.frequentAppointments.length} Frequent Appointment(s)`
             ]
         });
     }

@@ -1,7 +1,7 @@
 {{ assignment?.description || 'No assignment given' }}
 
 <div class="placeholder" *ngIf="!assignment?.description">
-    <mat-icon svgIcon>done_all</mat-icon>
+    <mat-icon svgIcon>assignment_turned_in</mat-icon>
 </div>
 
 <div *ngIf="appointment?.description">
