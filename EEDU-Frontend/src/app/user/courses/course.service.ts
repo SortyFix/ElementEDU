@@ -120,6 +120,13 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
         return this.http.delete<void>(url, { withCredentials: true });
     }
 
+    protected override postDelete(id: bigint[]): void {
+        super.postDelete(id);
+        this._allSubject.next(
+            this._allSubject.value.filter(((value: CourseModel): boolean =>!id.includes(value.id)))
+        );
+    }
+
     public override get translate(): OperatorFunction<any[], CourseModel[]> {
         return map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item)));
     }
