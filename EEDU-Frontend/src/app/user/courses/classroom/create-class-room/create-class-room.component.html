@@ -27,8 +27,9 @@
             </general-selection-input>
 
             <general-selection-input
-                [multiple]="true"
                 [values]="courses"
+                [multiple]="true"
+                [allowNull]="true"
                 formControlName="courses"
                 label="Select Courses"
                 placeholder="Enter a course this class should be added to and press enter">

@@ -38,7 +38,7 @@ import {UserModel} from "../../../user-model";
 })
 export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
-    private _users: UserModel[] = [];
+    private _users: readonly UserModel[] = [];
 
     constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder, "Create Class Room");
@@ -47,9 +47,9 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
         this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
     }
 
-    private _courses: CourseModel[] = [];
+    private _courses: readonly CourseModel[] = [];
 
-    protected get courses(): CourseModel[] { return this._courses; }
+    protected get courses(): readonly CourseModel[] { return this._courses; }
 
     protected override get loading(): boolean {
         return super.loading && this._courseService.fetchedAdmin;
@@ -59,11 +59,11 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
         return [ClassRoomCreateModel.fromObject(this.form.value)];
     }
 
-    protected get teacher(): UserModel[] {
+    protected get teacher(): readonly UserModel[] {
         return this.getUsers(AccountType.TEACHER);
     }
 
-    protected get students(): UserModel[] {
+    protected get students(): readonly UserModel[] {
         return this.getUsers(AccountType.STUDENT);
     }
 
@@ -76,7 +76,7 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
         });
     }
 
-    private getUsers(accountType: AccountType): UserModel[] {
+    private getUsers(accountType: AccountType): readonly UserModel[] {
         return this._users.filter((user: UserModel): boolean => user.accountType === accountType && !user.classroom);
     }
 }
