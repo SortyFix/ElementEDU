@@ -14,8 +14,8 @@ import {
 import {AccountType} from "../../user/account-type";
 
 @Component({
-  selector: 'app-calendar-controls',
-  standalone: true,
+    selector: 'app-calendar-controls',
+    standalone: true,
     imports: [
         MatButtonToggleGroup,
         MatButtonToggle,
@@ -25,37 +25,16 @@ import {AccountType} from "../../user/account-type";
         NgIf,
         MatChip,
     ],
-  templateUrl: './calendar-controls.component.html',
-  styleUrl: './calendar-controls.component.scss'
+    templateUrl: './calendar-controls.component.html',
+    styleUrl: './calendar-controls.component.scss'
 })
 export class CalendarControlsComponent {
 
-    private _viewDate: Date = new Date();
-    private _viewType: CalendarView = CalendarView.Month;
+    protected readonly CalendarView: typeof CalendarView = CalendarView;
 
     constructor(private _userService: UserService, private _dialog: MatDialog) {}
 
-    protected get isTeacher(): boolean {
-        return this._userService.getUserData.accountType == AccountType.TEACHER;
-    }
-
-    protected set viewType(value: CalendarView) {
-        this._viewType = value;
-    }
-
-    public set dayClicked(date: Date)
-    {
-        if (this._viewType !== CalendarView.Month) {
-            return;
-        }
-
-        this.viewType = CalendarView.Day;
-        this.viewDateExact = date;
-    }
-
-    public get viewType(): CalendarView {
-        return this._viewType;
-    }
+    private _viewDate: Date = new Date();
 
     public get viewDate(): Date {
         return this._viewDate;
@@ -65,32 +44,27 @@ export class CalendarControlsComponent {
         this._viewDate = value;
     }
 
+    private _viewType: CalendarView = CalendarView.Month;
 
-    private set viewDateExact(value: Date) {
-        this._viewDate = value;
+    public get viewType(): CalendarView {
+        return this._viewType;
     }
 
-    protected next(): void {
-        this.moveView = 1;
+    protected set viewType(value: CalendarView) {
+        this._viewType = value;
     }
 
-    protected previous(): void {
-        this.moveView = -1;
-    }
-
-    private set moveView(steps: number) {
-        const currentDate: Date = this.viewDate;
-        switch (this._viewType) {
-            case CalendarView.Month:
-                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth() + steps, 1);
-                break;
-            case CalendarView.Week:
-                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (steps * 7));
-                break;
-            case CalendarView.Day:
-                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + steps);
-                break;
+    public set dayClicked(date: Date) {
+        if (this._viewType !== CalendarView.Month) {
+            return;
         }
+
+        this.viewType = CalendarView.Day;
+        this.viewDateExact = date;
+    }
+
+    protected get isTeacher(): boolean {
+        return this._userService.getUserData.accountType == AccountType.TEACHER;
     }
 
     protected get title(): string {
@@ -122,14 +96,38 @@ export class CalendarControlsComponent {
         }
     }
 
-    protected createAppointment(): void
-    {
+    private set viewDateExact(value: Date) {
+        this._viewDate = value;
+    }
+
+    private set moveView(steps: number) {
+        const currentDate: Date = this.viewDate;
+        switch (this._viewType) {
+            case CalendarView.Month:
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth() + steps, 1);
+                break;
+            case CalendarView.Week:
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + (steps * 7));
+                break;
+            case CalendarView.Day:
+                this.viewDateExact = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + steps);
+                break;
+        }
+    }
+
+    protected next(): void {
+        this.moveView = 1;
+    }
+
+    protected previous(): void {
+        this.moveView = -1;
+    }
+
+    protected createAppointment(): void {
         this._dialog.open(CreateAppointmentComponent, {
             width: '600px',
             disableClose: true,
         })
     }
-
-    protected readonly CalendarView: typeof CalendarView = CalendarView;
 }
 

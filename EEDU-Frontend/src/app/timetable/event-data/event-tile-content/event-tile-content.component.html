@@ -1,7 +1,7 @@
 <mat-card>
     <mat-card-header>
         <mat-card-subtitle>{{ title() }}</mat-card-subtitle>
-        <button mat-icon-button type="button" (click)="editing = !editing" *ngIf="teacher">
+        <button (click)="editing = !editing" *ngIf="teacher" mat-icon-button type="button">
             <mat-icon>{{ icon }}</mat-icon>
         </button>
     </mat-card-header>

@@ -6,7 +6,8 @@ import {
     CalendarDayModule,
     CalendarEvent,
     CalendarModule,
-    CalendarMonthModule, CalendarMonthViewDay,
+    CalendarMonthModule,
+    CalendarMonthViewDay,
     CalendarView,
     CalendarWeekModule,
 } from "angular-calendar";
@@ -29,8 +30,8 @@ import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointm
 
 
 @Component({
-  selector: 'app-timetable',
-  standalone: true,
+    selector: 'app-timetable',
+    standalone: true,
     imports: [
         CalendarMonthModule,
         CalendarWeekModule,
@@ -56,48 +57,17 @@ import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointm
             useClass: DateFormatter
         }
     ],
-  templateUrl: './timetable.component.html',
-  styleUrl: './timetable.component.scss'
+    templateUrl: './timetable.component.html',
+    styleUrl: './timetable.component.scss'
 })
 export class TimetableComponent implements OnInit, OnDestroy {
 
     @ViewChild('controls') controls!: CalendarControlsComponent;
     @ViewChild('eventComponent') eventComponent!: EventDataComponent;
-
+    protected readonly AppointmentEntryModel = AppointmentEntryModel;
+    protected readonly FrequentAppointmentModel = FrequentAppointmentModel;
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
-    private _events: CalendarEvent[] = [];
-
-    private _selectedEvent?: CalendarEvent;
-
-    protected get selectedEvent(): CalendarEvent | undefined {
-        return this._selectedEvent;
-    }
-
-    protected get selectedAppointment(): AppointmentEntryModel {
-        return this.selectedEvent?.meta.eventData;
-    }
-
-    protected createEvent(): void
-    {
-        if(!this.selectedEvent)
-        {
-            return;
-        }
-
-        const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
-        this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
-            start: this.selectedEvent.start,
-            room: frequentData.room,
-            duration: frequentData.duration,
-        })]).subscribe((createdEvent: AppointmentEntryModel[]): void =>
-        {
-            this.selectedEvent = this.events.find((current: CalendarEvent): boolean =>
-            {
-                return typeof current.id === 'number' && BigInt(current.id) === createdEvent[0].id;
-            });
-        });
-    }
 
     constructor(
         private readonly _dialogRef: MatDialog,
@@ -107,21 +77,33 @@ export class TimetableComponent implements OnInit, OnDestroy {
         @Inject(DOCUMENT) private document: any,
     ) {}
 
-    /**
-     * Initializes the component and sets up the calendar theme and event subscriptions.
-     *
-     * This lifecycle method applies the calendar theme to the document body and subscribes to the courses
-     * observable from the {@link CourseService}. When courses are fetched, it transforms them into events
-     * using the {@link #courseEvents} method and stores them in the {@code _events} array. If courses haven't been
-     * fetched yet, it triggers a fetch operation.
-     *
-     * @public
-     */
-    public ngOnInit(): void {
-        document.body.classList.add(this.CALENDAR_THEME_CLASS);
+    private _events: CalendarEvent[] = [];
 
-        const courses: Observable<CourseModel[]> = this.courseService.value$;
-        courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
+    /**
+     * Retrieves the list of {@link CalendarEvent} instances managed by this component.
+     *
+     * This accessor provides the array of {@link CalendarEvent} instances that represent the events currently
+     * associated with the calendar. These events are used to populate and display the calendar's content.
+     *
+     * @returns an array of {@link CalendarEvent} instances.
+     * @protected
+     */
+    protected get events(): CalendarEvent[] {
+        return this._events;
+    }
+
+    private _selectedEvent?: CalendarEvent;
+
+    protected get selectedEvent(): CalendarEvent | undefined {
+        return this._selectedEvent;
+    }
+
+    private set selectedEvent(value: CalendarEvent | undefined) {
+        this._selectedEvent = value;
+    }
+
+    protected get selectedAppointment(): AppointmentEntryModel {
+        return this.selectedEvent?.meta.eventData;
     }
 
     protected get nextEvents(): CalendarEvent[] {
@@ -129,41 +111,6 @@ export class TimetableComponent implements OnInit, OnDestroy {
         return this.events.filter((event: CalendarEvent): boolean => event.start > refDate)
             .sort((a: CalendarEvent, b: CalendarEvent): number => a.start.getTime() - b.start.getTime())
             .slice(0, 3);
-    }
-
-    /**
-     * Removes the calendar theme from the document body.
-     *
-     * This lifecycle method is invoked when the component is destroyed. It ensures that the calendar theme
-     * class is removed from the document body to prevent styling issues when the component is no longer in use.
-     *
-     * @public
-     */
-    public ngOnDestroy(): void
-    {
-        this.document.body.classList.remove(this.CALENDAR_THEME_CLASS)
-    }
-
-    protected onDayClicked(event: CalendarMonthViewDay): void {
-        this.controls.dayClicked = event.date;
-    }
-
-    protected onEventClicked(event: CalendarEvent): void
-    {
-        this.selectedEvent = event;
-    }
-
-
-    private set selectedEvent(value: CalendarEvent | undefined) {
-        this._selectedEvent = value;
-    }
-
-    protected dateToString(date: Date): string {
-        return date.toLocaleDateString('de-DE', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric'
-        });
     }
 
     /**
@@ -193,16 +140,78 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Retrieves the list of {@link CalendarEvent} instances managed by this component.
+     * Retrieves the {@link CourseService} instance used by the class.
      *
-     * This accessor provides the array of {@link CalendarEvent} instances that represent the events currently
-     * associated with the calendar. These events are used to populate and display the calendar's content.
+     * This accessor provides the instance of {@link CourseService} used by this class. It allows access to
+     * the service used for operations related to courses and their data.
      *
-     * @returns an array of {@link CalendarEvent} instances.
-     * @protected
+     * @returns the {@link CourseService} instance used internally by this class.
+     * @private
      */
-    protected get events(): CalendarEvent[] {
-        return this._events;
+    private get courseService(): CourseService {
+        return this._courseService;
+    }
+
+    /**
+     * Initializes the component and sets up the calendar theme and event subscriptions.
+     *
+     * This lifecycle method applies the calendar theme to the document body and subscribes to the courses
+     * observable from the {@link CourseService}. When courses are fetched, it transforms them into events
+     * using the {@link #courseEvents} method and stores them in the {@code _events} array. If courses haven't been
+     * fetched yet, it triggers a fetch operation.
+     *
+     * @public
+     */
+    public ngOnInit(): void {
+        document.body.classList.add(this.CALENDAR_THEME_CLASS);
+
+        const courses: Observable<CourseModel[]> = this.courseService.value$;
+        courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
+    }
+
+    /**
+     * Removes the calendar theme from the document body.
+     *
+     * This lifecycle method is invoked when the component is destroyed. It ensures that the calendar theme
+     * class is removed from the document body to prevent styling issues when the component is no longer in use.
+     *
+     * @public
+     */
+    public ngOnDestroy(): void {
+        this.document.body.classList.remove(this.CALENDAR_THEME_CLASS)
+    }
+
+    protected createEvent(): void {
+        if (!this.selectedEvent) {
+            return;
+        }
+
+        const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
+        this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
+            start: this.selectedEvent.start,
+            room: frequentData.room,
+            duration: frequentData.duration,
+        })]).subscribe((createdEvent: AppointmentEntryModel[]): void => {
+            this.selectedEvent = this.events.find((current: CalendarEvent): boolean => {
+                return typeof current.id === 'number' && BigInt(current.id) === createdEvent[0].id;
+            });
+        });
+    }
+
+    protected onDayClicked(event: CalendarMonthViewDay): void {
+        this.controls.dayClicked = event.date;
+    }
+
+    protected onEventClicked(event: CalendarEvent): void {
+        this.selectedEvent = event;
+    }
+
+    protected dateToString(date: Date): string {
+        return date.toLocaleDateString('de-DE', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric'
+        });
     }
 
     /**
@@ -218,7 +227,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
      * @private
      */
     private courseEvents(courses: CourseModel[]): CalendarEvent[] {
-        return courses.flatMap(({ name, appointmentEntries, frequentAppointments }: CourseModel): CalendarEvent[] => [
+        return courses.flatMap(({name, appointmentEntries, frequentAppointments}: CourseModel): CalendarEvent[] => [
             ...this.toEvents(name, frequentAppointments),
             ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
         ]);
@@ -240,21 +249,5 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private toEvents(name: string, scheduled: readonly FrequentAppointmentModel[]): CalendarEvent[] {
         return scheduled.flatMap((entity: FrequentAppointmentModel): CalendarEvent[] => entity.asEvent(name));
     }
-
-    /**
-     * Retrieves the {@link CourseService} instance used by the class.
-     *
-     * This accessor provides the instance of {@link CourseService} used by this class. It allows access to
-     * the service used for operations related to courses and their data.
-     *
-     * @returns the {@link CourseService} instance used internally by this class.
-     * @private
-     */
-    private get courseService(): CourseService {
-        return this._courseService;
-    }
-
-    protected readonly AppointmentEntryModel = AppointmentEntryModel;
-    protected readonly FrequentAppointmentModel = FrequentAppointmentModel;
 
 }

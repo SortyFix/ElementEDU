@@ -1,30 +1,30 @@
 <div class="container">
     <div class="calendar-container">
-        <div class="calendar-info-wrapper" [style.flex-direction]="wrap ? 'column' : 'row'">
+        <div [style.flex-direction]="wrap ? 'column' : 'row'" class="calendar-info-wrapper">
             <!-- Calendar Component -->
             <div class="calendar-wrapper">
                 <app-calendar-controls #controls></app-calendar-controls>
                 <div class="scrollable-container">
-                    <mwl-calendar-month-view *ngIf="controls.viewType === CalendarView.Month"
-                                             [viewDate]="controls.viewDate"
+                    <mwl-calendar-month-view (dayClicked)="onDayClicked($event.day)"
+                                             (eventClicked)="onEventClicked($event.event)"
+                                             *ngIf="controls.viewType === CalendarView.Month"
                                              [events]="events"
                                              [locale]="'en-GB'"
-                                             [weekStartsOn]="1"
-                                             (dayClicked)="onDayClicked($event.day)"
-                                             (eventClicked)="onEventClicked($event.event)">
+                                             [viewDate]="controls.viewDate"
+                                             [weekStartsOn]="1">
                     </mwl-calendar-month-view>
-                    <mwl-calendar-week-view *ngIf="controls.viewType === CalendarView.Week"
-                                            [viewDate]="controls.viewDate"
+                    <mwl-calendar-week-view (eventClicked)="onEventClicked($event.event)"
+                                            *ngIf="controls.viewType === CalendarView.Week"
                                             [events]="events"
                                             [locale]="'en-GB'"
-                                            [weekStartsOn]="1"
-                                            (eventClicked)="onEventClicked($event.event)">
+                                            [viewDate]="controls.viewDate"
+                                            [weekStartsOn]="1">
                     </mwl-calendar-week-view>
-                    <mwl-calendar-day-view *ngIf="controls.viewType === CalendarView.Day"
-                                           [viewDate]="controls.viewDate"
+                    <mwl-calendar-day-view (eventClicked)="onEventClicked($event.event)"
+                                           *ngIf="controls.viewType === CalendarView.Day"
                                            [events]="events"
                                            [locale]="'en-GB'"
-                                           (eventClicked)="onEventClicked($event.event)">
+                                           [viewDate]="controls.viewDate">
                     </mwl-calendar-day-view>
                 </div>
                 <div style="display: flex; justify-content: space-between">
@@ -34,16 +34,15 @@
             </div>
 
             <!-- Mini Calendar and Events on-->
-            <div class="info-box"
+            <div [style.margin-left]="!wrap ? '5px' : '0'"
                  [style.margin-top]="wrap ? '5px' : '0'"
-                 [style.margin-left]="!wrap ? '5px' : '0'"
-                 [style.max-width]="wrap ? null : '350px'">
-                @if(!wrap)
-                {
+                 [style.max-width]="wrap ? null : '350px'"
+                 class="info-box">
+                @if (!wrap) {
                     <mat-calendar [(selected)]="controls.viewDate"></mat-calendar>
                     <mat-divider></mat-divider>
                 }
-                <h4 class="mat-title" [style.text-align]="'center'">Upcoming homework & tests</h4>
+                <h4 [style.text-align]="'center'" class="mat-title">Upcoming homework & tests</h4>
                 <div class="upcoming-events-container">
                     <mat-list *ngFor="let event of nextEvents">
                         <mat-list-item>
@@ -57,16 +56,13 @@
     </div>
 
     <div class="appointment-box">
-        @if(selectedEvent && selectedEvent.meta.type === AppointmentEntryModel)
-        {
+        @if (selectedEvent && selectedEvent.meta.type === AppointmentEntryModel) {
             <app-event-data
                 [title]="selectedEvent.title"
                 [subtitle]="dateToString(selectedEvent.start)"
                 [appointment]="selectedAppointment" #eventComponent
             ></app-event-data>
-        }
-        @else if (selectedEvent && selectedEvent.meta.type == FrequentAppointmentModel)
-        {
+        } @else if (selectedEvent && selectedEvent.meta.type == FrequentAppointmentModel) {
             <button mat-raised-button (click)="createEvent()">Edit data</button>
         }
     </div>

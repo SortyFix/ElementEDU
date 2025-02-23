@@ -1,0 +1,23 @@
+{{ assignment?.description || 'No assignment given' }}
+
+<div
+    *ngIf="!assignment?.description"
+    class="placeholder"
+    style="">
+    <mat-icon svgIcon>done_all</mat-icon>
+</div>
+
+<div *ngIf="appointment?.description">
+    <mat-list>
+        <mat-list-item>
+            <span matListItemTitle>Deadline:</span>
+            <span matListItemLine>{{ assignment?.submitUntil }}</span>
+        </mat-list-item>
+    </mat-list>
+</div>
+
+<form (ngSubmit)="onSubmit()" [formGroup]="form" ]="form">
+    <app-file-upload formControlName="files"></app-file-upload>
+    <button mat-flat-button type="submit">Submit</button>
+</form>
+

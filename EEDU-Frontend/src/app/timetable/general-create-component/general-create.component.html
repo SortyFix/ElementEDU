@@ -1,9 +1,9 @@
 <mat-card>
-    <mat-progress-bar class="loading-bar" mode="indeterminate" *ngIf="loading()"></mat-progress-bar>
-    <div class="overlay" *ngIf="loading()"></div>
+    <mat-progress-bar *ngIf="loading()" class="loading-bar" mode="indeterminate"></mat-progress-bar>
+    <div *ngIf="loading()" class="overlay"></div>
     <mat-card-header style="display: flex; justify-content: space-between">
         <mat-card-title>{{ title() }}</mat-card-title>
-        <button mat-icon-button mat-dialog-close class="close-button">
+        <button class="close-button" mat-dialog-close mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
     </mat-card-header>

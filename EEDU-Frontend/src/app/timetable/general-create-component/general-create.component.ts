@@ -7,8 +7,8 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-general-create',
-  standalone: true,
+    selector: 'app-general-create',
+    standalone: true,
     imports: [
         MatIcon,
         MatCardTitle,
@@ -19,8 +19,8 @@ import {NgIf} from "@angular/common";
         MatDialogClose,
         NgIf,
     ],
-  templateUrl: './general-create.component.html',
-  styleUrl: './general-create.component.scss'
+    templateUrl: './general-create.component.html',
+    styleUrl: './general-create.component.scss'
 })
 export class GeneralCreateComponent {
 

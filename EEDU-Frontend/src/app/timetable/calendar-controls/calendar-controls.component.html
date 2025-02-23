@@ -1,4 +1,3 @@
-
 <div class="title">
     <mat-chip *ngIf="isTeacher">Teachers View</mat-chip>
     <mat-chip *ngIf="!isTeacher">Students View</mat-chip>
@@ -7,7 +6,7 @@
 
 <div class="calendar-controls">
     <div>
-        <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [(ngModel)]="viewType">
+        <mat-button-toggle-group [(ngModel)]="viewType" [hideSingleSelectionIndicator]="true">
             <mat-button-toggle [value]="CalendarView.Day">Day</mat-button-toggle>
             <mat-button-toggle [value]="CalendarView.Week">Week</mat-button-toggle>
             <mat-button-toggle [value]="CalendarView.Month">Month</mat-button-toggle>
@@ -15,13 +14,13 @@
     </div>
 
     <div>
-        <button mat-icon-button aria-label="previous" (click)="previous()">
+        <button (click)="previous()" aria-label="previous" mat-icon-button>
             <mat-icon>arrow_back_ios</mat-icon>
         </button>
-        <button mat-icon-button aria-label="next" (click)="next()">
+        <button (click)="next()" aria-label="next" mat-icon-button>
             <mat-icon>arrow_forward_ios</mat-icon>
         </button>
-        <button mat-icon-button aria-label="next" (click)="createAppointment()" *ngIf="isTeacher">
+        <button (click)="createAppointment()" *ngIf="isTeacher" aria-label="next" mat-icon-button>
             <mat-icon>add</mat-icon>
         </button>
     </div>

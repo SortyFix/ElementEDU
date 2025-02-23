@@ -29,8 +29,8 @@ import {RoomTabComponent} from "./room-tab/room-tab.component";
 import {SelectionInput} from "../../common/selection-input/selection-input.component";
 
 @Component({
-  selector: 'app-event-data',
-  standalone: true,
+    selector: 'app-event-data',
+    standalone: true,
     imports: [
         ReactiveFormsModule,
         NgIf,
@@ -52,20 +52,17 @@ import {SelectionInput} from "../../common/selection-input/selection-input.compo
         RoomTabComponent,
         SelectionInput
     ],
-  templateUrl: './event-data.component.html',
-  styleUrl: './event-data.component.scss'
+    templateUrl: './event-data.component.html',
+    styleUrl: './event-data.component.scss'
 })
 export class EventDataComponent {
 
     public title: InputSignal<string> = input<string>('');
     public subtitle: InputSignal<string> = input<string>('');
-
-    private _event!: AppointmentEntryModel;
     private readonly _form: FormGroup;
     private readonly _rooms: RoomModel[] = [];
 
-    public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService)
-    {
+    public constructor(formBuilder: FormBuilder, roomService: RoomService, private _appointmentService: AppointmentService) {
         // automatically fetches the rooms
         roomService.value$.subscribe((rooms: RoomModel[]): void => {
             this._rooms.length = 0;
@@ -87,8 +84,7 @@ export class EventDataComponent {
         this.form.get('description')?.setValue(this.event.description);
         this.form.get('room')?.setValue(this.event.room);
 
-        if(value.assignment)
-        {
+        if (value.assignment) {
             const assignment: AssignmentModel = value.assignment;
             this.form.get('assignment')?.setValue(assignment.description);
             this.form.get('publish')?.setValue(assignment.publish);
@@ -104,43 +100,14 @@ export class EventDataComponent {
 
     }
 
-    protected hasEdited(field: 'description' | 'room' | 'assignment'): boolean
-    {
-        switch (field)
-        {
-            case 'description': return this.form.get('description')?.value !== this.event.description;
-            case 'room': return this.form.get('room')?.value !== this.event.room;
-            case 'assignment':
-                const assignment: AssignmentModel | undefined = this.event.assignment;
-                if(!assignment)
-                {
-                    return !!this.form.get('assignment')?.value;
-                }
+    private _event!: AppointmentEntryModel;
 
-                const assignmentEdited: boolean = this.form.get('assignment')?.value !== assignment.description;
-                const publishEdited: boolean = (this.form.get('publish')?.value as Date).getTime() !== assignment.publish.getTime();
-                const submitUntilEdited: boolean = (this.form.get('submitUntil')?.value as Date).getTime() !== assignment.submitUntil.getTime();
-
-                return assignmentEdited || publishEdited || submitUntilEdited;
-        }
+    protected get event(): AppointmentEntryModel {
+        return this._event;
     }
 
     protected get anyEdit(): boolean {
         return this.hasEdited('description') || this.hasEdited('room') || this.hasEdited('assignment')
-    }
-
-    protected onSubmit(): void
-    {
-        this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
-            description: this.form.get('description')?.value,
-            room: this.form.get('room')?.value,
-            // undefined means not updating  !!!
-            assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
-        })).subscribe((response: AppointmentEntryModel): void => { this.appointment = response;  });
-    }
-
-    protected get event(): AppointmentEntryModel {
-        return this._event;
     }
 
     protected get rooms(): RoomModel[] {
@@ -149,6 +116,14 @@ export class EventDataComponent {
 
     protected get form(): FormGroup {
         return this._form;
+    }
+
+    protected get assignmentModel(): AssignmentModel {
+        return AssignmentModel.fromObject({
+            description: this.form.get('assignment')?.value,
+            publish: this.form.get('publish')?.value,
+            submitUntil: this.form.get('submitUntil')?.value
+        });
     }
 
     private get assignmentCreateModel(): GenericAssignmentCreateModel {
@@ -160,11 +135,32 @@ export class EventDataComponent {
         }
     }
 
-    protected get assignmentModel(): AssignmentModel {
-        return AssignmentModel.fromObject({
-            description: this.form.get('assignment')?.value,
-            publish: this.form.get('publish')?.value,
-            submitUntil: this.form.get('submitUntil')?.value
-        });
+    protected hasEdited(field: 'description' | 'room' | 'assignment'): boolean {
+        switch (field) {
+            case 'description':
+                return this.form.get('description')?.value !== this.event.description;
+            case 'room':
+                return this.form.get('room')?.value !== this.event.room;
+            case 'assignment':
+                const assignment: AssignmentModel | undefined = this.event.assignment;
+                if (!assignment) {
+                    return !!this.form.get('assignment')?.value;
+                }
+
+                const assignmentEdited: boolean = this.form.get('assignment')?.value !== assignment.description;
+                const publishEdited: boolean = (this.form.get('publish')?.value as Date).getTime() !== assignment.publish.getTime();
+                const submitUntilEdited: boolean = (this.form.get('submitUntil')?.value as Date).getTime() !== assignment.submitUntil.getTime();
+
+                return assignmentEdited || publishEdited || submitUntilEdited;
+        }
+    }
+
+    protected onSubmit(): void {
+        this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
+            description: this.form.get('description')?.value,
+            room: this.form.get('room')?.value,
+            // undefined means not updating  !!!
+            assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
+        })).subscribe((response: AppointmentEntryModel): void => { this.appointment = response; });
     }
 }

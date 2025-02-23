@@ -6,8 +6,8 @@ import {NgIf} from "@angular/common";
 import {UserService} from "../../../user/user.service";
 
 @Component({
-  selector: 'app-event-tile-content',
-  standalone: true,
+    selector: 'app-event-tile-content',
+    standalone: true,
     imports: [
         MatIcon,
         MatIconButton,
@@ -17,20 +17,16 @@ import {UserService} from "../../../user/user.service";
         MatCardContent,
         NgIf
     ],
-  templateUrl: './event-tile-content.component.html',
-  styleUrl: './event-tile-content.component.scss'
+    templateUrl: './event-tile-content.component.html',
+    styleUrl: './event-tile-content.component.scss'
 })
 export class EventTileContentComponent {
 
     public readonly title: InputSignal<string> = input<string>('');
-    private _editing: boolean = false;
-
 
     constructor(private _userService: UserService) {}
 
-    protected get teacher(): boolean {
-        return this._userService.getUserData.inGroup('teacher');
-    }
+    private _editing: boolean = false;
 
     public get editing(): boolean {
         return this._editing;
@@ -38,6 +34,10 @@ export class EventTileContentComponent {
 
     protected set editing(value: boolean) {
         this._editing = value;
+    }
+
+    protected get teacher(): boolean {
+        return this._userService.getUserData.inGroup('teacher');
     }
 
     protected get icon(): 'check' | 'edit' {
