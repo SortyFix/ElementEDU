@@ -8,6 +8,7 @@ import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.model.UserModel;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeModel;
 import de.gaz.eedu.user.theming.ThemeService;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
@@ -15,6 +16,7 @@ import de.gaz.eedu.user.verification.credentials.implementations.CredentialMetho
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see UserService
  * @see GroupService
  */
+@Slf4j
 @Getter(AccessLevel.PROTECTED)
 public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, UserModel, UserCreateModel> {
 
@@ -56,73 +59,69 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
         };
     }
 
+    private static @NotNull UserCreateModel createModel(int number)
+    {
+        String id = String.valueOf(number);
+        AccountType type = AccountType.STUDENT;
+        UserStatus status = UserStatus.PRESENT;
+
+        return new UserCreateModel("User", id, "user." + id, type, false, false, status, 1L, new String[0]);
+    }
+
+    private @NotNull UserModel model(int number)
+    {
+        String id = String.valueOf(number);
+        AccountType type = AccountType.STUDENT;
+        UserStatus status = UserStatus.PRESENT;
+        ThemeModel theme = getThemeService().loadByIdSafe(1L);
+
+        GroupModel[] groupModel = {new GroupModel("student", new PrivilegeModel[0])};
+        return new UserModel(number + 1L, "User", id, "user." + id, type, status, groupModel, theme, null);
+    }
+
     @Override
     protected @NotNull UserCreateModel occupiedCreateModel() {
-        return new UserCreateModel(
-                "Max",
-                "musterman",
-                "max.mustermann",
-                AccountType.STUDENT,
-                true,
-                false,
-                UserStatus.PRESENT,
-                1L,
-                new String[0]
-        );
+        return createModel(0);
     }
 
     @Override
     protected @NotNull TestData<Long, Boolean>[] deleteEntities() {
+
         //noinspection unchecked
-        return new TestData[] { new TestData<>(4, true) };
+        return new TestData[] {
+                new TestData<>(17, true),
+                new TestData<>(18, true),
+                new TestData<>(19, false),
+        };
     }
 
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
-        final UserCreateModel createModel = new UserCreateModel(
-                "jonas",
-                "yonas",
-                "jonas.yonas",
-                AccountType.STUDENT,
-                true,
-                false,
-                UserStatus.PRESENT,
-                1L,
-                new String[0]
-        );
-
-        final ThemeModel themeModel = themeService.loadByIdSafe(1L);
-        final UserModel expected = new UserModel(
-                7L,
-                "jonas",
-                "yonas",
-                "jonas.yonas",
-                AccountType.STUDENT,
-                UserStatus.PRESENT,
-                new GroupModel[0],
-                themeModel,
-                null
-        );
-
-        return Eval.eval(createModel, expected, (request, expect, result) -> {
+        return Eval.eval(createModel(18), model(18), (request, expect, result) -> {
             Assertions.assertEquals(expect, result);
             Assertions.assertEquals(expect.firstName(), result.firstName());
             Assertions.assertEquals(expect.lastName(), result.lastName());
             Assertions.assertEquals(expect.loginName(), result.loginName());
+
             Assertions.assertEquals(expect.accountType(), result.accountType());
+            Assertions.assertEquals(expect.status(), result.status());
+            Assertions.assertArrayEquals(expect.groups(), result.groups());
+            Assertions.assertEquals(expect.theme(), result.theme());
+            Assertions.assertNull(result.classroom());
         });
     }
 
     @Transactional
-    @ValueSource(longs = {2, 3})
+    @ValueSource(longs = {1, 2})
     @ParameterizedTest(name = "{index} => request={0}")
     public void testAttachGroup(long userID) {
-        GroupEntity groupEntity = getGroupService().loadEntityById("admin").orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getGroupService().loadEntityById("group0").orElseThrow(IllegalStateException::new);
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
 
         Runnable test = () -> test(Eval.eval(groupEntity, true, Validator.equals()), userEntity::attachGroups);
-        if(userID == 3)
+        if(userID == 1)
         {
+            // expect the group was already added
             Assertions.assertThrows(IllegalStateException.class, test::run);
             return;
         }
@@ -149,11 +148,11 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
      *               the {@link ValueSource} annotation.
      */
     @ParameterizedTest(name = "{index} => request={0}")
-    @ValueSource(longs = {3, 2})
+    @ValueSource(longs = {1, 2})
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void testDetachGroup(long userID) {
         UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
-        test(Eval.eval("admin", userID == 3, Validator.equals()), userEntity::detachGroups);
+        test(Eval.eval("group0", userID == 1, Validator.equals()), userEntity::detachGroups);
     }
 
     @ParameterizedTest

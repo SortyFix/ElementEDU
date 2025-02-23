@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 
     @Override @Transactional public void run(@NotNull String... args)
     {
+
         if (userService.getRepository().findByLoginName("root").isEmpty())
         {
             createDefaultUser();
@@ -71,6 +72,10 @@ import java.util.stream.Stream;
 
         createDefaultPrivileges();
         createDefaultGroup();
+
+        // skip adding root user when testing
+        if(Objects.equals(getEnvironment().getActiveProfiles()[0], "test")) { return; }
+
         UserEntity userEntity = createDefaultUser(createDefaultTheme());
         setPassword(userEntity, randomPassword);
 

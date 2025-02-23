@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.group;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
@@ -36,18 +37,18 @@ public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEnt
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
-        GroupCreateModel groupCreateModel = new GroupCreateModel("test", new String[0]);
-        GroupModel groupModel = new GroupModel("test", new PrivilegeModel[0]);
+        GroupCreateModel groupCreateModel = new GroupCreateModel("group9", new String[0]);
+        GroupModel groupModel = new GroupModel("group9", new PrivilegeModel[0]);
         return Eval.eval(groupCreateModel, groupModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
-            Assertions.assertEquals(expect.privileges().length, result.privileges().length);
+            Assertions.assertArrayEquals(expect.privileges(), result.privileges());
         });
     }
 
     @Override protected @NotNull GroupCreateModel occupiedCreateModel()
     {
-        return new GroupCreateModel("user", new String[0]);
+        return new GroupCreateModel("group0", new String[0]);
     }
 
     /**
@@ -73,12 +74,20 @@ public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEnt
      * @param groupID the current group id to be tested for granting privilege. These are adjustable in the
      *                {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"moderator", "admin"})
-    @Transactional public void testGroupGrantPrivilege(String groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"group0", "group0"})
+    @Transactional public void testGroupGrantPrivilege(@NotNull String groupID)
     {
-        PrivilegeEntity privilegeEntity = getPrivilegeService().loadEntityByIDSafe("MODERATE");
-        GroupEntity groupEntity = getService().loadEntityByIDSafe(groupID);
-        test(Eval.eval(privilegeEntity, Objects.equals(groupID, "moderator"), Validator.equals()), groupEntity::grantPrivilege);
+        PrivilegeEntity privilege = getPrivilegeService().loadEntityById("PRIVILEGE0").orElseThrow(IllegalStateException::new);
+        GroupEntity group = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
+
+        Runnable test = () -> test(Eval.eval(privilege, true, Validator.equals()), group::grantPrivilege);
+        if(Objects.equals(groupID, "group0"))
+        {
+            // expect the privilege was already added
+            Assertions.assertThrows(IllegalStateException.class, test::run);
+            return;
+        }
+        test.run();
     }
 
     /**
@@ -97,8 +106,19 @@ public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEnt
      * @param groupID the current group id that should be tested for the privilege revocation. These IDs can be modified inside
      *                the {@link ValueSource} annotation.
      */
-    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(longs = {3, 2}) @Transactional public void testGroupRevokePrivilege(long groupID)
+    @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"group0", "group1"})
+    @Transactional public void testGroupRevokePrivilege(@NotNull String groupID)
     {
-        // TODO
+        GroupEntity groupEntity = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
+        test(Eval.eval("PRIVILEGE0", Objects.equals(groupID, "group0"), Validator.equals()), groupEntity::revokePrivilege);
+    }
+
+    @Override protected @NotNull TestData<String, Boolean>[] deleteEntities()
+    {
+        //noinspection unchecked
+        return new TestData[]{
+                new TestData<>("group9", true),
+                new TestData<>("group10", false),
+        };
     }
 }

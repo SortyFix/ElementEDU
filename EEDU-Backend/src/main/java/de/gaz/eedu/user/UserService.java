@@ -83,9 +83,14 @@ public class UserService extends EntityService<Long, UserRepository, UserEntity,
             entity.setThemeEntity(themeRepository.getReferenceById(current.theme()));
 
             List<String> ids = Arrays.asList(current.groups());
+
+            GroupEntity accountType = getGroupRepository().findEntity(entity.getAccountType().toString()).orElseThrow();
+            entity.setTypeGroup(accountType);
+
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
         })).toList()).stream().peek(user -> {
+            //TODO remove duplicate above
             GroupEntity accountType = getGroupRepository().findEntity(user.getAccountType().toString()).orElseThrow();
             user.setTypeGroup(accountType);
         }).toList();

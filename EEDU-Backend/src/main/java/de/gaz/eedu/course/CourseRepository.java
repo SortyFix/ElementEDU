@@ -29,8 +29,11 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>
 
     @Query(
             "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
-                    "FROM CourseEntity c JOIN c.users u WHERE c.id = :course"
-    ) @NotNull @Unmodifiable Set<ReducedUserModel> findAllReducedUsersByCourse(long course);
+            "FROM CourseEntity c JOIN c.users u WHERE c.id = :course UNION " +
+            "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
+            "FROM CourseEntity c JOIN c.classRoom.users u WHERE c.id = :course"
+    )
+    @NotNull @Unmodifiable Set<ReducedUserModel> findAllReducedUsersByCourse(long course);
 
     @Query(
             "SELECT c FROM CourseEntity c " +

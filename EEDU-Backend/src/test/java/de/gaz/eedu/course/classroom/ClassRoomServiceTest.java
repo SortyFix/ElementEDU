@@ -2,13 +2,15 @@ package de.gaz.eedu.course.classroom;
 
 import de.gaz.eedu.ArrayTestData;
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
-import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -16,48 +18,63 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
+@Slf4j
 @Getter(AccessLevel.PROTECTED)
-public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel> {
+public class ClassRoomServiceTest extends ServiceTest<Long, ClassRoomService, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
+{
 
     @Autowired private ClassRoomService service;
 
-    @Contract(pure = true, value = "-> new")
-    private static @NotNull Stream<ArrayTestData<Long, Long>> getUser() {
+    @Override protected @NotNull TestData<Long, Boolean>[] deleteEntities()
+    {
+        //noinspection unchecked
+        return new TestData[] {
+            new TestData<>(10, true),
+            new TestData<>(11, false)
+        };
+    }
+
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUser()
+    {
         return Stream.of(
-                new ArrayTestData<>(1L, 1L),
-                new ArrayTestData<>(2L, 2L, 3L),
-                new ArrayTestData<>(3L, new Long[]{})
+                new ArrayTestData<>(1L, 1L, 6L, 11L),
+                new ArrayTestData<>(2L, 2L, 7L, 12L),
+                new ArrayTestData<>(6L, new Long[]{})
         );
     }
 
-    @Override
-    protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval() {
-        ClassRoomCreateModel classRoomCreateModel = new ClassRoomCreateModel("5b", 2L, new Long[0], new Long[0]);
+    @Override protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval()
+    {
+        ReducedUserModel teacher = new ReducedUserModel(6L, "User", "5", AccountType.TEACHER);
 
-        @SuppressWarnings("DataFlowIssue")
-        ClassRoomModel classRoomModel = new ClassRoomModel(5L, "5b", null, new ReducedUserModel[0]);
-
-        return Eval.eval(classRoomCreateModel, classRoomModel, (request, expect, result) -> {
-            Assertions.assertEquals(expect.id(), result.id());
-            Assertions.assertEquals(expect.name(), result.name());
-            Assertions.assertArrayEquals(expect.students(), result.students());
-        });
+        return Eval.eval(
+                new ClassRoomCreateModel("classroom10", teacher.id(), new Long[0], new Long[0]),
+                new ClassRoomModel(11L, "classroom10", teacher, new ReducedUserModel[0]),
+                (request, expect, result) ->
+                {
+                    Assertions.assertEquals(expect, result);
+                    Assertions.assertEquals(expect.name(), result.name());
+                    Assertions.assertEquals(expect.tutor(), result.tutor());
+                    Assertions.assertArrayEquals(expect.students(), result.students());
+                });
     }
 
-    @Override
-    protected @NotNull ClassRoomCreateModel occupiedCreateModel() {
-        return new ClassRoomCreateModel("Q1", 1L, new Long[0], new Long[0]);
+    @Override protected @NotNull ClassRoomCreateModel occupiedCreateModel()
+    {
+        return new ClassRoomCreateModel("classroom0", 5L, new Long[0], new Long[0]);
     }
 
-    @Transactional
-    @ParameterizedTest(name = "{index} => data={0}")
-    @MethodSource("getUser")
-    public void testGetUsers(@NotNull ArrayTestData<Long, Long> data) {
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
+    public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
+    {
         test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request -> {
-            Stream<UserEntity> userEntities = getService().loadEntityByIDSafe(data.entityID()).getStudents().stream();
-            return userEntities.map(UserEntity::getId).toArray(Long[]::new);
+
+            Set<ReducedUserModel> reducedUserModels = getService().loadReducedModelsByClass(request);
+            log.info(reducedUserModels.toString());
+            return reducedUserModels.stream().map(ReducedUserModel::id).toArray(Long[]::new);
         });
     }
 }

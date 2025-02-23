@@ -3,7 +3,6 @@ package de.gaz.eedu.user;
 import jakarta.validation.constraints.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -155,6 +155,11 @@ public class GroupEntity implements EntityModelRelation<String, GroupModel>
      */
     public boolean grantPrivilege(@NotNull PrivilegeEntity... privilegeEntity)
     {
+        List<PrivilegeEntity> entities = Arrays.asList(privilegeEntity);
+        if(!Collections.disjoint(this.getPrivileges(), entities))
+        {
+            throw new IllegalStateException("The group already has one of these privileges.");
+        }
         return privileges.addAll(Arrays.asList(privilegeEntity));
     }
 

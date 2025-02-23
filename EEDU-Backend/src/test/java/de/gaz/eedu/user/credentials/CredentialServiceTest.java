@@ -1,6 +1,7 @@
 package de.gaz.eedu.user.credentials;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.verification.credentials.CredentialEntity;
 import de.gaz.eedu.user.verification.credentials.CredentialService;
@@ -20,7 +21,6 @@ import java.util.Set;
 @Getter(AccessLevel.PROTECTED)
 public class CredentialServiceTest extends ServiceTest<Long, CredentialService, CredentialEntity, CredentialModel, CredentialCreateModel>
 {
-
     @Autowired private CredentialService service;
 
     @Override protected @NotNull Eval<CredentialCreateModel, CredentialModel> successEval()
@@ -47,10 +47,16 @@ public class CredentialServiceTest extends ServiceTest<Long, CredentialService, 
         CredentialModel credentialModel = new CredentialModel(1858448519L, passwordMethod, true);
         test(Eval.eval(createModel, credentialModel, ((request, expect, result) ->
         {
-            Assertions.assertEquals(expect.id(), result.id());
+            Assertions.assertEquals(expect, result);
             Assertions.assertEquals(expect.method(), result.method());
             Assertions.assertEquals(expect.enabled(), result.enabled());
         })), creation -> getService().create(Set.of(creation)).getFirst());
+    }
+
+    @Override protected @NotNull TestData<Long, Boolean>[] deleteEntities()
+    {
+        //noinspection unchecked
+        return new TestData[] {new TestData<>(964, true), new TestData<>(965, false)};
     }
 
     @Override protected @NotNull CredentialCreateModel occupiedCreateModel()

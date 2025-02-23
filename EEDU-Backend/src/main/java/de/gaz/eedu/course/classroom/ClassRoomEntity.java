@@ -86,7 +86,6 @@ public class ClassRoomEntity implements EntityModelRelation<Long, ClassRoomModel
     {
         if (this.users.isEmpty())
         {
-
             return false;
         }
 

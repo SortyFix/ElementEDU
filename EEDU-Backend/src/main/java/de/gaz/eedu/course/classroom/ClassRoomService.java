@@ -11,6 +11,7 @@ import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.OccupiedException;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -61,6 +62,11 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
     private final CourseService courseService;
     private final UserRepository userRepository;
 
+    public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByClass(long classroom)
+    {
+        return getRepository().findAllUsersByClass(classroom);
+    }
+
     @Transactional
     @Override
     public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException
@@ -83,13 +89,29 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
     {
         // remove this classroom from all courses and users
         getCourseService().saveEntity(entry.getCourses().stream().peek(CourseEntity::unlinkClassRoom).toList());
-        getUserRepository().saveAllEntities(getUsers(entry).peek(user -> user.setClassRoom(null)).toList());
+        getUserRepository().saveAllEntities(getUsers(entry, true).peek(user -> user.setClassRoom(null)).toList());
     }
 
     private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom)
     {
+        return getUsers(classRoom, false);
+    }
+
+    private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom, boolean ignoreMissingTutor)
+    {
+        Stream<UserEntity> tutor = Stream.empty();
+
+        try
+        {
+            tutor = Stream.of(classRoom.getTutor());
+        }
+        catch (Exception exception)
+        {
+            if(!ignoreMissingTutor) { throw exception; }
+        }
+
         Stream<UserEntity> students = classRoom.getStudents().stream();
-        return Stream.concat(students, Stream.of(classRoom.getTutor()));
+        return Stream.concat(students, tutor);
     }
 
     @Contract(pure = true, value = "-> new")

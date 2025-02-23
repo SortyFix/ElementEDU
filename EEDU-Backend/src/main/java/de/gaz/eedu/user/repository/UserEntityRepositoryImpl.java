@@ -14,20 +14,23 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository @Transactional
+@Repository
+@Transactional
 public class UserEntityRepositoryImpl extends AbstractEntityRepository<Long, UserEntity> implements UserEntityRepository
 {
     private static final String QUERY_TEMPLATE;
-    @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;
 
-    static {
-        QUERY_TEMPLATE = String.join(" ",
+    static
+    {
+        QUERY_TEMPLATE = String.join(
+                " ",
                 "SELECT u FROM UserEntity u",
                 "LEFT JOIN FETCH u.groups g",
                 "LEFT JOIN FETCH g.privileges p",
-                "LEFT JOIN FETCH u.themeEntity t"
-        );
+                "LEFT JOIN FETCH u.themeEntity t");
     }
+
+    @Getter(AccessLevel.PROTECTED) private final GroupRepository groupRepository;
 
     public UserEntityRepositoryImpl(@NonNull EntityManager entityManager, @NonNull GroupRepository groupRepository)
     {
@@ -37,8 +40,9 @@ public class UserEntityRepositoryImpl extends AbstractEntityRepository<Long, Use
 
     @Override protected @NonNull TypedQuery<UserEntity> findEntityQuery(@NonNull Long id)
     {
-        String sqlQuery = String.join(" ", QUERY_TEMPLATE, "WHERE u.id = :userId");
-        return getEntityManager().createQuery(sqlQuery, UserEntity.class).setParameter("userId", id);
+        return getEntityManager().createQuery(
+                "SELECT u FROM UserEntity u LEFT JOIN FETCH u.groups g LEFT JOIN FETCH g.privileges p LEFT JOIN FETCH u.themeEntity t WHERE u.id = :userId",
+                UserEntity.class).setParameter("userId", id);
     }
 
     @Override protected @NonNull TypedQuery<UserEntity> findAllEntitiesQuery()

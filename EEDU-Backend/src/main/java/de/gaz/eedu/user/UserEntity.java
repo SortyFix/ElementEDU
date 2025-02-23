@@ -208,7 +208,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
     public boolean attachGroups(@NotNull GroupEntity... groupEntities)
     {
         List<GroupEntity> entities = Arrays.asList(groupEntities);
-        if(!Collections.disjoint(this.groups, entities))
+        if(!Collections.disjoint(this.getGroups(), entities))
         {
             throw new IllegalStateException("The user already has one of these groups.");
         }

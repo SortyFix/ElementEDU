@@ -20,20 +20,20 @@ public class RoomServiceTest extends ServiceTest<String, RoomService, RoomEntity
 
     @Override protected @NotNull Eval<RoomCreateModel, RoomModel> successEval() throws IOException, URISyntaxException
     {
-        return Eval.eval(new RoomCreateModel("402"), new RoomModel("402"), (request, expect, result) -> Assertions.assertEquals(expect.id(), result.id()));
+        return Eval.eval(new RoomCreateModel("room9"), new RoomModel("room9"), (request, expect, result) -> Assertions.assertEquals(expect, result));
     }
 
     @Override protected @NotNull RoomCreateModel occupiedCreateModel()
     {
-        return new RoomCreateModel("403");
+        return new RoomCreateModel("room0");
     }
 
     @Override protected @NotNull TestData<String, Boolean>[] deleteEntities()
     {
         //noinspection unchecked
         return new TestData[] {
-                new TestData<>("406", true),
-                new TestData<>("407", false),
+                new TestData<>("room9", true),
+                new TestData<>("room10", false),
         };
     }
 }

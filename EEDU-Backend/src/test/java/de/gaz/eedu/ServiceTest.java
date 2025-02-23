@@ -18,9 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * {@code ServiceTest} is an abstract class, providing a generic way to test services.
@@ -29,8 +27,8 @@ import java.util.stream.Collectors;
  *
  * <p>
  * This class provides us the functionality to test services in the Spring context, which is ensured
- * by the `SpringBootTest` annotation. It also ensures that these tests will be run with the "test"
- * profile active, which is done using the `ActiveProfiles` annotation. The need to use the Spring
+ * by the {@link SpringBootTest} annotation. It also makes sure that these tests will be run with the "test"
+ * profile active, which is done using the {@link ActiveProfiles} annotation. The need to use the Spring
  * context and a specific profile comes from the fact that these tests might have to mock beans and
  * use repositories for some data retrieval operations.
  * </p>
@@ -40,9 +38,10 @@ import java.util.stream.Collectors;
  * </p>
  *
  * <ul>
- *     <li>E is the entity that the service will be handling. This entity must extend EDUEntity.</li>
- *     <li>M is the model for the entity - a lighter or specific view of the entity.</li>
- *     <li>C is a creation model for the entity - a model specifically designed for creating new instances of E.</li>
+ *     <li>E is the entity that the service will be handling. This entity must extend {@link EntityModelRelation}.</li>
+ *     <li>S is the actual service that will be handling everything. It must extend {@link EntityService}.</li>
+ *     <li>M is the model for the entity - a lighter or specific view of the entity sometimes referred to as DTO. It must extend {@link EntityModel}</li>
+ *     <li>C is a creation model for the entity - a model specifically designed for creating new instances of E. It must extend {@link CreationModel}</li>
  * </ul>
  *
  * @param <E> The entity type that the service under test handles.
@@ -179,7 +178,12 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
 
         for(TestData<P, Boolean> current : deleteData)
         {
-            test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> getService().delete(id));
+            test(Eval.eval(
+                    current.entityID(),
+                    current.expected(),
+                    Validator.equals()),
+                    (id) -> getService().delete(id)
+            );
         }
     }
 
@@ -257,10 +261,7 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
          * allows for safe usage in any context, even in a multi-threaded environment.
          * </p>
          * <p>
-         * The array equality check is performed by converting the expected array into a {@link Set} using the
-         * {@link Arrays#stream(Object[])} and {@link Collectors#toSet()} methods, and then iterating through the actual result
-         * array to ensure each element is present in the expected set. If any element in the result array is not present in the
-         * expected set, an assertion failure will be triggered using {@link Assertions#assertTrue(boolean)}.
+         * The array equality check is performed by calling {@link Assertions#assertArrayEquals(Object[], Object[])}.
          * </p>
          * <p>
          * Example Usage:
@@ -295,14 +296,7 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
          */
         @Contract(pure = true) static <R, E> @NotNull Validator<R, E[]> arrayEquals()
         {
-            return (request, expect, result) ->
-            {
-                Set<E> expected = Arrays.stream(expect).collect(Collectors.toSet());
-                for (E current : result)
-                {
-                    Assertions.assertTrue(expected.contains(current));
-                }
-            };
+            return (request, expect, result) -> Assertions.assertArrayEquals(expect, result);
         }
 
         /**
