@@ -38,7 +38,7 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     @Autowired private UserService userService;
     @Autowired private SubjectService subjectService;
 
-    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUserData()
+    @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<Long, Long>> getUser()
     {
         return Stream.of(
                 //1 is in class and course. Should not duplicate, others come from attached class
@@ -61,7 +61,7 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     {
         String name = "course9";
         ReducedUserModel teacher = new ReducedUserModel(6L, "User", "5", AccountType.TEACHER);
-        ClassRoomModel classRoom = getClassRoomService().loadByIdSafe(1L);
+        ClassRoomModel classRoom = getClassRoomService().loadByIdSafe("classroom0");
         SubjectModel subject = new SubjectModel("subject9");
 
         FrequentAppointmentModel[] frequent = new FrequentAppointmentModel[0];
@@ -95,13 +95,24 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
         return new CourseCreateModel("course0", "subject0", 4L, new Long[0], null);
     }
 
-    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUserData")
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
     public void testGetUsers(@NotNull ArrayTestData<Long, Long> data)
     {
         test(Eval.eval(data.entityID(), data.expected(), Validator.exactArrayEquals()), request ->
         {
             Set<ReducedUserModel> reducedUserModels = getService().loadReducedModelsByCourse(request);
             return reducedUserModels.stream().map(ReducedUserModel::id).toArray(Long[]::new);
+        });
+    }
+
+    @Transactional @ParameterizedTest(name = "{index} => data={0}") @MethodSource("getUser")
+    public void testGetUsersByEntity(@NotNull ArrayTestData<Long, Long> data)
+    {
+        test(Eval.eval(data.entityID(), data.expected(), Validator.arrayEquals()), request -> {
+            CourseEntity course = getService().loadEntityByIDSafe(request);
+            Stream<UserEntity> students = course.getStudents().stream();
+
+            return Stream.concat(students, course.getTeacher().stream()).map(UserEntity::getId).toArray(Long[]::new);
         });
     }
 

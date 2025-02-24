@@ -82,7 +82,7 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
 
             if (Objects.nonNull(createModel.classroom()))
             {
-                long classroom = createModel.classroom();
+                String classroom = createModel.classroom();
                 getClassRepository().findById(classroom).ifPresentOrElse(entity::linkClassRoom, () -> {
                     throw entityUnknown(classroom).get();
                 });

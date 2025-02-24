@@ -4,11 +4,7 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Class Name</mat-label>
-                <input
-                    formControlName="name"
-                    matInput
-                    type="text"
-                />
+                <input formControlName="id" matInput type="text"/>
             </mat-form-field>
 
             <general-selection-input
@@ -20,6 +16,7 @@
 
             <general-selection-input
                 [multiple]="true"
+                [allowNull]="true"
                 [values]="students"
                 formControlName="students"
                 label="Select Students"

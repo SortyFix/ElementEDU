@@ -13,11 +13,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long>
+public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, String>
 {
 
     @Query("SELECT c FROM ClassRoomEntity c LEFT JOIN FETCH c.users LEFT JOIN FETCH c.courses WHERE c.id = :id")
-    @Override @NotNull Optional<ClassRoomEntity> findById(@NotNull Long id);
+    @Override @NotNull Optional<ClassRoomEntity> findById(@NotNull String id);
 
     @Query("SELECT COUNT(u) > 0 FROM CourseEntity c JOIN c.users u WHERE c.id = :courseId AND u.id = :userId")
     boolean existsUserInCourse(long userId, long courseId);
@@ -30,7 +30,7 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Long
             "FROM ClassRoomEntity c " +
             "JOIN c.users u " +
             "WHERE c.id = :classroom"
-    ) @NotNull @Unmodifiable Set<ReducedUserModel> findAllUsersByClass(long classroom);
+    ) @NotNull @Unmodifiable Set<ReducedUserModel> findAllUsersByClass(@NotNull String classroom);
 
-    boolean existsByNameIn(@NotNull Collection<String> name);
+    boolean existsByIdIn(@NotNull Collection<String> name);
 }

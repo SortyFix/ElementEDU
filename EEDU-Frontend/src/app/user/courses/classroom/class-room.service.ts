@@ -11,7 +11,7 @@ import {CourseService} from "../course.service";
 @Injectable({
     providedIn: 'root'
 })
-export class ClassRoomService extends AbstractCourseComponentsService<bigint, ClassRoomModel, ClassRoomCreateModel> {
+export class ClassRoomService extends AbstractCourseComponentsService<string, ClassRoomModel, ClassRoomCreateModel> {
 
     private readonly _translateCourses: OperatorFunction<any[], CourseModel[]>;
 
@@ -30,7 +30,7 @@ export class ClassRoomService extends AbstractCourseComponentsService<bigint, Cl
         return this.http.get<any[]>(`${this.BACKEND_URL}/course/classroom/get/all`, {withCredentials: true});
     }
 
-    public fetchCourses(classRoom: bigint): Observable<CourseModel[]> {
+    public fetchCourses(classRoom: string): Observable<CourseModel[]> {
         const url: string = `${this.BACKEND_URL}/course/classroom/get/courses/${classRoom}`;
         return this.http.get<any[]>(url, {withCredentials: true}).pipe(this._translateCourses);
     }
@@ -40,7 +40,7 @@ export class ClassRoomService extends AbstractCourseComponentsService<bigint, Cl
         return this.http.post<any[]>(url, this.toPackets(createModels), {withCredentials: true});
     }
 
-    protected override deleteValue(id: bigint[]): Observable<void> {
+    protected override deleteValue(id: string[]): Observable<void> {
         const url: string = `${this.BACKEND_URL}/course/classroom/delete/${id.toString()}`;
         return this.http.delete<void>(url, {withCredentials: true});
     }

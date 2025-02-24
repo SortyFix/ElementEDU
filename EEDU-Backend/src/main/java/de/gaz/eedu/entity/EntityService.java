@@ -179,7 +179,7 @@ public abstract class EntityService<
         List<E> systemEntities = entities.stream().filter(entity -> !entity.isDeletable()).toList();
         if(!systemEntities.isEmpty())
         {
-            String error = "The entities/entity " + systemEntities + " can not be deleted.";
+            String error = "The object(s) " + systemEntities + " can not be deleted.";
             throw new ResponseStatusException(HttpStatus.CONFLICT, error);
         }
 
@@ -189,15 +189,15 @@ public abstract class EntityService<
             log.info("The system has initiated a deletion request for the entity {} {}.", entityName, id);
             if (entry.deleteManagedRelations())
             {
-                getRepository().save(entry);
+                saveEntity(entry);
+                getRepository().flush();
             }
 
             deleteRelations(entry);
-
-            log.info("The deletion process of the entity {} {} has been successfully executed.", entityName, id);
         }
 
         getRepository().deleteAll(entities);
+        log.info("The deletion process of the object(s) {} has been successfully executed.", entities);
         return true;
     }
 
@@ -249,11 +249,19 @@ public abstract class EntityService<
      */
     @Transactional public @NotNull <T extends E> List<T> saveEntity(@NotNull Iterable<T> entity)
     {
+        if(!entity.iterator().hasNext())
+        {
+            log.info("Received save request for no entities. Skipping...");
+            return Collections.emptyList();
+        }
+
         if(getRepository() instanceof EntityRepository<?, ?> overridden)
         {
             //noinspection unchecked
             return ((EntityRepository<P, T>) overridden).saveAllEntities(entity);
         }
+
+        log.info("Saving object(s) {}.", entity);
         return getRepository().saveAll(entity);
     }
 

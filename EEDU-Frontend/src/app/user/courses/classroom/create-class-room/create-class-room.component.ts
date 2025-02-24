@@ -69,10 +69,10 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {
         return formBuilder.group({
-            name: [null, Validators.required],
-            students: [null, Validators.required],
-            courses: [null, Validators.required],
+            id: [null, Validators.required],
             tutor: [null, Validators.required],
+            students: [null],
+            courses: [null],
         });
     }
 

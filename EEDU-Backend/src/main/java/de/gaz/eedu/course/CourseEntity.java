@@ -198,11 +198,23 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      */
     public boolean attachStudents(@NonNull UserEntity... user)
     {
-        // Filter already attached users out
-        Predicate<UserEntity> predicate = present -> getStudents().stream().noneMatch(presentUser -> Objects.equals(
-                presentUser,
-                present));
-        return this.users.addAll(Arrays.stream(user).filter(predicate).collect(Collectors.toSet()));
+        List<UserEntity> userEntities = Arrays.asList(user);
+        if(!Collections.disjoint(this.users, userEntities))
+        {
+            throw new IllegalStateException("Some of these users already have been attached to this entity.");
+        }
+
+        for (UserEntity userEntity : userEntities)
+        {
+            if(Objects.equals(userEntity.getAccountType(), AccountType.STUDENT))
+            {
+               continue;
+            }
+
+            throw new AccountTypeMismatch(AccountType.STUDENT, userEntity.getAccountType());
+        }
+
+        return this.users.addAll(userEntities);
     }
 
     /**
@@ -349,9 +361,14 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
     public @NotNull @Unmodifiable Set<UserEntity> getStudents()
     {
         // add users from class if class is present
-        Stream<UserEntity> clazzStream = getClassRoom().stream().flatMap(clazz -> clazz.getStudents().stream());
-        Stream<UserEntity> userStream = getUsers().stream().filter(user -> !Objects.equals(user.getAccountType(), AccountType.TEACHER));
-        return Stream.concat(userStream, clazzStream).collect(Collectors.toUnmodifiableSet());
+        Stream<ClassRoomEntity> classRoomStream = getClassRoom().stream();
+        Stream<UserEntity> clazzUsers = classRoomStream.flatMap(clazz -> clazz.getStudents().stream());
+
+        return Stream.concat(clazzUsers, getUsers().stream().filter(user ->
+        {
+            AccountType accountType = user.getAccountType();
+            return !Objects.equals(accountType, AccountType.TEACHER);
+        })).collect(Collectors.toUnmodifiableSet());
     }
 
     public @NotNull @Unmodifiable Set<FrequentAppointmentEntity> getFrequentAppointments()

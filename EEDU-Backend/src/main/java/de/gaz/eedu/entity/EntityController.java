@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +63,7 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
      */
     public @NotNull ResponseEntity<Void> delete(@NotNull P[] id)
     {
-        log.info("Received an incoming delete request from class {} with id {}.", getClass().getSuperclass(), id);
+        log.info("Received an incoming delete request from class {} with id {}.", getClass().getSimpleName(), id);
         return getService().delete(List.of(id)) ? empty(HttpStatus.OK) : empty(HttpStatus.NOT_MODIFIED);
     }
 
@@ -83,7 +82,7 @@ public abstract class EntityController<P, S extends EntityService<P, ?, ?, M, C>
      */
     public @NotNull ResponseEntity<M> getData(@NotNull P id)
     {
-        log.info("Received an incoming get request from class {} with id {}.", getClass().getName(), id);
+        log.info("Received an incoming get request from class {} with id {}.", getClass().getSimpleName(), id);
         return getService().loadById(id).map(ResponseEntity::ok) .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 

@@ -1,8 +1,7 @@
 import {GenericReducedUserModel, ReducedUserModel} from "../../reduced-user-model";
 
 export interface GenericClassRoomModel {
-    id: bigint;
-    name: string;
+    id: string;
     tutor: GenericReducedUserModel;
     students: GenericReducedUserModel[];
 }
@@ -10,18 +9,13 @@ export interface GenericClassRoomModel {
 export class ClassRoomModel {
 
     constructor(
-        private readonly _id: bigint,
-        private readonly _name: string,
+        private readonly _id: string,
         private readonly _tutor: ReducedUserModel,
         private readonly _students: ReducedUserModel[],
     ) { }
 
-    public get id(): bigint {
+    public get id(): string {
         return this._id;
-    }
-
-    public get name(): string {
-        return this._name;
     }
 
     public get students(): ReducedUserModel[] {
@@ -33,7 +27,7 @@ export class ClassRoomModel {
     }
 
     public static fromObject(obj: GenericClassRoomModel): ClassRoomModel {
-        return new ClassRoomModel(obj.id, obj.name, ReducedUserModel.fromObject(obj.tutor), obj.students.map(
+        return new ClassRoomModel(obj.id, ReducedUserModel.fromObject(obj.tutor), obj.students.map(
             (item: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(item)
         ));
     }

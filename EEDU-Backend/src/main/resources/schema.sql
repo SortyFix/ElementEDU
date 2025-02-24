@@ -23,8 +23,7 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- Classes, Courses and Subjects --
 CREATE TABLE IF NOT EXISTS class_room_entity
 (
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    id VARCHAR(255) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS subject_entity
@@ -42,7 +41,7 @@ CREATE TABLE IF NOT EXISTS course_entity
     name          VARCHAR(255) NOT NULL,
     subject_id    VARCHAR(50)  NOT NULL,
     repository_id BIGINT       NOT NULL,
-    class_room_id BIGINT       NULL,
+    class_room_id VARCHAR(255) NULL,
     FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
     FOREIGN KEY (repository_id) REFERENCES file_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
@@ -104,7 +103,7 @@ CREATE TABLE IF NOT EXISTS user_entity
     locked         BIT          NOT NULL,
     theme_id       BIGINT       NULL,
     status         TINYINT      NULL,
-    class_room_id  BIGINT       NULL,
+    class_room_id  VARCHAR(255) NULL,
     FOREIGN KEY (theme_id) REFERENCES theme_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
@@ -210,7 +209,7 @@ CREATE TABLE IF NOT EXISTS post_entity
     author           VARCHAR(255)   NOT NULL,
     title            VARCHAR(255)   NOT NULL,
     thumbnailurl     VARCHAR(255),
-    body             VARCHAR(65000) NOT NULL,
+    body             VARCHAR(255) NOT NULL,
     time_of_creation BIGINT         NOT NULL
 );
 
@@ -235,6 +234,7 @@ CREATE TABLE IF NOT EXISTS post_tags
     FOREIGN KEY (post_id) REFERENCES post_entity (id) ON DELETE CASCADE
 );
 
+
 /*
 INSERT INTO subject_entity (id)
 VALUES ('Mathematics'),
@@ -246,7 +246,9 @@ INSERT INTO group_entity (id)
 VALUES ('parent'),
        ('girl'),
        ('boys');
+*/
 
+/*
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r,
                           widget_color_g, widget_color_b)
 VALUES ('dark', 120, 120, 120, 100, 100, 100);
@@ -269,7 +271,9 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    
        ('Ethan', 'Schwarz', 'ethan.schwarz', 2, TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE Student
        ('Charlotte', 'Zimmer', 'charlotte.zimmer', 2, FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED Student
        ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1); -- EXCUSED Student
+*/
 
+/*
 INSERT INTO file_entity (data_directory)
 VALUES ('/repo/algebra/101'),  -- File for Algebra 101
        ('/repo/calculus/101'), -- File for Calculus 101
@@ -307,4 +311,5 @@ VALUES (1, 5), -- Sara Müller to Algebra 101
        (4, 4), -- Lora Schmidt to History 101
        (5, 2), -- John Zimmermann to Introduction to Programming
        (5, 10); -- Liam Schneider to Introduction to Programming
+
 */

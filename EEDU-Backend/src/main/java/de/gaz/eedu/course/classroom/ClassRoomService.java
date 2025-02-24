@@ -53,33 +53,25 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Service
 @Getter
-public class ClassRoomService extends EntityService<Long, ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
+public class ClassRoomService extends EntityService<String, ClassRoomRepository, ClassRoomEntity, ClassRoomModel, ClassRoomCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final ClassRoomRepository repository;
     private final CourseService courseService;
     private final UserRepository userRepository;
 
-    public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByClass(long classroom)
+    public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByClass(@NotNull String classroom)
     {
         return getRepository().findAllUsersByClass(classroom);
     }
 
-    @Transactional
-    @Override
-    public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException
+    @Transactional @Override public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException
     {
-        if (getRepository().existsByNameIn(model.stream().map(ClassRoomCreateModel::name).toList()))
+        if (getRepository().existsByIdIn(model.stream().map(ClassRoomCreateModel::id).toList()))
         {
             throw new OccupiedException();
         }
 
-        List<ClassRoomEntity> entities = saveEntity(model.stream().map(classroomFactory()).toList());
-
-        // safe external managed relations
-        getUserRepository().saveAllEntities(entities.stream().flatMap(this::getUsers).toList());
-        getCourseService().saveEntity(entities.stream().flatMap(clazz -> clazz.getCourses().stream()).toList());
-
-        return entities;
+        return injectAndSaveRelations(saveEntity(model.stream().map(classroomFactory()).toList()));
     }
 
     @Override public void deleteRelations(@NotNull ClassRoomEntity entry)
@@ -89,10 +81,26 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
         getUserRepository().saveAllEntities(getUsers(entry).peek(user -> user.setClassRoom(null)).toList());
     }
 
+    private @NotNull @Unmodifiable List<ClassRoomEntity> injectAndSaveRelations(@NotNull List<ClassRoomEntity> entries)
+    {
+        // ensure the repository is flushed
+        getRepository().flush();
+
+        for (ClassRoomEntity classRoomEntity : entries)
+        {
+            classRoomEntity.getTutor().ifPresent(teacher -> teacher.setClassRoom(classRoomEntity));
+            classRoomEntity.getStudents().forEach(student -> student.setClassRoom(classRoomEntity));
+            classRoomEntity.getCourses().forEach(course -> course.linkClassRoom(classRoomEntity));
+        }
+
+        getUserRepository().saveAllEntities(entries.stream().flatMap(this::getUsers).toList());
+        getCourseService().saveEntity(entries.stream().flatMap(clazz -> clazz.getCourses().stream()).toList());
+        return entries;
+    }
+
     private @NotNull Stream<UserEntity> getUsers(@NotNull ClassRoomEntity classRoom)
     {
-        Stream<UserEntity> students = classRoom.getStudents().stream();
-        return Stream.concat(students, classRoom.getTutor().stream());
+        return Stream.concat(classRoom.getStudents().stream(), classRoom.getTutor().stream());
     }
 
     @Contract(pure = true, value = "-> new")
@@ -102,14 +110,11 @@ public class ClassRoomService extends EntityService<Long, ClassRoomRepository, C
         {
             UserEntity tutor = fetchTutor(current.tutor());
             List<UserEntity> fetchedUsers = getUserRepository().findAllById(List.of(current.students()));
+
             Collection<UserEntity> users = Stream.concat(Stream.of(tutor), fetchedUsers.stream()).toList();
             Collection<CourseEntity> courses = getCourseService().loadEntityById(Arrays.asList(current.courses()));
 
-            ClassRoomEntity classRoomEntity = new ClassRoomEntity(courses, users);
-            tutor.setClassRoom(classRoomEntity);
-            fetchedUsers.forEach(userEntity -> userEntity.setClassRoom(classRoomEntity));
-            courses.forEach(course -> course.linkClassRoom(classRoomEntity));
-            return current.toEntity(classRoomEntity);
+            return current.toEntity(new ClassRoomEntity(current.id(), courses, users));
         };
     }
 

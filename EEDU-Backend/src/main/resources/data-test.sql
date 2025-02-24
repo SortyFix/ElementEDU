@@ -31,7 +31,7 @@ VALUES ('room0'),
        ('room9')
 ;
 
-INSERT INTO class_room_entity(name)
+INSERT INTO class_room_entity(id)
 VALUES ('classroom0'),
        ('classroom1'),
        ('classroom2'),
@@ -57,16 +57,16 @@ VALUES ('repository0'),
        ('repository9');
 
 INSERT INTO course_entity(name, subject_id, repository_id, class_room_id)
-VALUES ('course0', 'subject0', 1, 1),
-       ('course1', 'subject1', 2, 2),
-       ('course2', 'subject2', 3, 3),
-       ('course3', 'subject3', 4, 4),
-       ('course4', 'subject4', 5, 5),
-       ('course5', 'subject5', 6, 6),
-       ('course6', 'subject6', 7, 7),
-       ('course7', 'subject7', 8, 9),
-       ('course8', 'subject8', 9, 9),
-       ('course9', 'subject9', 10, 10)
+VALUES ('course0', 'subject0', 1, 'classroom0'),
+       ('course1', 'subject1', 2, 'classroom1'),
+       ('course2', 'subject2', 3, 'classroom2'),
+       ('course3', 'subject3', 4, 'classroom3'),
+       ('course4', 'subject4', 5, 'classroom4'),
+       ('course5', 'subject5', 6, 'classroom5'),
+       ('course6', 'subject6', 7, 'classroom6'),
+       ('course7', 'subject7', 8, 'classroom7'),
+       ('course8', 'subject8', 9, 'classroom8'),
+       ('course9', 'subject9', 10, 'classroom9')
 ;
 
 INSERT INTO privilege_entity (id)
@@ -110,24 +110,24 @@ MERGE INTO group_privileges (group_id, privilege_id) VALUES
 
 /* Max = securestPasswordProbably123!, John = 123password! and Martin = password123*/
 INSERT INTO user_entity (first_name, last_name, login_name, account_type, system_account, enabled, locked, theme_id, status, class_room_id)
-VALUES ('User', '0', 'user.0', 0, FALSE, TRUE, FALSE, 1, 0, 1),      -- Regular user, enabled, not locked, (in group0)
-       ('User', '1', 'user.1', 0, FALSE, TRUE, TRUE, 1, 0, 2),       -- Regular user, enabled, locked (in group1)
-       ('User', '2', 'user.2', 0, FALSE, FALSE, FALSE, 1, 0, 3),     -- Regular user, disabled, not locked (in group2)
-       ('User', '3', 'user.3', 0, FALSE, FALSE, TRUE, 1, 0, 4),      -- Regular user, disabled, locked (in group3)
-       ('User', '4', 'user.4', 0, TRUE, TRUE, FALSE, 1, 0, 5),       -- System account, enabled, not locked  (in group4)
-       ('User', '5', 'user.5', 1, TRUE, TRUE, TRUE, 1, 0, 1),        -- System account, enabled, locked (in group5)
-       ('User', '6', 'user.6', 1, TRUE, FALSE, FALSE, 1, 0, 2),      -- System account, disabled, not locked (in group6)
-       ('User', '7', 'user.7', 1, TRUE, FALSE, TRUE, 1, 0, 3),       -- System account, disabled, locked (in group7)
-       ('User', '8', 'user.8', 1, FALSE, TRUE, FALSE, 1, 0, 4),      -- Admin user, enabled, not locked (in group8)
-       ('User', '9', 'user.9', 1, FALSE, TRUE, TRUE, 1, 0, 5),       -- Admin user, enabled, locked (in group9)
-       ('User', '10', 'user.10', 2, FALSE, FALSE, FALSE, 1, 0, 1),   -- Admin user, disabled, not locked
-       ('User', '11', 'user.11', 2, FALSE, FALSE, TRUE, 1, 0, 2),    -- Admin user, disabled, locked
-       ('User', '12', 'user.12', 2, TRUE, TRUE, FALSE, 1, 0, 3),     -- System admin, enabled, not locked
-       ('User', '13', 'user.13', 2, TRUE, TRUE, TRUE, 1, 0, 4),      -- System admin, enabled, locked
-       ('User', '14', 'user.14', 2, TRUE, FALSE, FALSE, 1, 0, 5),    -- System admin, disabled, not locked
+VALUES ('User', '0', 'user.0', 0, FALSE, TRUE, FALSE, 1, 0, 'classroom0'),      -- Regular user, enabled, not locked, (in group0)
+       ('User', '1', 'user.1', 0, FALSE, TRUE, TRUE, 1, 0, 'classroom1'),       -- Regular user, enabled, locked (in group1)
+       ('User', '2', 'user.2', 0, FALSE, FALSE, FALSE, 1, 0, 'classroom2'),     -- Regular user, disabled, not locked (in group2)
+       ('User', '3', 'user.3', 0, FALSE, FALSE, TRUE, 1, 0, 'classroom3'),      -- Regular user, disabled, locked (in group3)
+       ('User', '4', 'user.4', 0, TRUE, TRUE, FALSE, 1, 0, 'classroom4'),       -- System account, enabled, not locked  (in group4)
+       ('User', '5', 'user.5', 1, TRUE, TRUE, TRUE, 1, 0, 'classroom0'),        -- System account, enabled, locked (in group5)
+       ('User', '6', 'user.6', 1, TRUE, FALSE, FALSE, 1, 0, 'classroom1'),      -- System account, disabled, not locked (in group6)
+       ('User', '7', 'user.7', 1, TRUE, FALSE, TRUE, 1, 0, 'classroom2'),       -- System account, disabled, locked (in group7)
+       ('User', '8', 'user.8', 1, FALSE, TRUE, FALSE, 1, 0, 'classroom3'),      -- Admin user, enabled, not locked (in group8)
+       ('User', '9', 'user.9', 1, FALSE, TRUE, TRUE, 1, 0, 'classroom4'),       -- Admin user, enabled, locked (in group9)
+       ('User', '10', 'user.10', 2, FALSE, FALSE, FALSE, 1, 0, 'classroom0'),   -- Admin user, disabled, not locked
+       ('User', '11', 'user.11', 2, FALSE, FALSE, TRUE, 1, 0, 'classroom1'),    -- Admin user, disabled, locked
+       ('User', '12', 'user.12', 2, TRUE, TRUE, FALSE, 1, 0, 'classroom2'),     -- System admin, enabled, not locked
+       ('User', '13', 'user.13', 2, TRUE, TRUE, TRUE, 1, 0, 'classroom3'),      -- System admin, enabled, locked
+       ('User', '14', 'user.14', 2, TRUE, FALSE, FALSE, 1, 0, 'classroom4'),    -- System admin, disabled, not locked
        ('User', '15', 'user.15', 2, TRUE, FALSE, TRUE, 1, 0, NULL),  -- System admin, disabled, locked
        ('User', '16', 'user.16', 0, FALSE, TRUE, FALSE, 1, 0, NULL), -- Test user for deletion case (enabled, not locked)
-       ('User', '17', 'user.17', 1, FALSE, TRUE, FALSE, 1, 0, 9)     -- Test user for deletion case (in group0)
+       ('User', '17', 'user.17', 1, FALSE, TRUE, FALSE, 1, 0, 'classroom8')     -- Test user for deletion case (in group0)
 ;
 
 INSERT INTO course_users(user_id, course_id) VALUES (1, 1), (1, 2);
