@@ -30,40 +30,35 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     private final CourseService service;
 
     @GetMapping("/{course}/subject/{subject}")
-    public void setSubject(@PathVariable long course, @PathVariable String subject)
+    public @NotNull ResponseEntity<Void> setSubject(@PathVariable long course, @PathVariable String subject)
     {
-        CourseEntity courseEntity = getService().loadEntityByIDSafe(course);
-        courseEntity.setSubject(getService(), getService().getSubjectService().loadEntityByIDSafe(subject));
+        log.info("Received incoming request for setting the subject of course {} to {}.", course, subject);
+        return empty(getService().setSubject(course, subject) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/{course}/attach")
-    public @NotNull HttpStatus attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    public @NotNull ResponseEntity<Void> attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for attaching user(s) {} to course {}.", users, course);
-
-        UserEntity[] entities = getService().getUserRepository().findAllById(Set.of(users)).toArray(UserEntity[]::new);
-        boolean modified = getService().loadEntityByIDSafe(course).attachStudents(getService(), entities);
-        return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return empty(getService().attachUser(course, users) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("{course}/detach")
-    public @NotNull HttpStatus detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    public @NotNull ResponseEntity<Void> detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for detaching user(s) {} from course {}.", users, course);
-
-        boolean modified = getService().loadEntityByIDSafe(course).detachStudents(getService(), users);
-        return modified ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return empty(getService().detachUser(course, users) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('COURSE_CREATE')")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_CREATE.toString())")
     @Override public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
     {
         return super.create(model);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('COURSE_DELETE')")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_DELETE.toString())")
     @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
@@ -86,7 +81,6 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     {
         return getCourses(user);
     }
-
 
     @GetMapping("/get/all")
     @Override public @NotNull ResponseEntity<Set<CourseModel>> fetchAll()

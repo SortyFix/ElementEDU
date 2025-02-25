@@ -23,13 +23,15 @@ public class RoomController extends EntityController<String, RoomService, RoomMo
     private final RoomService service;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('ROOM_CREATE')")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).ROOM_CREATE.toString())")
     @Override
     public @NotNull ResponseEntity<RoomModel[]> create(@NotNull @RequestBody RoomCreateModel[] model) throws CreationException
-    {return super.create(model);}
+    {
+        return super.create(model);
+    }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('ROOM_DELETE')")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).ROOM_DELETE.toString())")
     @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable String[] id)
     {
         return super.delete(id);

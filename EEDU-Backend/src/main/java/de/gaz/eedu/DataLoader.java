@@ -10,6 +10,7 @@ import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.model.UserCreateModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
+import de.gaz.eedu.user.privileges.SystemPrivileges;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
@@ -29,6 +30,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -102,8 +104,11 @@ import java.util.stream.Stream;
 
     private void createDefaultPrivileges()
     {
-        Stream<String> privileges = PrivilegeEntity.getProtectedPrivileges().stream();
-        getPrivilegeService().createEntity(privileges.map(PrivilegeCreateModel::new).collect(Collectors.toSet()));
+        getPrivilegeService().createEntity(Arrays.stream(SystemPrivileges.values()).map(privilege ->
+        {
+            String privilegeName = privilege.toString();
+            return new PrivilegeCreateModel(privilegeName);
+        }).collect(Collectors.toUnmodifiableSet()));
     }
 
     private void createDefaultGroup()

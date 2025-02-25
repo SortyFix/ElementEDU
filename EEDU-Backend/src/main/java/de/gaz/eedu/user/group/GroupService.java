@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,38 +28,40 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Getter(AccessLevel.PROTECTED)
 @Service
 @AllArgsConstructor
-public class GroupService extends EntityService<String, GroupRepository, GroupEntity, GroupModel, GroupCreateModel> {
+@Getter(AccessLevel.PROTECTED)
+public class GroupService extends EntityService<String, GroupRepository, GroupEntity, GroupModel, GroupCreateModel>
+{
 
     private final GroupRepository repository;
     private final UserService userService; // managed by
     private final PrivilegeRepository privilegeRepository;
 
-    private static void validateGroups(GroupEntity @NotNull [] entities) throws ResponseStatusException
+    private static void validateGroups(String @NotNull [] entities) throws ResponseStatusException
     {
         Set<String> specialGroups = AccountType.groupSet();
-        for (GroupEntity entity : entities)
+        for (String entity : entities)
         {
-            if(!specialGroups.contains(entity.getId()))
+            if (!specialGroups.contains(entity))
             {
                 continue;
             }
 
-            String message = String.format("Group %s cannot be attached.", entity.getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+            throw new GroupUnprocessableException(entity);
         }
     }
 
-    @Override public @NotNull List<GroupEntity> createEntity(@NotNull Set<GroupCreateModel> createModel) throws CreationException
+    @Override
+    public @NotNull List<GroupEntity> createEntity(@NotNull Set<GroupCreateModel> createModel) throws CreationException
     {
         if (getRepository().existsByIdIn(createModel.stream().map(GroupCreateModel::id).toList()))
         {
             throw new OccupiedException();
         }
 
-        return getRepository().saveAll(createModel.stream().map(current -> {
+        return getRepository().saveAll(createModel.stream().map(current ->
+        {
             GroupEntity groupEntity = new GroupEntity(current.id());
             return current.toEntity(groupEntity, group ->
             {
@@ -79,19 +80,22 @@ public class GroupService extends EntityService<String, GroupRepository, GroupEn
         getUserService().saveEntity(users);
     }
 
-    @Transactional
-    public boolean attachGroups(long userId, @NotNull String[] groups)
-    {
-        GroupEntity[] entities = loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
-
-        validateGroups(entities);
-
-        UserService userService = getUserService();
-        return userService.loadEntityByIDSafe(userId).attachGroups(userService, entities);
-    }
-
     @Override public @NotNull @Unmodifiable Set<GroupEntity> findAllEntities(@NotNull Predicate<GroupEntity> predicate)
     {
         return getRepository().findAllEntities().stream().filter(predicate).collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Transactional public boolean attachGroups(long userId, @NotNull String[] groups) throws GroupUnprocessableException
+    {
+        validateGroups(groups);
+
+        GroupEntity[] entities = loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
+        return getUserService().loadEntityByIDSafe(userId).attachGroups(getUserService(), entities);
+    }
+
+    @Transactional public boolean detachGroups(long userId, @NotNull String[] groups) throws GroupUnprocessableException
+    {
+        validateGroups(groups);
+        return getUserService().loadEntityByIDSafe(userId).detachGroups(getUserService(), groups);
     }
 }

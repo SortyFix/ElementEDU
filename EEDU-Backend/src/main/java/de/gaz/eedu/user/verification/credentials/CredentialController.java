@@ -47,13 +47,18 @@ import java.util.Set;
  * @see CredentialCreateModel
  */
 @RestController
-@RequestMapping("/api/v1/user/login/credentials")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/user/login/credentials")
 public class CredentialController extends EntityController<Long, CredentialService, CredentialModel, CredentialCreateModel>
 {
     @Getter(AccessLevel.PROTECTED) private final CredentialService service;
 
-    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_DELETE') or (@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and #id == authentication.principal))")
+    @PreAuthorize(
+            "hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_DELETE.toString()) or " +
+            "(@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and " +
+                    "#id == authentication.principal)" +
+            ")"
+    )
     @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
@@ -78,7 +83,8 @@ public class CredentialController extends EntityController<Long, CredentialServi
         return create(userId, model);
     }
 
-    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE')") @PostMapping("/create/{userId}")
+    @PostMapping("/create/{userId}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE.toString())")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
@@ -86,7 +92,8 @@ public class CredentialController extends EntityController<Long, CredentialServi
         return ResponseEntity.ok(credential.getMethod().getCredential().getSetupData(credential));
     }
 
-    @PreAuthorize("hasAuthority('USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY')") @PostMapping("/create/temporary/{userId}")
+    @PostMapping("/create/temporary/{userId}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY.toString())")
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));

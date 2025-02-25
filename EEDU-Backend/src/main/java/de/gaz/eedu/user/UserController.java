@@ -63,7 +63,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * @return a {@link ResponseEntity} containing the newly created {@link UserModel}.
      * @throws CreationException if an error occurs during the user creation process.
      */
-    @PreAuthorize("hasAuthority('USER_CREATE')") @PostMapping("/create") @Override
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREATE.toString())") @PostMapping("/create") @Override
     public @NotNull ResponseEntity<UserModel[]> create(@NotNull @RequestBody UserCreateModel[] model) throws CreationException
     {
         return super.create(model);
@@ -81,7 +81,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * @param id the unique identifier of the user to be deleted.
      * @return {@code true} if the user was successfully deleted; otherwise, {@code false}.
      */
-    @PreAuthorize("hasAuthority('USER_DELETE')") @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_DELETE.toString())") @DeleteMapping("/delete/{id}")
     @Override public @NotNull ResponseEntity<Void> delete(@PathVariable @NotNull Long[] id)
     {
         return super.delete(id);
@@ -98,7 +98,7 @@ public class UserController extends EntityController<Long, UserService, UserMode
      * @param id the unique identifier of the user whose data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
      */
-    @PreAuthorize("hasAuthority('USER_OTHERS_GET') or #id == authentication.principal")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_OTHERS_GET.toString()) or #id == authentication.principal")
     @GetMapping("/get/{id}") @Override public @NotNull ResponseEntity<UserModel> getData(@PathVariable @NotNull Long id)
     {
         return super.getData(id);
@@ -216,8 +216,9 @@ public class UserController extends EntityController<Long, UserService, UserMode
         log.info("User {} has been logged out.", user);
     }
 
-    @PreAuthorize("hasAnyAuthority('USER_OTHERS_GET')") @GetMapping("/all") @Override
-    public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_OTHERS_GET.toString())")
+    @Override public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
         return super.fetchAll();
     }

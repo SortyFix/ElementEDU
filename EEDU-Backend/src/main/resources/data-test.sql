@@ -127,7 +127,7 @@ VALUES ('User', '0', 'user.0', 0, FALSE, TRUE, FALSE, 1, 0, 'classroom0'),      
        ('User', '14', 'user.14', 2, TRUE, FALSE, FALSE, 1, 0, 'classroom4'),    -- System admin, disabled, not locked
        ('User', '15', 'user.15', 2, TRUE, FALSE, TRUE, 1, 0, NULL),  -- System admin, disabled, locked
        ('User', '16', 'user.16', 0, FALSE, TRUE, FALSE, 1, 0, NULL), -- Test user for deletion case (enabled, not locked)
-       ('User', '17', 'user.17', 1, FALSE, TRUE, FALSE, 1, 0, 'classroom8')     -- Test user for deletion case (in group0)
+       ('User', '17', 'user.17', 1, FALSE, TRUE, FALSE, 1, 0, 'classroom9')     -- Test user for deletion case (in group0)
 ;
 
 INSERT INTO course_users(user_id, course_id) VALUES (1, 1), (1, 2);

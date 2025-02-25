@@ -11,6 +11,7 @@ import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
+import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,13 +34,15 @@ public class ClassRoomServiceTest extends ServiceTest<String, ClassRoomService, 
 
     @Autowired private ClassRoomService service;
     @Autowired private CourseRepository courseRepository;
+    @Autowired private UserRepository userRepository;
 
     @Contract(pure = true, value = "-> new") private static @NotNull Stream<ArrayTestData<String, Long>> getUser()
     {
         return Stream.of(
                 new ArrayTestData<>("classroom0", 1L, 6L, 11L),
                 new ArrayTestData<>("classroom1", 2L, 7L, 12L),
-                new ArrayTestData<>("classroom5", new Long[]{}));
+                new ArrayTestData<>("classroom5", new Long[]{})
+        );
     }
 
     @Override protected @NotNull TestData<String, Boolean>[] deleteEntities()
@@ -48,22 +51,19 @@ public class ClassRoomServiceTest extends ServiceTest<String, ClassRoomService, 
         return new TestData[]{new TestData<>("classroom9", true), new TestData<>("classroom10", false)};
     }
 
-    @Override protected @NotNull Validator<String, Boolean> preDeleteValidation()
+    @Override protected @NotNull Validator<String, Boolean> deletionProcess(@NotNull TestData<String, Boolean> data)
     {
-        return (request, expect, result) ->
-        {
-            boolean classRoomAssigned = getCourseRepository().findById(10L).orElseThrow().hasClassRoomAssigned();
-            Assertions.assertEquals(classRoomAssigned, Objects.equals(request, "classroom9"));
-        };
-    }
+        boolean isEntity = Objects.equals(data.entityID(), "classroom9");
+        long course = 10, user = 18;
 
-    @Override protected @NotNull Validator<String, Boolean> verifyDeletionOutcome()
-    {
-        return (request, expect, result) ->
+        Assertions.assertEquals(getCourseRepository().findById(course).orElseThrow().hasClassRoomAssigned(), isEntity);
+        Assertions.assertEquals(getUserRepository().findById(user).orElseThrow().hasClassRoomAssigned(), isEntity);
+
+        return ((request, expect, result) ->
         {
-            boolean classRoomAssigned = getCourseRepository().findById(10L).orElseThrow().hasClassRoomAssigned();
-            Assertions.assertFalse(classRoomAssigned);
-        };
+            Assertions.assertFalse(getCourseRepository().findById(course).orElseThrow().hasClassRoomAssigned());
+            Assertions.assertFalse(getUserRepository().findById(user).orElseThrow().hasClassRoomAssigned());
+        });
     }
 
     @Override protected @NotNull Eval<ClassRoomCreateModel, ClassRoomModel> successEval()

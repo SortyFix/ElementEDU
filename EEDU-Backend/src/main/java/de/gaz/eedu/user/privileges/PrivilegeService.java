@@ -10,9 +10,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +28,19 @@ public class PrivilegeService extends EntityService<String, PrivilegeRepository,
 {
     private final PrivilegeRepository repository;
     private final GroupService groupService;
+
+    @Transactional
+    public boolean grantPrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
+    {
+        PrivilegeEntity[] entities = loadEntityById(Arrays.asList(privileges)).toArray(PrivilegeEntity[]::new);
+        return getGroupService().loadEntityByIDSafe(group).grantPrivilege(getGroupService(), entities);
+    }
+
+    @Transactional
+    public boolean revokePrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
+    {
+        return getGroupService().loadEntityByIDSafe(group).revokePrivilege(getGroupService(), privileges);
+    }
 
     @Transactional
     @Override public @NotNull List<PrivilegeEntity> createEntity(@NotNull Set<PrivilegeCreateModel> createModel) throws CreationException

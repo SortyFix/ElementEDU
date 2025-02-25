@@ -22,7 +22,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -48,6 +54,32 @@ public class CourseService extends EntityService<Long, CourseRepository, CourseE
     public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByCourse(long course)
     {
         return getRepository().findAllReducedUsersByCourse(course);
+    }
+
+    @Transactional
+    public boolean setSubject(@PathVariable long course, @PathVariable String subject)
+    {
+        CourseEntity courseEntity = loadEntityByIDSafe(course);
+        if(Objects.equals(courseEntity.getSubject().getId(), subject))
+        {
+            return false;
+        }
+
+        courseEntity.setSubject(this, getSubjectService().loadEntityByIDSafe(subject));
+        return true;
+    }
+
+    @Transactional
+    public boolean attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    {
+        UserEntity[] entities = getUserRepository().findAllById(Set.of(users)).toArray(UserEntity[]::new);
+        return loadEntityByIDSafe(course).attachStudents(this, entities);
+    }
+
+    @Transactional
+    public boolean detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
+    {
+        return loadEntityByIDSafe(course).detachStudents(this, users);
     }
 
     @Transactional @Override

@@ -17,51 +17,6 @@ import java.util.Set;
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity")
 public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeModel>
 {
-    private final static Set<String> PROTECTED_PRIVILEGES;
-
-    static {
-        PROTECTED_PRIVILEGES = new HashSet<>(Set.of(
-                "CLASS_CREATE",
-                "CLASS_DELETE",
-
-                "SUBJECT_CREATE",
-                "SUBJECT_DELETE",
-
-                "ROOM_CREATE",
-                "ROOM_DELETE",
-
-                "COURSE_CREATE",
-                "COURSE_DELETE",
-
-                "USER_DELETE",
-                "USER_CREATE",
-                "USER_OTHERS_GET",
-
-                "USER_GROUP_ATTACH",
-                "USER_GROUP_DETACH",
-
-                "GROUP_GET",
-                "GROUP_CREATE",
-                "GROUP_DELETE",
-
-                "GROUP_PRIVILEGE_GRANT",
-                "GROUP_PRIVILEGE_REVOKE",
-
-                "PRIVILEGE_GET",
-                "PRIVILEGE_CREATE",
-                "PRIVILEGE_DELETE",
-
-                "USER_CREDENTIAL_OTHERS_CREATE",
-                "USER_CREDENTIAL_OTHERS_DELETE",
-                "USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY"
-        ));
-    }
-
-    public static Set<String> getProtectedPrivileges()
-    {
-        return PROTECTED_PRIVILEGES;
-    }
-
     @Id @Setter(AccessLevel.NONE) @Column(length = 50) private String id;
     @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
     private final Set<GroupEntity> groupEntities = new HashSet<>();
@@ -78,7 +33,7 @@ public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeMod
 
     @Override public boolean isDeletable()
     {
-        return !PROTECTED_PRIVILEGES.contains(getId());
+        return !SystemPrivileges.isSystemPrivilege(getId());
     }
 
     @Contract(pure = true) @Override public String toString()

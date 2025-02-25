@@ -22,7 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -62,6 +66,17 @@ public class ClassRoomService extends EntityService<String, ClassRoomRepository,
     public @NotNull @Unmodifiable Set<ReducedUserModel> loadReducedModelsByClass(@NotNull String classroom)
     {
         return getRepository().findAllUsersByClass(classroom);
+    }
+
+    @Transactional public boolean linkClass(@PathVariable long course, @PathVariable String classroom)
+    {
+        ClassRoomEntity classRoom = loadEntityByIDSafe(classroom);
+        return getCourseService().loadEntityByIDSafe(course).linkClassRoom(getCourseService(), classRoom);
+    }
+
+    @Transactional public boolean unlinkClass(@PathVariable long course)
+    {
+        return getCourseService().loadEntityByIDSafe(course).unlinkClassRoom(getCourseService());
     }
 
     @Transactional @Override public @NotNull List<ClassRoomEntity> createEntity(@NotNull Set<ClassRoomCreateModel> model) throws CreationException

@@ -26,15 +26,14 @@ public class SubjectController extends EntityController<String, SubjectService, 
     @Getter(AccessLevel.PROTECTED) private final SubjectService service;
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('SUBJECT_CREATE')")
-    @Override
-    public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model) throws CreationException
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).SUBJECT_CREATE.toString())")
+    @Override public @NotNull ResponseEntity<SubjectModel[]> create(@NotNull @RequestBody SubjectCreateModel[] model) throws CreationException
     {
         return super.create(model);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('SUBJECT_DELETE')")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).SUBJECT_DELETE.toString())")
     @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable String[] id)
     {
         return super.delete(id);

@@ -182,21 +182,15 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
         for(TestData<P, Boolean> current : deleteData)
         {
             test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> {
-                preDeleteValidation().evaluate(id, current.expected(), current.expected());
-                boolean deleted = getService().delete(id);
-                verifyDeletionOutcome().evaluate(id, current.expected(), deleted);
-                return deleted;
+                Validator<P, Boolean> delete = this.deletionProcess(current);
+                boolean outcome = getService().delete(id);
+                delete.evaluate(id, current.expected(), outcome);
+                return outcome;
             });
         }
     }
 
-    protected @NotNull Validator<P, Boolean> preDeleteValidation()
-    {
-        return ((request, expect, result) -> {});
-    }
-
-    @Contract(pure = true, value = "-> new")
-    protected @NotNull Validator<P, Boolean> verifyDeletionOutcome()
+    protected @NotNull Validator<P, Boolean> deletionProcess(@NotNull TestData<P, Boolean> data)
     {
         return ((request, expect, result) -> {});
     }

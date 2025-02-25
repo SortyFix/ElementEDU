@@ -375,6 +375,22 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
         return Stream.concat(this.courses.stream(), courseStream).collect(Collectors.toUnmodifiableSet());
     }
 
+    public boolean unsetClassroom(@NotNull UserService userService)
+    {
+        return saveEntityIfPredicateTrue(userService, true, (expect) -> this.unsetClassroom());
+    }
+
+    public boolean unsetClassroom()
+    {
+        if(this.hasClassRoomAssigned())
+        {
+            return false;
+        }
+
+        this.classRoom = null;
+        return true;
+    }
+
     public boolean setClassRoom(@NotNull UserService userService, @Nullable ClassRoomEntity classRoom)
     {
         return this.saveEntityIfPredicateTrue(userService, classRoom, this::setClassRoom);
