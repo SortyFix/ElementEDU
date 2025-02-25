@@ -14,6 +14,28 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Represents a privilege entity within the system. Privileges define specific authorities that can be granted to groups of users.
+ * Each privilege is identified by a {@link String} id which is the primary key. It is persisted in the "privilege_entity" database table.
+ * <p>
+ * Privileges are associated with groups {@link GroupEntity} through a many-to-many relationship. A privilege can be granted to
+ * multiple groups, and a group can have multiple privileges. This relationship is managed by the database join table implicitly
+ * defined by the {@link ManyToMany} annotation and the {@code groupEntities} field.
+ * <p>
+ * This entity implements the {@link EntityModelRelation} interface, enabling conversion to and from the corresponding
+ * {@link PrivilegeModel} for use when communicating with the frontend. This allows for a clean separation between the
+ * persistence model (this entity) and the frontend model (the {@link PrivilegeModel}).
+ * <p>
+ * Privileges are used by Spring Security to control access to resources. The {@link #toAuthority()} method facilitates
+ * this by converting the privilege into a {@link org.springframework.security.core.GrantedAuthority}, which Spring Security
+ * understands.
+ *
+ * @see GroupEntity
+ * @see PrivilegeModel
+ * @see SystemPrivileges
+ *
+ * @author Ivo Quiring
+ */
 @Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity")
 public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeModel>
 {
@@ -21,6 +43,15 @@ public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeMod
     @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
     private final Set<GroupEntity> groupEntities = new HashSet<>();
 
+    /**
+     * Converts this privilege into a {@link org.springframework.security.core.GrantedAuthority}.
+     * <p>
+     * This conversion is necessary because, during user authentication, privileges are loaded and added to Spring Security.
+     * This method ensures that {@link org.springframework.security.access.prepost.PreAuthorize} works correctly with these authorities.
+     *
+     * @return a {@link org.springframework.security.core.authority.SimpleGrantedAuthority} representing this privilege.
+     * The authority's string representation is the same as {{@link #getId()}}.
+     */
     public @NotNull SimpleGrantedAuthority toAuthority()
     {
         return new SimpleGrantedAuthority(getId());

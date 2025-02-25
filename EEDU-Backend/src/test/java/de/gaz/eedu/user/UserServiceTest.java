@@ -2,7 +2,7 @@ package de.gaz.eedu.user;
 
 import de.gaz.eedu.ServiceTest;
 import de.gaz.eedu.TestData;
-import de.gaz.eedu.user.exception.InsecurePasswordException;
+import de.gaz.eedu.exception.StateTransitionException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupModel;
@@ -106,7 +106,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
         if(userID == 1)
         {
             // expect the group was already added
-            Assertions.assertThrows(IllegalStateException.class, test::run);
+            Assertions.assertThrows(StateTransitionException.class, test::run);
             return;
         }
         test.run();

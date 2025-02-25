@@ -105,6 +105,8 @@ MERGE INTO group_privileges (group_id, privilege_id) VALUES
     ('group6', 'PRIVILEGE6'),
     ('group7', 'PRIVILEGE7'),
     ('group8', 'PRIVILEGE8'),
+    -- test relation deletion test
+    ('group9', 'PRIVILEGE8'),
     ('group9', 'PRIVILEGE9')
 ;
 
@@ -149,6 +151,7 @@ MERGE INTO user_groups (user_id, group_id) VALUES
     (7, 'group6'),
     (8, 'group7'),
     (9, 'group8'),
+    (10, 'group9'),
     (18, 'group0')
 ;
 

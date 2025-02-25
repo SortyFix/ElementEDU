@@ -182,7 +182,7 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
         for(TestData<P, Boolean> current : deleteData)
         {
             test(Eval.eval(current.entityID(), current.expected(), Validator.equals()), (id) -> {
-                Validator<P, Boolean> delete = this.deletionProcess(current);
+                Validator<P, Boolean> delete = this.deletePipeline(current);
                 boolean outcome = getService().delete(id);
                 delete.evaluate(id, current.expected(), outcome);
                 return outcome;
@@ -190,7 +190,7 @@ public abstract class ServiceTest<P, S extends EntityService<P, ?, E, M, C>, E e
         }
     }
 
-    protected @NotNull Validator<P, Boolean> deletionProcess(@NotNull TestData<P, Boolean> data)
+    protected @NotNull Validator<P, Boolean> deletePipeline(@NotNull TestData<P, Boolean> data)
     {
         return ((request, expect, result) -> {});
     }

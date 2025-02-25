@@ -10,6 +10,7 @@ import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.exception.AccountTypeMismatch;
+import de.gaz.eedu.exception.StateTransitionException;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
@@ -176,7 +177,7 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * @return true if the users were successfully attached, false otherwise.
      * @see #attachStudents(UserEntity...)
      */
-    public boolean attachStudents(@NotNull CourseService courseService, @NonNull UserEntity... user)
+    public boolean attachStudents(@NotNull CourseService courseService, @NonNull UserEntity... user) throws StateTransitionException
     {
         return saveEntityIfPredicateTrue(courseService, user, this::attachStudents);
     }
@@ -196,12 +197,12 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
      * @see #attachStudents(CourseService, UserEntity...)
      * @see CourseService#saveEntity(Iterable)
      */
-    public boolean attachStudents(@NonNull UserEntity... user)
+    public boolean attachStudents(@NonNull UserEntity... user) throws StateTransitionException
     {
         List<UserEntity> userEntities = Arrays.asList(user);
         if(!Collections.disjoint(this.users, userEntities))
         {
-            throw new IllegalStateException("Some of these users already have been attached to this entity.");
+            throw new StateTransitionException("A user is already in this course");
         }
 
         for (UserEntity userEntity : userEntities)

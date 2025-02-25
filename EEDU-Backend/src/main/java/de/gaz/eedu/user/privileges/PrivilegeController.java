@@ -2,7 +2,7 @@ package de.gaz.eedu.user.privileges;
 
 import de.gaz.eedu.entity.EntityController;
 import de.gaz.eedu.exception.CreationException;
-import de.gaz.eedu.user.group.GroupService;
+import de.gaz.eedu.exception.StateTransitionException;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import lombok.AccessLevel;
@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 /**
  * Controller for managing privilege-related operations for user groups.
@@ -35,14 +33,45 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
 {
     private final PrivilegeService service;
 
+    /**
+     * Endpoint for granting privileges to groups.
+     * <p>
+     * In order to call this the authentication principle needs the privilege {@link SystemPrivileges#GROUP_PRIVILEGE_GRANT}.
+     *
+     * @param group      the name of the group to which privileges will be granted.
+     * @param privileges an array of privileges to grant to the specified group. For example: "READ,WRITE".
+     * @return A {@link ResponseEntity} with an HTTP status indicating the result of the operation.
+     * Returns {@link HttpStatus#OK} if the privileges were successfully granted.
+     * Returns {@link HttpStatus#NOT_MODIFIED} if the privileges were not modified (e.g., the group already
+     * had the specified privileges, or the operation failed for some other reason).
+     *
+     * @throws StateTransitionException is thrown when the group already has one of the privileges
+     * @see SystemPrivileges#GROUP_PRIVILEGE_GRANT
+     */
     @PutMapping("/{group}/grant/{privileges}")
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).GROUP_PRIVILEGE_GRANT.toString())")
-    public @NotNull ResponseEntity<Void> grantPrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)
+    public @NotNull ResponseEntity<Void> grantPrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges) throws StateTransitionException
     {
         log.info("Received incoming request for granting privilege(s) {} to group {}.", privileges, group);
         return empty(getService().grantPrivileges(group, privileges) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
+    /**
+     * Endpoint for revoking privileges from groups.
+     * <p>
+     * In order to call this the authentication principle needs the privilege {@link SystemPrivileges#GROUP_PRIVILEGE_REVOKE}.
+     * <p>
+     * Note! This is using path variables. it should be formatted like
+     *
+     * @param group      the name of the group from which privileges will be revoked.
+     * @param privileges an array of privileges to revoked from the specified group. For example: "READ,WRITE".
+     * @return A {@link ResponseEntity} with an HTTP status indicating the result of the operation.
+     * Returns {@link HttpStatus#OK} if the privileges were successfully revoked.
+     * Returns {@link HttpStatus#NOT_MODIFIED} if the privileges were not modified (e.g., the group
+     * had none of the specified privileges, or the operation failed for some other reason).
+     *
+     * @see SystemPrivileges#GROUP_PRIVILEGE_REVOKE
+     */
     @DeleteMapping("/{group}/revoke/{privileges}")
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).GROUP_PRIVILEGE_REVOKE.toString())")
     public @NotNull ResponseEntity<Void> revokePrivileges(@PathVariable String group, @PathVariable @NotNull String[] privileges)

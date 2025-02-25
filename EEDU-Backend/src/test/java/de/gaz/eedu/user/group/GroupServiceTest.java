@@ -5,8 +5,9 @@ import de.gaz.eedu.TestData;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.privileges.PrivilegeEntity;
-import de.gaz.eedu.user.privileges.PrivilegeService;
+import de.gaz.eedu.user.privileges.PrivilegeRepository;
 import de.gaz.eedu.user.privileges.model.PrivilegeModel;
+import de.gaz.eedu.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,7 +34,42 @@ import java.util.Objects;
 public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEntity, GroupModel, GroupCreateModel>
 {
     @Autowired private GroupService service;
-    @Autowired private PrivilegeService privilegeService;
+    @Autowired private PrivilegeRepository privilegeRepository;
+    @Autowired private UserRepository userRepository;
+
+    @Override protected @NotNull TestData<String, Boolean>[] deleteEntities()
+    {
+        //noinspection unchecked
+        return new TestData[]{
+                new TestData<>("group9", true),
+                new TestData<>("group10", false),
+        };
+    }
+
+    @Transactional
+    @Override protected @NotNull Validator<String, Boolean> deletePipeline(@NotNull TestData<String, Boolean> data)
+    {
+        boolean expect = Objects.equals(data.entityID(), "group9");
+        Assertions.assertEquals(expect, getUserRepository().findEntity(10L).orElseThrow().inGroup(data.entityID()));
+
+        PrivilegeEntity before = getPrivilegeRepository().findByIdEagerly("PRIVILEGE8").orElseThrow();
+        Assertions.assertEquals(expect, before.getGroupEntities().stream().anyMatch(groupEntity ->
+        {
+            String groupId = groupEntity.getId();
+            return Objects.equals(groupId, data.entityID());
+        }));
+
+        return (request, expect1, result) -> {
+            Assertions.assertFalse(getUserRepository().findEntity(10L).orElseThrow().inGroup(data.entityID()));
+
+            PrivilegeEntity after = getPrivilegeRepository().findByIdEagerly("PRIVILEGE8").orElseThrow();
+            Assertions.assertFalse(after.getGroupEntities().stream().anyMatch(groupEntity ->
+            {
+                String groupId = groupEntity.getId();
+                return Objects.equals(groupId, data.entityID());
+            }));
+        };
+    }
 
     @Override protected @NotNull Eval<GroupCreateModel, GroupModel> successEval()
     {
@@ -77,8 +113,8 @@ public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEnt
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"group0", "group0"})
     @Transactional public void testGroupGrantPrivilege(@NotNull String groupID)
     {
-        PrivilegeEntity privilege = getPrivilegeService().loadEntityById("PRIVILEGE0").orElseThrow(IllegalStateException::new);
-        GroupEntity group = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
+        PrivilegeEntity privilege = getPrivilegeRepository().findById("PRIVILEGE0").orElseThrow();
+        GroupEntity group = getService().loadEntityById(groupID).orElseThrow();
 
         Runnable test = () -> test(Eval.eval(privilege, true, Validator.equals()), group::grantPrivilege);
         if(Objects.equals(groupID, "group0"))
@@ -109,16 +145,7 @@ public class GroupServiceTest extends ServiceTest<String, GroupService, GroupEnt
     @ParameterizedTest(name = "{index} => request={0}") @ValueSource(strings = {"group0", "group1"})
     @Transactional public void testGroupRevokePrivilege(@NotNull String groupID)
     {
-        GroupEntity groupEntity = getService().loadEntityById(groupID).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getService().loadEntityById(groupID).orElseThrow();
         test(Eval.eval("PRIVILEGE0", Objects.equals(groupID, "group0"), Validator.equals()), groupEntity::revokePrivilege);
-    }
-
-    @Override protected @NotNull TestData<String, Boolean>[] deleteEntities()
-    {
-        //noinspection unchecked
-        return new TestData[]{
-                new TestData<>("group9", true),
-                new TestData<>("group10", false),
-        };
     }
 }

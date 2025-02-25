@@ -51,7 +51,7 @@ public class ClassRoomServiceTest extends ServiceTest<String, ClassRoomService, 
         return new TestData[]{new TestData<>("classroom9", true), new TestData<>("classroom10", false)};
     }
 
-    @Override protected @NotNull Validator<String, Boolean> deletionProcess(@NotNull TestData<String, Boolean> data)
+    @Override protected @NotNull Validator<String, Boolean> deletePipeline(@NotNull TestData<String, Boolean> data)
     {
         boolean isEntity = Objects.equals(data.entityID(), "classroom9");
         long course = 10, user = 18;

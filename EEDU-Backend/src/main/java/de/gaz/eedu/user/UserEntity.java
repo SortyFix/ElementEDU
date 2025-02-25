@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.classroom.ClassRoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.exception.StateTransitionException;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.model.GroupModel;
 import de.gaz.eedu.user.illnessnotifications.IllnessNotificationEntity;
@@ -30,19 +31,54 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class represents the user.
+ * Represents a user entity within the system.
+ * Each user is identified by a {@link Long} id which is the primary key. It is persisted in the "group_entity" database table.
  * <p>
- * In this specific class the user is represented as an object.
- * It's noteworthy that this class is connected to a table in a database using jakarta.persistence.
- * <p>
- * This {@link UserEntity} can be a part of many {@link GroupEntity}s. These can have
- * {@link de.gaz.eedu.user.privileges.PrivilegeEntity}s.
- * This is important when authorizing this user as {@link de.gaz.eedu.user.privileges.PrivilegeEntity} cannot be
- * directly added to a users account.
+ * Users have relationships with several other entities:
+ * <ul>
+ *     <li>
+ *         Users are associated with {@link IllnessNotificationEntity} through a one-to-many relationship. A user can have
+ *         multiple illnessNotifications, and a illnessNotification can only have one user. This relationship is managed by the database join table implicitly
+ *         defined by the {@link OneToMany} annotation and the {@code illnessNotificationEntities} field.
+ *     </li>
+ *     <li>
+ *         Users are associated with {@link CredentialEntity} through a one-to-many relationship. A user can have
+ *         multiple credentials, and a credential can only have one user. This relationship is managed by the database join table implicitly
+ *         defined by the {@link OneToMany} annotation and the {@code credentials} field.
+ *     </li>
+ *     <li>
+ *         Users are associated with {@link ThemeEntity} through a many-to-one relationship. A user can have one
+ *         theme, and a theme can have multiple users. This relationship is managed by the database join table implicitly
+ *         defined by the {@link ManyToOne} annotation and the {@code themeEntity} field.
+ *     </li>
+ *     <li>
+ *         Users are associated with {@link ClassRoomEntity} through a many-to-one relationship. A user can have one classroom
+ *         assigned, and a classroom can have multiple users. This relationship is managed by the database join table implicitly
+ *         defined by the {@link ManyToOne} annotation and the {@code groups} field.
+ *     </li>
+ *     <li>
+ *          Users are associated with {@link GroupEntity} through a many-to-many relationship. A user can be attached to
+ *          multiple groups, and a group can have multiple users. This relationship is managed by the database join table implicitly
+ *          defined by the {@link ManyToMany} annotation and the {@code groups} field.
+ *     </li>
+ * </ul>
  *
- * @author ivo
+ * This entity implements the {@link EntityModelRelation} interface, enabling conversion to and from the corresponding
+ * {@link UserModel} for use when communicating with the frontend. This allows for a clean separation between the persistence model
+ * (this entity) and the frontend model (the {@link UserModel}).
+ * <p>
+ * The user provides access to user-related information, including credentials and assigned groups. This information
+ * can be used for various purposes, such as authentication, authorization, personalization, and data retrieval.
+ *
+ * @see IllnessNotificationEntity
+ * @see CredentialEntity
+ * @see ThemeEntity
+ * @see ClassRoomEntity
  * @see GroupEntity
- * @see de.gaz.eedu.user.privileges.PrivilegeEntity
+ * @see EntityModelRelation
+ * @see UserModel
+ *
+ * @author Ivo Quiring
  */
 @Entity @Table(name = "user_entity")
 @Slf4j @NoArgsConstructor @AllArgsConstructor @Getter @Setter
@@ -186,7 +222,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @param groupEntities The groups to be attached.
      * @return true if a group was successfully attached and the user entity was saved, false otherwise.
      */
-    @Transactional public boolean attachGroups(@NotNull UserService userService, @NotNull GroupEntity... groupEntities)
+    @Transactional public boolean attachGroups(@NotNull UserService userService, @NotNull GroupEntity... groupEntities) throws StateTransitionException
     {
         return saveEntityIfPredicateTrue(userService, groupEntities, this::attachGroups);
     }
@@ -205,12 +241,13 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @see #detachGroups(String...)
      * @see #getGroups()
      */
-    public boolean attachGroups(@NotNull GroupEntity... groupEntities)
+    public boolean attachGroups(@NotNull GroupEntity... groupEntities) throws StateTransitionException
     {
         List<GroupEntity> entities = Arrays.asList(groupEntities);
+
         if(!Collections.disjoint(this.getGroups(), entities))
         {
-            throw new IllegalStateException("The user already has one of these groups.");
+            throw new StateTransitionException("The user already has group(s).");
         }
 
         return this.groups.addAll(entities);
@@ -273,11 +310,11 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @see #attachGroups(GroupEntity...)
      * @see #detachGroups(String...)
      */
-    public @NotNull @Unmodifiable Set<GroupEntity> getGroups()
+    public @NotNull @Unmodifiable Set<GroupEntity> getGroups() throws StateTransitionException
     {
         if(Objects.isNull(getTypeGroup()))
         {
-            throw new IllegalStateException("The type group was not yet set.");
+            throw new StateTransitionException("The type group was not yet set.");
         }
 
         return Stream.concat(groups.stream(), Stream.of(getTypeGroup())).collect(Collectors.toUnmodifiableSet());

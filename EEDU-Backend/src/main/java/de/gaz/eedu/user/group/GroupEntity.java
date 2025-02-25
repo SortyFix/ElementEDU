@@ -24,19 +24,32 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This class represents a database entry of a group.
+ * Represents a group entity within the system. Groups have specific authorities and can be attached to users.
+ * Each group is identified by a {@link String} id which is the primary key. It is persisted in the "group_entity" database table.
  * <p>
- * This is the representation of a database entry of a group. It contains its id, id, users and the
- * privileges this group has.
- * Groups are used to cluster {@link UserEntity} together and manage their access precisely. This is archived by
- * adding {@link PrivilegeEntity}s to
- * this object and then assign users to it.
+ * Groups are associated with {@link UserEntity} through a many-to-many relationship. A group can be attached to
+ * multiple users, and a user can have multiple groups. This relationship is managed by the database join table implicitly
+ * defined by the {@link ManyToMany} annotation and the {@code users} field.
+ * It is required to use the {@link de.gaz.eedu.user.UserService} in order to attach this group to any user.
  * <p>
- * Note that a {@link UserEntity} can be part of multiple groups.
+ * Groups are also associated with {@link PrivilegeEntity} through a many-to-many relationship. A privilege can be granted to
+ * multiple groups, and a group can have multiple privileges. This relationship is managed by the database join table implicitly
+ * defined by the {@link ManyToMany} annotation and the {@code users} field.
+ * <p>
+ * This entity implements the {@link EntityModelRelation} interface, enabling conversion to and from the corresponding
+ * {@link GroupModel} for use when communicating with the frontend. This allows for a clean separation between the persistence model
+ * (this entity) and the frontend model (the {@link GroupModel}).
+ * <p>
+ * Groups are used by Spring Security to control access to resources. The {@link #toSpringSecurity()} ()} method facilitates
+ * this by converting the group into a list {@link org.springframework.security.core.GrantedAuthority}, including itself
+ * as {@code ROLE_(this objects id)}, which Spring Security understands.
  *
- * @author ivo
  * @see UserEntity
  * @see PrivilegeEntity
+ * @see GroupEntity
+ * @see GroupModel
+ *
+ * @author Ivo Quiring
  */
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Table(name = "group_entity")
 public class GroupEntity implements EntityModelRelation<String, GroupModel>
