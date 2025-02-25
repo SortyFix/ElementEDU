@@ -14,11 +14,31 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+/**
+ * Represents a room entity within the system. Rooms define specific physical rooms that can be used by other components.
+ * Each room is identified by a {@link String} id which is the primary key. It is persisted in the "room_entity" database table.
+ * <p>
+ * Rooms are associated with {@link AppointmentEntryEntity} through a one-to-many relationship. A room can be set to
+ * multiple appointments, and an appointment can only have one room. This relationship is managed by the database join table implicitly
+ * defined by the {@link OneToMany} annotation and the {@code appointments} field.
+ * <p>
+ * Rooms are associated with {@link FrequentAppointmentEntity} through a one-to-many relationship. A room can be set to
+ * multiple frequent appointments, and a frequent appointment can only have one room. This relationship is managed by the
+ * database join table implicitly defined by the {@link OneToMany} annotation and the {@code frequentAppointments} field.
+ * <p>
+ * This entity implements the {@link EntityModelRelation} interface, enabling conversion to and from the corresponding
+ * {@link RoomModel} for use when communicating with the frontend. This allows for a clean separation between the
+ * persistence model (this entity) and the frontend model (the {@link RoomModel}).
+ *
+ * @see AppointmentEntryEntity
+ * @see FrequentAppointmentEntity
+ * @see EntityModelRelation
+ * @see RoomModel
+ *
+ * @author Ivo Quiring
+ */
+@Entity @Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 public class RoomEntity implements EntityModelRelation<String, RoomModel>
 {
     @JsonBackReference @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
