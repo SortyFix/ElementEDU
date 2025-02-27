@@ -62,7 +62,10 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
     }
 
     public findBySubjectLazily(subjects: string[]): readonly CourseModel[] {
-        return this.value.filter((course: CourseModel): boolean => subjects.includes(course.subject.id));
+        return this._allSubject.value.filter((course: CourseModel): boolean =>
+        {
+            return subjects.includes(course.subject.id);
+        });
     }
 
     public override clearCache(): void {

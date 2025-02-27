@@ -1,18 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {GeneralCreateComponent} from './general-create.component';
+import {GeneralCardComponent} from './general-card.component';
 
 describe('GeneralCreateComponentComponent', () => {
-    let component: GeneralCreateComponent;
-    let fixture: ComponentFixture<GeneralCreateComponent>;
+    let component: GeneralCardComponent;
+    let fixture: ComponentFixture<GeneralCardComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [GeneralCreateComponent]
+            imports: [GeneralCardComponent]
         })
             .compileComponents();
 
-        fixture = TestBed.createComponent(GeneralCreateComponent);
+        fixture = TestBed.createComponent(GeneralCardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -27,7 +27,7 @@ export class SubjectService extends AbstractCourseComponentsService<string, Subj
         if (this._courseService.fetched) {
             return of(this._courseService.findBySubjectLazily(subjects));
         }
-        return this.fetchCourses(subjects)
+        return this.fetchCourses(subjects);
     }
 
     public fetchCourses(subjects: string[]): Observable<readonly CourseModel[]>

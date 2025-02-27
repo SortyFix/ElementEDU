@@ -5,7 +5,6 @@ import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatInput} from "@angular/material/input";
-import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {DialogRef} from "@angular/cdk/dialog";
 import {ClassRoomService} from "../class-room.service";
@@ -19,6 +18,7 @@ import {
     AbstractCourseComponentsCreate
 } from "../../abstract-course-components/create/abstract-course-components-create";
 import {UserModel} from "../../../user-model";
+import {GeneralCardComponent} from "../../../../common/general-card-component/general-card.component";
 
 @Component({
     selector: 'app-create-class-room',
@@ -31,7 +31,7 @@ import {UserModel} from "../../../user-model";
         MatLabel,
         MatFormField,
         MatCardContent,
-        GeneralCreateComponent,
+        GeneralCardComponent,
         SelectionInput
     ],
     templateUrl: './create-class-room.component.html',

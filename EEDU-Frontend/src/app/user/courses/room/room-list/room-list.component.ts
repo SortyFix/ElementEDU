@@ -9,6 +9,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {AbstractCourseComponentList} from "../../abstract-course-components/list/abstract-course-component-list";
+import {DeleteRoomComponent} from "./delete-room/delete-room.component";
 
 @Component({
     selector: 'app-room-list',
@@ -26,6 +27,6 @@ import {AbstractCourseComponentList} from "../../abstract-course-components/list
 export class RoomListComponent extends AbstractCourseComponentList<string, RoomModel> {
 
     public constructor(service: RoomService, dialog: MatDialog) {
-        super(service, dialog, CreateRoomComponent, {title: (value: RoomModel): string => value.id});
+        super(service, dialog, CreateRoomComponent, DeleteRoomComponent, {title: (value: RoomModel): string => value.id});
     }
 }

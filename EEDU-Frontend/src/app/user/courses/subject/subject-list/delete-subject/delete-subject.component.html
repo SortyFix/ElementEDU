@@ -1,0 +1,8 @@
+<app-delete-dialog title="subject(s)" [entries]="entries" [ref]="ref" [loading]="loading">
+    <ng-container *ngIf="!loading && affectedCourses.length > 0">
+        <p>Note that this will also delete the courses:</p>
+        <mat-chip-set>
+            @for (chip of affectedCourses; track chip) { <mat-chip>{{ chip }}</mat-chip> }
+        </mat-chip-set>
+    </ng-container>
+</app-delete-dialog>

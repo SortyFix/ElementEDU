@@ -9,7 +9,7 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {NgIf} from "@angular/common";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {AbstractCourseComponentList} from "../../abstract-course-components/list/abstract-course-component-list";
-import {DeleteSubjectsComponent} from "../delete-subjects/delete-subjects.component";
+import {DeleteSubjectComponent} from "./delete-subject/delete-subject.component";
 
 @Component({
     selector: 'app-subject-list',
@@ -27,6 +27,6 @@ import {DeleteSubjectsComponent} from "../delete-subjects/delete-subjects.compon
 export class SubjectListComponent extends AbstractCourseComponentList<string, SubjectModel> {
 
     public constructor(service: SubjectService, dialog: MatDialog) {
-        super(service, dialog, CreateSubjectComponent, {title: (value: SubjectModel): string => value.id}, DeleteSubjectsComponent);
+        super(service, dialog, CreateSubjectComponent, DeleteSubjectComponent, {title: (value: SubjectModel): string => value.id});
     }
 }

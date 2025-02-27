@@ -6,7 +6,6 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {SubjectModel} from "../subject/subject-model";
 import {SubjectService} from "../subject/subject.service";
-import {GeneralCreateComponent} from "../../../timetable/general-create-component/general-create.component";
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
 import {DialogRef} from "@angular/cdk/dialog";
@@ -19,6 +18,7 @@ import {ClassRoomService} from "../classroom/class-room.service";
 import {UserService} from "../../user.service";
 import {AccountType} from "../../account-type";
 import {CourseCreateModel} from "../course-create-model";
+import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 
 @Component({
     selector: 'app-create-course',
@@ -29,7 +29,7 @@ import {CourseCreateModel} from "../course-create-model";
         MatLabel,
         MatFormField,
         MatInput,
-        GeneralCreateComponent,
+        GeneralCardComponent,
         MatCardActions,
         MatButton,
         ReactiveFormsModule,

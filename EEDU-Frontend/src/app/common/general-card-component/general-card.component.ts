@@ -7,7 +7,7 @@ import {MatDialogClose} from "@angular/material/dialog";
 import {NgIf} from "@angular/common";
 
 @Component({
-    selector: 'app-general-create',
+    selector: 'app-general-card',
     standalone: true,
     imports: [
         MatIcon,
@@ -19,10 +19,10 @@ import {NgIf} from "@angular/common";
         MatDialogClose,
         NgIf,
     ],
-    templateUrl: './general-create.component.html',
-    styleUrl: './general-create.component.scss'
+    templateUrl: './general-card.component.html',
+    styleUrl: './general-card.component.scss'
 })
-export class GeneralCreateComponent {
+export class GeneralCardComponent {
 
     public readonly title: InputSignal<string> = input<string>('');
     public readonly loading: InputSignal<boolean> = input<boolean>(true);

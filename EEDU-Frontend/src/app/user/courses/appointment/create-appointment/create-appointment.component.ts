@@ -9,7 +9,6 @@ import {
 } from "./create-standalone-appointment/create-standalone-appointment.component";
 import {CreateFrequentAppointmentComponent} from "./create-frequent-appointment/create-frequent-appointment.component";
 import {DialogRef} from "@angular/cdk/dialog";
-import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {CourseModel} from "../../course-model";
 import {RoomModel} from "../../room/room-model";
 import {RoomService} from "../../room/room.service";
@@ -18,6 +17,7 @@ import {CourseService} from "../../course.service";
 import {AppointmentCreateModel} from "../entry/appointment-create-model";
 import {FrequentAppointmentCreateModel,} from "../frequent/frequent-appointment-create-model";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
+import {GeneralCardComponent} from "../../../../common/general-card-component/general-card.component";
 
 /**
  * A component for creating appointments
@@ -43,7 +43,7 @@ import {SelectionInput} from "../../../../common/selection-input/selection-input
         MatButton,
         CreateStandaloneAppointmentComponent,
         CreateFrequentAppointmentComponent,
-        GeneralCreateComponent,
+        GeneralCardComponent,
         SelectionInput,
     ],
     templateUrl: './create-appointment.component.html',

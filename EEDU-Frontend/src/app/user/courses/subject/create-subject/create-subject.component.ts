@@ -8,12 +8,12 @@ import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {DialogRef} from "@angular/cdk/dialog";
 import {SubjectModel} from "../subject-model";
 import {SubjectService} from "../subject.service";
-import {GeneralCreateComponent} from "../../../../timetable/general-create-component/general-create.component";
 import {MatChipGrid, MatChipInput, MatChipRemove, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {
     AbstractCourseComponentsCreateMultiple
 } from "../../abstract-course-components/create/abstract-course-components-create-multiple";
+import {GeneralCardComponent} from "../../../../common/general-card-component/general-card.component";
 
 @Component({
     selector: 'app-create-subject',
@@ -27,7 +27,7 @@ import {
         MatFormField,
         MatInput,
         ReactiveFormsModule,
-        GeneralCreateComponent,
+        GeneralCardComponent,
         MatIcon,
         MatChipRow,
         MatChipGrid,
