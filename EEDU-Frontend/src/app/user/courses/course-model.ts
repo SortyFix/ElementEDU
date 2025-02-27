@@ -3,6 +3,7 @@ import {FrequentAppointmentModel, GenericFrequentAppointment} from "./appointmen
 import {GenericSubject, SubjectModel} from "./subject/subject-model";
 import {ClassRoomModel, GenericClassRoomModel} from "./classroom/class-room-model";
 import {GenericReducedUserModel, ReducedUserModel} from "../reduced-user-model";
+import {Observable} from "rxjs";
 
 export interface GenericCourse {
     id: bigint;
@@ -60,11 +61,11 @@ export class CourseModel {
         return this._classRoom;
     }
 
-    public static fromObject(object: GenericCourse): CourseModel {
+    public static fromObject(object: GenericCourse, findBySubject: () => Observable<readonly CourseModel[]>): CourseModel {
         const course: CourseModel = new CourseModel(
             BigInt(object.id),
             object.name,
-            SubjectModel.fromObject(object.subject),
+            SubjectModel.fromObject(object.subject, findBySubject),
             (object.students || []).map(
                 (student: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(student)
             ),

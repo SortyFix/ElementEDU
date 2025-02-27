@@ -248,7 +248,6 @@ VALUES ('parent'),
        ('boys');
 */
 
-/*
 INSERT INTO theme_entity (name, background_color_r, background_color_g, background_color_b, widget_color_r,
                           widget_color_g, widget_color_b)
 VALUES ('dark', 120, 120, 120, 100, 100, 100);
@@ -271,7 +270,6 @@ VALUES ('Max', 'Mustermann', 'max.mustermann', 2, FALSE, TRUE, FALSE, 1, 0),    
        ('Ethan', 'Schwarz', 'ethan.schwarz', 2, TRUE, TRUE, FALSE, 1, 3),       -- PROSPECTIVE Student
        ('Charlotte', 'Zimmer', 'charlotte.zimmer', 2, FALSE, TRUE, TRUE, 1, 2), -- UNEXCUSED Student
        ('James', 'Krause', 'james.krause', 2, FALSE, TRUE, FALSE, 1, 1); -- EXCUSED Student
-*/
 
 /*
 INSERT INTO file_entity (data_directory)

@@ -96,12 +96,16 @@ export class CreateCourseComponent extends AbstractCourseComponentsCreate<Course
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {
         return formBuilder.group({
-            name: ['', Validators.required],
+            name: [null, Validators.required],
             subject: [null, Validators.required],
             teacher: [null, Validators.required],
             students: [null],
             classroom: [null],
         });
+    }
+
+    protected override get canSubmit(): boolean {
+        return true;
     }
 
     private getUsers(accountType: AccountType): readonly ReducedUserModel[] {

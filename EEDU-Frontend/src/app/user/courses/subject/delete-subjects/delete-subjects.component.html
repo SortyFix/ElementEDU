@@ -1,0 +1,24 @@
+<mat-card>
+    <mat-card-header style="display: flex; justify-content: space-between">
+        <mat-card-title>Delete Subjects</mat-card-title>
+        <button class="close-button" mat-dialog-close mat-icon-button>
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-card-header>
+    <mat-card-content *ngIf="finishedLoading">
+        <p>Are you sure you wish to delete the subjects listed below?</p>
+        <mat-chip-set *ngFor="let subject of entries;">
+            <mat-chip>{{ subject }}</mat-chip>
+        </mat-chip-set>
+
+        <p>Note that this will also delete the courses:</p>
+        <mat-chip-set *ngFor="let course of affectedCourses;">
+            <mat-chip>{{ course }}</mat-chip>
+        </mat-chip-set>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+        <button class="close-button" mat-button type="button" (click)="onCancel()">Cancel</button>
+        <button mat-stroked-button type="submit" color="warn" (click)="onSubmit()">Submit</button>
+    </mat-card-actions>
+</mat-card>

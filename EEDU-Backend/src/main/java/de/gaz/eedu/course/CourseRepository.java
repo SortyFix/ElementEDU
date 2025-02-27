@@ -1,5 +1,6 @@
 package de.gaz.eedu.course;
 
+import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -19,7 +20,7 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>
             "SELECT c FROM CourseEntity c " +
             "LEFT JOIN FETCH c.frequentAppointments sA " +
             "LEFT JOIN FETCH c.appointments a " +
-            "LEFT JOIN FETCH c.classRoom r" +
+            "LEFT JOIN FETCH c.classRoom r " +
             "LEFT JOIN FETCH c.subject s " +
             "LEFT JOIN FETCH c.users u " +
             "LEFT JOIN FETCH c.repository rE " +

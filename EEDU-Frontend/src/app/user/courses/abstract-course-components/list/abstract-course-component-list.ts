@@ -13,7 +13,8 @@ export abstract class AbstractCourseComponentList<P, T extends { id: P }> {
         private readonly _service: AbstractCourseComponentsService<P, T, any>,
         private readonly _dialog: MatDialog,
         private readonly _componentType: ComponentType<any>,
-        private readonly _listData: ListItemInfo<T>) {
+        private readonly _listData: ListItemInfo<T>,
+        private readonly _deleteComponent?: ComponentType<any>) {
 
         if (!this._listData.icon) {
             this._listData.icon = (): string => _service.icon;
@@ -50,11 +51,23 @@ export abstract class AbstractCourseComponentList<P, T extends { id: P }> {
         return this._dialog.open(this._componentType, {width: '600px', disableClose: true});
     }
 
-    protected openDeleteDialog(): MatDialogRef<any> {
-        return this._dialog.open(this._componentType, {width: '600px', disableClose: true});
+    protected openDeleteDialog(selectedValues: T[]): void {
+        if(!this._deleteComponent)
+        {
+            this.delete(selectedValues);
+            return;
+        }
+        this._dialog.open(this._deleteComponent, {
+            width: '600px',
+            disableClose: true,
+            data: { entries: selectedValues }
+        }).afterClosed().subscribe(((should: boolean): void => {
+            if(!should) { return; }
+            this.delete(selectedValues);
+        }));
     }
 
-    protected delete(selectedValues: T[]): void {
+    private delete(selectedValues: T[]): void {
         this._service.delete(selectedValues.map((value: T): P => value.id)).subscribe();
     }
 

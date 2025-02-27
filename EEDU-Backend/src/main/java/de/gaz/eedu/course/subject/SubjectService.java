@@ -1,5 +1,7 @@
 package de.gaz.eedu.course.subject;
 
+import de.gaz.eedu.course.CourseEntity;
+import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.model.SubjectCreateModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.EntityService;
@@ -12,8 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,5 +40,11 @@ public class SubjectService extends EntityService<String, SubjectRepository, Sub
             return current.toEntity(subject);
         }).toList();
         return saveEntity(subjectEntities);
+    }
+
+    public @NotNull CourseModel[] loadCourses(@NotNull String[] subjectId)
+    {
+        Stream<CourseEntity> courses = getRepository().findAllCoursesBySubjectIds(Arrays.asList(subjectId)).stream();
+        return courses.map(CourseEntity::toModel).toArray(CourseModel[]::new);
     }
 }

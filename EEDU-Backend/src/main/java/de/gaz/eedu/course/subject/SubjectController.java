@@ -1,5 +1,6 @@
 package de.gaz.eedu.course.subject;
 
+import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.course.subject.model.SubjectCreateModel;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.EntityController;
@@ -40,15 +41,21 @@ public class SubjectController extends EntityController<String, SubjectService, 
     }
 
     //@PreAuthorize("isAuthenticated()")
+
     @GetMapping("/get/{id}")
     @Override public @NotNull ResponseEntity<SubjectModel> getData(@NotNull @PathVariable String id)
     {
         return super.getData(id);
     }
-
     @GetMapping("/get/all")
     @Override public @NotNull ResponseEntity<Set<SubjectModel>> fetchAll()
     {
         return super.fetchAll();
+    }
+
+    @GetMapping("/courses/{subjects}")
+    public @NotNull ResponseEntity<CourseModel[]> getCourses(@NotNull @PathVariable String[] subjects)
+    {
+        return ResponseEntity.ok(getService().loadCourses(subjects));
     }
 }

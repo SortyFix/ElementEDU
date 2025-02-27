@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
-import {CourseModel} from "./course-model";
+import {BehaviorSubject, map, Observable, of, OperatorFunction, tap} from "rxjs";
+import {CourseModel, GenericCourse} from "./course-model";
 import {CourseCreateModel, CourseCreatePacket} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
@@ -38,7 +38,12 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
     }
 
     public override get translate(): OperatorFunction<any[], CourseModel[]> {
-        return map((response: any[]): CourseModel[] => response.map((item: any): CourseModel => CourseModel.fromObject(item)));
+        return map((response: any[]): CourseModel[] =>
+            response.map((item: GenericCourse): CourseModel => CourseModel.fromObject(item, (): Observable<readonly CourseModel[]> =>
+            {
+                return of(this.findBySubjectLazily([item.subject.id]));
+            }))
+        );
     }
 
     protected override get fetchAllValues(): Observable<any[]> {
@@ -56,7 +61,11 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
         );
     }
 
-    public override clearCache() {
+    public findBySubjectLazily(subjects: string[]): readonly CourseModel[] {
+        return this.value.filter((course: CourseModel): boolean => subjects.includes(course.subject.id));
+    }
+
+    public override clearCache(): void {
         super.clearCache();
         this._fetchedAdmin = false;
     }
