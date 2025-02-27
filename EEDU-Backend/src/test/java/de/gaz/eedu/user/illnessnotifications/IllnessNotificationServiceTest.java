@@ -56,7 +56,7 @@ public class IllnessNotificationServiceTest extends ServiceTest<Long, IllnessNot
     @Transactional
     protected void illnessNotificationUploadTest() throws IOException
     {
-        MockMultipartFile mockFile = new MockMultipartFile("illnessnotification.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt"));
+        MockMultipartFile mockFile = new MockMultipartFile("file", "illnessnotification.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile1.txt"));
         boolean excused = illnessNotificationService.excuse(1L, "Am sick", 39423943L, mockFile);
 
         Assertions.assertTrue(excused);

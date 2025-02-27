@@ -41,9 +41,9 @@ public class FileServiceTest
     public void testBatchUpload() throws Exception
     {
         MockMultipartFile[] batch = new MockMultipartFile[]{
-                new MockMultipartFile("batchfile1.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
-                new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
-                new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
+                new MockMultipartFile("file", "batchfile1.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
+                new MockMultipartFile("file", "batchfile2.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
+                new MockMultipartFile("file", "batchfile3.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
@@ -61,9 +61,9 @@ public class FileServiceTest
     {
         String subdirectory = "testdir";
         MockMultipartFile[] batch = new MockMultipartFile[]{
-                new MockMultipartFile("batchfile1.txt", getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
-                new MockMultipartFile("batchfile2.txt", getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
-                new MockMultipartFile("batchfile3.txt", getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
+                new MockMultipartFile("file", "batchfile1.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile1.txt")),
+                new MockMultipartFile("file", "batchfile2.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile2.txt")),
+                new MockMultipartFile("file", "batchfile3.txt", null, getClass().getClassLoader().getResourceAsStream("batchfile3.txt"))
         };
         FileCreateModel fileCreateModel = new FileCreateModel("homework", new String[]{"PRIVILEGE_ALL"}, new String[]{"wuff"});
         FileEntity fileEntity = fileService.createEntity(fileCreateModel);
