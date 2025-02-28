@@ -1,5 +1,5 @@
 import {Component, Input, input, InputSignal, Type} from '@angular/core';
-import {NgComponentOutlet, NgForOf, NgIf} from "@angular/common";
+import {NgComponentOutlet, NgForOf, NgIf, NgTemplateOutlet} from "@angular/common";
 import {
     MatAccordion,
     MatExpansionPanel,
@@ -15,8 +15,6 @@ import {AllCheckBoxComponent} from "./checkboxes/all-check-box.component";
 import {SingleCheckBoxComponent} from "./checkboxes/single-check-box.component";
 import {ListItemContent} from "./list-item-content";
 import {MatList, MatListItem} from "@angular/material/list";
-import {MatCheckbox} from "@angular/material/checkbox";
-import {MatIcon} from "@angular/material/icon";
 
 // noinspection JSUnusedGlobalSymbols
 export enum SelectionType {
@@ -35,7 +33,7 @@ export interface GeneralListInfo<T> {
 
 @Component({
     selector: 'list',
-    imports: [MatChipSet, MatChip, MatExpansionPanel, MatAccordion, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelHeader, MatFormField, MatInput, MatLabel, NgIf, FormsModule, NgForOf, AllCheckBoxComponent, SingleCheckBoxComponent, NgComponentOutlet, MatList, MatListItem, MatCheckbox, MatIcon,],
+    imports: [MatChipSet, MatChip, MatExpansionPanel, MatAccordion, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelHeader, MatFormField, MatInput, MatLabel, NgIf, FormsModule, NgForOf, AllCheckBoxComponent, SingleCheckBoxComponent, NgComponentOutlet, MatList, MatListItem, NgTemplateOutlet,],
     templateUrl: './abstract-list.component.html',
     styleUrl: './abstract-list.component.scss'
 })

@@ -1,3 +1,10 @@
+<p>Users:</p>
+<mat-chip-set>
+    @for (student of entry()?.students; track student.id) {
+        <mat-chip>{{ student.name }}</mat-chip>
+    }
+</mat-chip-set>
+
 <button mat-button>
     <mat-icon>person</mat-icon>
     Manage Users

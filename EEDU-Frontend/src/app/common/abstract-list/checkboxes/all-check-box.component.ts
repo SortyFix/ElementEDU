@@ -4,7 +4,7 @@ import {NgIf} from "@angular/common";
 
 @Component({
     selector: 'all-checkbox', template: `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex;">
             <mat-checkbox
                 [checked]="checked()"
                 [indeterminate]="indeterminate()"
@@ -12,7 +12,6 @@ import {NgIf} from "@angular/common";
                 (change)="this.onToggle.emit()">
                 Select All
             </mat-checkbox>
-
             <ng-content></ng-content>
         </div>
     `, imports: [MatCheckbox, NgIf]
