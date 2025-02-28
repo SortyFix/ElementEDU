@@ -53,7 +53,7 @@ export class IllnessNotificationComponent implements OnInit {
 
     ngOnInit(): void {
         this.getOwnSickNotes().subscribe(list => {
-            this.illnessNotifications = list;
+            this.illnessNotifications = list.sort(model => Number(model.id));
             console.log(this.illnessNotifications);
         })
     }

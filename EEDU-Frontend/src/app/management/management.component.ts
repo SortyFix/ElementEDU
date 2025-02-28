@@ -16,6 +16,10 @@ import {
 import {NgForOf, NgIf} from "@angular/common";
 import {FileService} from "../file/file.service";
 import {MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {ManagementService} from "./management.service";
+import {IllnessNotificationStatus} from "../illness-notification/illness-notification-status";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'app-management',
@@ -28,6 +32,7 @@ import {MatButton} from "@angular/material/button";
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
         NgForOf,
+        MatIcon,
         MatButton,
         NgIf
     ],
@@ -41,32 +46,32 @@ export class ManagementComponent implements OnInit {
 
     illnessNotifications: IllnessNotificationModel[] = []
 
-    PREFIX: string = "http://localhost:8080/api/v1";
-
-    constructor(protected userService: UserService, protected fileService: FileService, private http: HttpClient) {
+    constructor(protected managementService: ManagementService, protected userService: UserService, protected fileService: FileService, private http: HttpClient) {
     }
 
     ngOnInit(): void {
-        this.getPendingNotifications();
-        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this.userList = users });
-    }
-
-    private getPendingNotifications(): void
-    {
-        this.http.get<GenericIllnessNotificationModel[]>(`${this.PREFIX}/illness/management/get-pending`, {
-            withCredentials: true
-        }).subscribe((list: GenericIllnessNotificationModel[]): void => {
-             list.forEach((obj: GenericIllnessNotificationModel): void => {
-                let model: IllnessNotificationModel = IllnessNotificationModel.fromObject(obj);
-                this.illnessNotifications.push(model);
-             })
-            console.log(this.illnessNotifications);
-        })
+        this.managementService.getPendingNotifications().subscribe((list: IllnessNotificationModel[]): void => {
+            this.illnessNotifications = list;
+            this.userService.fetchAll.subscribe((users: UserModel[]): void => { this.userList = users });
+        });
     }
 
     public downloadFile(id: bigint)
     {
         this.fileService.downloadFile(id);
     }
+
+    public respondToNotification(id: bigint, status: IllnessNotificationStatus): void
+    {
+        this.managementService.respondToNotification(id, status).subscribe((accepted: boolean): void => {
+            let acceptedNoteIndex: number = this.illnessNotifications.findIndex((element: IllnessNotificationModel): boolean => element.id == id);
+            if(acceptedNoteIndex >= 0)
+            {
+                this.illnessNotifications.splice(acceptedNoteIndex, 1);
+            }
+        });
+    }
+
+    protected readonly IllnessNotificationStatus = IllnessNotificationStatus;
 }
 
