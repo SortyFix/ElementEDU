@@ -18,16 +18,7 @@ export interface GenericCourse {
 
 export class CourseModel {
 
-    public constructor(
-        private readonly _id: bigint,
-        private readonly _name: string,
-        private readonly _subject: SubjectModel,
-        private _students: readonly ReducedUserModel[],
-        private _appointmentEntries: readonly AppointmentEntryModel[],
-        private _frequentAppointments: readonly FrequentAppointmentModel[],
-        private readonly _teacher: ReducedUserModel | null,
-        private readonly _classRoom: ClassRoomModel | null,
-    ) {}
+    public constructor(private readonly _id: bigint, private readonly _name: string, private readonly _subject: SubjectModel, private _students: readonly ReducedUserModel[], private _appointmentEntries: readonly AppointmentEntryModel[], private _frequentAppointments: readonly FrequentAppointmentModel[], private readonly _teacher: ReducedUserModel | null, private readonly _classRoom: ClassRoomModel | null,) {}
 
     public get id(): bigint {
         return this._id;
@@ -42,6 +33,21 @@ export class CourseModel {
     }
 
     public get students(): readonly ReducedUserModel[] {
+
+        if (this.classRoom != null) {
+            const deduplicated = new Map();
+
+            [...this.classRoom.students, ...this.ownStudents].forEach(student => {
+                deduplicated.set(student.id, student);
+            });
+
+            return Array.from(deduplicated.values());
+        }
+
+        return this.ownStudents;
+    }
+
+    public get ownStudents(): readonly ReducedUserModel[] {
         return this._students;
     }
 
@@ -57,29 +63,18 @@ export class CourseModel {
         return this._teacher;
     }
 
-    public get classRoom(): GenericClassRoomModel | null {
+    public get classRoom(): ClassRoomModel | null {
         return this._classRoom;
     }
 
     public static fromObject(object: GenericCourse, findBySubject: () => Observable<readonly CourseModel[]>): CourseModel {
-        const course: CourseModel = new CourseModel(
-            BigInt(object.id),
-            object.name,
-            SubjectModel.fromObject(object.subject, findBySubject),
-            (object.students || []).map(
-                (student: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(student)
-            ),
-            this.getEntries(object.appointmentEntries),
-            object.frequentAppointments.map((entry: any): FrequentAppointmentModel => {
-                // when this method is called,
-                // the course will already be created
-                // and can therefore safely be returned here
+        const course: CourseModel = new CourseModel(BigInt(object.id), object.name, SubjectModel.fromObject(object.subject, findBySubject), (object.students || []).map((student: GenericReducedUserModel): ReducedUserModel => ReducedUserModel.fromObject(student)), this.getEntries(object.appointmentEntries), object.frequentAppointments.map((entry: any): FrequentAppointmentModel => {
+            // when this method is called,
+            // the course will already be created
+            // and can therefore safely be returned here
 
-                return FrequentAppointmentModel.fromObject(entry, (): CourseModel => course);
-            }),
-            object.teacher ? ReducedUserModel.fromObject(object.teacher) : null,
-            object.classRoom ? ClassRoomModel.fromObject(object.classRoom) : null
-        );
+            return FrequentAppointmentModel.fromObject(entry, (): CourseModel => course);
+        }), object.teacher ? ReducedUserModel.fromObject(object.teacher) : null, object.classRoom ? ClassRoomModel.fromObject(object.classRoom) : null);
         return course;
     }
 
