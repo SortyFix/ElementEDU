@@ -12,7 +12,8 @@ public record TemporaryCredentialCreateModel(
         @NotNull CredentialMethod method,
         @Nullable String data,
         @NotNull CredentialMethod... allowed
-) {
+)
+{
 
     public int bitMask()
     {

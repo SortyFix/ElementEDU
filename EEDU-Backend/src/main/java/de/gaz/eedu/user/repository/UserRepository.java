@@ -29,13 +29,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, UserEnt
 
     @Query(
             "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
-            "FROM UserEntity u " +
-            "WHERE u.id = :userId"
+                    "FROM UserEntity u " +
+                    "WHERE u.id = :userId"
     ) @NotNull Optional<ReducedUserModel> findReducedById(long userId);
 
     @Query(
             "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +
-            "FROM UserEntity u"
+                    "FROM UserEntity u"
     ) @Unmodifiable @NotNull Set<ReducedUserModel> findAllReduced();
 
 }

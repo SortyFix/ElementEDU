@@ -14,7 +14,8 @@ public record GeneratedToken(@NotNull JwtTokenType type, @NotNull String jwt, @N
     public static @NotNull GeneratedToken toToken(@NotNull String key, @NotNull JwtTokenType type, @NotNull Instant expires, @NotNull TokenData tokenData)
     {
         SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
-        String jwt = Jwts.builder().subject(type.name()).claims(tokenData.toMap()).expiration(Date.from(expires)).issuedAt(new Date()).signWith(secretKey).compact();
+        String jwt = Jwts.builder().subject(type.name()).claims(tokenData.toMap()).expiration(Date.from(expires)).issuedAt(
+                new Date()).signWith(secretKey).compact();
         return new GeneratedToken(type, jwt, TokenData.deserialize(key, jwt));
     }
 }

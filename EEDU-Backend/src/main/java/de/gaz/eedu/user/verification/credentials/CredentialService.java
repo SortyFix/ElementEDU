@@ -45,7 +45,8 @@ public class CredentialService extends EntityService<Long, CredentialRepository,
     public @NotNull List<CredentialEntity> createEntity(@NotNull Set<CredentialCreateModel> model) throws CreationException
     {
         Set<UserEntity> users = new HashSet<>();
-        List<CredentialEntity> credentials = saveEntity(model.stream().map(current -> {
+        List<CredentialEntity> credentials = saveEntity(model.stream().map(current ->
+        {
             UserEntity userEntity = getUserService().loadEntityByIDSafe(current.userID());
 
             CredentialEntity entity = new CredentialEntity(current.method(), current.temporary(), userEntity);

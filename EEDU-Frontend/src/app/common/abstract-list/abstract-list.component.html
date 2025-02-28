@@ -8,55 +8,39 @@
            autofocus matInput>
 </mat-form-field>
 
-<!--
-<div>
-    <mat-list>
-        <div style="display: flex">
-            <all-checkbox [checked]="isSelected('all')" [indeterminate]="partiallySelected" [show]="showCheckboxes">
-                <ng-content></ng-content>
-            </all-checkbox>
-        </div>
-
-        <div [style.height]="height() + 'px'" style="overflow: scroll;">
-            @for (value of filteredValues; track value) {
-
-                <mat-list-item class="selectable" (click)="firstSelect(value)">
-                    <div matListItemTitle style="width: 100%; display: flex; justify-content: space-between">
-                        <div>
-                            <single-checkbox
-                                [checked]="isSelected(value)"
-                                [icon]="loadIcon(value)"
-                                [title]="loadTitle(value)"
-                                [show]="showCheckboxes"
-                                (keyboardEvent)="handleKeyDown($event, value)"
-                                (onToggle)="toggle(value)">
-                            </single-checkbox>
-                        </div>
-
-                        <div>
-                            <mat-chip-set *ngIf="hasChips">
-                                @for (tag of loadChips(value); track tag) {
-                                    <mat-chip>{{ tag }}</mat-chip>
-                                }
-                            </mat-chip-set>
-                        </div>
-                    </div>
-                </mat-list-item>
-            }
-        </div>
-
-    </mat-list>
-</div>
--->
-
-<mat-accordion>
+<mat-accordion *ngIf="!hasContent">
     <all-checkbox
         [checked]="isSelected('all')"
         [indeterminate]="partiallySelected"
         (onToggle)="toggle('all')">
         <ng-content></ng-content>
     </all-checkbox>
-    <mat-expansion-panel *ngFor="let value of filteredValues" >
+
+    <mat-list>
+        <mat-list-item *ngFor="let value of filteredValues">
+            <mat-checkbox
+                [checked]="isSelected(value)"
+                [indeterminate]="partiallySelected"
+                (change)="toggle(value)">
+            </mat-checkbox>
+            <mat-icon *ngIf="loadIcon(value)">{{ loadIcon(value) }}</mat-icon>
+            <span>{{ loadTitle(value) }}</span>
+
+            <mat-chip-set *ngIf="hasChips">
+                <mat-chip *ngFor="let tag of loadChips(value)">{{ tag }}</mat-chip>
+            </mat-chip-set>
+        </mat-list-item>
+    </mat-list>
+</mat-accordion>
+
+<mat-accordion *ngIf="hasContent">
+    <all-checkbox
+        [checked]="isSelected('all')"
+        [indeterminate]="partiallySelected"
+        (onToggle)="toggle('all')">
+        <ng-content></ng-content>
+    </all-checkbox>
+    <mat-expansion-panel *ngFor="let value of filteredValues">
         <mat-expansion-panel-header tabindex="-1">
             <mat-panel-title>
                 <single-checkbox

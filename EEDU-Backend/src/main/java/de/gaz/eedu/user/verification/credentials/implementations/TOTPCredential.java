@@ -15,7 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import java.security.SecureRandom;
 import java.time.Instant;
 
-@AllArgsConstructor @Getter(AccessLevel.PROTECTED) public class TOTPCredential implements Credential
+@AllArgsConstructor
+@Getter(AccessLevel.PROTECTED)
+public class TOTPCredential implements Credential
 {
     private static final int BYTE_SIZE = 20;
     private static final Base32 BASE_32 = new Base32();
@@ -62,7 +64,7 @@ import java.time.Instant;
     }
 
     public record TOTPData(@NotNull String loginName, @NotNull String secret, @NotNull String algorithm, int digits,
-            int period)
+                           int period)
     {}
 
 }

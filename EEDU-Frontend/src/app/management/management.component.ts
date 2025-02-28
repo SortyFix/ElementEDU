@@ -17,10 +17,10 @@ import {
     GenericIllnessNotificationModel,
     IllnessNotificationModel
 } from "../illness-notification/model/illness-notification-model";
-import {SubjectListComponent} from "../user/courses/subject/subject-list/subject-list.component";
-import {RoomListComponent} from "../user/courses/room/room-list/room-list.component";
-import {ClassRoomListComponent} from "../user/courses/classroom/class-room-list/class-room-list.component";
-import {CourseListComponent} from "../user/courses/course-list/course-list.component";
+import {SubjectListComponent} from "../user/courses/subject/subject-dialogs/subject-list.component";
+import {RoomListComponent} from "../user/courses/room/room-dialogs/room-list.component";
+import {ClassRoomListComponent} from "../user/courses/classroom/class-room-dialogs/class-room-list.component";
+import {CourseListComponent} from "../user/courses/course-dialogs/course-list.component";
 import {FileService} from "../file/file.service";
 import {HttpClient} from "@angular/common/http";
 

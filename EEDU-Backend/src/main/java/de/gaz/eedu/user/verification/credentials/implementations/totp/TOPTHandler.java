@@ -11,7 +11,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-@Setter @Getter @AllArgsConstructor public class TOPTHandler
+@Setter
+@Getter
+@AllArgsConstructor
+public class TOPTHandler
 {
 
     private final HashingAlgorithm hashingAlgorithm;
@@ -41,8 +44,7 @@ import java.security.NoSuchAlgorithmException;
         {
             String actualCode = generateVerificationCode(secret, counter);
             return verifyCode(actualCode, code);
-        }
-        catch (InvalidKeyException | NoSuchAlgorithmException parent)
+        } catch (InvalidKeyException | NoSuchAlgorithmException parent)
         {
             throw new IllegalStateException(String.format("Unable to verify code %s.", code), parent);
         }
@@ -75,7 +77,8 @@ import java.security.NoSuchAlgorithmException;
     {
         byte[] data = new byte[8];
         long value = counter;
-        for (int i = 8; i-- > 0; value >>>= 8) {
+        for (int i = 8; i-- > 0; value >>>= 8)
+        {
             data[i] = (byte) value;
         }
 
@@ -88,12 +91,14 @@ import java.security.NoSuchAlgorithmException;
         return mac.doFinal(data);
     }
 
-    private @NotNull String getDigitsFromHash(byte @NotNull [] hash) {
+    private @NotNull String getDigitsFromHash(byte @NotNull [] hash)
+    {
         int offset = hash[hash.length - 1] & 0xF;
 
         long truncatedHash = 0;
 
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < 4; ++i)
+        {
             truncatedHash <<= 8;
             truncatedHash |= (hash[offset + i] & 0xFF);
         }

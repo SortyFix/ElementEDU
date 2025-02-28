@@ -43,7 +43,8 @@ public class CredentialEntity implements EntityModelRelation<Long, CredentialMod
         this.id = (long) Objects.hash(user.getCredentials().size(), user);
     }
 
-    @Contract(pure = true) private static long temporaryId(@NotNull @org.jetbrains.annotations.NotNull CredentialMethod method, long userId)
+    @Contract(pure = true)
+    private static long temporaryId(@NotNull @org.jetbrains.annotations.NotNull CredentialMethod method, long userId)
     {
         return Objects.hash(method.name(), userId);
     }

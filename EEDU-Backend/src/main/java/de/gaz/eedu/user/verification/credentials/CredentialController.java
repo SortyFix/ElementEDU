@@ -55,11 +55,12 @@ public class CredentialController extends EntityController<Long, CredentialServi
 
     @PreAuthorize(
             "hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_DELETE.toString()) or " +
-            "(@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and " +
+                    "(@verificationService.hasToken(T(de.gaz.eedu.user.verification.JwtTokenType).ADVANCED_AUTHORIZATION and " +
                     "#id == authentication.principal)" +
-            ")"
+                    ")"
     )
-    @DeleteMapping("/delete/{id}") @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
+    @DeleteMapping("/delete/{id}") @Override
+    public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
     }
@@ -84,7 +85,9 @@ public class CredentialController extends EntityController<Long, CredentialServi
     }
 
     @PostMapping("/create/{userId}")
-    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE.toString())")
+    @PreAuthorize(
+            "hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE.toString())"
+    )
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody UndefinedCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
@@ -93,7 +96,9 @@ public class CredentialController extends EntityController<Long, CredentialServi
     }
 
     @PostMapping("/create/temporary/{userId}")
-    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY.toString())")
+    @PreAuthorize(
+            "hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREDENTIAL_OTHERS_CREATE_TEMPORARY.toString())"
+    )
     public <T> @NotNull ResponseEntity<@Nullable T> create(@PathVariable long userId, @NotNull @RequestBody TemporaryCredentialCreateModel model)
     {
         Set<CredentialCreateModel> createModels = Set.of(new CredentialCreateModel(userId, model));
@@ -122,7 +127,9 @@ public class CredentialController extends EntityController<Long, CredentialServi
         validate(getService().enable(method, code, token), unauthorizedThrowable());
 
         // return login token after user has set up the credential
-        if (hasAuthority(JwtTokenType.CREDENTIAL_CREATION_PENDING.getAuthority().getAuthority(), VerificationAuthority.class))
+        if (hasAuthority(
+                JwtTokenType.CREDENTIAL_CREATION_PENDING.getAuthority().getAuthority(),
+                VerificationAuthority.class))
         {
             return authorizeToken(getService().verify(method, code, token), response);
         }

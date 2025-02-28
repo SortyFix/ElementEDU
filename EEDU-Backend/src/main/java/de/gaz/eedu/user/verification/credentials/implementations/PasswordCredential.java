@@ -12,7 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Set;
 
-@RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
+@RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class PasswordCredential implements Credential
 {
     private final BCryptPasswordEncoder passwordEncoder;
@@ -21,7 +22,8 @@ public class PasswordCredential implements Credential
     public void creation(@NotNull CredentialEntity credentialEntity)
     {
         String password = credentialEntity.getData();
-        if (!password.matches("^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
+        if (!password.matches(
+                "^(?=(.*[a-z])+)(?=(.*[A-Z])+)(?=(.*[0-9])+)(?=(.*[!\"#$%&'()*+,\\-./:;<=>?@\\[\\\\\\]^_`{|}~])+).{6,}$"))
         {
             throw new InsecurePasswordException();
         }
@@ -51,7 +53,7 @@ public class PasswordCredential implements Credential
     private void prohibitDuplication(@NotNull CredentialEntity credential) throws ResponseStatusException
     {
         Set<CredentialEntity> passwords = credential.getUser().getCredentials(CredentialMethod.PASSWORD);
-        if(passwords.stream().anyMatch(current -> verify(current, credential.getData()) && current.isEnabled()))
+        if (passwords.stream().anyMatch(current -> verify(current, credential.getData()) && current.isEnabled()))
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

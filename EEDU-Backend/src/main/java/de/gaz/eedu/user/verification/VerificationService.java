@@ -83,7 +83,6 @@ public class VerificationService
      *
      * @param jwtTokenType the token to check whether the user is authenticated with it.
      * @return whether the token is present or not.
-     *
      * @see #hasToken(Authentication, JwtTokenType...)
      */
     public boolean hasToken(@NotNull JwtTokenType... jwtTokenType)
@@ -101,9 +100,8 @@ public class VerificationService
      * Users will always be granted a token with a {@link JwtTokenType} attached.
      *
      * @param authentication the authentication context to check for.
-     * @param jwtTokenType the token to check whether the user is authenticated with it.
+     * @param jwtTokenType   the token to check whether the user is authenticated with it.
      * @return whether the token is present or not.
-     *
      * @see #hasToken(JwtTokenType...)
      */
     public boolean hasToken(@NotNull Authentication authentication, @NotNull JwtTokenType... jwtTokenType)
@@ -145,7 +143,12 @@ public class VerificationService
         Set<String> restricted = Set.of("expiry", "username");
         ClaimHolder<Long> expiry = new ClaimHolder<>("expiry", getExpiry(model).toEpochMilli());
         ClaimHolder<String> username = new ClaimHolder<>("username", user.getUsername());
-        TokenData tokenData = new TokenData(user.getId(), model instanceof AdvancedUserLoginModel, restricted, expiry, username);
+        TokenData tokenData = new TokenData(
+                user.getId(),
+                model instanceof AdvancedUserLoginModel,
+                restricted,
+                expiry,
+                username);
 
         if (user.getCredentials().isEmpty())
         {
@@ -313,8 +316,8 @@ public class VerificationService
                 }
                 yield authorities;
             }
-            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING, WEBSOCKET ->
-                    Collections.singleton(jwtTokenType.getAuthority());
+            case CREDENTIAL_SELECTION, CREDENTIAL_PENDING, CREDENTIAL_REQUIRED, CREDENTIAL_CREATION_PENDING,
+                 WEBSOCKET -> Collections.singleton(jwtTokenType.getAuthority());
         };
     }
 

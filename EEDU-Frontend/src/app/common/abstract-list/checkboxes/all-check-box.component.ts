@@ -3,8 +3,7 @@ import {MatCheckbox} from "@angular/material/checkbox";
 import {NgIf} from "@angular/common";
 
 @Component({
-    selector: 'all-checkbox',
-    template: `
+    selector: 'all-checkbox', template: `
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <mat-checkbox
                 [checked]="checked()"
@@ -16,11 +15,7 @@ import {NgIf} from "@angular/common";
 
             <ng-content></ng-content>
         </div>
-    `,
-    imports: [
-        MatCheckbox,
-        NgIf
-    ]
+    `, imports: [MatCheckbox, NgIf]
 })
 export class AllCheckBoxComponent {
     @Output() public readonly onToggle: EventEmitter<void> = new EventEmitter<void>;

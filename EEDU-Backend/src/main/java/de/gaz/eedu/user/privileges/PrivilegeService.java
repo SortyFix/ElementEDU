@@ -10,20 +10,17 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-@Service @AllArgsConstructor @Getter(AccessLevel.PROTECTED)
+@Service
+@AllArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class PrivilegeService extends EntityService<String, PrivilegeRepository, PrivilegeEntity, PrivilegeModel, PrivilegeCreateModel>
 {
     private final PrivilegeRepository repository;
@@ -43,7 +40,8 @@ public class PrivilegeService extends EntityService<String, PrivilegeRepository,
     }
 
     @Transactional
-    @Override public @NotNull List<PrivilegeEntity> createEntity(@NotNull Set<PrivilegeCreateModel> createModel) throws CreationException
+    @Override
+    public @NotNull List<PrivilegeEntity> createEntity(@NotNull Set<PrivilegeCreateModel> createModel) throws CreationException
     {
         if (getRepository().existsByIdIn(createModel.stream().map(PrivilegeCreateModel::id).toList()))
         {

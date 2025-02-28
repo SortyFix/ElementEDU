@@ -44,7 +44,6 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
      * Returns {@link HttpStatus#OK} if the privileges were successfully granted.
      * Returns {@link HttpStatus#NOT_MODIFIED} if the privileges were not modified (e.g., the group already
      * had the specified privileges, or the operation failed for some other reason).
-     *
      * @throws StateTransitionException is thrown when the group already has one of the privileges
      * @see SystemPrivileges#GROUP_PRIVILEGE_GRANT
      */
@@ -69,7 +68,6 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
      * Returns {@link HttpStatus#OK} if the privileges were successfully revoked.
      * Returns {@link HttpStatus#NOT_MODIFIED} if the privileges were not modified (e.g., the group
      * had none of the specified privileges, or the operation failed for some other reason).
-     *
      * @see SystemPrivileges#GROUP_PRIVILEGE_REVOKE
      */
     @DeleteMapping("/{group}/revoke/{privileges}")
@@ -82,7 +80,8 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).PRIVILEGE_CREATE.toString())")
-    @Override public @NotNull ResponseEntity<PrivilegeModel[]> create(@NotNull @RequestBody PrivilegeCreateModel[] model) throws CreationException
+    @Override
+    public @NotNull ResponseEntity<PrivilegeModel[]> create(@NotNull @RequestBody PrivilegeCreateModel[] model) throws CreationException
     {
         return super.create(model);
     }

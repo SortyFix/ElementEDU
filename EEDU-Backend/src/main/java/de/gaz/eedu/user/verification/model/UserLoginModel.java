@@ -19,8 +19,8 @@ public record UserLoginModel(@NotNull String loginName, @NotNull Boolean keepLog
 
     @Override public boolean equals(Object o)
     { // Automatically generated using intellij
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         UserLoginModel that = (UserLoginModel) o;
         return Objects.equals(loginName, that.loginName);
     }

@@ -30,18 +30,17 @@ import java.util.Set;
  * this by converting the privilege into a {@link org.springframework.security.core.GrantedAuthority}, which Spring Security
  * understands.
  *
+ * @author Ivo Quiring
  * @see GroupEntity
  * @see PrivilegeModel
  * @see SystemPrivileges
- *
- * @author Ivo Quiring
  */
-@Entity @Getter @AllArgsConstructor @NoArgsConstructor @Setter @Table(name = "privilege_entity")
+@Entity @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class PrivilegeEntity implements EntityModelRelation<String, PrivilegeModel>
 {
-    @Id @Setter(AccessLevel.NONE) @Column(length = 50) private String id;
     @JsonBackReference @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
     private final Set<GroupEntity> groupEntities = new HashSet<>();
+    @Id @Setter(AccessLevel.NONE) @Column(length = 50) private String id;
 
     /**
      * Converts this privilege into a {@link org.springframework.security.core.GrantedAuthority}.

@@ -14,7 +14,8 @@ public record CredentialCreateModel(
         @NotNull CredentialMethod method,
         @Nullable Integer temporary,
         @Nullable String data
-) implements CreationModel<Long, CredentialEntity> {
+) implements CreationModel<Long, CredentialEntity>
+{
 
     public CredentialCreateModel(long userId, @NotNull UndefinedCredentialCreateModel model)
     {

@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface PrivilegeRepository extends JpaRepository<PrivilegeEntity, String> {
+public interface PrivilegeRepository extends JpaRepository<PrivilegeEntity, String>
+{
 
 
     @Query("SELECT p FROM PrivilegeEntity p LEFT JOIN FETCH p.groupEntities WHERE p.id = :id")
