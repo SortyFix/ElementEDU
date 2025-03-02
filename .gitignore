@@ -35,3 +35,5 @@ build/
 
 # operating system stuff
 .directory
+/EEDU-Backend/src/main/java/de/gaz/eedu/delete/
+/EEDU-Backend/src/main/java/de/gaz/eedu/delete/TestController.java

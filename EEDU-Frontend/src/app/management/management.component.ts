@@ -9,9 +9,7 @@ import {
     MatExpansionPanelTitle
 } from '@angular/material/expansion';
 import {NgComponentOutlet, NgForOf, NgIf} from "@angular/common";
-import {MatButton} from "@angular/material/button";
 import {MatTab, MatTabContent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
-import {MatIcon} from "@angular/material/icon";
 import {icons} from "../../environment/styles";
 import {
     GenericIllnessNotificationModel,
@@ -23,6 +21,11 @@ import {ClassRoomListComponent} from "../user/courses/classroom/class-room-dialo
 import {CourseListComponent} from "../user/courses/course-dialogs/course-list.component";
 import {FileService} from "../file/file.service";
 import {HttpClient} from "@angular/common/http";
+import {MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {ManagementService} from "./management.service";
+import {IllnessNotificationStatus} from "../illness-notification/illness-notification-status";
+import {Observable} from "rxjs";
 
 export interface CourseTab
 {
@@ -30,6 +33,7 @@ export interface CourseTab
     icon: string,
     component: Type<any>
 }
+
 
 @Component({
     selector: 'app-management',
@@ -40,6 +44,7 @@ export interface CourseTab
         MatExpansionPanelTitle,
         MatExpansionPanelDescription,
         NgForOf,
+        MatIcon,
         MatButton,
         NgIf,
         MatTab,
@@ -66,35 +71,36 @@ export class ManagementComponent implements OnInit {
 
     illnessNotifications: IllnessNotificationModel[] = []
 
-    PREFIX: string = "http://localhost:8080/api/v1";
+    public constructor(protected managementService: ManagementService, protected userService: UserService, protected fileService: FileService, private http: HttpClient) {
+    }
 
-    public constructor(protected userService: UserService, protected fileService: FileService, private http: HttpClient) {}
-
-    public ngOnInit(): void {
-        this.getPendingNotifications();
-        this.userService.fetchAll.subscribe((users: UserModel[]): void => { this.userList = users });
+    ngOnInit(): void {
+        this.managementService.getPendingNotifications().subscribe((list: IllnessNotificationModel[]): void => {
+            this.illnessNotifications = list;
+            this.userService.fetchAll.subscribe((users: UserModel[]): void => { this.userList = users });
+        });
     }
 
     protected get courseComponentTabs(): CourseTab[] {
         return this._courseComponentsTabs;
     }
 
-    private getPendingNotifications(): void
-    {
-        this.http.get<GenericIllnessNotificationModel[]>(`${this.PREFIX}/illness/management/get-pending`, {
-            withCredentials: true
-        }).subscribe((list: GenericIllnessNotificationModel[]): void => {
-            list.forEach((obj: GenericIllnessNotificationModel): void => {
-                let model: IllnessNotificationModel = IllnessNotificationModel.fromObject(obj);
-                this.illnessNotifications.push(model);
-            })
-            console.log(this.illnessNotifications);
-        })
-    }
-
     public downloadFile(id: bigint)
     {
         this.fileService.downloadFile(id);
     }
+
+    public respondToNotification(id: bigint, status: IllnessNotificationStatus): void
+    {
+        this.managementService.respondToNotification(id, status).subscribe((accepted: boolean): void => {
+            let acceptedNoteIndex: number = this.illnessNotifications.findIndex((element: IllnessNotificationModel): boolean => element.id == id);
+            if(acceptedNoteIndex >= 0)
+            {
+                this.illnessNotifications.splice(acceptedNoteIndex, 1);
+            }
+        });
+    }
+
+    protected readonly IllnessNotificationStatus = IllnessNotificationStatus;
 }
 

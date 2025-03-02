@@ -14,12 +14,19 @@
                 </mat-expansion-panel-header>
                 <div class="expansion-body">
                     <div class="notification-details">
+                        <h3>ID:</h3> <span>{{ x.id }}</span>
                         <h3>From:</h3> <span>{{ x.timestampString }}</span>
                         <h3>To:</h3> <span>{{ x.expirationTimeString }}</span>
                         <h3>Reason:</h3> <span>{{ x.reason }}</span>
                     </div>
                     <button mat-flat-button class="appendix-button" (click)="downloadFile(x.fileModel.id)">
                         Download Appendix
+                    </button> <br>
+                    <button mat-flat-button class="appendix-button" (click)="respondToNotification(x.id, IllnessNotificationStatus.ACCEPTED)">
+                        <mat-icon>check</mat-icon> Accept
+                    </button>
+                    <button mat-flat-button class="appendix-button" (click)="respondToNotification(x.id, IllnessNotificationStatus.DECLINED)">
+                        <mat-icon>close</mat-icon> Decline
                     </button>
                 </div>
             </mat-expansion-panel>

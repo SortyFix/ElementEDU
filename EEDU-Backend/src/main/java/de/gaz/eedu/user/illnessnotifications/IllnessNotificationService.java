@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -78,12 +79,16 @@ import java.util.Set;
         }
     }
 
+    @Transactional
     public ResponseEntity<Boolean> respondToNotification(@NotNull IllnessNotificationEntity entity, @NotNull IllnessNotificationStatus status)
     {
         entity.setStatus(status);
         userService.loadEntityById(entity.getUser().getId()).ifPresentOrElse(userEntity ->
                         userEntity.setStatus(status.equals(IllnessNotificationStatus.ACCEPTED) ? UserStatus.EXCUSED : UserStatus.UNEXCUSED),
-                () -> ResponseEntity.status(HttpStatus.FORBIDDEN).body(false));
+                () -> {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                });
+        saveEntity(entity);
         return ResponseEntity.ok(true);
     }
 

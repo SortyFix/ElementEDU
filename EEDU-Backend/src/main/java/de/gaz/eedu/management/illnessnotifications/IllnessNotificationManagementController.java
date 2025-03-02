@@ -36,9 +36,9 @@ public class IllnessNotificationManagementController
         return illnessNotificationManagementService.getPendingNotfications();
     }
 
-    @PreAuthorize("hasAuthority('ADMINISTRATOR')") @PostMapping("/respond/{notificationId}/{status}")
+    @PutMapping("/respond/{notificationId}")
     public ResponseEntity<Boolean> respondToNotification(@NotNull @PathVariable Long notificationId, @NotNull
-    @PathVariable IllnessNotificationStatus status)
+    @RequestBody IllnessNotificationStatus status)
     {
         return illnessNotificationManagementService.respondToNotification(notificationId, status);
     }
