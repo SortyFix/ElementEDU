@@ -13,7 +13,7 @@
                 <textarea matInput class="reason-textarea" [(ngModel)]="reason"></textarea>
             </mat-form-field>
 
-            <app-file-upload [maxFiles]="1" (filesSelected)="onFilesSelected($event)">
+            <app-file-upload [maxFiles]="1" (filesSelected)="onFilesSelected($event)" [displayText]="'Add medical documents here'">
             </app-file-upload>
 
             <mat-form-field appearance="outline" class="full-width-field">

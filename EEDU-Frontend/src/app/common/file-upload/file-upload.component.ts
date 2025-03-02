@@ -1,6 +1,6 @@
 import {Component, EventEmitter, forwardRef, inject, input, InputSignal, Output, Type} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
-import {NgIf} from "@angular/common";
+import {NgClass, NgIf} from "@angular/common";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
@@ -11,7 +11,8 @@ const type: Type<FileUploadComponent> = forwardRef((): typeof FileUploadComponen
     selector: 'app-file-upload',
     imports: [
         MatIcon,
-        NgIf
+        NgIf,
+        NgClass
     ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true }
@@ -21,11 +22,13 @@ const type: Type<FileUploadComponent> = forwardRef((): typeof FileUploadComponen
 })
 export class FileUploadComponent implements ControlValueAccessor {
     @Output() filesSelected: EventEmitter<FileList> = new EventEmitter<FileList>();
+    public readonly displayText: InputSignal<string> = input<string>("Add files to upload here")
     public readonly maxFiles: InputSignal<number> = input<number>(5);
     public readonly accept: InputSignal<string> = input<string>("*/*");
 
     private _snackbar: MatSnackBar = inject(MatSnackBar);
     private _selectedFiles: FileList | null = null;
+    protected isDragging: boolean = false;
 
     private onChange: (files: FileList | null) => void = (): void => {};
     private onTouched: () => void = (): void => {};
@@ -37,6 +40,16 @@ export class FileUploadComponent implements ControlValueAccessor {
 
     public onFileSelected(event$: Event): void {
         const input = event$.target as HTMLInputElement;
+        this.addInputToBuffer(input);
+    }
+
+    onDrop(event: DragEvent): void {
+        event.preventDefault();
+        this.isDragging = false;
+        this.addFileToBuffer(event.dataTransfer?.files);
+    }
+
+    public addInputToBuffer(input: HTMLInputElement) {
         if(input.files && input.files.length <= this.maxFiles()) {
             this._selectedFiles = input.files;
             this.filesSelected.emit(this._selectedFiles);
@@ -49,6 +62,36 @@ export class FileUploadComponent implements ControlValueAccessor {
                 duration: 3000
             });
         }
+    }
+
+    public addFileToBuffer(files: FileList | undefined): void
+    {
+        if(files && files.length <= this.maxFiles()) {
+            this._selectedFiles = files;
+            this.filesSelected.emit(this._selectedFiles);
+            this.onChange(this._selectedFiles);
+            this.onTouched();
+        }
+        else
+        {
+            this._snackbar.open(`You can only upload ${this.maxFiles()} file(s) at a time.`, '', {
+                duration: 3000
+            });
+        }
+    }
+
+    public onDragEnter(event: DragEvent): void {
+        event.preventDefault();
+        this.isDragging = true;
+    }
+
+    public onDragOver(event: DragEvent): void {
+        event.preventDefault();
+    }
+
+    public onDragLeave(event: DragEvent): void {
+        event.preventDefault();
+        this.isDragging = false;
     }
 
     public get selectedFileCount(): number {
