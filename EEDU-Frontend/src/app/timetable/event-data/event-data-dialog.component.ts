@@ -19,10 +19,15 @@ import {
 import {EventTileContentComponent} from "./event-tile-content/event-tile-content.component";
 import {RoomTabComponent} from "./room-tab/room-tab.component";
 import {SelectionInput} from "../../common/selection-input/selection-input.component";
-import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
+import {
+    MAT_DIALOG_DATA,
+    MatDialogActions,
+    MatDialogContent,
+} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {CourseService} from "../../user/courses/course.service";
 import {CourseModel} from "../../user/courses/course-model";
+import {GeneralCardComponent} from "../../common/general-card-component/general-card.component";
 
 @Component({
     standalone: true,
@@ -42,7 +47,7 @@ import {CourseModel} from "../../user/courses/course-model";
         SelectionInput,
         MatDialogContent,
         MatDialogActions,
-        MatDialogTitle
+        GeneralCardComponent
     ],
     templateUrl: './event-data-dialog.component.html',
     styleUrl: './event-data-dialog.component.scss'

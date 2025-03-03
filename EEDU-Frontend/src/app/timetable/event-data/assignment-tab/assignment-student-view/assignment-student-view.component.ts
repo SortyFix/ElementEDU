@@ -7,6 +7,7 @@ import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/
 import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment-model";
+import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
 
 @Component({
     selector: 'app-assignment-student-view',
@@ -28,8 +29,9 @@ export class AssignmentStudentViewComponent {
 
     @Input() public appointment!: AppointmentEntryModel;
     private readonly _form: FormGroup;
+    private _canSubmit: boolean = false;
 
-    public constructor(form: FormBuilder) {
+    public constructor(private readonly _appointmentService: AppointmentService, form: FormBuilder) {
         this._form = form.group({files: [[], Validators.required]});
     }
 
@@ -42,6 +44,22 @@ export class AssignmentStudentViewComponent {
     }
 
     protected onSubmit(): void {
+        // this will be part of my flashback, when I reveal my story why I became evil and corrupted
+        const fileArray: File[] = [];
+        const files: FileList = this.form.get("files")?.value as FileList;
+        for (let i: number = 0; i < files.length; i++) {
+            fileArray.push(files.item(i) as File);
+        }
+        // --
 
+        this._appointmentService.submitAssignment(this.appointment.id, fileArray).subscribe((): void => {});
+    }
+
+    protected onFileSelected(event: FileList): void {
+        this._canSubmit = event.length > 0
+    }
+
+    protected get canSubmit(): boolean {
+        return this._canSubmit;
     }
 }

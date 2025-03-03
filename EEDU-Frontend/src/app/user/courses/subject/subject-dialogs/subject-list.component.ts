@@ -35,7 +35,6 @@ export class SubjectListComponent extends AbstractCourseComponentList<string, Su
 }
 
 @Component({
-    standalone: true,
     imports: [MatCardContent, MatCardActions, MatButton, MatDialogClose, MatLabel, MatFormField, MatInput, ReactiveFormsModule, GeneralCardComponent, MatIcon, MatChipRow, MatChipGrid, MatChipInput, MatChipRemove],
     templateUrl: '../../abstract-course-components/create/abstract-course-components-create-multiple.html',
 })

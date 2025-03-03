@@ -51,7 +51,6 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     @Column(name = "description", length = 1000)
     private String description;
 
-    // might be null, if submitHome is false, or it should be valid until next appointment
     @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference @Cascade(CascadeType.ALL)
     private CourseEntity course;
     @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
@@ -307,7 +306,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         String description = this.getAssignmentDescription();
 
         boolean invalid = Objects.isNull(description) || Objects.isNull(publish) || Objects.isNull(until);
-        if (invalid || (publish.isBefore(Instant.now()) && isStudent))
+        if (invalid || (Instant.now().isBefore(publish) && isStudent))
         {
             return Optional.empty();
         }

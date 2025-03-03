@@ -50,7 +50,7 @@ export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<Cla
 
     private _users: readonly UserModel[] = [];
 
-    constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
+    public constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder, "Create Class Room");
 
         userService.fetchAll.subscribe((user: UserModel[]): void => { this._users = user; });
