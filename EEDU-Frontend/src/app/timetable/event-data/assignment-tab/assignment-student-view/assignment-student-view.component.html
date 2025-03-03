@@ -4,17 +4,16 @@
     <mat-icon svgIcon>assignment_turned_in</mat-icon>
 </div>
 
-<div *ngIf="appointment?.description">
+<div *ngIf="assignment?.description">
     <mat-list>
         <mat-list-item>
             <span matListItemTitle>Deadline:</span>
             <span matListItemLine>{{ assignment?.submitUntil }}</span>
         </mat-list-item>
     </mat-list>
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="form">
+        <app-file-upload formControlName="files"></app-file-upload>
+        <button mat-flat-button type="submit">Submit</button>
+    </form>
 </div>
-
-<form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <app-file-upload formControlName="files"></app-file-upload>
-    <button mat-flat-button type="submit">Submit</button>
-</form>
-

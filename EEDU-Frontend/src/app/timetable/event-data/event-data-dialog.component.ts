@@ -68,6 +68,8 @@ export class EventDataDialogComponent {
 
         this._title = data.title;
 
+        console.log(data.appointment)
+
         this._form = formBuilder.group({
             description: [null],
             room: [null],
@@ -100,8 +102,15 @@ export class EventDataDialogComponent {
         // Default values when creating a new assignment
         this.form.get('publish')?.setValue(new Date());
 
-        // TODO next appointment
-        this.form.get('submitUntil')?.setValue(new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)));
+        // TODO also include frequent appointments
+        const appointments: readonly AppointmentEntryModel[] = this._appointmentService.nextAppointments;
+        let start: Date = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7));
+        if(appointments.length !== 0)
+        {
+            start = appointments[0].start;
+        }
+
+        this.form.get('submitUntil')?.setValue(start);
     }
 
     protected get title(): string {

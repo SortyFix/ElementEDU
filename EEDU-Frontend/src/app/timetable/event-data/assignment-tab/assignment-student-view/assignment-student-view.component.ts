@@ -37,8 +37,8 @@ export class AssignmentStudentViewComponent {
         return this._form;
     }
 
-    protected get assignment(): AssignmentModel | undefined {
-        return this.appointment.assignment;
+    protected get assignment(): AssignmentModel | null {
+        return this.appointment.assignment || null;
     }
 
     protected onSubmit(): void {

@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,11 +32,13 @@ public class FrequentAppointmentEntity implements EntityModelRelation<Long, Freq
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id;
     @JsonBackReference @ManyToOne(optional = false) @JoinColumn(name = "course_id", referencedColumnName = "id")
+    @Cascade(CascadeType.ALL)
     private CourseEntity course;
     private Instant startTimeStamp, untilTimeStamp;
     private Duration duration;
     private Period frequency;
-    @JsonBackReference @OneToMany(mappedBy = "frequentAppointment") private Set<AppointmentEntryEntity> entries;
+    @JsonBackReference @OneToMany(mappedBy = "frequentAppointment")
+    private Set<AppointmentEntryEntity> entries;
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
     private @NotNull RoomEntity room;

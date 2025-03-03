@@ -75,13 +75,8 @@
 
     <mat-dialog-actions style="display: flex; justify-content: space-between">
         <span></span>
-
-        <p>Teacher: {{ course }}</p>
-
-        <button [disabled]="appointment.editing || room.editing || description.editing" mat-flat-button
-                type="submit">Save Changes
-        </button>
-
+        <p>Teacher: {{ course.teacher?.name }}</p>
+        <button [disabled]="!anyEdit" mat-flat-button type="submit">Save Changes</button>
     </mat-dialog-actions>
 </form>
 

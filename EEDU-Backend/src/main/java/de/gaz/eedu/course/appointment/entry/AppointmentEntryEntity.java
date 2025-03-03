@@ -19,6 +19,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +52,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     private String description;
 
     // might be null, if submitHome is false, or it should be valid until next appointment
-    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
+    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference @Cascade(CascadeType.ALL)
     private CourseEntity course;
     @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
     private @Nullable FrequentAppointmentEntity frequentAppointment;
