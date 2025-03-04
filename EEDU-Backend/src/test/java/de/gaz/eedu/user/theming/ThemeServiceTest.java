@@ -18,7 +18,7 @@ public class ThemeServiceTest extends ServiceTest<Long, ThemeService, ThemeEntit
     @Override protected @NotNull Eval<ThemeCreateModel, ThemeModel> successEval()
     {
         ThemeCreateModel themeCreateModel = new ThemeCreateModel("test", new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF}, new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
-        ThemeModel themeModel = new ThemeModel(7L, "test", (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF);
+        ThemeModel themeModel = new ThemeModel(5L, "test", (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF);
         return Eval.eval(themeCreateModel, themeModel, (request, expect, result) ->
         {
             Assertions.assertEquals(expect.id(), result.id());
