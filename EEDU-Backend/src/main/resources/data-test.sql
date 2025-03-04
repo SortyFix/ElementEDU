@@ -155,6 +155,24 @@ MERGE INTO user_groups (user_id, group_id) VALUES
     (18, 'group0')
 ;
 
+INSERT INTO post_entity (author, title, thumbnailurl, body, time_of_creation) VALUES
+    ('a', 'a', 'a', 'a', 234234),
+    ('a', 'a', 'a', 'a', 234234),
+    ('a', 'a', 'a', 'a', 234234)
+;
+
+INSERT INTO post_user_edit_privileges (post_id, edit_privileges) VALUES
+    (1, 'privilege0'),
+    (2, 'privilege0'),
+    (3, 'privilege0')
+;
+
+INSERT INTO post_tags (post_id, tags) VALUES
+    (1, 'test'),
+    (2, 'test'),
+    (3, 'test')
+;
+
 INSERT INTO message_entity (author_id, body, timestamp, status)
 VALUES (1, 'Hey, wie geht es?', 1702672064, 0),
        (2, 'voll cool.', 1702672164, 0),
