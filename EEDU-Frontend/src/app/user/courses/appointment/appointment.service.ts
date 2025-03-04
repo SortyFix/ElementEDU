@@ -14,19 +14,31 @@ import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
 import {FileService} from "../../../file/file.service";
 import {AssignmentModel} from "./entry/assignment-model";
+import {AssignmentInsightModel, GenericAssignmentInsightModel} from "./entry/assignment-insight-model";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppointmentService {
 
-    private readonly BACKEND_URL: string = environment.backendUrl;
+    private readonly BACKEND_URL: string = `${environment.backendUrl}/course/appointment`;
 
     constructor(
         private readonly _http: HttpClient,
         private readonly _courseService: CourseService,
         private readonly _fileService: FileService
     ) { }
+
+    public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
+        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status`;
+        return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(
+            map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] =>
+                response.map(
+                    (item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item)
+                )
+            )
+        );
+    }
 
     public get nextAppointments(): readonly AppointmentEntryModel[] {
         return this.courseService.value.flatMap(
@@ -51,7 +63,7 @@ export class AppointmentService {
     }
 
     public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>> {
-        const url: string = `${environment.backendUrl}/course/appointment/submit/assignment/${appointment}`;
+        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}`;
         return this._fileService.uploadFiles(url, assignmentFiles);
     }
 
@@ -68,7 +80,7 @@ export class AppointmentService {
      * @public
      */
     public createAppointment(course: bigint, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]> {
-        const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/standalone`
+        const url = `${this.BACKEND_URL}/${course}/schedule/standalone`
         return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel):
         {
             start: number,
@@ -84,7 +96,7 @@ export class AppointmentService {
     }
 
     public updateAppointment(appointment: bigint, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel> {
-        const url = `${this.BACKEND_URL}/course/appointment/update/standalone/${appointment}`
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}`
         return this.http.post<any>(url, updateModel.toPacket, {withCredentials: true}).pipe(
             map((response: any): AppointmentEntryModel => {
                 const updated: AppointmentEntryModel = AppointmentEntryModel.fromObject(response);
@@ -107,7 +119,7 @@ export class AppointmentService {
      * @public
      */
     public createFrequent(course: bigint, createModel: FrequentAppointmentCreateModel[]): Observable<FrequentAppointmentModel[]> {
-        const url = `${this.BACKEND_URL}/course/appointment/${course}/schedule/frequent`;
+        const url = `${this.BACKEND_URL}/${course}/schedule/frequent`;
 
         return this.http.post<any[]>(url,
             createModel.map((current: FrequentAppointmentCreateModel): FrequentAppointmentCreatePacket => current.toPacket),

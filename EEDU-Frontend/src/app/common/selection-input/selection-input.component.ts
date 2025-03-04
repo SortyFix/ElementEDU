@@ -1,10 +1,10 @@
 import {
-    Component, computed,
+    Component, computed, EventEmitter,
     forwardRef, Input,
     input,
     InputSignal,
     model,
-    ModelSignal,
+    ModelSignal, Output,
     Signal,
     signal,
     Type,
@@ -94,6 +94,8 @@ const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => 
     styleUrl: './selection-input.component.scss'
 })
 export class SelectionInput<T extends {name: string} | { id: string }> implements ControlValueAccessor, Validator {
+
+    @Output() public readonly valueChange: EventEmitter<readonly T[] | T> = new EventEmitter<readonly T[] | T>;
 
     protected readonly ENTER: 13 = ENTER;
 
@@ -286,13 +288,13 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
         if(this.multiple())
         {
             this.selectedValues.update((values: readonly T[]): readonly T[] => [...values, value]);
-            this.onChange(this.selectedValues())
+            this.update = this.selectedValues();
             this.currentValue.set('');
             return;
         }
 
         this.currentValue.set(this.toName(value));
-        this.onChange(value);
+        this.update = value;
     }
 
     protected remove(value: T): void {
@@ -303,8 +305,14 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
             }
 
             const updatedValues: T[] = values.filter((_: T, i: number): boolean => i !== index);
-            this.onChange(updatedValues);
+            this.update = updatedValues;
             return updatedValues;
         });
+    }
+
+    private set update(value: readonly T[] | T)
+    {
+        this.onChange(value);
+        this.valueChange.emit(value)
     }
 }

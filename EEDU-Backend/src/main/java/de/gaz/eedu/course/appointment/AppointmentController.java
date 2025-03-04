@@ -55,7 +55,7 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
-    @PostMapping("/submit/assignment/{appointment}/status")
+    @GetMapping("/submit/assignment/{appointment}/status")
     @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
     public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)
     {

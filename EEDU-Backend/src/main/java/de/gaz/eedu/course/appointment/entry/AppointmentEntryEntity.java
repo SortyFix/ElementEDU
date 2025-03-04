@@ -12,6 +12,7 @@ import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
+import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -91,7 +92,8 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     public @NotNull AssignmentInsightModel getInsight(@NotNull UserEntity user)
     {
-        String uploadPath = uploadPath(user.getId());
+        FileEntity repository = getCourse().getRepository();
+        String uploadPath = repository.getFilePath(uploadPath(user.getId()));
         File file = new File(uploadPath);
         File[] files = file.listFiles();
         if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
