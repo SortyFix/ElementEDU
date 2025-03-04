@@ -54,7 +54,7 @@ public class ClassRoomServiceTest extends ServiceTest<String, ClassRoomService, 
     @Override protected @NotNull Validator<String, Boolean> deletePipeline(@NotNull TestData<String, Boolean> data)
     {
         boolean isEntity = Objects.equals(data.entityID(), "classroom9");
-        long course = 10, user = 18;
+        long course = 9, user = 18;
 
         Assertions.assertEquals(getCourseRepository().findById(course).orElseThrow().hasClassRoomAssigned(), isEntity);
         Assertions.assertEquals(getUserRepository().findById(user).orElseThrow().hasClassRoomAssigned(), isEntity);

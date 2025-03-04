@@ -65,7 +65,7 @@ VALUES ('course0', 'subject0', 1, 'classroom0'),
        ('course5', 'subject5', 6, 'classroom5'),
        ('course6', 'subject6', 7, 'classroom6'),
        ('course7', 'subject7', 8, 'classroom7'),
-       ('course8', 'subject8', 9, 'classroom8'),
+       ('course8', 'subject8', 9, 'classroom9'), -- test deletion of classroom
        ('course9', 'subject9', 10, 'classroom9')
 ;
 
