@@ -61,15 +61,13 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
     {
         String name = "course9";
         ReducedUserModel teacher = new ReducedUserModel(6L, "User", "5", AccountType.TEACHER);
-        ClassRoomModel classRoom = getClassRoomService().loadByIdSafe("classroom0");
+        ClassRoomModel classRoom = getClassRoomService().loadByIdSafe("classroom1");
         SubjectModel subject = new SubjectModel("subject9");
 
         FrequentAppointmentModel[] frequent = new FrequentAppointmentModel[0];
         AppointmentEntryModel[] appointments = new AppointmentEntryModel[0];
 
-        ReducedUserModel[] students = new ReducedUserModel[classRoom.students().length + 1];
-        System.arraycopy(classRoom.students(), 0, students, 0, classRoom.students().length);
-        students[students.length - 1] = getUserService().loadByIdSafe(16L).toReducedModel();
+        ReducedUserModel[] students = { getUserService().loadByIdSafe(16L).toReducedModel() };
 
         CourseCreateModel create = new CourseCreateModel(name, subject.id(), teacher.id(), new Long[] { 16L }, classRoom.id());
         CourseModel courseModel = new CourseModel(11L, name, subject, students, appointments, frequent, teacher, classRoom);
@@ -83,6 +81,10 @@ public class CourseServiceTest extends ServiceTest<Long, CourseService, CourseEn
 
             // Can't be sure about the order
             Assertions.assertEquals(expect.students().length, result.students().length);
+
+            Assertions.assertNotNull(expect.classRoom());
+            Assertions.assertNotNull(result.classRoom());
+            Assertions.assertEquals(expect.classRoom().students().length, result.classRoom().students().length);
 
             Assertions.assertArrayEquals(expect.appointmentEntries(), result.appointmentEntries());
             Assertions.assertArrayEquals(expect.frequentAppointments(), result.frequentAppointments());
