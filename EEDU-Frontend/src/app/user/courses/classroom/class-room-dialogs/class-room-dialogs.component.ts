@@ -49,20 +49,19 @@ export class ClassRoomListComponent extends AbstractCourseComponentList<string, 
 export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
     private _users: readonly UserModel[] = [];
+    private _courses: readonly CourseModel[] = [];
 
     public constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder, "Create Class Room");
 
         userService.fetchAll.subscribe((user: UserModel[]): void => { this._users = user; });
-        this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
+        this._courseService.ownCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
     }
-
-    private _courses: readonly CourseModel[] = [];
 
     protected get courses(): readonly CourseModel[] { return this._courses; }
 
     protected override get loading(): boolean {
-        return super.loading && this._courseService.fetchedAdmin;
+        return super.loading && this._courseService.fetched;
     }
 
     protected override get createModel(): ClassRoomCreateModel[] {

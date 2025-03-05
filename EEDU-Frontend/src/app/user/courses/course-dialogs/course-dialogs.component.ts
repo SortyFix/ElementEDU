@@ -52,15 +52,6 @@ export class CourseListComponent extends AbstractCourseComponentList<bigint, Cou
     protected override get content(): Type<ListItemContent<CourseModel>> | null {
         return CourseListItemComponent;
     }
-
-    protected override get loaded(): boolean {
-        return (super.service as CourseService).fetchedAdmin;
-    }
-
-    protected override subscribe(): void {
-        const courseService: CourseService = super.service as CourseService;
-        courseService.adminCourses$.subscribe((values: CourseModel[]): void => { this.values = values; });
-    }
 }
 
 @Component({

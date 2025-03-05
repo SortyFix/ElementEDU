@@ -3,7 +3,6 @@ package de.gaz.eedu.course;
 import de.gaz.eedu.course.model.CourseCreateModel;
 import de.gaz.eedu.course.model.CourseModel;
 import de.gaz.eedu.entity.EntityController;
-import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -76,7 +75,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
         return ResponseEntity.ok(getService().getCourses(user));
     }
 
-    @GetMapping("/get/courses")
+    @GetMapping("/get")
     public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
     {
         return getCourses(user);

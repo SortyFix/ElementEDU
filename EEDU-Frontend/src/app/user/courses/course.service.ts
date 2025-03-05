@@ -19,7 +19,8 @@ import {EntityService} from "../../entity/entity-service";
 })
 export class CourseService extends EntityService<bigint, CourseModel, GenericCourse, CourseCreateModel> {
 
-    private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
+    private _fetchedOwn: boolean = false;
+    private readonly _ownCourses: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
     public constructor(http: HttpClient) { super(http, 'course'); }
 
@@ -29,36 +30,34 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
         });
     }
 
-    private _fetchedAdmin: boolean = false;
-
-    public get fetchedAdmin(): boolean {
-        return this._fetchedAdmin;
+    public get fetchedOwn(): boolean {
+        return this._fetchedOwn;
     }
 
-    public get adminCourses$(): Observable<CourseModel[]> {
-        if (!this.fetchedAdmin) {
-            this.fetchAdminCourses.subscribe();
+    public get ownCourses$(): Observable<CourseModel[]> {
+        if (!this.fetchedOwn) {
+            this.fetchOwnCourses.subscribe();
         }
-        return this._allSubject.asObservable();
+        return this._ownCourses.asObservable();
     }
 
-    private get fetchAdminCourses(): Observable<CourseModel[]> {
-        const url: string = `${this.BACKEND_URL}/get/all`;
+    private get fetchOwnCourses(): Observable<CourseModel[]> {
+        const url: string = `${this.BACKEND_URL}/get`;
         return this.http.get<any[]>(url, {withCredentials: true}).pipe(this.translateValue, tap((response: CourseModel[]): void => {
-            this._allSubject.next(response);
-            this._fetchedAdmin = true;
+            this._ownCourses.next(response);
+            this._fetchedOwn = true;
         }));
     }
 
     public findBySubjectLazily(subjects: string[]): readonly CourseModel[] {
-        return this._allSubject.value.filter((course: CourseModel): boolean => {
+        return this.value.filter((course: CourseModel): boolean => {
             return subjects.includes(course.subject.id);
         });
     }
 
     public override clearCache(): void {
         super.clearCache();
-        this._fetchedAdmin = false;
+        this._fetchedOwn = false;
     }
 
     /**
@@ -106,11 +105,11 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
 
     protected override pushCreated(response: CourseModel[]): void {
         super.pushCreated(response);
-        this._allSubject.next([...this._allSubject.value, ...response]);
+        this._ownCourses.next([...this._ownCourses.value, ...response]);
     }
 
     protected override postDelete(id: bigint[]): void {
         super.postDelete(id);
-        this._allSubject.next(this._allSubject.value.filter(((value: CourseModel): boolean => !id.includes(value.id))));
+        this._ownCourses.next(this._ownCourses.value.filter((value: CourseModel): boolean => !id.includes(value.id)));
     }
 }

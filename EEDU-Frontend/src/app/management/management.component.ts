@@ -12,20 +12,17 @@ import {NgComponentOutlet, NgForOf, NgIf} from "@angular/common";
 import {MatTab, MatTabContent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {icons} from "../../environment/styles";
 import {
-    GenericIllnessNotificationModel,
     IllnessNotificationModel
 } from "../illness-notification/model/illness-notification-model";
-import {SubjectListComponent} from "../user/courses/subject/subject-dialogs/subject-list.component";
+import {SubjectListComponent} from "../user/courses/subject/subject-dialogs/subject-dialogs.component";
 import {RoomListComponent} from "../user/courses/room/room-dialogs/room-list.component";
-import {ClassRoomListComponent} from "../user/courses/classroom/class-room-dialogs/class-room-list.component";
-import {CourseListComponent} from "../user/courses/course-dialogs/course-list.component";
+import {ClassRoomListComponent} from "../user/courses/classroom/class-room-dialogs/class-room-dialogs.component";
+import {CourseListComponent} from "../user/courses/course-dialogs/course-dialogs.component";
 import {FileService} from "../file/file.service";
-import {HttpClient} from "@angular/common/http";
 import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {ManagementService} from "./management.service";
 import {IllnessNotificationStatus} from "../illness-notification/illness-notification-status";
-import {Observable} from "rxjs";
 
 export interface CourseTab
 {
@@ -71,7 +68,7 @@ export class ManagementComponent implements OnInit {
 
     illnessNotifications: IllnessNotificationModel[] = []
 
-    public constructor(protected managementService: ManagementService, protected userService: UserService, protected fileService: FileService, private http: HttpClient) {
+    public constructor(protected managementService: ManagementService, protected userService: UserService, protected fileService: FileService) {
     }
 
     ngOnInit(): void {
