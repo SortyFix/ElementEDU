@@ -1,20 +1,20 @@
 import {ThemeModel} from "../theming/theme-model";
-import {GenericGroupModel, GroupModel} from "./group/group-model";
+import {GenericGroup, GroupModel} from "./group/group-model";
 import {AccountType} from "./account-type";
-import {ClassRoomModel, GenericClassRoomModel} from "./courses/classroom/class-room-model";
+import {ClassRoomModel, GenericClassRoom} from "./courses/classroom/class-room-model";
 
 export enum UserStatus {PRESENT = "PRESENT", EXCUSED = "EXCUSED", UNEXCUSED = "UNEXCUSED", PROSPECTIVE = "PROSPECTIVE" }
 
-export interface GenericUserModel {
+export interface GenericUser {
     id: bigint;
     firstName: string;
     lastName: string;
     loginName: string;
     accountType: string;
     status: string
-    groups: GenericGroupModel[],
+    groups: GenericGroup[],
     theme: any,
-    classroom?: GenericClassRoomModel
+    classroom?: GenericClassRoom
 }
 
 export class UserModel {
@@ -70,7 +70,7 @@ export class UserModel {
         return this._classroom;
     }
 
-    public static fromObject(object: GenericUserModel): UserModel {
+    public static fromObject(object: GenericUser): UserModel {
         const themeModel: ThemeModel = ThemeModel.fromObject(object.theme);
         return new UserModel(
             object.id,

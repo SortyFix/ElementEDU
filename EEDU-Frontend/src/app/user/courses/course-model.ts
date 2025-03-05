@@ -1,7 +1,7 @@
 import {AppointmentEntryModel, GenericAppointmentEntry} from "./appointment/entry/appointment-entry-model";
 import {FrequentAppointmentModel, GenericFrequentAppointment} from "./appointment/frequent/frequent-appointment-model";
 import {GenericSubject, SubjectModel} from "./subject/subject-model";
-import {ClassRoomModel, GenericClassRoomModel} from "./classroom/class-room-model";
+import {ClassRoomModel, GenericClassRoom} from "./classroom/class-room-model";
 import {GenericReducedUserModel, ReducedUserModel} from "../reduced-user-model";
 import {Observable} from "rxjs";
 
@@ -13,7 +13,7 @@ export interface GenericCourse {
     appointmentEntries: GenericAppointmentEntry[];
     frequentAppointments: GenericFrequentAppointment[];
     teacher?: GenericReducedUserModel,
-    classRoom?: GenericClassRoomModel;
+    classRoom?: GenericClassRoom;
 }
 
 export class CourseModel {

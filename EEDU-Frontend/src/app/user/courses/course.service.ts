@@ -1,16 +1,15 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, map, Observable, of, OperatorFunction, tap} from "rxjs";
+import {BehaviorSubject, map, Observable, of, tap} from "rxjs";
 import {CourseModel, GenericCourse} from "./course-model";
-import {CourseCreateModel, CourseCreatePacket} from "./course-create-model";
+import {CourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
-import {AbstractCourseComponentsService} from "./abstract-course-components/abstract-course-components-service";
-import {icons} from "../../../environment/styles";
+import {EntityService} from "../../entity/entity-service";
 
 /**
  * Service for managing {@link CourseModel} instances.
  *
- * This service extends {@link AbstractCourseComponentsService} to provide functionalities
+ * This service extends {@link EntityService} to provide functionalities
  * for handling courses, including retrieval and creation operations.
  *
  * @author Ivo Quiring
@@ -18,11 +17,17 @@ import {icons} from "../../../environment/styles";
 @Injectable({
     providedIn: 'root'
 })
-export class CourseService extends AbstractCourseComponentsService<bigint, CourseModel, CourseCreateModel> {
+export class CourseService extends EntityService<bigint, CourseModel, GenericCourse, CourseCreateModel> {
 
     private readonly _allSubject: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
-    public constructor(http: HttpClient) { super(http, icons.course); }
+    public constructor(http: HttpClient) { super(http, 'course'); }
+
+    public override translate(obj: GenericCourse): CourseModel {
+        return CourseModel.fromObject(obj, (): Observable<readonly CourseModel[]> => {
+            return of(this.findBySubjectLazily([obj.subject.id]));
+        });
+    }
 
     private _fetchedAdmin: boolean = false;
 
@@ -37,33 +42,16 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
         return this._allSubject.asObservable();
     }
 
-    public override get translate(): OperatorFunction<any[], CourseModel[]> {
-        return map((response: any[]): CourseModel[] =>
-            response.map((item: GenericCourse): CourseModel => CourseModel.fromObject(item, (): Observable<readonly CourseModel[]> =>
-            {
-                return of(this.findBySubjectLazily([item.subject.id]));
-            }))
-        );
-    }
-
-    protected override get fetchAllValues(): Observable<any[]> {
-        const url: string = `${this.BACKEND_URL}/course/get/courses`;
-        return this.http.get<any[]>(url, {withCredentials: true});
-    }
-
     private get fetchAdminCourses(): Observable<CourseModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/get/all`;
-        return this.http.get<any[]>(url, {withCredentials: true}).pipe(
-            this.translate, tap((response: CourseModel[]): void => {
-                this._allSubject.next(response);
-                this._fetchedAdmin = true;
-            })
-        );
+        const url: string = `${this.BACKEND_URL}/get/all`;
+        return this.http.get<any[]>(url, {withCredentials: true}).pipe(this.translateValue, tap((response: CourseModel[]): void => {
+            this._allSubject.next(response);
+            this._fetchedAdmin = true;
+        }));
     }
 
     public findBySubjectLazily(subjects: string[]): readonly CourseModel[] {
-        return this._allSubject.value.filter((course: CourseModel): boolean =>
-        {
+        return this._allSubject.value.filter((course: CourseModel): boolean => {
             return subjects.includes(course.subject.id);
         });
     }
@@ -84,9 +72,7 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
      */
     public fetchUsers(course: bigint): Observable<ReducedUserModel[]> {
         const url: string = `${this.BACKEND_URL}/get/users/${course}`;
-        return this.http.get<ReducedUserModel[]>(url).pipe(map((user: any[]): ReducedUserModel[] =>
-            user.map((item: any): ReducedUserModel => ReducedUserModel.fromObject(item))
-        ));
+        return this.http.get<ReducedUserModel[]>(url).pipe(map((user: any[]): ReducedUserModel[] => user.map((item: any): ReducedUserModel => ReducedUserModel.fromObject(item))));
     }
 
     /**
@@ -123,24 +109,8 @@ export class CourseService extends AbstractCourseComponentsService<bigint, Cours
         this._allSubject.next([...this._allSubject.value, ...response]);
     }
 
-    protected override createValue(createModels: CourseCreateModel[]): Observable<CourseModel[]> {
-        const url: string = `${this.BACKEND_URL}/course/create`;
-        return this.http.post<any[]>(url, this.toPackets(createModels), {withCredentials: true});
-    }
-
-    protected override deleteValue(id: bigint[]): Observable<void> {
-        const url: string = `${this.BACKEND_URL}/course/delete/${id.toString()}`;
-        return this.http.delete<void>(url, {withCredentials: true});
-    }
-
     protected override postDelete(id: bigint[]): void {
         super.postDelete(id);
-        this._allSubject.next(
-            this._allSubject.value.filter(((value: CourseModel): boolean => !id.includes(value.id)))
-        );
-    }
-
-    private toPackets(createModels: CourseCreateModel[]): CourseCreatePacket[] {
-        return createModels.map((createModels: CourseCreateModel): CourseCreatePacket => createModels.toPacket);
+        this._allSubject.next(this._allSubject.value.filter(((value: CourseModel): boolean => !id.includes(value.id))));
     }
 }

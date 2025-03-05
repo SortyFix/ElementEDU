@@ -1,25 +1,21 @@
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {ListItemInfo, SelectionType} from "../../../../common/abstract-list/abstract-list.component";
-import {AbstractCourseComponentsService} from "../abstract-course-components-service";
 import {ListItemContent} from "../../../../common/abstract-list/list-item-content";
 import {Type} from "@angular/core";
+import {EntityService} from "../../../../entity/entity-service";
 
 export abstract class AbstractCourseComponentList<P, T extends { id: P }> {
 
     protected readonly SelectionType: typeof SelectionType = SelectionType;
 
     protected constructor(
-        private readonly _service: AbstractCourseComponentsService<P, T, any>,
+        private readonly _service: EntityService<P, T, any, any>,
         private readonly _dialog: MatDialog,
         private readonly _componentType: ComponentType<any>,
         private readonly _deleteComponent: ComponentType<any>,
         private readonly _listData: ListItemInfo<T>
     ) {
-
-        if (!this._listData.icon) {
-            this._listData.icon = (): string => _service.icon;
-        }
 
         this.subscribe();
     }
@@ -40,7 +36,7 @@ export abstract class AbstractCourseComponentList<P, T extends { id: P }> {
         return this.service.fetched;
     }
 
-    protected get service(): AbstractCourseComponentsService<P, T, any> {
+    protected get service(): EntityService<P, T, any, any> {
         return this._service;
     }
 

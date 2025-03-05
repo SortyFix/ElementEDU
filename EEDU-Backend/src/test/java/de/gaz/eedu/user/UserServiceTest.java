@@ -47,20 +47,18 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     {
         String id = String.valueOf(number);
         AccountType type = AccountType.STUDENT;
-        UserStatus status = UserStatus.PRESENT;
-
-        return new UserCreateModel("User", id, "user." + id, type, false, false, status, 1L, new String[0]);
+        return new UserCreateModel("User", id, "user." + id, type, false, 1L, new String[0]);
     }
 
-    private @NotNull UserModel model(int number)
+    private @NotNull UserModel model()
     {
-        String id = String.valueOf(number);
+        String id = String.valueOf(18);
         AccountType type = AccountType.STUDENT;
-        UserStatus status = UserStatus.PRESENT;
+        UserStatus status = UserStatus.PROSPECTIVE;
         ThemeModel theme = getThemeService().loadByIdSafe(1L);
 
         GroupModel[] groupModel = {new GroupModel("student", new PrivilegeModel[0])};
-        return new UserModel(number + 1L, "User", id, "user." + id, type, status, groupModel, theme, null);
+        return new UserModel(18 + 1L, "User", id, "user." + id, type, status, groupModel, theme, null);
     }
 
     @Override
@@ -81,7 +79,7 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
 
     @Override
     protected @NotNull ServiceTest.Eval<UserCreateModel, UserModel> successEval() {
-        return Eval.eval(createModel(18), model(18), (request, expect, result) -> {
+        return Eval.eval(createModel(18), model(), (request, expect, result) -> {
             Assertions.assertEquals(expect, result);
             Assertions.assertEquals(expect.firstName(), result.firstName());
             Assertions.assertEquals(expect.lastName(), result.lastName());

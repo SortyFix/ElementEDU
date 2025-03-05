@@ -1,15 +1,16 @@
-export interface GenericPrivilegeModel {
+export interface GenericPrivilege {
     id: string;
 }
 
 export class PrivilegeModel {
-    constructor(private readonly _id: string) { }
+
+    public constructor(private readonly _id: string) { }
 
     public get id(): string {
         return this._id;
     }
 
-    public static fromObject(obj: GenericPrivilegeModel): PrivilegeModel {
+    public static fromObject(obj: GenericPrivilege): PrivilegeModel {
         return new PrivilegeModel(obj.id);
     }
 }

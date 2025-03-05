@@ -1,19 +1,23 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {finalize, map, Observable, of, tap} from "rxjs";
-import {UserModel} from "./user-model";
-import {environment} from "../../environment/environment";
+import {GenericUser, UserModel} from "./user-model";
 import {ReducedUserModel} from "./reduced-user-model";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {UserCreateModel} from "./user-create-model";
+import {EntityService} from "../entity/entity-service";
 
 @Injectable({
     providedIn: 'root'
 })
-export class UserService {
-    private readonly BACKEND_URL: string = environment.backendUrl;
+export class UserService extends EntityService<bigint, UserModel, GenericUser, UserCreateModel> {
+
     private _loaded: boolean = false;
 
-    public constructor(private _http: HttpClient, private _snackBar: MatSnackBar) {}
+    public constructor(http: HttpClient, private _snackBar: MatSnackBar)
+    {
+        super(http, 'user')
+    }
 
     /**
      * Retrieves the user data from local storage.
@@ -58,81 +62,47 @@ export class UserService {
     }
 
     /**
-     * Fetches the full data of all available users.
-     *
-     * This method retrieves an array of {@link UserModel}, containing the full details of all users in the system.
-     *
-     * @returns An observable that holds an array of {@link UserModel}.
-     */
-    public get fetchAll(): Observable<UserModel[]> {
-        const url: string = `${this.BACKEND_URL}/user/all`;
-        return this.http.get<any[]>(url, {withCredentials: true}).pipe(
-            map((response: any[]): UserModel[] =>
-                response.map((element: any): UserModel => UserModel.fromObject(element))
-            )
-        );
-    }
-
-    /**
-     * Fetches reduced versions of all available users.
-     *
-     * This method retrieves an array of {@link ReducedUserModel}, containing reduced user data
-     * for all users in the system. It is typically used for listing users with restricted details
-     * in scenarios where full user data is not required or permitted.
-     *
-     * @returns an observable that holds an array of {@link ReducedUserModel}.
-     */
-    public get fetchAllReduced(): Observable<ReducedUserModel[]> {
-        const url: string = `${this.BACKEND_URL}/user/all/reduced`;
-        return this.http.get<any[]>(url, {withCredentials: true}).pipe(
-            map((response: any[]): ReducedUserModel[] =>
-                response.map((element: any): ReducedUserModel => ReducedUserModel.fromObject(element))
-            )
-        );
-    }
-
-    private get http(): HttpClient {
-        return this._http;
-    }
-
-    /**
      * Fetches the full data of the currently authenticated user.
      *
      * This private method is used internally to retrieve the full details of the authenticated user from the backend.
      *
      * @returns aAn observable that holds a {@link UserModel} containing the full details of the authenticated user.
      */
-    private get fetchUserData(): Observable<UserModel> {
-        const url: string = `${this.BACKEND_URL}/user/get`;
-        return this.http.get<UserModel>(url, {withCredentials: true});
+    private get fetchUserData(): Observable<any> {
+        return this.http.get<any>(`${this.BACKEND_URL}/get`, { withCredentials: true });
     }
 
     public loadData(): Observable<void> {
         this._loaded = this.isLoggedIn;
         if (this._loaded) {
-            return this.fetchUserData.pipe(tap({
-                next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
-                error: (error: any): void => {
-                    if (error && 'status' in error && typeof error.status === 'number') {
-                        // noinspection FallThroughInSwitchStatementJS
-                        switch (error.status) { // fall through
-                            // @ts-ignore
-                            case 404:
-                                this._snackBar.open("The account you are using seems not to exist.")
-                            case 403:
-                                this.logout().subscribe();
-                                break;
-                        }
-                        // logout when token expired
-                        return;
-                    }
-                }
-            }), map((): void => {}));
+           return this.refreshLogin;
         }
 
         return this.fetchUserData.pipe(tap<UserModel>({
             next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
         }), finalize((): void => { this._loaded = true; }), map((): void => {}));
+    }
+
+    private get refreshLogin(): Observable<void>
+    {
+        return this.fetchUserData.pipe(tap({
+            next: (value: UserModel): void => this.storeUserData(JSON.stringify(value)),
+            error: (error: any): void => {
+                if (error && 'status' in error && typeof error.status === 'number') {
+                    // noinspection FallThroughInSwitchStatementJS
+                    switch (error.status) { // fall through
+                        // @ts-ignore
+                        case 404:
+                            this._snackBar.open("The account you are using seems not to exist.");
+                        case 403:
+                            this.logout().subscribe();
+                            break;
+                    }
+                    // logout when token expired
+                    return;
+                }
+            }
+        }), map((): void => {}));
     }
 
     /**
@@ -148,7 +118,7 @@ export class UserService {
             return of();
         }
 
-        const url: string = `${this.BACKEND_URL}/user/logout`;
+        const url: string = `${this.BACKEND_URL}/logout`;
         return this.http.get<void>(url, {withCredentials: true}).pipe(tap<any>({
             next: () => {
                 localStorage.removeItem("userData");
@@ -164,6 +134,24 @@ export class UserService {
     }
 
     /**
+     * Fetches reduced versions of all available users.
+     *
+     * This method retrieves an array of {@link ReducedUserModel}, containing reduced user data
+     * for all users in the system. It is typically used for listing users with restricted details
+     * in scenarios where full user data is not required or permitted.
+     *
+     * @returns an observable that holds an array of {@link ReducedUserModel}.
+     */
+    public get fetchAllReduced(): Observable<ReducedUserModel[]> {
+        const url: string = `${this.BACKEND_URL}/all/reduced`;
+        return this.http.get<any[]>(url, {withCredentials: true}).pipe(
+            map((response: any[]): ReducedUserModel[] =>
+                response.map((element: any): ReducedUserModel => ReducedUserModel.fromObject(element))
+            )
+        );
+    }
+
+    /**
      * Fetches a reduced version of the {@link UserModel} for a specific user.
      *
      * This method retrieves a {@link ReducedUserModel}, which contains reduced user data.
@@ -173,12 +161,16 @@ export class UserService {
      * @returns an observable that holds an array of {@link ReducedUserModel}.
      */
     public fetchReduced(userId: bigint) {
-        const url: string = `${this.BACKEND_URL}/user/get/${userId}/reduced`;
+        const url: string = `${this.BACKEND_URL}/get/${userId}/reduced`;
         return this.http.get<any[]>(url, {withCredentials: true}).pipe(
             map((response: any[]): ReducedUserModel[] =>
                 response.map((element: any): ReducedUserModel => ReducedUserModel.fromObject(element))
             )
         );
+    }
+
+    public override translate(obj: any): UserModel {
+        return UserModel.fromObject(obj)
     }
 
     private storeUserData(userData: string) {

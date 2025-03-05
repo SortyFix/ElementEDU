@@ -1,11 +1,12 @@
-import {GenericPrivilegeModel, PrivilegeModel} from "./privilege-model";
+import {GenericPrivilege, PrivilegeModel} from "./privilege-model";
 
-export interface GenericGroupModel {
+export interface GenericGroup {
     id: string;
-    privileges: GenericPrivilegeModel[];
+    privileges: GenericPrivilege[];
 }
 
 export class GroupModel {
+
     constructor(
         private readonly _id: string,
         private readonly _privileges: PrivilegeModel[]
@@ -19,8 +20,8 @@ export class GroupModel {
         return this._privileges;
     }
 
-    public static fromObject(obj: GenericGroupModel): GroupModel {
-        return new GroupModel(obj.id, obj.privileges.map((privilege: GenericPrivilegeModel): PrivilegeModel =>
+    public static fromObject(obj: GenericGroup): GroupModel {
+        return new GroupModel(obj.id, obj.privileges.map((privilege: GenericPrivilege): PrivilegeModel =>
             PrivilegeModel.fromObject(privilege)
         ));
     }
