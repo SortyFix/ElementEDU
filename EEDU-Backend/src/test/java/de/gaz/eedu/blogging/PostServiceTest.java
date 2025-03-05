@@ -1,6 +1,7 @@
 package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.ServiceTest;
+import de.gaz.eedu.TestData;
 import de.gaz.eedu.exception.OccupiedException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -75,6 +76,14 @@ public class PostServiceTest extends ServiceTest<Long, PostService, PostEntity, 
         entity.attachTags(getService(),"Tag4", "Tag5");
 
         Assertions.assertEquals(5, entity.getTags().size());
+    }
+
+    @Override protected @NotNull TestData<Long, Boolean>[] deleteEntities()
+    {
+        return new TestData[] {
+                new TestData<>(1L, true),
+                new TestData<>(11L, false)
+        };
     }
 
     @NotNull
