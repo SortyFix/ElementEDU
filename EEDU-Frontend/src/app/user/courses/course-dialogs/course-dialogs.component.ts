@@ -1,15 +1,8 @@
-import {Component, Inject, Type} from '@angular/core';
-import {AbstractList} from "../../../common/abstract-list/abstract-list.component";
+import {Component, Inject} from '@angular/core';
 import {CourseModel} from "../course-model";
 import {CourseService} from "../course.service";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatIcon} from "@angular/material/icon";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
-import {NgIf} from "@angular/common";
-import {MatProgressBar} from "@angular/material/progress-bar";
-import {AbstractCourseComponentList} from "../abstract-course-components/list/abstract-course-component-list";
-import {ListItemContent} from "../../../common/abstract-list/list-item-content";
-import {CourseListItemComponent} from "./course-list-item/course-list-item.component";
+import {MatButton} from "@angular/material/button";
+import {MAT_DIALOG_DATA, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
 import {DeleteDialogComponent} from "../../../common/delete-dialog/delete-dialog.component";
 import {AbstractDeleteDialog} from "../abstract-course-components/delete/abstract-delete-dialog";
 import {AccountType} from '../../account-type';
@@ -28,31 +21,6 @@ import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-
-@Component({
-    imports: [MatProgressBar, AbstractList, MatIconButton, MatButton, MatIcon, NgIf],
-    templateUrl: '../abstract-course-components/list/abstract-course-components-list.html',
-    styleUrl: '../abstract-course-components/list/abstract-course-components-list.scss'
-})
-export class CourseListComponent extends AbstractCourseComponentList<bigint, CourseModel> {
-
-    public constructor(service: CourseService, dialog: MatDialog) {
-        super(service, dialog, CreateCourseComponent, DeleteCourseComponent, {
-            title: (value: CourseModel): string => value.name,
-            chips: (value: CourseModel): string[] => [
-                `${value.teacher?.name}`,
-                `${value.students?.length} Student(s)`,
-                value.subject.id,
-                `${value.appointmentEntries.length} Appointment(s)`,
-                `${value.frequentAppointments.length} Frequent Appointment(s)`,
-            ]
-        });
-    }
-
-    protected override get content(): Type<ListItemContent<CourseModel>> | null {
-        return CourseListItemComponent;
-    }
-}
 
 @Component({
     imports: [MatCardContent, MatDialogClose, MatLabel, MatFormField, MatInput, GeneralCardComponent, MatCardActions, MatButton, ReactiveFormsModule, SelectionInput],

@@ -1,13 +1,8 @@
 import {Component, Inject} from '@angular/core';
-import {AbstractList} from "../../../../common/abstract-list/abstract-list.component";
 import {ClassRoomModel} from "../class-room-model";
 import {ClassRoomService} from "../class-room.service";
-import {MatIcon} from "@angular/material/icon";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {NgIf} from "@angular/common";
-import {MatProgressBar} from "@angular/material/progress-bar";
-import {AbstractCourseComponentList} from "../../abstract-course-components/list/abstract-course-component-list";
+import {MAT_DIALOG_DATA, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
+import {MatButton} from "@angular/material/button";
 import {DeleteDialogComponent} from "../../../../common/delete-dialog/delete-dialog.component";
 import {AbstractDeleteDialog} from "../../abstract-course-components/delete/abstract-delete-dialog";
 import {CourseModel} from "../../course-model";
@@ -26,21 +21,6 @@ import {CourseService} from "../../course.service";
 import {UserModel} from "../../../user-model";
 import {ClassRoomCreateModel} from "../class-room-create-model";
 import {AccountType} from "../../../account-type";
-
-@Component({
-    imports: [MatProgressBar, AbstractList, MatIconButton, MatButton, MatIcon, NgIf,],
-    templateUrl: '../../abstract-course-components/list/abstract-course-components-list.html',
-    styleUrl: '../../abstract-course-components/list/abstract-course-components-list.scss'
-})
-export class ClassRoomListComponent extends AbstractCourseComponentList<string, ClassRoomModel> {
-
-    public constructor(service: ClassRoomService, dialog: MatDialog) {
-        super(service, dialog, CreateClassRoomComponent, DeleteClassRoomComponent, {
-            title: (value: ClassRoomModel): string => value.id,
-            chips: (value: ClassRoomModel): string[] => [`Tutor: ${value.tutor.name}`, `${value.students.length} Users`]
-        });
-    }
-}
 
 @Component({
     imports: [MatCardActions, MatButton, MatDialogClose, ReactiveFormsModule, MatInput, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, SelectionInput],
