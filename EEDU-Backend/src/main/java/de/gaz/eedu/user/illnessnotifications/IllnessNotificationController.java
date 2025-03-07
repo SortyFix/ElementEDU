@@ -21,7 +21,7 @@ import java.util.List;
     private final IllnessNotificationService illnessNotificationService;
 
     // TODO: Only for parent accounts
-    @PreAuthorize("isAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(
             @AuthenticationPrincipal Long id, @RequestParam("reason") @NotNull String reason,
             @RequestParam("expirationTime") @NotNull Long expirationTime, @RequestParam(value = "file") MultipartFile file)
     {
@@ -31,7 +31,7 @@ import java.util.List;
                         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/my-notifications")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/my-notifications")
     public ResponseEntity<List<ReducedIllnessNotificationModel>> getOwnNotifications(@AuthenticationPrincipal Long id)
     {
         return illnessNotificationService.getReducedEntitiesByUser(id);

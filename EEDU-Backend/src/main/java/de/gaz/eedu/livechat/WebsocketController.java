@@ -28,7 +28,7 @@ public class WebsocketController
     private final MessageService messageService;
 
     @PostMapping("/create")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public ResponseEntity<ChatModel> createNewRoom(@AuthenticationPrincipal Long userId, @RequestBody @NotNull List<Long> users)
     {
         return ResponseEntity.ok(chatService.createChat(userId, users));
@@ -48,6 +48,7 @@ public class WebsocketController
     }
 
     @MessageMapping("/send")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public HttpStatus sendMessage(@NotNull String json)
     {
         try {
@@ -58,14 +59,14 @@ public class WebsocketController
     }
 
     @PostMapping("/get/chat")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public ResponseEntity<MessageModel[]> getMessages(@AuthenticationPrincipal Long userId, @NotNull @RequestBody Long chatId)
     {
         return ResponseEntity.ok(chatService.getMessages(userId, chatId).orElse(new MessageModel[]{}));
     }
 
     @GetMapping("/get")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public ChatModel getChatData(@NotNull String json) throws JsonProcessingException
     {
         return chatService.getChatData(json);
@@ -78,7 +79,7 @@ public class WebsocketController
     }
 
     @GetMapping("/getChatList")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public ResponseEntity<List<ChatModel>> getChatList(@AuthenticationPrincipal Long userId)
     {
         return ResponseEntity.ok(chatService.getChatsFromUser(userId));

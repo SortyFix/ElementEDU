@@ -18,7 +18,7 @@ import java.io.IOException;
     private final PostService postService;
     private final PostRepository postRepository;
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@NotNull @PathVariable Long postId)
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@NotNull @PathVariable Long postId)
     {
         return ResponseEntity.ok(postService.getModel(postId));
     }

@@ -34,7 +34,7 @@ public class ThemeController
      * @param theme_id ID of the theme to set
      * @return ThemeModel
      */
-    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')") @PutMapping("/me/theme/set")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PutMapping("/me/theme/set")
     public ResponseEntity<ThemeModel> setTheme(@AuthenticationPrincipal Long id, @RequestBody Long theme_id){
         try
         {
@@ -54,7 +54,7 @@ public class ThemeController
      * @param id ID of the theme to output
      * @return ThemeModel
      */
-    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHORIZED')")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @GetMapping("/me/theme/get") public ResponseEntity<ThemeModel> getTheme(@AuthenticationPrincipal Long id){
         if(userService.loadEntityById(id).isPresent())
         {
@@ -70,7 +70,7 @@ public class ThemeController
      * Returns all themes in the database as SimpleThemeModels.
      * @return SimpleThemeModel
      */
-    @GetMapping("/theme/all") public ResponseEntity<SimpleThemeModel[]> getAllThemes()
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/theme/all") public ResponseEntity<SimpleThemeModel[]> getAllThemes()
     {
         return ResponseEntity.ok(themeRepository.findAll().stream()
                                                 .map(ThemeEntity::toSimpleModel).toArray(SimpleThemeModel[]::new));
@@ -82,7 +82,7 @@ public class ThemeController
      * @param themeCreateModel template of the theme to be created
      * @return ThemeEntity
      */
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/create")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREATE.toString())") @PostMapping("/theme/create")
     public @NotNull ResponseEntity<ThemeEntity[]> createTheme(@NotNull @RequestBody ThemeCreateModel[] themeCreateModel)
     {
         try
@@ -96,7 +96,7 @@ public class ThemeController
     }
 
     // Possibly set for deletion.
-    @PreAuthorize("hasAuthority('ADMIN')") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREATE.toString())") @PostMapping("/theme/delete") public @NotNull ResponseEntity<?> deleteTheme(@NotNull @RequestBody Long themeId)
     {
         if(!themeService.delete(themeId))
         {
