@@ -29,7 +29,7 @@
             <mat-grid-tile *ngFor="let x of articleList">
                 <div class="news-card" (click)="openArticle(x.id)" style="cursor: pointer;">
                     <div class="news-thumbnail" *ngIf="thumbnailBlobExists(x)">
-                        <img [ngSrc]="x.thumbnailBlob" alt="" fill>
+                        <img [src]="x.thumbnailBlob" alt="" fill>
                     </div>
                     <div class="news-content">
                         <h3 class="news-title">{{ x.title }}</h3>

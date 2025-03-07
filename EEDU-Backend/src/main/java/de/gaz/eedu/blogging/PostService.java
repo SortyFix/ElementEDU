@@ -2,6 +2,7 @@ package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.file.FileCreateModel;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.file.FileService;
@@ -127,8 +128,9 @@ public class PostService extends EntityService<Long, PostRepository, PostEntity,
     public @NotNull PostModel createPost(@NotNull Long userId, @Nullable MultipartFile thumbnail, @NotNull PostCreateModel createModel)
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
+        System.out.println(userEntity.getAuthorities());
         // TODO: FIX ADMIN AUTHORITIES
-        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasAuthority("ROLE_administrator"))
+        if(userEntity.hasAuthority(writePrivilege) || userEntity.hasRole("administrator"))
         {
             if(Objects.nonNull(thumbnail))
             {

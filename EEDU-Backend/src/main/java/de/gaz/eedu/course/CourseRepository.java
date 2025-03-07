@@ -1,6 +1,5 @@
 package de.gaz.eedu.course;
 
-import de.gaz.eedu.course.subject.SubjectEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;

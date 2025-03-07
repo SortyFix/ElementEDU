@@ -18,24 +18,23 @@ import java.io.IOException;
 {
     private final PostService postService;
     private final PostRepository postRepository;
-    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()") @GetMapping("/get/{postId}") public ResponseEntity<PostModel> getPost(@NotNull @PathVariable Long postId)
     {
         return ResponseEntity.ok(postService.getModel(postId));
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/length") public ResponseEntity<Long> getLength()
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/length") public ResponseEntity<Long> getLength()
     {
         return ResponseEntity.ok(postService.getLength());
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@NotNull @RequestParam Integer pageNumber)
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/list") public ResponseEntity<PostModel[]> getPostList(@NotNull @RequestParam Integer pageNumber)
     {
         return ResponseEntity.ok(postService.getPostList(pageNumber));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_administrator')") @PostMapping("/post")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/post")
     public ResponseEntity<PostModel> createPost(
             @AuthenticationPrincipal Long userId,
             @NotNull @RequestPart("createModel") PostCreateModel createModel,
@@ -44,7 +43,7 @@ import java.io.IOException;
         return ResponseEntity.ok(postService.createPost(userId, multipartFile, createModel));
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/edit/{postId}") public ResponseEntity<PostModel> editPost(@AuthenticationPrincipal Long userId, @RequestBody PostCreateModel createModel, @PathVariable Long postId)
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/edit/{postId}") public ResponseEntity<PostModel> editPost(@AuthenticationPrincipal Long userId, @RequestBody PostCreateModel createModel, @PathVariable Long postId)
     {
         if(postService.userHasEditAuthority(userId, postId))
         {
@@ -54,7 +53,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/edit/{postId}/attach/tags") public ResponseEntity<Boolean> attachTags(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... tags)
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/edit/{postId}/attach/tags") public ResponseEntity<Boolean> attachTags(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... tags)
     {
         if(postService.userHasEditAuthority(userId, postId))
         {
@@ -64,7 +63,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @PostMapping("/edit/{postId}/detach/tags")
     public ResponseEntity<Boolean> removeTags(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... tags)
     {
@@ -76,7 +75,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @PostMapping("/edit/{postId}/attach/editPrivileges")
     public ResponseEntity<Boolean> addEditPrivileges(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... privileges)
     {
@@ -88,7 +87,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     @PostMapping("/edit/{postId}/detach/editPrivileges")
     public ResponseEntity<Boolean> removeEditPrivileges(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @NotNull @RequestBody String... privileges)
     {
@@ -100,7 +99,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/editThumbnail") public ResponseEntity<PostModel> editThumbnail(@AuthenticationPrincipal Long userId, @NotNull @RequestBody Long postId, @NotNull @RequestPart MultipartFile newThumbnail) throws IOException
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/editThumbnail") public ResponseEntity<PostModel> editThumbnail(@AuthenticationPrincipal Long userId, @NotNull @RequestBody Long postId, @NotNull @RequestPart MultipartFile newThumbnail) throws IOException
     {
         if(postService.userHasEditAuthority(userId, postId))
         {
@@ -110,7 +109,7 @@ import java.io.IOException;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @DeleteMapping("/delete/{postId}") public void deletePost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @DeleteMapping("/delete/{postId}") public void deletePost(@AuthenticationPrincipal Long userId, @NotNull @PathVariable Long postId)
     {
         if(postService.userHasEditAuthority(userId, postId))
         {

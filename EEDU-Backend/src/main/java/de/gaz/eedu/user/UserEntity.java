@@ -350,7 +350,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
 
     public boolean hasAuthority(@NotNull String name)
     {
-        return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(name.toUpperCase()));
+        return getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(name));
     }
 
     public boolean hasAnyRole(@NotNull Collection<String> roles)
