@@ -1,6 +1,5 @@
 package de.gaz.eedu.blogging;
 
-import de.gaz.eedu.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
