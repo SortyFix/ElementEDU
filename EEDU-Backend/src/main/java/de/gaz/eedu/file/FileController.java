@@ -23,7 +23,7 @@ import java.util.function.Function;
     private final @NotNull UserService userService;
     private final @NotNull FileService fileService;
 
-    @PreAuthorize("isAuthenticated()") @PostMapping("/{id}/modify/tags") public HttpStatus modifyTags(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/{id}/modify/tags") public HttpStatus modifyTags(
             @AuthenticationPrincipal Long userId, @PathVariable Long id, @NotNull @RequestBody Set<String> newTags)
     {
         FileEntity fileEntity = fileService.getRepository().getReferenceById(id);
@@ -35,7 +35,7 @@ import java.util.function.Function;
         return HttpStatus.UNAUTHORIZED;
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/info/{fileId}") public ResponseEntity<FileModel> getFileInfoById(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/info/{fileId}") public ResponseEntity<FileModel> getFileInfoById(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
     {
         Function<FileEntity, Boolean> access = file ->
@@ -51,7 +51,7 @@ import java.util.function.Function;
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}") public ResponseEntity<ByteArrayResource> downloadFileWithID(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/{fileId}") public ResponseEntity<ByteArrayResource> downloadFileWithID(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId) throws IOException
     {
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
@@ -62,7 +62,7 @@ import java.util.function.Function;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}/{index}") public ResponseEntity<ByteArrayResource> downloadFileIndexWithID(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/{fileId}/{index}") public ResponseEntity<ByteArrayResource> downloadFileIndexWithID(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId, @PathVariable Integer index) throws IOException
     {
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
@@ -73,7 +73,7 @@ import java.util.function.Function;
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/get/{fileId}/files") public ResponseEntity<List<FileInfoModel>> getSingleFiles(
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/{fileId}/files") public ResponseEntity<List<FileInfoModel>> getSingleFiles(
             @AuthenticationPrincipal Long userId, @PathVariable Long fileId)
     {
         Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
