@@ -216,14 +216,14 @@ public class UserController extends EntityController<Long, UserService, UserMode
         log.info("User {} has been logged out.", user);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/get/all")
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_OTHERS_GET.toString())")
     @Override public @NotNull ResponseEntity<Set<UserModel>> fetchAll()
     {
         return super.fetchAll();
     }
 
-    @PreAuthorize("isAuthenticated()") @GetMapping("/all/reduced")
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/all/reduced")
     public @NotNull ResponseEntity<ReducedUserModel[]> fetchAllReduced()
     {
         return ResponseEntity.ok(getService().findAllReduced().toArray(new ReducedUserModel[0]));

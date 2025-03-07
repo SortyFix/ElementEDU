@@ -142,8 +142,6 @@ import java.util.stream.Stream;
                 "root", // login id
                 AccountType.ADMINISTRATOR,
                 true, // enabled
-                false, // locked
-                UserStatus.PROSPECTIVE,
                 themeEntity.getId(),
                 new String[] {  } // groups
         ))).getFirst());

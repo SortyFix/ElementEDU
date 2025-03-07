@@ -1,13 +1,8 @@
 import {Component, Inject} from '@angular/core';
-import {AbstractList} from "../../../../common/abstract-list/abstract-list.component";
 import {ClassRoomModel} from "../class-room-model";
 import {ClassRoomService} from "../class-room.service";
-import {MatIcon} from "@angular/material/icon";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {NgIf} from "@angular/common";
-import {MatProgressBar} from "@angular/material/progress-bar";
-import {AbstractCourseComponentList} from "../../abstract-course-components/list/abstract-course-component-list";
+import {MAT_DIALOG_DATA, MatDialogClose, MatDialogRef} from "@angular/material/dialog";
+import {MatButton} from "@angular/material/button";
 import {DeleteDialogComponent} from "../../../../common/delete-dialog/delete-dialog.component";
 import {AbstractDeleteDialog} from "../../abstract-course-components/delete/abstract-delete-dialog";
 import {CourseModel} from "../../course-model";
@@ -28,41 +23,25 @@ import {ClassRoomCreateModel} from "../class-room-create-model";
 import {AccountType} from "../../../account-type";
 
 @Component({
-    imports: [MatProgressBar, AbstractList, MatIconButton, MatButton, MatIcon, NgIf,],
-    templateUrl: '../../abstract-course-components/list/abstract-course-components-list.html',
-    styleUrl: '../../abstract-course-components/list/abstract-course-components-list.scss'
-})
-export class ClassRoomListComponent extends AbstractCourseComponentList<string, ClassRoomModel> {
-
-    public constructor(service: ClassRoomService, dialog: MatDialog) {
-        super(service, dialog, CreateClassRoomComponent, DeleteClassRoomComponent, {
-            title: (value: ClassRoomModel): string => value.id,
-            chips: (value: ClassRoomModel): string[] => [`Tutor: ${value.tutor.name}`, `${value.students.length} Users`]
-        });
-    }
-}
-
-@Component({
     imports: [MatCardActions, MatButton, MatDialogClose, ReactiveFormsModule, MatInput, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, SelectionInput],
     templateUrl: './create-class-room.component.html',
 })
 export class CreateClassRoomComponent extends AbstractCourseComponentsCreate<ClassRoomModel> {
 
     private _users: readonly UserModel[] = [];
+    private _courses: readonly CourseModel[] = [];
 
     public constructor(service: ClassRoomService, dialogRef: DialogRef, formBuilder: FormBuilder, userService: UserService, private readonly _courseService: CourseService) {
         super(service, dialogRef, formBuilder, "Create Class Room");
 
         userService.fetchAll.subscribe((user: UserModel[]): void => { this._users = user; });
-        this._courseService.adminCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
+        this._courseService.ownCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
     }
-
-    private _courses: readonly CourseModel[] = [];
 
     protected get courses(): readonly CourseModel[] { return this._courses; }
 
     protected override get loading(): boolean {
-        return super.loading && this._courseService.fetchedAdmin;
+        return super.loading && this._courseService.fetched;
     }
 
     protected override get createModel(): ClassRoomCreateModel[] {

@@ -1,52 +1,32 @@
 import {Injectable} from '@angular/core';
-import {map, Observable, of, OperatorFunction} from "rxjs";
+import {Observable, of} from "rxjs";
 import {GenericSubject, SubjectModel} from "./subject-model";
 import {HttpClient} from "@angular/common/http";
-import {AbstractCourseComponentsService} from "../abstract-course-components/abstract-course-components-service";
 import {CourseService} from "../course.service";
-import {icons} from "../../../../environment/styles";
 import {CourseModel} from "../course-model";
+import {EntityService} from "../../../entity/entity-service";
 
 @Injectable({
     providedIn: 'root'
 })
-export class SubjectService extends AbstractCourseComponentsService<string, SubjectModel, { id: string }> {
+export class SubjectService extends EntityService<string, SubjectModel, GenericSubject, GenericSubject> {
 
-    public constructor(http: HttpClient,
-            private readonly _courseService: CourseService
-    ) { super(http, icons.subject) }
+    public constructor(http: HttpClient, private readonly _courseService: CourseService) { super(http, 'course/subject') }
 
-    public override get translate(): OperatorFunction<any[], SubjectModel[]> {
-        return map((response: any[]): SubjectModel[] => response.map((item: GenericSubject): SubjectModel =>
-            SubjectModel.fromObject(item, (): Observable<readonly CourseModel[]> => this.fetchCoursesLazily([item.id]))
-        ));
+    public override translate(obj: GenericSubject): SubjectModel {
+        return SubjectModel.fromObject(obj, (): Observable<readonly CourseModel[]> => this.fetchCoursesLazily([obj.id]));
     }
 
-    public fetchCoursesLazily(subjects: string[]): Observable<readonly CourseModel[]>
-    {
+    public fetchCoursesLazily(subjects: string[]): Observable<readonly CourseModel[]> {
         if (this._courseService.fetched) {
             return of(this._courseService.findBySubjectLazily(subjects));
         }
         return this.fetchCourses(subjects);
     }
 
-    public fetchCourses(subjects: string[]): Observable<readonly CourseModel[]>
-    {
-        const url = `${this.BACKEND_URL}/course/subject/courses/${subjects.toString()}`;
-        return this.http.get<any[]>(url, {withCredentials: true}).pipe(this._courseService.translate);
-    }
-
-    protected override get fetchAllValues(): Observable<SubjectModel[]> {
-        return this.http.get<any[]>(`${this.BACKEND_URL}/course/subject/get/all`, {withCredentials: true});
-    }
-
-    protected override createValue(models: { id: string }[]): Observable<SubjectModel[]> {
-        return this.http.post<any[]>(`${this.BACKEND_URL}/course/subject/create`, models, {withCredentials: true});
-    }
-
-    protected override deleteValue(id: string[]): Observable<void> {
-        const url: string = `${this.BACKEND_URL}/course/subject/delete/${id.toString()}`;
-        return this.http.delete<void>(url, {withCredentials: true});
+    public fetchCourses(subjects: string[]): Observable<readonly CourseModel[]> {
+        const url: string = `${this.BACKEND_URL}/courses/${subjects.toString()}`;
+        return this.http.get<any[]>(url, {withCredentials: true}).pipe(this._courseService.translateValue);
     }
 
     protected override postDelete(id: string[]): void {

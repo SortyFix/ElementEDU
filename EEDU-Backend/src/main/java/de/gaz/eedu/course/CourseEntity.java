@@ -17,6 +17,7 @@ import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,9 +50,9 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
     private final Set<UserEntity> users = new HashSet<>();
-    @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE) @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private final Set<FrequentAppointmentEntity> frequentAppointments = new HashSet<>();
-    @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE) @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
     private String name;

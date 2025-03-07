@@ -1,6 +1,6 @@
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DialogRef} from "@angular/cdk/dialog";
-import {AbstractCourseComponentsService} from "../abstract-course-components-service";
+import {EntityService} from "../../../../entity/entity-service";
 
 export abstract class AbstractCourseComponentsCreate<T> {
 
@@ -11,7 +11,7 @@ export abstract class AbstractCourseComponentsCreate<T> {
 
     protected constructor
     (
-        private _service: AbstractCourseComponentsService<any, any, any>,
+        private _service: EntityService<any, any, any, any>,
         private _dialogRef: DialogRef, formBuilder: FormBuilder,
         title: string
     ) {
