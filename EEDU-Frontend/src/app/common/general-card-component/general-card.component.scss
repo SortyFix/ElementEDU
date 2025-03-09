@@ -8,6 +8,12 @@
     z-index: 2;
 }
 
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 // Ensure that the loading bar and the close button can still be seen through the overlay
 .loading-bar, .close-button {
     z-index: 3;
