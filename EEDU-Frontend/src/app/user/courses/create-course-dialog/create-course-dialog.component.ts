@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {SelectionInput} from "../../../common/selection-input/selection-input.component";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 import {AbstractCreateEntity} from "../../../entity/create-entity/abstract-create-entity";
 import {ReducedUserModel} from "../../reduced-user-model";
@@ -22,7 +22,7 @@ import {NgIf} from "@angular/common";
 import {GeneralErrorBoxComponent} from "../../../common/general-error-box/general-error-box.component";
 
 @Component({
-    imports: [MatCardActions, SelectionInput, ReactiveFormsModule, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
+    imports: [MatCardActions, SelectionInput, ReactiveFormsModule, MatHint, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
     templateUrl: './create-course-dialog.component.html'
 })
 export class CreateCourseDialogComponent extends AbstractCreateEntity {
@@ -81,10 +81,6 @@ export class CreateCourseDialogComponent extends AbstractCreateEntity {
 
     protected override get loading(): boolean {
         return !this._subjectService.fetched || !this._classroomService.fetched;
-    }
-
-    protected override get canSubmit(): boolean {
-        return true;
     }
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {

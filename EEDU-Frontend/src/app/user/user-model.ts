@@ -91,6 +91,6 @@ export class UserModel {
     }
 
     public hasPrivilege(privilege: string): boolean {
-        return this.groups && this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
+        return this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
     }
 }

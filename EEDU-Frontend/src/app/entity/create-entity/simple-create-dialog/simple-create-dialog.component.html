@@ -21,7 +21,10 @@
         </mat-card-content>
         <mat-card-actions align="end">
             <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">Submit</button>
+            <button [disabled]="form.invalid"
+                    color="primary" mat-stroked-button type="submit">
+                Submit
+            </button>
         </mat-card-actions>
     </abstract-general-card>
 </form>

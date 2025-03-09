@@ -157,4 +157,6 @@ export class AbstractList<T> {
     protected unselectAll(): void {
         this._selection.clear();
     }
+
+    protected readonly SelectionType = SelectionType;
 }

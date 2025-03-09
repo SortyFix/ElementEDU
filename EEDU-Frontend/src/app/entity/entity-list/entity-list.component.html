@@ -16,10 +16,14 @@
             [selectionType]="SelectionType.MULTIPLE"
             [values]="pagedValues">
             <div style="margin-left: auto">
-                <button (click)="deletePressed.emit(list.selected)" *ngIf="list.selected.length > 0" mat-icon-button>
+                <button
+                    *ngIf="list.selected.length > 0 && hasPrivilege(service()!.privileges.deletePrivilege)"
+                    (click)="deletePressed.emit(list.selected)" mat-icon-button>
                     <mat-icon>delete</mat-icon>
                 </button>
-                <button (click)="openCreateDialog()" mat-icon-button>
+                <button
+                    *ngIf="hasPrivilege(service()!.privileges.createPrivilege)"
+                    (click)="openCreateDialog()" mat-icon-button>
                     <mat-icon>add</mat-icon>
                 </button>
                 <button mat-icon-button>

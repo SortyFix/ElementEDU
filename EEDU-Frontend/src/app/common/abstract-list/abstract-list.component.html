@@ -31,7 +31,7 @@
                                 [checked]="isSelected(value)"
                                 [icon]="loadIcon(value)"
                                 [title]="loadTitle(value)"
-                                [show]="true"
+                                [show]="selectionType() === SelectionType.MULTIPLE"
                                 (keyboardEvent)="handleKeyDown($event, value)"
                                 (onToggle)="toggle(value)">
                             </single-checkbox>

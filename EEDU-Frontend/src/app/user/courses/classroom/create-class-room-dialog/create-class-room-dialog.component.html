@@ -2,6 +2,9 @@
     <abstract-general-card [loading]="loading" title="{{ title }}">
         <ng-container *ngIf="!eligibleTeacher">
             <general-error-box message="No eligible tutor could be discovered." subMessage="A tutor is required to set up a class."></general-error-box>
+            <mat-card-content style="text-align: center">
+                <button mat-button mat-dialog-close type="button" class="close-button">Close Dialog</button>
+            </mat-card-content>
         </ng-container>
 
         <ng-container *ngIf="eligibleTeacher">
@@ -9,7 +12,8 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label>Class Name</mat-label>
-                    <input formControlName="id" matInput type="text"/>
+                    <input formControlName="id" matInput type="text" maxlength="20" #input/>
+                    <mat-hint align="end">{{input.value.length}}/{{input.maxLength}}</mat-hint>
                 </mat-form-field>
 
                 <general-selection-input
@@ -29,6 +33,7 @@
                 </general-selection-input>
 
                 <general-selection-input
+                    *ngIf="loading || courses.length > 0"
                     [values]="courses"
                     [multiple]="true"
                     [allowNull]="true"
@@ -40,7 +45,10 @@
             </mat-card-content>
             <mat-card-actions align="end">
                 <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
-                <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
+                <button [disabled]="!canSubmit"
+                        color="primary" mat-stroked-button type="submit">
+                    Submit
+                </button>
             </mat-card-actions>
         </ng-container>
     </abstract-general-card>

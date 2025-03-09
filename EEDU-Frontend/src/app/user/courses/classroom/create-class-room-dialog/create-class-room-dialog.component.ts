@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GeneralCardComponent} from "../../../../common/general-card-component/general-card.component";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
@@ -20,7 +20,7 @@ import {NgIf} from "@angular/common";
 import {GeneralErrorBoxComponent} from "../../../../common/general-error-box/general-error-box.component";
 
 @Component({
-    imports: [ReactiveFormsModule, GeneralCardComponent, MatLabel, MatCardContent, MatFormField, SelectionInput, MatCardActions, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
+    imports: [ReactiveFormsModule, GeneralCardComponent, MatLabel, MatHint, MatCardContent, MatFormField, SelectionInput, MatCardActions, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
     templateUrl: './create-class-room-dialog.component.html',
 })
 export class CreateClassRoomDialogComponent extends AbstractCreateEntity {

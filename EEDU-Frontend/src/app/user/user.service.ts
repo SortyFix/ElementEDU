@@ -24,6 +24,12 @@ export class UserService extends EntityService<bigint, UserModel, GenericUser, U
         }, CreateUserDialogComponent);
     }
 
+    protected override sort(input: UserModel[]): UserModel[] {
+        return input.sort((o1: UserModel, o2: UserModel): number => {
+            return o1.lastName.localeCompare(o2.lastName);
+        });
+    }
+
     /**
      * Retrieves the user data from local storage.
      *

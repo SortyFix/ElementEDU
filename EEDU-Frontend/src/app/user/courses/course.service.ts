@@ -31,6 +31,12 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
         }, CreateCourseDialogComponent);
     }
 
+    protected override sort(input: CourseModel[]): CourseModel[] {
+        return input.sort((o1: CourseModel, o2: CourseModel): number => {
+            return o1.name.localeCompare(o2.name);
+        });
+    }
+
     public override translate(obj: GenericCourse): CourseModel {
         return CourseModel.fromObject(obj, (): Observable<readonly CourseModel[]> => {
             return of(this.findBySubjectLazily([obj.subject.id]));

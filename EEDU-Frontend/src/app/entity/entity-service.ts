@@ -54,9 +54,19 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
     public get fetchAll(): Observable<T[]> {
         const url: string = `${this.BACKEND_URL}/get/all`
         return this.http.get<G[]>(url, {withCredentials: true}).pipe(this.translateValue, tap((response: T[]): void => {
-            this._subject.next(response);
+            this._subject.next(this.sort(response));
             this._fetched = true;
         }), finalize((): void => {this._fetched = true}));
+    }
+
+    protected sort(input: T[]): T[]
+    {
+        return input.sort((o1: T, o2: T): 1 | -1 | 0 => {
+            const id1: P = o1.id;
+            const id2: P = o2.id;
+
+            return (id1 > id2 ? 1 : id1 < id2 ? -1 : 0);
+        });
     }
 
     protected get BACKEND_URL(): string {

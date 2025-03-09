@@ -3,7 +3,6 @@ package de.gaz.eedu;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.UserStatus;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
@@ -12,6 +11,7 @@ import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.SystemPrivileges;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
@@ -34,9 +34,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
+@Component
+@RequiredArgsConstructor
+@Slf4j
+@Getter(AccessLevel.PROTECTED)
+public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
     private final GroupService groupService;
@@ -50,8 +53,8 @@ import java.util.stream.Stream;
 
     @Override @Transactional public void run(@NotNull String... args)
     {
-
-        if (userService.getRepository().findByLoginName("root").isEmpty())
+        createDefaultPrivileges();
+        if (getUserService().getRepository().findByLoginName("root").isEmpty())
         {
             createDefaultUser();
         }
@@ -72,11 +75,10 @@ import java.util.stream.Stream;
     {
         String randomPassword = randomPassword();
 
-        createDefaultPrivileges();
         createDefaultGroup();
 
         // skip adding root user when testing
-        if(Objects.equals(getEnvironment().getActiveProfiles()[0], "test")) { return; }
+        if (Objects.equals(getEnvironment().getActiveProfiles()[0], "test")) {return;}
 
         UserEntity userEntity = createDefaultUser(createDefaultTheme());
         setPassword(userEntity, randomPassword);
@@ -98,13 +100,23 @@ import java.util.stream.Stream;
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
         int bitMask = CredentialMethod.bitMask(password);
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
+        CredentialCreateModel credential = new CredentialCreateModel(
+                userEntity.getId(),
+                password,
+                bitMask,
+                randomPassword);
         getCredentialService().createEntity(Set.of(credential));
     }
 
     private void createDefaultPrivileges()
     {
-        getPrivilegeService().createEntity(Arrays.stream(SystemPrivileges.values()).map(privilege ->
+        Set<String> existingPrivileges = getPrivilegeService().findAll().stream().map(PrivilegeModel::id).collect(
+                Collectors.toUnmodifiableSet());
+        getPrivilegeService().createEntity(Arrays.stream(SystemPrivileges.values()).filter(current ->
+        {
+            String privilegeName = current.toString();
+            return !existingPrivileges.contains(privilegeName);
+        }).map(privilege ->
         {
             String privilegeName = privilege.toString();
             return new PrivilegeCreateModel(privilegeName);
@@ -113,17 +125,19 @@ import java.util.stream.Stream;
 
     private void createDefaultGroup()
     {
-        getGroupService().createEntity(AccountType.groupSet().stream().map(
-                (currentGroup) -> new GroupCreateModel(currentGroup, new String[0])
-        ).collect(Collectors.toSet()));
+        getGroupService().createEntity(AccountType.groupSet().stream().map((currentGroup) -> new GroupCreateModel(
+                currentGroup,
+                new String[0])).collect(Collectors.toSet()));
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark",
+        ThemeCreateModel defaultDark = new ThemeCreateModel(
+                "defaultDark",
                 new byte[]{Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5},
                 new byte[]{Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10});
-        ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight",
+        ThemeCreateModel defaultLight = new ThemeCreateModel(
+                "defaultLight",
                 new byte[]{Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255},
                 new byte[]{Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235});
 
@@ -140,10 +154,8 @@ import java.util.stream.Stream;
                 "root", // first id
                 "root", // last id
                 "root", // login id
-                AccountType.ADMINISTRATOR,
-                true, // enabled
-                themeEntity.getId(),
-                new String[] {  } // groups
+                AccountType.ADMINISTRATOR, true, // enabled
+                themeEntity.getId(), new String[]{} // groups
         ))).getFirst());
     }
 

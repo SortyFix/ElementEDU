@@ -12,7 +12,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-simple-create-dialog',
-    imports: [ReactiveFormsModule, GeneralCardComponent, MatCardContent, MatLabel, MatSuffix, MatFormField, MatChipGrid, MatChipRow, MatChipRemove, MatIcon, MatCardActions, MatDialogClose, MatButton, MatInput, MatChipInput, MatSuffix, MatTooltip],
+    imports: [ReactiveFormsModule, GeneralCardComponent, MatCardContent, MatLabel, MatSuffix, MatFormField, MatChipGrid, MatChipRow, MatChipRemove, MatIcon, MatCardActions, MatDialogClose, MatButton, MatInput, MatChipInput, MatTooltip],
     templateUrl: './simple-create-dialog.component.html',
     styleUrl: './simple-create-dialog.component.scss'
 })

@@ -26,9 +26,14 @@
                         <mat-option [value]="type">{{ type.toLowerCase() }}</mat-option>
                     }
                 </mat-select>
+                <mat-icon
+                    *ngIf="administratorSelected" matSuffix
+                    matTooltip="If the user is set administrator, they will automatically be granted full access to the system. This can potentially cause significant damage to the system. Only proceed if you trust them.">
+                    warning
+                </mat-icon>
             </mat-form-field>
 
-            <mat-checkbox class="checkbox-margin" formControlName="enabled">Enabled</mat-checkbox>
+            <mat-checkbox class="checkbox-margin" formControlName="enabled">Instantly enable the account.</mat-checkbox>
 
             <general-selection-input
                 *ngIf="loading || groups.length > 0"
@@ -40,7 +45,10 @@
         </mat-card-content>
         <mat-card-actions align="end">
             <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
-            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
+            <button [disabled]="!canSubmit"
+                    color="primary" mat-stroked-button type="submit">
+                Submit
+            </button>
         </mat-card-actions>
     </abstract-general-card>
 </form>

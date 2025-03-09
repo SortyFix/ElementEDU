@@ -78,13 +78,13 @@ const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => 
         MatAutocomplete,
         MatOption,
         FormsModule,
+        MatIcon,
         MatLabel,
         NgIf,
         MatChipGrid,
         MatChipRow,
-        MatIcon,
         MatChipInput,
-        MatChipRemove
+        MatChipRemove,
     ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true },

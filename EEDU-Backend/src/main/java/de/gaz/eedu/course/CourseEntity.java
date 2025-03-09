@@ -55,6 +55,7 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
     @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE) @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
+    @Column(length = 50, nullable = false)
     private String name;
     @ManyToOne @JsonManagedReference @JoinColumn(name = "class_room_id", referencedColumnName = "id")
     @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private @Nullable ClassRoomEntity classRoom;
