@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
-//TODO manage access. Yes, I'll do it later
-
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/course")
@@ -36,6 +34,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     }
 
     @PostMapping("/{course}/attach")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_ATTACH_USER.toString())")
     public @NotNull ResponseEntity<Void> attachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for attaching user(s) {} to course {}.", users, course);
@@ -43,6 +42,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     }
 
     @GetMapping("{course}/detach")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_DETACH_USER.toString())")
     public @NotNull ResponseEntity<Void> detachUser(@PathVariable long course, @NotNull @RequestBody Long... users)
     {
         log.info("Received incoming request for detaching user(s) {} from course {}.", users, course);
@@ -50,46 +50,49 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_CREATE.toString())")
-    @Override public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_CREATE.toString())") @Override
+    public @NotNull ResponseEntity<CourseModel[]> create(@NotNull @RequestBody CourseCreateModel[] model)
     {
         return super.create(model);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_DELETE.toString())")
-    @Override public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_DELETE.toString())") @Override
+    public @NotNull ResponseEntity<Void> delete(@NotNull @PathVariable Long[] id)
     {
         return super.delete(id);
-    }
-
-    @GetMapping("/get/{id}")
-    @Override public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
-    {
-        return super.getData(id);
-    }
-
-    @GetMapping("/get/courses/{user}")
-    public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
-    {
-        return ResponseEntity.ok(getService().getCourses(user));
-    }
-
-    @GetMapping("/get")
-    public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
-    {
-        return getCourses(user);
-    }
-
-    @GetMapping("/get/all")
-    @Override public @NotNull ResponseEntity<Set<CourseModel>> fetchAll()
-    {
-        return super.fetchAll();
     }
 
     @GetMapping("/users/{course}")
     public @NotNull ResponseEntity<ReducedUserModel[]> getUsers(@PathVariable long course)
     {
         return ResponseEntity.ok(getService().loadReducedModelsByCourse(course).toArray(new ReducedUserModel[0]));
+    }
+
+    @GetMapping("/get/{id}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_GET.toString())") @Override
+    public @NotNull ResponseEntity<CourseModel> getData(@NotNull @PathVariable Long id)
+    {
+        return super.getData(id);
+    }
+
+    @GetMapping("/get/all")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_GET.toString())") @Override
+    public @NotNull ResponseEntity<Set<CourseModel>> fetchAll()
+    {
+        return super.fetchAll();
+    }
+
+    @GetMapping("/get") @PreAuthorize("@verificationService.fullyAuthenticated()")
+    public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
+    {
+        return getCourses(user);
+    }
+
+    @GetMapping("/get/courses/{user}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_GET.toString())")
+    public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
+    {
+        return ResponseEntity.ok(getService().getCourses(user));
     }
 }

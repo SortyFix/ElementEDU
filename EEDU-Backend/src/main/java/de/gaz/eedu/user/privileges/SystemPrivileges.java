@@ -10,6 +10,10 @@ import java.util.Optional;
 public enum SystemPrivileges
 {
     CLASS_CREATE,
+    CLASS_ATTACH_USER,
+    CLASS_DETACH_USER,
+    CLASS_LINK_COURSE,
+    CLASS_UNLINK_CLASS,
     CLASS_DELETE,
     CLASS_GET,
 
@@ -22,6 +26,8 @@ public enum SystemPrivileges
     ROOM_GET,
 
     COURSE_CREATE,
+    COURSE_ATTACH_USER,
+    COURSE_DETACH_USER,
     COURSE_DELETE,
     COURSE_GET,
 
