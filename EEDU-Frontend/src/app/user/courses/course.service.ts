@@ -5,6 +5,8 @@ import {CourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
 import {EntityService} from "../../entity/entity-service";
+import {CreateCourseDialogComponent} from "./create-course-dialog/create-course-dialog.component";
+import {AbstractSimpleCreateEntity} from "../../entity/create-entity/abstract-simple-create-entity";
 
 /**
  * Service for managing {@link CourseModel} instances.
@@ -22,7 +24,7 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
     private _fetchedOwn: boolean = false;
     private readonly _ownCourses: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
-    public constructor(http: HttpClient) { super(http, 'course'); }
+    public constructor(http: HttpClient) { super(http, 'course', CreateCourseDialogComponent as unknown as typeof AbstractSimpleCreateEntity); }
 
     public override translate(obj: GenericCourse): CourseModel {
         return CourseModel.fromObject(obj, (): Observable<readonly CourseModel[]> => {

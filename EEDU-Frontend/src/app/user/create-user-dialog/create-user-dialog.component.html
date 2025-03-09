@@ -1,0 +1,35 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <app-general-card [loading]="loading" title="{{ title }}">
+        <mat-card-content>
+            <div style="display: flex; gap: 4px">
+                <mat-form-field appearance="outline">
+                    <mat-label>first Name</mat-label>
+                    <input formControlName="firstName" matInput type="text"/>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>last Name</mat-label>
+                    <input formControlName="lastName" matInput type="text"/>
+                </mat-form-field>
+            </div>
+
+
+            <mat-form-field appearance="outline">
+                <mat-label>login Name</mat-label>
+                <input formControlName="loginName" matInput type="text"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Account Type</mat-label>
+                <mat-select formControlName="accountType">
+                    @for (type of accountTypes; track type) {
+                        <mat-option [value]="type">{{ type.toLowerCase() }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <mat-checkbox class="checkbox-margin" formControlName="enabled">Enabled</mat-checkbox>
+
+        </mat-card-content>
+    </app-general-card>
+</form>

@@ -5,6 +5,10 @@
             @for (chip of entries(); track chip) { <mat-chip>{{ chip }}</mat-chip> }
         </mat-chip-listbox>
 
+        @if (addition() != null)
+        {
+            <ng-template *ngTemplateOutlet="addition()"></ng-template>
+        }
         <ng-content></ng-content>
     </mat-card-content>
     <mat-card-actions align="end">

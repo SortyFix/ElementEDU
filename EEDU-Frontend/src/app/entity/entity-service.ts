@@ -1,6 +1,8 @@
 import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environment/environment";
+import {AbstractSimpleCreateEntity} from "./create-entity/abstract-simple-create-entity";
+import {ComponentType} from "@angular/cdk/overlay";
 
 export abstract class EntityService<P, T extends { id: P }, G, C> {
 
@@ -9,8 +11,13 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
 
     protected constructor(
         private readonly _http: HttpClient,
-        private readonly _location: string
+        private readonly _location: string,
+        private readonly _createDialog: typeof AbstractSimpleCreateEntity,
     ) {}
+
+    public get createDialogType(): ComponentType<any> {
+        return this._createDialog as ComponentType<any>;
+    }
 
     public abstract translate(obj: G): T;
 

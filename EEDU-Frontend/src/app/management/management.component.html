@@ -38,21 +38,14 @@
     <p style="text-indent: 2em"> No pending sick notes! </p>
 </div>
 
-<h1 class="text">Manage users</h1>
-<p class="text">
-    Manage other users here. Reassign them to new groups, manage their authorities, <br>
-    assign them a different status or delete their account.
-</p>
+<mat-grid-list cols="2" gutterSize="5px" style="width: 99%; overflow: visible;">
+    <mat-grid-tile style="overflow: visible;">
+        <app-management-user-section style="width: 100%; overflow: visible"></app-management-user-section>
+    </mat-grid-tile>
+    <mat-grid-tile style="overflow: visible;">
+        <app-management-course-section style="width: 100%; overflow: visible"></app-management-course-section>
+    </mat-grid-tile>
+</mat-grid-list>
 
-<mat-tab-group style="margin: 8px">
-    <mat-tab *ngFor="let tab of courseComponentTabs" [label]="tab.label">
-        <ng-template mat-tab-label>
-            <mat-icon class="course-component-icon">{{ tab.icon }}</mat-icon>
-            {{ tab.label }}
-        </ng-template>
-        <ng-template matTabContent>
-            <app-entity-list (addPressed)="openDialog(tab.newDialog)" [itemInfo]="tab.itemInfo" [service]="tab.service">
-            </app-entity-list >
-        </ng-template>
-    </mat-tab>
-</mat-tab-group>
+
+

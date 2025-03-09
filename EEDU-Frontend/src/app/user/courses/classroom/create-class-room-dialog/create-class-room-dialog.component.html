@@ -1,0 +1,41 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <app-general-card [loading]="loading" title="{{ title }}">
+        <mat-card-content>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Class Name</mat-label>
+                <input formControlName="id" matInput type="text"/>
+            </mat-form-field>
+
+            <general-selection-input
+                [values]="teacher"
+                formControlName="tutor"
+                label="Select Tutor"
+                placeholder="Enter the tutor you wish to set for this class">
+            </general-selection-input>
+
+            <general-selection-input
+                [multiple]="true"
+                [allowNull]="true"
+                [values]="students"
+                formControlName="students"
+                label="Select Students"
+                placeholder="Enter a students name and press enter">
+            </general-selection-input>
+
+            <general-selection-input
+                [values]="courses"
+                [multiple]="true"
+                [allowNull]="true"
+                formControlName="courses"
+                label="Select Courses"
+                placeholder="Enter a course this class should be added to and press enter">
+            </general-selection-input>
+
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
+        </mat-card-actions>
+    </app-general-card>
+</form>

@@ -4,20 +4,19 @@
 
     <div *ngIf="loaded && values.length == 0" class="empty-list-content">
         <mat-icon class="empty-list-icon">folder_open</mat-icon>
-        <button (click)="addPressed.emit()" mat-flat-button>Create first entry</button>
+        <button (click)="openCreateDialog()" mat-flat-button>Create first entry</button>
     </div>
-
     <list
         #list
         *ngIf="loaded && values.length > 0"
-        [height]="300"
+        [height]="435"
         [itemInfo]="itemInfo()"
         [selectionType]="SelectionType.MULTIPLE" [values]="values">
         <div style="margin-left: auto">
             <button (click)="deletePressed.emit(list.selected)" *ngIf="list.selected.length > 0" mat-icon-button>
                 <mat-icon>delete</mat-icon>
             </button>
-            <button (click)="addPressed.emit()" mat-icon-button>
+            <button (click)="openCreateDialog()" mat-icon-button>
                 <mat-icon>add</mat-icon>
             </button>
         </div>

@@ -1,0 +1,11 @@
+<mat-tab-group style="margin: 8px;">
+    <mat-tab *ngFor="let tab of tabs()" [label]="tab.label">
+        <ng-template mat-tab-label>
+            <mat-icon class="course-component-icon">{{ tab.icon }}</mat-icon>
+            {{ tab.label }}
+        </ng-template>
+        <ng-template matTabContent>
+            <app-entity-list [itemInfo]="tab.itemInfo" [service]="tab.service"></app-entity-list >
+        </ng-template>
+    </mat-tab>
+</mat-tab-group>
