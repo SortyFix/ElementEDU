@@ -1,9 +1,12 @@
 <mat-card>
     <mat-progress-bar *ngIf="loading()" class="loading-bar" mode="indeterminate"></mat-progress-bar>
     <div *ngIf="loading()" class="overlay"></div>
-    <mat-card-header class="header" style=>
+    <mat-card-header class="header">
         <mat-card-title>{{ title() }}</mat-card-title>
-        <button class="close-button" mat-dialog-close mat-icon-button>
+        @if (subtitle() != null) {
+            <mat-card-subtitle>{{ subtitle() }}</mat-card-subtitle>
+        }
+        <button color="warn" class="close-button" mat-dialog-close mat-icon-button>
             <mat-icon>close</mat-icon>
         </button>
     </mat-card-header>

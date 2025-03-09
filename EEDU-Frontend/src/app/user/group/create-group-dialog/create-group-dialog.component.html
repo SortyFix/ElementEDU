@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <app-general-card [loading]="loading" title="{{ title }}">
+    <abstract-general-card [loading]="loading" title="{{ title }}">
         <mat-card-content>
             <mat-form-field appearance="outline">
                 <mat-label>Group Name</mat-label>
@@ -8,5 +8,5 @@
 
             <general-selection-input [values]="privileges" [allowNull]="true" [multiple]="true" title="Select Privileges" formControlName="privileges"></general-selection-input>
         </mat-card-content>
-    </app-general-card>
+    </abstract-general-card>
 </form>

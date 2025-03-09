@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit($event)" [formGroup]="form">
-    <app-general-card [loading]="false" title="{{ title() }}">
+    <abstract-general-card [loading]="false" title="{{ title() }}">
         <mat-card-content>
 
             <mat-form-field appearance="outline">
@@ -22,6 +22,6 @@
             <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
             <button [disabled]="form.invalid" mat-stroked-button type="submit">Submit</button>
         </mat-card-actions>
-    </app-general-card>
+    </abstract-general-card>
 </form>
 
