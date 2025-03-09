@@ -20,7 +20,6 @@ import {IllnessNotificationStatus} from "../illness-notification/illness-notific
 import {MatDialog} from "@angular/material/dialog";
 import {ManagementCourseSectionComponent} from "./management-course-section/management-course-section.component";
 import {ManagementUserSectionComponent} from "./management-user-section/management-user-section.component";
-import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 
 
 @Component({
@@ -38,9 +37,7 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
         MatIcon,
         NgForOf,
         ManagementCourseSectionComponent,
-        ManagementUserSectionComponent,
-        MatGridList,
-        MatGridTile
+        ManagementUserSectionComponent
     ],
     templateUrl: './management.component.html',
     styleUrl: './management.component.scss'
@@ -72,7 +69,7 @@ export class ManagementComponent implements OnInit {
 
     public respondToNotification(id: bigint, status: IllnessNotificationStatus): void
     {
-        this.managementService.respondToNotification(id, status).subscribe((accepted: boolean): void => {
+        this.managementService.respondToNotification(id, status).subscribe((): void => {
             let acceptedNoteIndex: number = this.illnessNotifications.findIndex((element: IllnessNotificationModel): boolean => element.id == id);
             if(acceptedNoteIndex >= 0)
             {

@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EntityListComponent } from './entity-list.component';
 
 describe('EntityListComponent', () => {
-  let component: EntityListComponent;
-  let fixture: ComponentFixture<EntityListComponent>;
+  let component: EntityListComponent<any>;
+  let fixture: ComponentFixture<EntityListComponent<any>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {GenericPrivilege, PrivilegeModel} from "./privilege-model";
 import {HttpClient} from "@angular/common/http";
-import {EntityService} from "../../entity/entity-service";
+import {EntityService} from "../../../entity/entity-service";
 import {CreatePrivilegesDialogComponent} from "./create-privilege-dialog/create-privileges-dialog.component";
 
 @Injectable({

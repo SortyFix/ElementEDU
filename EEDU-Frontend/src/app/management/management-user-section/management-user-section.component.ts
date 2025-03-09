@@ -4,12 +4,12 @@ import {
 } from "../lazy-loaded-accordion/lazy-loaded-accordion.component";
 import {UserService} from "../../user/user.service";
 import {GroupService} from "../../user/group/group.service";
-import {PrivilegeService} from "../../user/group/privilege.service";
 import {UserModel} from "../../user/user-model";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
+import {PrivilegeService} from "../../user/group/privilege/privilege.service";
 
 @Component({
-    selector: 'app-management-user-section',
+    selector: 'management-user-section',
     imports: [LazyLoadedAccordionComponent, MatCard, MatCardSubtitle, MatCardTitle, MatCardHeader, MatCardContent],
     templateUrl: './management-user-section.component.html',
     styleUrl: './management-user-section.component.scss'
@@ -27,7 +27,10 @@ export class ManagementUserSectionComponent {
             deleteDialog: null as any,
             icon: 'person',
             itemInfo: {
-                title: (entry: UserModel): string => entry.name,
+                title: (entry: UserModel): string => entry.loginName,
+                chips: (entry: UserModel): string[] => {
+                    return [entry.name, entry.accountType];
+                }
             }
         }, {
             label: 'Groups',

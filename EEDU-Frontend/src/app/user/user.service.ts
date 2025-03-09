@@ -7,7 +7,6 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {UserCreateModel} from "./user-create-model";
 import {EntityService} from "../entity/entity-service";
 import {CreateUserDialogComponent} from "./create-user-dialog/create-user-dialog.component";
-import {AbstractSimpleCreateEntity} from "../entity/create-entity/abstract-simple-create-entity";
 
 @Injectable({
     providedIn: 'root'
@@ -18,7 +17,7 @@ export class UserService extends EntityService<bigint, UserModel, GenericUser, U
 
     public constructor(http: HttpClient, private _snackBar: MatSnackBar)
     {
-        super(http, 'user', CreateUserDialogComponent as unknown as typeof AbstractSimpleCreateEntity);
+        super(http, 'user', CreateUserDialogComponent);
     }
 
     /**

@@ -7,7 +7,6 @@ import {CourseModel, GenericCourse} from "../course-model";
 import {CourseService} from "../course.service";
 import {EntityService} from "../../../entity/entity-service";
 import {CreateClassRoomDialogComponent} from "./create-class-room-dialog/create-class-room-dialog.component";
-import {AbstractSimpleCreateEntity} from "../../../entity/create-entity/abstract-simple-create-entity";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +15,7 @@ export class ClassRoomService extends EntityService<string, ClassRoomModel, Gene
     private readonly _translateCourses: OperatorFunction<GenericCourse[], CourseModel[]>;
 
     public constructor(http: HttpClient, courseService: CourseService) {
-        super(http, 'course/classroom', CreateClassRoomDialogComponent as unknown as typeof AbstractSimpleCreateEntity);
+        super(http, 'course/classroom', CreateClassRoomDialogComponent);
         this._translateCourses = courseService.translateValue;
     }
 

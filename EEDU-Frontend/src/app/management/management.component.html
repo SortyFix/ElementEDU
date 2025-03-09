@@ -38,14 +38,10 @@
     <p style="text-indent: 2em"> No pending sick notes! </p>
 </div>
 
-<mat-grid-list cols="2" gutterSize="5px" style="width: 99%; overflow: visible;">
-    <mat-grid-tile style="overflow: visible;">
-        <app-management-user-section style="width: 100%; overflow: visible"></app-management-user-section>
-    </mat-grid-tile>
-    <mat-grid-tile style="overflow: visible;">
-        <app-management-course-section style="width: 100%; overflow: visible"></app-management-course-section>
-    </mat-grid-tile>
-</mat-grid-list>
+<div class="lazily-loaded-tabs">
+    <management-user-section class="management-section"></management-user-section>
+    <management-course-section class="management-section"></management-course-section>
+</div>
 
 
 

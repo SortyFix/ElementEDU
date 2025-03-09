@@ -3,13 +3,13 @@ import {AbstractCreateEntity} from "../../../entity/create-entity/abstract-creat
 import {DialogRef} from "@angular/cdk/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GroupService} from "../group.service";
-import {PrivilegeService} from "../privilege.service";
-import {PrivilegeModel} from "../privilege-model";
 import {MatCardContent} from "@angular/material/card";
 import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {SelectionInput} from "../../../common/selection-input/selection-input.component";
+import {PrivilegeModel} from "../privilege/privilege-model";
+import {PrivilegeService} from "../privilege/privilege.service";
 
 @Component({
     imports: [MatCardContent, GeneralCardComponent, ReactiveFormsModule, MatLabel, MatFormField, MatInput, SelectionInput],

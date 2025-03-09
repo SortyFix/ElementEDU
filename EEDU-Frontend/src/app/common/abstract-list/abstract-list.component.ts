@@ -25,6 +25,7 @@ export interface ListItemInfo<T> {
     title: (value: T) => string;
     icon?: (value: T) => string;
     chips?: (value: T) => string[];
+    content?: Type<ListItemContent<T>>;
 }
 
 export interface GeneralListInfo<T> {
@@ -41,7 +42,6 @@ export class AbstractList<T> {
 
     public readonly itemInfo: InputSignal<ListItemInfo<T> | null> = input<ListItemInfo<T> | null>(null);
 
-    public readonly componentContent: InputSignal<Type<ListItemContent<T>> | null> = input<Type<ListItemContent<T>> | null>(null);
     public readonly generalListInfo: InputSignal<GeneralListInfo<T> | null> = input<GeneralListInfo<T> | null>(null);
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
     public readonly height: InputSignal<number | undefined> = input<number | undefined>();
@@ -73,11 +73,11 @@ export class AbstractList<T> {
     protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
 
     protected get hasContent(): boolean {
-        return !!this.componentContent();
+        return !!this.itemInfo()?.content;
     }
 
     protected get content(): Type<any> {
-        return this.componentContent()!;
+        return this.itemInfo()!.content!;
     }
 
     protected get partiallySelected(): boolean {

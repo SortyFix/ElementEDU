@@ -7,43 +7,17 @@ import {ComponentType} from "@angular/cdk/overlay";
 export abstract class EntityService<P, T extends { id: P }, G, C> {
 
     private readonly _subject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
+
+    protected constructor(private readonly _http: HttpClient, private readonly _location: string, private readonly _createDialog: ComponentType<AbstractSimpleCreateEntity>,) {}
+
     private _fetched: boolean = false
-
-    protected constructor(
-        private readonly _http: HttpClient,
-        private readonly _location: string,
-        private readonly _createDialog: typeof AbstractSimpleCreateEntity,
-    ) {}
-
-    public get createDialogType(): ComponentType<any> {
-        return this._createDialog as ComponentType<any>;
-    }
-
-    public abstract translate(obj: G): T;
-
-    protected get BACKEND_URL(): string {
-        return `${environment.backendUrl}/${this._location}`;
-    }
-
-    public create(models: C[]): Observable<T[]> {
-        const url: string = `${this.BACKEND_URL}/create`;
-        return this.http.post<G[]>(url, this.toPackets(models), {withCredentials: true}).pipe(this.translateValue, tap((response: T[]): void => this.pushCreated(response)));
-    }
-
-    public get(id: P): Observable<T> {
-        const url: string = `${this.BACKEND_URL}/get/${id}`;
-        return this.http.get<G>(url).pipe(// this will be a part of my flashback of why I have gone crazy
-            map((response: G): G[] => [response]), this.translateValue, map((response: any[]): any => response[0])
-        );
-    }
-
-    public delete(id: P[]): Observable<void> {
-        const url: string = `${this.BACKEND_URL}/delete/${id}`;
-        return this.http.delete(url, {withCredentials: true}).pipe(map((): void => { this.postDelete(id); }));
-    }
 
     public get fetched(): boolean {
         return this._fetched;
+    }
+
+    public get createDialogType(): ComponentType<AbstractSimpleCreateEntity> {
+        return this._createDialog;
     }
 
     public get translateValue(): OperatorFunction<G[], T[]> {
@@ -52,10 +26,6 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
 
     public get value(): T[] {
         return this.value$.value;
-    }
-
-    protected get http(): HttpClient {
-        return this._http;
     }
 
     public get value$(): BehaviorSubject<T[]> {
@@ -71,6 +41,40 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
             this._subject.next(response)
             this._fetched = true;
         }));
+    }
+
+    protected get BACKEND_URL(): string {
+        return `${environment.backendUrl}/${this._location}`;
+    }
+
+    protected get http(): HttpClient {
+        return this._http;
+    }
+
+    public abstract translate(obj: G): T;
+
+    public create(models: C[]): Observable<T[]> {
+        const url: string = `${this.BACKEND_URL}/create`;
+        return this.http.post<G[]>(url, this.toPackets(models), {withCredentials: true}).pipe(this.translateValue, tap((response: T[]): void => this.pushCreated(response)));
+    }
+
+    public get(id: P): Observable<T> {
+        const url: string = `${this.BACKEND_URL}/get/${id}`;
+        return this.http.get<G>(url).pipe(// this will be a part of my flashback of why I have gone crazy
+            map((response: G): G[] => [response]), this.translateValue, map((response: any[]): any => response[0]));
+    }
+
+    public delete(id: P[]): Observable<void> {
+        const url: string = `${this.BACKEND_URL}/delete/${id}`;
+        return this.http.delete(url, {withCredentials: true}).pipe(map((): void => { this.postDelete(id); }));
+    }
+
+    public clearCache(): void {
+        this._fetched = false;
+    }
+
+    public update(): void {
+        this.value$.next([...this.value]);
     }
 
     protected toPackets(models: C[]): any[] {
@@ -89,13 +93,5 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
 
     protected postDelete(id: P[]): void {
         this.value$.next(this.value.filter(((value: T): boolean => !id.includes(value.id))));
-    }
-
-    public clearCache(): void {
-        this._fetched = false;
-    }
-
-    public update(): void {
-        this.value$.next([...this.value]);
     }
 }

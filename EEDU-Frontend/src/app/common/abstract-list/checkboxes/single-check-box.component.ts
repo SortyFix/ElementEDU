@@ -5,8 +5,7 @@ import {NgIf} from "@angular/common";
 import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
-    selector: 'single-checkbox',
-    template: `
+    selector: 'single-checkbox', template: `
         <a matListItemTitle>
             <mat-checkbox
                 *ngIf="show()"
@@ -14,17 +13,13 @@ import {MatCheckbox} from "@angular/material/checkbox";
                 (click)="$event.stopPropagation()"
                 (change)="onToggle.emit()"
                 (keydown)="keyboardEvent.emit($event)">
+                <a class="title">
+                    <mat-icon class="icon" *ngIf="icon()">{{ icon() }}</mat-icon>
+                    {{ title() }}
+                </a>
             </mat-checkbox>
-            <mat-icon class="icon" *ngIf="icon()">{{ icon() }}</mat-icon>
-            <a class="title">{{ title() }}</a>
         </a>
-    `,
-    imports: [
-        MatCheckbox,
-        NgIf,
-        MatListItemTitle,
-        MatIcon
-    ]
+    `, styles: '.title { user-select: none }', imports: [MatCheckbox, NgIf, MatListItemTitle, MatIcon]
 })
 export class SingleCheckBoxComponent {
     @Output() public readonly keyboardEvent: EventEmitter<KeyboardEvent> = new EventEmitter<KeyboardEvent>;

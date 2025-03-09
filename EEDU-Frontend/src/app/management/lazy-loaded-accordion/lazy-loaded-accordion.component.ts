@@ -1,4 +1,4 @@
-import {Component, input, InputSignal, Type} from '@angular/core';
+import {Component, input, InputSignal} from '@angular/core';
 import {MatIcon} from "@angular/material/icon";
 import {MatTab, MatTabContent, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
 import {EntityListComponent} from "../../entity/entity-list/entity-list.component";
@@ -6,7 +6,6 @@ import {NgForOf} from "@angular/common";
 import {ComponentType} from "@angular/cdk/overlay";
 import {EntityService} from "../../entity/entity-service";
 import {ListItemInfo} from "../../common/abstract-list/abstract-list.component";
-import {ListItemContent} from "../../common/abstract-list/list-item-content";
 
 export interface LazyLoadedAccordionTab {
     label: string;
@@ -14,7 +13,6 @@ export interface LazyLoadedAccordionTab {
     service: EntityService<any, any, any, any>;
     itemInfo: ListItemInfo<any>;
     deleteDialog: ComponentType<any>,
-    content?: Type<ListItemContent<any>>
 }
 
 @Component({
