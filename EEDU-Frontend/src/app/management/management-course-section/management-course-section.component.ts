@@ -39,7 +39,7 @@ export class ManagementCourseSectionComponent {
                 title: (value: CourseModel): string => value.name,
                 chips: (value: CourseModel): string[] => [`${value.teacher?.name}`, `${value.students?.length} Student(s)`, value.subject.id, `${value.appointmentEntries.length} Appointment(s)`, `${value.frequentAppointments.length} Frequent Appointment(s)`],
                 content: CourseListItemComponent
-            }
+            },
         }, {
             label: 'Class Rooms',
             icon: icons.classroom,

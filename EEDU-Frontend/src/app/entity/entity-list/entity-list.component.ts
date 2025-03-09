@@ -9,10 +9,13 @@ import {MatDialog} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {AccessibilityService} from "../../accessibility.service";
+import {UserService} from "../../user/user.service";
+import {GeneralErrorBoxComponent} from "../../common/general-error-box/general-error-box.component";
 
 @Component({
     selector: 'app-entity-list',
-    imports: [MatIcon, AbstractList, NgIf, MatProgressBar, MatIconButton, MatButton, MatPaginator, MatCheckbox],
+    imports: [MatIcon, AbstractList, NgIf, MatProgressBar, MatIconButton, MatButton, MatPaginator, MatCheckbox, GeneralErrorBoxComponent],
     templateUrl: './entity-list.component.html',
     styleUrl: './entity-list.component.scss'
 })
@@ -31,14 +34,28 @@ export class EntityListComponent<T extends { id: any }> implements AfterViewInit
 
     private _pagedValues: readonly T[] = [];
 
-    public constructor(private readonly _matDialog: MatDialog, private readonly cdr: ChangeDetectorRef) {}
+    public constructor(
+        private readonly _matDialog: MatDialog,
+        private readonly _cdr: ChangeDetectorRef,
+        private readonly _accessibilityService: AccessibilityService,
+        private readonly _userService: UserService
+    ) {}
+
+    protected hasPrivilege(privilege: string | null): boolean
+    {
+        if(privilege === null)
+        {
+            return true;
+        }
+        return this._userService.getUserData.hasPrivilege(privilege);
+    }
 
     protected get paginatorEnabled(): boolean {
         return this._paginatorEnabled;
     }
     protected get paginatorRequired(): boolean
     {
-        return this._values.length > 10;
+        return this._values.length > 10 && !this._accessibilityService.mobile;
     }
 
     protected togglePaginator(): void {
@@ -81,7 +98,7 @@ export class EntityListComponent<T extends { id: any }> implements AfterViewInit
         this.service()?.value$.subscribe((value: T[]): void => {
             this._values = value;
             this.updatePagedValues();
-            this.cdr.detectChanges();
+            this._cdr.detectChanges();
         })
     }
 
@@ -96,7 +113,7 @@ export class EntityListComponent<T extends { id: any }> implements AfterViewInit
     }
 
     private updatePagedValues(): void {
-        if(!this.paginatorEnabled)
+        if(!this.paginatorEnabled || !this.paginatorRequired)
         {
             this._pagedValues = this._values;
             return;

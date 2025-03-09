@@ -17,7 +17,11 @@ export class UserService extends EntityService<bigint, UserModel, GenericUser, U
 
     public constructor(http: HttpClient, private _snackBar: MatSnackBar)
     {
-        super(http, 'user', CreateUserDialogComponent);
+        super(http, 'user',{
+            createPrivilege: "USER_CREATE",
+            deletePrivilege: "USER_DELETE",
+            fetchPrivilege: "USER_OTHERS_GET"
+        }, CreateUserDialogComponent);
     }
 
     /**

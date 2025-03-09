@@ -4,19 +4,19 @@
             <div style="display: flex; gap: 4px">
                 <mat-form-field appearance="outline">
                     <mat-label>first Name</mat-label>
-                    <input formControlName="firstName" matInput type="text"/>
+                    <input formControlName="firstName" (input)="updateLoginName()" matInput type="text"/>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label>last Name</mat-label>
-                    <input formControlName="lastName" matInput type="text"/>
+                    <input formControlName="lastName" (input)="updateLoginName()" matInput type="text"/>
                 </mat-form-field>
             </div>
 
 
             <mat-form-field appearance="outline">
                 <mat-label>login Name</mat-label>
-                <input formControlName="loginName" matInput type="text"/>
+                <input formControlName="loginName" (input)="onLoginNameEdited()" matInput type="text"/>
             </mat-form-field>
 
             <mat-form-field>
@@ -30,6 +30,17 @@
 
             <mat-checkbox class="checkbox-margin" formControlName="enabled">Enabled</mat-checkbox>
 
+            <general-selection-input
+                *ngIf="loading || groups.length > 0"
+                label="Assign groups" formControlName="groups"
+                [values]="groups"
+                [allowNull]="true"
+                [multiple]="true">
+            </general-selection-input>
         </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
+        </mat-card-actions>
     </abstract-general-card>
 </form>

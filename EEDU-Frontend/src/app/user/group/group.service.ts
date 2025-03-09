@@ -10,7 +10,11 @@ import {CreateGroupDialogComponent} from "./create-group-dialog/create-group-dia
 export class GroupService extends EntityService<string, GroupModel, GenericGroup, { id: string, privileges: string[] }>
 {
     public constructor(http: HttpClient) {
-        super(http, "user/group", CreateGroupDialogComponent);
+        super(http, "user/group", {
+            createPrivilege: "GROUP_CREATE",
+            deletePrivilege: "GROUP_DELETE",
+            fetchPrivilege: "GROUP_GET"
+        }, CreateGroupDialogComponent);
     }
 
     public override translate(obj: any): GroupModel {

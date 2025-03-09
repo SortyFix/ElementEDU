@@ -11,15 +11,19 @@ public enum SystemPrivileges
 {
     CLASS_CREATE,
     CLASS_DELETE,
+    CLASS_GET,
 
     SUBJECT_CREATE,
     SUBJECT_DELETE,
+    SUBJECT_GET,
 
     ROOM_CREATE,
     ROOM_DELETE,
+    ROOM_GET,
 
     COURSE_CREATE,
     COURSE_DELETE,
+    COURSE_GET,
 
     USER_DELETE,
     USER_CREATE,

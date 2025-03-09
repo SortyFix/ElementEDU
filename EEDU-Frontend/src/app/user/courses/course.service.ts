@@ -23,7 +23,13 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
     private _fetchedOwn: boolean = false;
     private readonly _ownCourses: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
-    public constructor(http: HttpClient) { super(http, 'course', CreateCourseDialogComponent); }
+    public constructor(http: HttpClient) {
+        super(http, 'course', {
+            createPrivilege: "COURSE_CREATE",
+            deletePrivilege: "COURSE_DELETE",
+            fetchPrivilege: "COURSE_GET"
+        }, CreateCourseDialogComponent);
+    }
 
     public override translate(obj: GenericCourse): CourseModel {
         return CourseModel.fromObject(obj, (): Observable<readonly CourseModel[]> => {

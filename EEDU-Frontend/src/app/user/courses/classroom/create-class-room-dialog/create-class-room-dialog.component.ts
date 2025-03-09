@@ -16,9 +16,11 @@ import {UserService} from "../../../user.service";
 import {CourseService} from "../../course.service";
 import {AbstractCreateEntity} from "../../../../entity/create-entity/abstract-create-entity";
 import {ClassRoomCreateModel} from "../class-room-create-model";
+import {NgIf} from "@angular/common";
+import {GeneralErrorBoxComponent} from "../../../../common/general-error-box/general-error-box.component";
 
 @Component({
-    imports: [ReactiveFormsModule, GeneralCardComponent, MatLabel, MatCardContent, MatFormField, SelectionInput, MatCardActions, MatButton, MatDialogClose, MatInput],
+    imports: [ReactiveFormsModule, GeneralCardComponent, MatLabel, MatCardContent, MatFormField, SelectionInput, MatCardActions, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
     templateUrl: './create-class-room-dialog.component.html',
 })
 export class CreateClassRoomDialogComponent extends AbstractCreateEntity {
@@ -44,7 +46,11 @@ export class CreateClassRoomDialogComponent extends AbstractCreateEntity {
     }
 
     protected override get loading(): boolean {
-        return this._courseService.fetched;
+        return !this._courseService.fetched;
+    }
+
+    protected get eligibleTeacher(): boolean {
+        return this.loading || this.teacher.length > 0;
     }
 
     protected get teacher(): readonly UserModel[] {

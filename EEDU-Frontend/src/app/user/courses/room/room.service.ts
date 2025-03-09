@@ -9,7 +9,13 @@ import {CreateRoomDialogComponent} from "./create-room-dialog/create-room-dialog
 })
 export class RoomService extends EntityService<string, RoomModel, GenericRoom, GenericRoom> {
 
-    public constructor(http: HttpClient) { super(http, 'course/room', CreateRoomDialogComponent); }
+    public constructor(http: HttpClient) {
+        super(http, 'course/room', {
+            createPrivilege: "ROOM_CREATE",
+            deletePrivilege: "ROOM_DELETE",
+            fetchPrivilege: "ROOM_GET"
+        }, CreateRoomDialogComponent);
+    }
 
     public override translate(obj: GenericRoom): RoomModel {
         return RoomModel.fromObject(obj);

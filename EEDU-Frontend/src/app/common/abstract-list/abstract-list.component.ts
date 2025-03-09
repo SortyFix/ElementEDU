@@ -15,6 +15,7 @@ import {AllCheckBoxComponent} from "./checkboxes/all-check-box.component";
 import {SingleCheckBoxComponent} from "./checkboxes/single-check-box.component";
 import {ListItemContent} from "./list-item-content";
 import {MatList, MatListItem} from "@angular/material/list";
+import {AccessibilityService} from "../../accessibility.service";
 
 // noinspection JSUnusedGlobalSymbols
 export enum SelectionType {
@@ -50,6 +51,8 @@ export class AbstractList<T> {
 
     private _values: readonly T[] = [];
 
+    public constructor(private readonly _accessibilityService: AccessibilityService) {}
+
     @Input() public set values(value: readonly T[]) {
         this._values = value as readonly T[];
 
@@ -70,7 +73,10 @@ export class AbstractList<T> {
         return this._values;
     }
 
-    protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
+    protected get hasChips(): boolean
+    {
+        return !this._accessibilityService.mobile && !!this.itemInfo()!.chips;
+    }
 
     protected get hasContent(): boolean {
         return !!this.itemInfo()?.content;

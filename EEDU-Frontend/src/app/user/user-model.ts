@@ -18,7 +18,8 @@ export interface GenericUser {
 }
 
 export class UserModel {
-    constructor(
+
+    public constructor(
         private readonly _id: bigint,
         private readonly _firstName: string,
         private readonly _lastName: string,

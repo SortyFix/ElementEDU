@@ -2,16 +2,17 @@ import {Component, EventEmitter, input, InputSignal, Output, signal, WritableSig
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 import {MatCardActions, MatCardContent} from "@angular/material/card";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow} from "@angular/material/chips";
+import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow} from "@angular/material/chips";
 import {MatIcon} from "@angular/material/icon";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-simple-create-dialog',
-    imports: [ReactiveFormsModule, GeneralCardComponent, MatCardContent, MatLabel, MatFormField, MatChipGrid, MatChipRow, MatIcon, MatCardActions, MatDialogClose, MatButton, MatInput, MatChipInput],
+    imports: [ReactiveFormsModule, GeneralCardComponent, MatCardContent, MatLabel, MatSuffix, MatFormField, MatChipGrid, MatChipRow, MatChipRemove, MatIcon, MatCardActions, MatDialogClose, MatButton, MatInput, MatChipInput, MatSuffix, MatTooltip],
     templateUrl: './simple-create-dialog.component.html',
     styleUrl: './simple-create-dialog.component.scss'
 })

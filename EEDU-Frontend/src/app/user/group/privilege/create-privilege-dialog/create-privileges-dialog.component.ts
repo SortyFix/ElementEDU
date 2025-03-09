@@ -3,7 +3,7 @@ import {DialogRef} from "@angular/cdk/dialog";
 import {PrivilegeService} from "../privilege.service";
 import {
     SimpleCreateDialogComponent
-} from "../../../../entity/create-entity/s-create-dialog/simple-create-dialog.component";
+} from "../../../../entity/create-entity/simple-create-dialog/simple-create-dialog.component";
 import {AbstractSimpleCreateEntity} from "../../../../entity/create-entity/abstract-simple-create-entity";
 
 @Component({

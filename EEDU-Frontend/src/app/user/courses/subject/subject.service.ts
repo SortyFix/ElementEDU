@@ -14,7 +14,11 @@ export class SubjectService extends EntityService<string, SubjectModel, GenericS
 
     public constructor(http: HttpClient, private readonly _courseService: CourseService)
     {
-        super(http, 'course/subject', CreateSubjectDialogComponent);
+        super(http, 'course/subject', {
+            createPrivilege: "SUBJECT_CREATE",
+            deletePrivilege: "SUBJECT_DELETE",
+            fetchPrivilege: "SUBJECT_GET"
+        }, CreateSubjectDialogComponent);
     }
 
     public override translate(obj: GenericSubject): SubjectModel {

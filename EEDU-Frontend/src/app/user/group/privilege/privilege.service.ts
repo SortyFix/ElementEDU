@@ -10,7 +10,11 @@ import {CreatePrivilegesDialogComponent} from "./create-privilege-dialog/create-
 export class PrivilegeService extends EntityService<string, PrivilegeModel, GenericPrivilege, GenericPrivilege> {
 
     public constructor(http: HttpClient) {
-        super(http, 'user/group/privilege', CreatePrivilegesDialogComponent);
+        super(http, 'user/group/privilege', {
+            createPrivilege: "PRIVILEGE_CREATE",
+            deletePrivilege: "PRIVILEGE_DELETE",
+            fetchPrivilege: "PRIVILEGE_GET"
+        }, CreatePrivilegesDialogComponent);
     }
 
     public override translate(obj: any): PrivilegeModel {

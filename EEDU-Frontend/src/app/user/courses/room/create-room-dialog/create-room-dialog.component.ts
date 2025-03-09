@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {SimpleCreateDialogComponent} from "../../../../entity/create-entity/s-create-dialog/simple-create-dialog.component";
+import {SimpleCreateDialogComponent} from "../../../../entity/create-entity/simple-create-dialog/simple-create-dialog.component";
 import {AbstractSimpleCreateEntity} from "../../../../entity/create-entity/abstract-simple-create-entity";
 import {DialogRef} from "@angular/cdk/dialog";
 import {RoomService} from "../room.service";

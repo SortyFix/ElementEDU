@@ -1,16 +1,32 @@
-import {BehaviorSubject, map, Observable, OperatorFunction, tap} from "rxjs";
+import {BehaviorSubject, finalize, map, Observable, OperatorFunction, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environment/environment";
 import {AbstractSimpleCreateEntity} from "./create-entity/abstract-simple-create-entity";
 import {ComponentType} from "@angular/cdk/overlay";
 
+export interface DefaultRequiredPrivileges
+{
+    fetchPrivilege: string | null;
+    createPrivilege: string | null;
+    deletePrivilege: string | null;
+}
+
 export abstract class EntityService<P, T extends { id: P }, G, C> {
 
     private readonly _subject: BehaviorSubject<T[]> = new BehaviorSubject<T[]>([]);
 
-    protected constructor(private readonly _http: HttpClient, private readonly _location: string, private readonly _createDialog: ComponentType<AbstractSimpleCreateEntity>,) {}
+    protected constructor(
+        private readonly _http: HttpClient,
+        private readonly _location: string,
+        private readonly _defaultRequiredPrivileges: DefaultRequiredPrivileges,
+        private readonly _createDialog: ComponentType<AbstractSimpleCreateEntity>) {}
+
 
     private _fetched: boolean = false
+
+    public get privileges(): DefaultRequiredPrivileges {
+        return this._defaultRequiredPrivileges;
+    }
 
     public get fetched(): boolean {
         return this._fetched;
@@ -38,9 +54,9 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
     public get fetchAll(): Observable<T[]> {
         const url: string = `${this.BACKEND_URL}/get/all`
         return this.http.get<G[]>(url, {withCredentials: true}).pipe(this.translateValue, tap((response: T[]): void => {
-            this._subject.next(response)
+            this._subject.next(response);
             this._fetched = true;
-        }));
+        }), finalize((): void => {this._fetched = true}));
     }
 
     protected get BACKEND_URL(): string {
@@ -58,7 +74,7 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
         return this.http.post<G[]>(url, this.toPackets(models), {withCredentials: true}).pipe(this.translateValue, tap((response: T[]): void => this.pushCreated(response)));
     }
 
-    public get(id: P): Observable<T> {
+    public fetch(id: P): Observable<T> {
         const url: string = `${this.BACKEND_URL}/get/${id}`;
         return this.http.get<G>(url).pipe(// this will be a part of my flashback of why I have gone crazy
             map((response: G): G[] => [response]), this.translateValue, map((response: any[]): any => response[0]));

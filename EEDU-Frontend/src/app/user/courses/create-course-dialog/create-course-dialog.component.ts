@@ -18,12 +18,15 @@ import {AccountType} from "../../account-type";
 import {MatButton} from "@angular/material/button";
 import {MatDialogClose} from "@angular/material/dialog";
 import {MatInput} from "@angular/material/input";
+import {NgIf} from "@angular/common";
+import {GeneralErrorBoxComponent} from "../../../common/general-error-box/general-error-box.component";
 
 @Component({
-    imports: [MatCardActions, SelectionInput, ReactiveFormsModule, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, MatButton, MatDialogClose, MatInput],
-    templateUrl: './create-course-dialog.component.html',
+    imports: [MatCardActions, SelectionInput, ReactiveFormsModule, MatLabel, MatFormField, MatCardContent, GeneralCardComponent, MatButton, MatDialogClose, MatInput, NgIf, GeneralErrorBoxComponent],
+    templateUrl: './create-course-dialog.component.html'
 })
 export class CreateCourseDialogComponent extends AbstractCreateEntity {
+
     private _users: readonly ReducedUserModel[] = [];
 
     public constructor(courseService: CourseService, dialogRef: DialogRef, formBuilder: FormBuilder, private readonly _subjectService: SubjectService, private readonly _userService: UserService, private readonly _classroomService: ClassRoomService,) {
@@ -58,6 +61,10 @@ export class CreateCourseDialogComponent extends AbstractCreateEntity {
 
     private set classrooms(classrooms: ClassRoomModel[]) {
         this._classrooms = classrooms;
+    }
+
+    protected get eligibleTeacher(): boolean {
+        return this.loading || this.teacher.length > 0;
     }
 
     protected override get createModel(): any[] {

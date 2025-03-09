@@ -3,16 +3,19 @@ import {AbstractCreateEntity} from "../../../entity/create-entity/abstract-creat
 import {DialogRef} from "@angular/cdk/dialog";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {GroupService} from "../group.service";
-import {MatCardContent} from "@angular/material/card";
+import {MatCardActions, MatCardContent} from "@angular/material/card";
 import {GeneralCardComponent} from "../../../common/general-card-component/general-card.component";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {SelectionInput} from "../../../common/selection-input/selection-input.component";
 import {PrivilegeModel} from "../privilege/privilege-model";
 import {PrivilegeService} from "../privilege/privilege.service";
+import {NgIf} from "@angular/common";
+import {MatButton} from "@angular/material/button";
+import {MatDialogClose} from "@angular/material/dialog";
 
 @Component({
-    imports: [MatCardContent, GeneralCardComponent, ReactiveFormsModule, MatLabel, MatFormField, MatInput, SelectionInput],
+    imports: [MatCardContent, GeneralCardComponent, ReactiveFormsModule, MatLabel, MatFormField, MatInput, SelectionInput, NgIf, MatCardActions, MatButton, MatDialogClose],
     templateUrl: './create-group-dialog.component.html',
     styleUrl: './create-group-dialog.component.scss'
 })

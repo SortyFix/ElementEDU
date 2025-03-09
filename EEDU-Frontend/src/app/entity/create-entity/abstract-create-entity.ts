@@ -24,7 +24,9 @@ export abstract class AbstractCreateEntity extends AbstractSimpleCreateEntity {
         return [this.form.value];
     }
 
-    protected get canSubmit(): boolean { return this.form.valid; }
+    protected get canSubmit(): boolean {
+        return this.form.valid;
+    }
 
     protected getForm(formBuilder: FormBuilder): FormGroup {
         return formBuilder.group({id: [null, Validators.required]});
