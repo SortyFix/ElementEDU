@@ -34,6 +34,11 @@ export class CreateCourseDialogComponent extends AbstractCreateEntity {
 
         this._userService.fetchAllReduced.subscribe((users: ReducedUserModel[]): void => {
             this._users = users;
+            const teacher: readonly ReducedUserModel[] = this.teacher;
+            if(teacher.length === 1)
+            {
+                this.form.get('teacher')?.setValue(teacher[0]);
+            }
         });
 
         this.subjects = this._subjectService.value;

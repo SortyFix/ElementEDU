@@ -18,6 +18,7 @@
 
                 <general-selection-input
                     [values]="teacher"
+                    [disabled]="teacher.length === 1"
                     formControlName="tutor"
                     label="Select Tutor"
                     placeholder="Enter the tutor you wish to set for this class">

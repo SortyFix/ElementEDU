@@ -23,6 +23,7 @@
 
                 <general-selection-input
                     [values]="teacher"
+                    [disabled]="teacher.length === 1"
                     formControlName="teacher"
                     label="Teacher">
                 </general-selection-input>

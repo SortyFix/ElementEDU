@@ -35,6 +35,7 @@
             [(ngModel)]="currentValue"
             [placeholder]="placeholder()"
             [matAutocomplete]="complete"
+            [disabled]="accessibleValues().length == 1"
             (blur)="onTouched()"
         />
     }

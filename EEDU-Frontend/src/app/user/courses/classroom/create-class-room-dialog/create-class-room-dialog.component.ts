@@ -37,7 +37,14 @@ export class CreateClassRoomDialogComponent extends AbstractCreateEntity {
     ) {
         super(service, dialogRef, formBuilder, "Create Classroom");
 
-        userService.fetchAll.subscribe((user: UserModel[]): void => { this._users = user; });
+        userService.fetchAll.subscribe((user: UserModel[]): void => {
+            this._users = user;
+            const tutor: readonly UserModel[] = this.teacher;
+            if(tutor.length === 1)
+            {
+                this.form.get('tutor')?.setValue(tutor[0]);
+            }
+        });
         this._courseService.ownCourses$.subscribe((course: CourseModel[]): void => { this._courses = course; });
     }
 
