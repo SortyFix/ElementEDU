@@ -41,23 +41,28 @@ export class AppointmentService {
     }
 
     public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
-        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status/all`;
+        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/all`;
         return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] => response.map((item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item))));
     }
 
     public fetchInsight(appointment: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status`;
+        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status`;
         return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
     }
 
     public fetchUsersInsight(appointment: bigint, user: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status/${user}`;
+        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/${user}`;
         return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
     }
 
     public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>> {
-        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}`;
+        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/submit`;
         return this._fileService.uploadFiles(url, assignmentFiles);
+    }
+
+    public deleteAssignment(appointment: bigint, assignmentFiles: string[]): Observable<void> {
+        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/delete/${assignmentFiles.toString()}`;
+        return this.http.delete<void>(url, {withCredentials: true});
     }
 
     /**

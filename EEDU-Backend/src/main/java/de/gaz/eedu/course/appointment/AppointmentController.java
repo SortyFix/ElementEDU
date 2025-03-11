@@ -49,21 +49,20 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
                 appointments,
                 course);
 
-        Set<InternalFrequentAppointmentCreateModel> internal = toInternalCreateModel(course, appointments).collect(
-                Collectors.toUnmodifiableSet());
+        Set<InternalFrequentAppointmentCreateModel> internal = toInternalCreateModel(course, appointments).collect(Collectors.toUnmodifiableSet());
         Stream<FrequentAppointmentEntity> entities = getService().createEntity(internal).stream();
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
     @PreAuthorize("hasRole('teacher')")
-    @GetMapping("/submit/assignment/{appointment}/status/all")
+    @GetMapping("/assignment/{appointment}/status/all")
     public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)
     {
         return ResponseEntity.ok(getService().getInsight(appointment).toArray(AssignmentInsightModel[]::new));
     }
 
     @PreAuthorize("hasRole('teacher')")
-    @GetMapping("/submit/assignment/{appointment}/status/{user}")
+    @GetMapping("/assignment/{appointment}/status/{user}")
     public @NotNull ResponseEntity<AssignmentInsightModel> submitStatus(@PathVariable long appointment, @PathVariable long user)
     {
         ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
@@ -71,18 +70,24 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
     }
 
     @PreAuthorize("hasRole('student')")
-    @GetMapping("/submit/assignment/{appointment}/status")
+    @GetMapping("/assignment/{appointment}/status")
     public @NotNull ResponseEntity<AssignmentInsightModel> ownSubmitStatus(@AuthenticationPrincipal long userId, @PathVariable long appointment)
     {
         ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
         return getService().getInsight(appointment, userId).map(ResponseEntity::ok).orElse(notFound);
     }
 
-    @PostMapping("/submit/assignment/{appointment}")
+    @DeleteMapping("/assignment/{appointment}/delete/{files}")
+    public @NotNull ResponseEntity<Void> deleteAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @PathVariable @NotNull String[] files)
+    {
+        return empty(getService().deleteAssignment(userId, appointment, files) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("/assignment/{appointment}/submit")
     public @NotNull ResponseEntity<Void> submitAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @NotNull @RequestPart("file") MultipartFile[] files)
     {
         getService().submitAssignment(userId, appointment, files);
-        return empty(HttpStatus.OK);
+        return empty(HttpStatus.CREATED);
     }
 
     @PostMapping("/update/standalone/{appointment}") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")

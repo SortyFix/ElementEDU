@@ -198,16 +198,23 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
 
     public void submitAssignment(long user, long assignment, @NotNull MultipartFile[] files)
     {
-        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
-        AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));
-        entry.submitAssignment(user, files);
+        getAppointmentEntry(assignment).submitAssignment(user, files);
+    }
+
+    public boolean deleteAssignment(long user, long assignment, @NotNull String[] files)
+    {
+        return getAppointmentEntry(assignment).deleteAssignment(user, files);
     }
 
     public void hasSubmitted(long user, long assignment, @NotNull MultipartFile[] files)
     {
-        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
-        AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));
-        entry.submitAssignment(user, files);
+        getAppointmentEntry(assignment).submitAssignment(user, files);
+    }
+
+    private AppointmentEntryEntity getAppointmentEntry(long id) throws EntityUnknownException
+    {
+        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(id);
+        return entryReference.orElseThrow(entityUnknown(id));
     }
 
     /**

@@ -33,6 +33,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -49,19 +53,17 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     @Setter(AccessLevel.NONE) @Id private Long id;
     private Duration duration;
     private Instant publish;
-    @Column(name = "description", length = 1000)
-    private String description;
+    @Column(name = "description", length = 1000) private String description;
 
-    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference @Cascade(CascadeType.ALL)
-    private CourseEntity course;
+    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
+    @Cascade(CascadeType.ALL) private CourseEntity course;
     @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
     private @Nullable FrequentAppointmentEntity frequentAppointment;
 
     // must be set through extra method to validate integrity
-    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE)
-    @Nullable private String assignmentDescription;
-    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE)
-    @Nullable private Instant publishAssignment, submitAssignmentUntil;
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE) @Nullable private String assignmentDescription;
+    @Getter(AccessLevel.PROTECTED) @Setter(AccessLevel.NONE) @Nullable
+    private Instant publishAssignment, submitAssignmentUntil;
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id")
     private @Nullable RoomEntity room;
@@ -80,6 +82,42 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         this.id = id;
     }
 
+    private static @NotNull File loadFileSave(@NotNull String uploadPath, @NotNull String fileName)
+    {
+        if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\"))
+        {
+            String errorMessage = String.format("Invalid file name: %s contains illegal path characters.", fileName);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
+        }
+
+        Path filePath = Paths.get(uploadPath, fileName);
+
+        try
+        {
+            Path normalizedPath = filePath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+
+            // some security is crucial
+            if (!normalizedPath.startsWith(uploadPath))
+            {
+                String errorMessage = String.format("File %s is outside the allowed directory.", fileName);
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+            }
+
+            File file = normalizedPath.toFile();
+            if (!file.exists())
+            {
+                String errorMessage = String.format("File %s does not exist.", fileName);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
+            }
+
+            return file;
+        } catch (IOException e)
+        {
+            String errorMessage = String.format("Error processing file path for %s.", fileName);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, e);
+        }
+    }
+
     public @NotNull Optional<RoomEntity> getRoom()
     {
         FrequentAppointmentEntity frequentAppointment = getFrequentAppointment();
@@ -92,8 +130,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     public @NotNull AssignmentInsightModel getInsight(@NotNull UserEntity user)
     {
-        FileEntity repository = getCourse().getRepository();
-        String uploadPath = repository.getFilePath(uploadPath(user.getId()));
+        String uploadPath = getUploadPath(user.getId());
         File file = new File(uploadPath);
         File[] files = file.listFiles();
         if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
@@ -115,8 +152,41 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        getCourse().getRepository().uploadBatch(uploadPath(user), files);
-        log.info("User {} has uploaded files to appointment entry {}", user, getId());
+        String uploadPath = getUploadPath(user);
+        File[] file = new File(uploadPath).listFiles();
+        if (file != null && (file.length + files.length) > 5)
+        {
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "The maximum amount of files exceeded.");
+        }
+
+        getCourse().getRepository().uploadBatch(uploadPath, files);
+        log.info("User {} has uploaded files to appointment entry {}.", user, getId());
+    }
+
+    public boolean deleteAssignment(long user, String @NotNull ... files)
+    {
+        String uploadPath = uploadPath(user);
+        File[] toBeDeleted = new File[files.length];
+
+        for (int i = 0; i < files.length; i++) {toBeDeleted[i] = loadFileSave(uploadPath, files[i]);}
+
+        boolean allDeleted = true;
+        for (File file : toBeDeleted)
+        {
+            if (!file.delete())
+            {
+                allDeleted = false; // If any file fails to delete, mark as false
+            }
+        }
+        log.info("User {} has deleted files from appointment entry {}.", user, getId());
+
+        return allDeleted;
+    }
+
+    private @NotNull String getUploadPath(long user)
+    {
+        FileEntity repository = getCourse().getRepository();
+        return repository.getFilePath(uploadPath(user));
     }
 
     public boolean hasSubmitted(@NotNull UserEntity user)
@@ -149,16 +219,12 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
                 getRoom().map(RoomEntity::toModel).orElse(null),
                 this.getDuration().toMillis(),
                 this.getDescription(),
-                assignment
-        );
+                assignment);
     }
 
-    @Contract(pure = true, value = "-> new")
-    @Override public String toString()
+    @Contract(pure = true, value = "-> new") @Override public String toString()
     { // Automatically generated by IntelliJ
-        return "AppointmentEntryEntity{" +
-                "id=" + id +
-                '}';
+        return "AppointmentEntryEntity{" + "id=" + id + '}';
     }
 
     @Override public boolean equals(Object o)
@@ -285,14 +351,14 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
      *                              without a null check.
      *                              Example usage:
      *                              <pre>
-     *                                                           {@code
-     *                                                           Optional<AssignmentModel> assignment = entity.getAssignment();
-     *                                                           assignment.ifPresent(a -> {
-     *                                                               System.out.println("Assignment Description: " + a.getDescription());
-     *                                                               System.out.println("Submission Deadline: " + a.getSubmitUntil());
-     *                                                           });
-     *                                                           }
-     *                                                           </pre>
+     *                                                                                        {@code
+     *                                                                                        Optional<AssignmentModel> assignment = entity.getAssignment();
+     *                                                                                        assignment.ifPresent(a -> {
+     *                                                                                            System.out.println("Assignment Description: " + a.getDescription());
+     *                                                                                            System.out.println("Submission Deadline: " + a.getSubmitUntil());
+     *                                                                                        });
+     *                                                                                        }
+     *                                                                                        </pre>
      */
     public @NotNull Optional<AssignmentModel> getAssignment()
     {
