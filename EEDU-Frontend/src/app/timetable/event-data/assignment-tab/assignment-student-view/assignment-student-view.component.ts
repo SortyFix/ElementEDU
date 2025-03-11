@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {AfterViewInit, Component, Input} from '@angular/core';
 import {AppointmentEntryModel} from "../../../../user/courses/appointment/entry/appointment-entry-model";
 import {FileUploadComponent} from "../../../../common/file-upload/file-upload.component";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
@@ -8,6 +8,7 @@ import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment-model";
 import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
+import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment-insight-model";
 
 @Component({
     selector: 'app-assignment-student-view',
@@ -25,14 +26,26 @@ import {AppointmentService} from "../../../../user/courses/appointment/appointme
     templateUrl: './assignment-student-view.component.html',
     styleUrl: './assignment-student-view.component.scss'
 })
-export class AssignmentStudentViewComponent {
+export class AssignmentStudentViewComponent implements AfterViewInit {
 
     @Input() public appointment!: AppointmentEntryModel;
     private readonly _form: FormGroup;
     private _canSubmit: boolean = false;
+    private _insight?: AssignmentInsightModel;
+
+
+    protected get insight(): AssignmentInsightModel | undefined {
+        return this._insight;
+    }
 
     public constructor(private readonly _appointmentService: AppointmentService, form: FormBuilder) {
         this._form = form.group({files: [[], Validators.required]});
+    }
+
+    public ngAfterViewInit(): void {
+        this._appointmentService.fetchInsight(this.appointment.id).subscribe((insights: AssignmentInsightModel): void => {
+            this._insight = insights;
+        });
     }
 
     protected get form(): FormGroup {

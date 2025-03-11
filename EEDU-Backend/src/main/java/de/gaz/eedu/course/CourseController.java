@@ -83,9 +83,10 @@ public class CourseController extends EntityController<Long, CourseService, Cour
         return super.fetchAll();
     }
 
-    @GetMapping("/get") @PreAuthorize("@verificationService.fullyAuthenticated()")
+    @GetMapping("/get") @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public @NotNull ResponseEntity<CourseModel[]> getOwnCourses(@AuthenticationPrincipal long user)
     {
+        log.info("Received incoming request for getting the own courses from user {}.", user);
         return getCourses(user);
     }
 
@@ -93,6 +94,7 @@ public class CourseController extends EntityController<Long, CourseService, Cour
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_GET.toString())")
     public @NotNull ResponseEntity<CourseModel[]> getCourses(@PathVariable long user)
     {
+        log.info("Received incoming request for getting courses from user {}.", user);
         return ResponseEntity.ok(getService().getCourses(user));
     }
 }

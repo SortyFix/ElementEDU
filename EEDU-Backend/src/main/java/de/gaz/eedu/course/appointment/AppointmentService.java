@@ -89,11 +89,15 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         }).orElse(Collections.emptyList());
     }
 
-    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
+    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user) throws ResponseStatusException
     {
         return getEntryRepository().findById(appointment).map(entry ->
         {
             UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(entityUnknown(user));
+            if (!entry.getCourse().isPart(userEntity))
+            {
+                throw forbiddenThrowable();
+            }
             return entry.getInsight(userEntity);
         });
     }
@@ -193,6 +197,13 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
     }
 
     public void submitAssignment(long user, long assignment, @NotNull MultipartFile[] files)
+    {
+        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
+        AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));
+        entry.submitAssignment(user, files);
+    }
+
+    public void hasSubmitted(long user, long assignment, @NotNull MultipartFile[] files)
     {
         Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
         AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));

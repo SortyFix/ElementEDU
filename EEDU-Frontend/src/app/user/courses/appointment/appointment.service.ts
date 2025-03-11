@@ -6,8 +6,7 @@ import {map, Observable, tap} from "rxjs";
 import {AppointmentCreateModel} from "./entry/appointment-create-model";
 import {AppointmentEntryModel} from "./entry/appointment-entry-model";
 import {
-    FrequentAppointmentCreateModel,
-    FrequentAppointmentCreatePacket
+    FrequentAppointmentCreateModel, FrequentAppointmentCreatePacket
 } from "./frequent/frequent-appointment-create-model";
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
@@ -23,35 +22,14 @@ export class AppointmentService {
 
     private readonly BACKEND_URL: string = `${environment.backendUrl}/course/appointment`;
 
-    constructor(
-        private readonly _http: HttpClient,
-        private readonly _courseService: CourseService,
-        private readonly _fileService: FileService
-    ) { }
-
-    public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
-        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status`;
-        return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(
-            map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] =>
-                response.map(
-                    (item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item)
-                )
-            )
-        );
-    }
+    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService, private readonly _fileService: FileService) { }
 
     public get nextAppointments(): readonly AppointmentEntryModel[] {
-        return this.courseService.value.flatMap(
-            (course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries
-        ).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort(
-            (a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime()
-        );
+        return this.courseService.value.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime());
     }
 
     public get nextAssignments(): readonly AssignmentModel[] {
-        return this.nextAppointments.filter(
-            (appointment: AppointmentEntryModel): boolean => !!appointment.assignment
-        ).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel>appointment.assignment);
+        return this.nextAppointments.filter((appointment: AppointmentEntryModel): boolean => !!appointment.assignment).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel>appointment.assignment);
     }
 
     protected get http(): HttpClient {
@@ -60,6 +38,21 @@ export class AppointmentService {
 
     protected get courseService(): CourseService {
         return this._courseService;
+    }
+
+    public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
+        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status/all`;
+        return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] => response.map((item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item))));
+    }
+
+    public fetchInsight(appointment: bigint): Observable<AssignmentInsightModel> {
+        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status`;
+        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
+    }
+
+    public fetchUsersInsight(appointment: bigint, user: bigint): Observable<AssignmentInsightModel> {
+        const url: string = `${this.BACKEND_URL}/submit/assignment/${appointment}/status/${user}`;
+        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
     }
 
     public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>> {
@@ -81,29 +74,18 @@ export class AppointmentService {
      */
     public createAppointment(course: bigint, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]> {
         const url = `${this.BACKEND_URL}/${course}/schedule/standalone`
-        return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel):
-        {
-            start: number,
-            duration: number,
-            description?: string,
-            assignment?: AppointmentCreateModel
-        } => current.toPacket), {withCredentials: true}).pipe(
-            map((response: any[]): AppointmentEntryModel[] =>
-                response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))
-            ),
-            tap({next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)})
-        );
+        return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel): {
+            start: number, duration: number, description?: string, assignment?: AppointmentCreateModel
+        } => current.toPacket), {withCredentials: true}).pipe(map((response: any[]): AppointmentEntryModel[] => response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))), tap({next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)}));
     }
 
     public updateAppointment(appointment: bigint, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel> {
         const url = `${this.BACKEND_URL}/update/standalone/${appointment}`
-        return this.http.post<any>(url, updateModel.toPacket, {withCredentials: true}).pipe(
-            map((response: any): AppointmentEntryModel => {
-                const updated: AppointmentEntryModel = AppointmentEntryModel.fromObject(response);
-                this.pushAppointment([updated])
-                return updated;
-            })
-        );
+        return this.http.post<any>(url, updateModel.toPacket, {withCredentials: true}).pipe(map((response: any): AppointmentEntryModel => {
+            const updated: AppointmentEntryModel = AppointmentEntryModel.fromObject(response);
+            this.pushAppointment([updated])
+            return updated;
+        }));
     }
 
     /**
@@ -121,21 +103,15 @@ export class AppointmentService {
     public createFrequent(course: bigint, createModel: FrequentAppointmentCreateModel[]): Observable<FrequentAppointmentModel[]> {
         const url = `${this.BACKEND_URL}/${course}/schedule/frequent`;
 
-        return this.http.post<any[]>(url,
-            createModel.map((current: FrequentAppointmentCreateModel): FrequentAppointmentCreatePacket => current.toPacket),
-            {withCredentials: true}
-        ).pipe(
-            map((response: any[]): FrequentAppointmentModel[] => {
-                return response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, (): CourseModel => {
-                    return <CourseModel>this.courseService.findCourseLazily(course);
-                }))
-            }),
-            tap({
-                next: (appointments: FrequentAppointmentModel[]): void => {
-                    this.pushFrequent(course, appointments)
-                }
-            })
-        );
+        return this.http.post<any[]>(url, createModel.map((current: FrequentAppointmentCreateModel): FrequentAppointmentCreatePacket => current.toPacket), {withCredentials: true}).pipe(map((response: any[]): FrequentAppointmentModel[] => {
+            return response.map((item: any): FrequentAppointmentModel => FrequentAppointmentModel.fromObject(item, (): CourseModel => {
+                return <CourseModel>this.courseService.findCourseLazily(course);
+            }))
+        }), tap({
+            next: (appointments: FrequentAppointmentModel[]): void => {
+                this.pushFrequent(course, appointments)
+            }
+        }));
     }
 
     private pushAppointment(objects: AppointmentEntryModel[]): void {

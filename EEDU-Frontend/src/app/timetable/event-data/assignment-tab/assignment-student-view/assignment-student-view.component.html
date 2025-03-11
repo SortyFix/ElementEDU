@@ -4,6 +4,11 @@
     <mat-icon svgIcon>assignment_turned_in</mat-icon>
 </div>
 
+<div *ngIf="insight">
+    {{ insight.submitted }}
+    {{ insight.files }}
+</div>
+
 <div *ngIf="assignment?.description">
     <mat-list>
         <mat-list-item>

@@ -19,7 +19,6 @@ import {MatCalendar} from "@angular/material/datepicker";
 import {MatDivider} from "@angular/material/divider";
 import {DateFormatter} from "./date-formatter";
 import {MatButton} from "@angular/material/button";
-import {Observable} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {CourseModel} from "../user/courses/course-model";
 import {AppointmentEntryModel} from "../user/courses/appointment/entry/appointment-entry-model";
@@ -32,30 +31,10 @@ import {AppointmentCreateModel} from "../user/courses/appointment/entry/appointm
 @Component({
     selector: 'app-timetable',
     standalone: true,
-    imports: [
-        CalendarMonthModule,
-        CalendarWeekModule,
-        CalendarDayModule,
-        CalendarModule,
-        NgIf,
-        MatList,
-        MatListItem,
-        MatListItemTitle,
-        MatListItemLine,
-        FormsModule,
-        CalendarControlsComponent,
-        MatCalendar,
-        MatDivider,
-        MatButton,
-        NgForOf,
-        ReactiveFormsModule,
-    ],
-    providers: [
-        {
-            provide: CalendarDateFormatter,
-            useClass: DateFormatter
-        }
-    ],
+    imports: [CalendarMonthModule, CalendarWeekModule, CalendarDayModule, CalendarModule, NgIf, MatList, MatListItem, MatListItemTitle, MatListItemLine, FormsModule, CalendarControlsComponent, MatCalendar, MatDivider, MatButton, NgForOf, ReactiveFormsModule,],
+    providers: [{
+        provide: CalendarDateFormatter, useClass: DateFormatter
+    }],
     templateUrl: './timetable.component.html',
     styleUrl: './timetable.component.scss'
 })
@@ -68,13 +47,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
     private readonly CALENDAR_THEME_CLASS: string = 'calendar-theme';
     private readonly _CalendarView: typeof CalendarView = CalendarView;
 
-    constructor(
-        private readonly _dialogRef: MatDialog,
-        private readonly _courseService: CourseService,
-        private readonly _appointmentService: AppointmentService,
-        private readonly _accessibilityService: AccessibilityService,
-        @Inject(DOCUMENT) private document: any,
-    ) {}
+    constructor(private readonly _dialogRef: MatDialog, private readonly _courseService: CourseService, private readonly _appointmentService: AppointmentService, private readonly _accessibilityService: AccessibilityService, @Inject(DOCUMENT) private document: any,) {}
 
     private _events: CalendarEvent[] = [];
 
@@ -160,8 +133,9 @@ export class TimetableComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         document.body.classList.add(this.CALENDAR_THEME_CLASS);
 
-        const courses: Observable<CourseModel[]> = this.courseService.value$;
-        courses.subscribe((courses: CourseModel[]): void => { this._events = this.courseEvents(courses); });
+        this.courseService.ownCourses$.subscribe((courses: CourseModel[]): void => {
+            this._events = this.courseEvents(courses);
+        });
     }
 
     /**
@@ -183,9 +157,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
 
         const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
         this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
-            start: this.selectedEvent.start,
-            room: frequentData.room,
-            duration: frequentData.duration,
+            start: this.selectedEvent.start, room: frequentData.room, duration: frequentData.duration,
         })]).subscribe((createdEvent: AppointmentEntryModel[]): void => {
             this.selectedEvent = this.events.find((current: CalendarEvent): boolean => {
                 return typeof current.id === 'number' && BigInt(current.id) === createdEvent[0].id;
@@ -201,16 +173,13 @@ export class TimetableComponent implements OnInit, OnDestroy {
         this.selectedEvent = event;
         const size: number = Math.min(1300, Math.max(this._accessibilityService.dimensions.width, 600));
         this._dialogRef.open(EventDataDialogComponent, {
-            width: `${size}px`,
-            data: {title: event.title, appointment: this.selectedEvent?.meta.eventData }
+            width: `${size}px`, data: {title: event.title, appointment: this.selectedEvent?.meta.eventData}
         });
     }
 
     protected dateToString(date: Date): string {
         return date.toLocaleDateString('de-DE', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric'
+            day: 'numeric', month: 'numeric', year: 'numeric'
         });
     }
 
@@ -227,10 +196,7 @@ export class TimetableComponent implements OnInit, OnDestroy {
      * @private
      */
     private courseEvents(courses: CourseModel[]): CalendarEvent[] {
-        return courses.flatMap(({name, appointmentEntries, frequentAppointments}: CourseModel): CalendarEvent[] => [
-            ...this.toEvents(name, frequentAppointments),
-            ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),
-        ]);
+        return courses.flatMap(({name, appointmentEntries, frequentAppointments}: CourseModel): CalendarEvent[] => [...this.toEvents(name, frequentAppointments), ...appointmentEntries.map((entity: AppointmentEntryModel): CalendarEvent => entity.asEvent(name)),]);
     }
 
     /**
