@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,18 @@ public class AssignmentController
 {
     private final AssessmentService service;
     private final AppointmentService appointmentService;
+
+    @GetMapping("/{appointment}/download/{user}")
+    public @NotNull ResponseEntity<ByteArrayResource> downloadAssignments(@PathVariable long appointment, @PathVariable long user)
+    {
+        return getAppointmentService().downloadAssignments(appointment, user);
+    }
+
+    @GetMapping("/{appointment}/download/{user}/{file}")
+    public @NotNull ResponseEntity<ByteArrayResource> downloadAssignment(@PathVariable long appointment, @PathVariable long user, @PathVariable String file)
+    {
+        return getAppointmentService().downloadAssignment(appointment, user, file);
+    }
 
     @PreAuthorize("hasRole('teacher')") @GetMapping("/{appointment}/status/all")
     public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)

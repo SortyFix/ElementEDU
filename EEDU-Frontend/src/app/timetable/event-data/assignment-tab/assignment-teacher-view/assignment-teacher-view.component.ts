@@ -1,20 +1,26 @@
 import {Component, Input, input, InputSignal} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {AppointmentEntryModel} from "../../../../user/courses/appointment/entry/appointment-entry-model";
-import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
 import {MatList, MatListItem} from "@angular/material/list";
 import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
 import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatOption, MatSelect} from "@angular/material/select";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
     imports: [
         NgIf,
-        SelectionInput,
+        MatLabel,
         MatList,
-        MatListItem
+        MatFormField,
+        MatSelect,
+        MatOption,
+        MatListItem,
+        MatIcon
     ],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
@@ -24,8 +30,6 @@ export class AssignmentTeacherViewComponent {
     private _appointment: AppointmentEntryModel | null = null;
     private _assignmentInsightModels: readonly AssignmentInsightModel[] = [];
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
-
-    private _currentInsight: AssignmentInsightModel | null = null;
 
     public constructor(private readonly _assignmentService: AssignmentService) {
     }
@@ -52,11 +56,21 @@ export class AssignmentTeacherViewComponent {
         return this.appointment!.assignment || null;
     }
 
-    protected valueUpdate(event: readonly AssignmentInsightModel[] | AssignmentInsightModel): void {
-        this._currentInsight = event as AssignmentInsightModel
+    protected toArray(value: any): readonly string[]
+    {
+        if(value instanceof AssignmentInsightModel)
+        {
+            return value.files;
+        }
+        return [];
     }
 
-    protected get currentInsight(): AssignmentInsightModel | null {
-        return this._currentInsight;
+    protected toIcon(insight: AssignmentInsightModel): 'assignment_turned_in' | 'assignment_late' | 'pending'
+    {
+        if(this.assignment?.submitUntil.getTime() && (this.assignment?.submitUntil.getTime()) < new Date().getTime())
+        {
+            return insight.submitted ? 'assignment_turned_in' : 'assignment_late';
+        }
+        return insight.submitted ? 'assignment_turned_in' : 'pending';
     }
 }

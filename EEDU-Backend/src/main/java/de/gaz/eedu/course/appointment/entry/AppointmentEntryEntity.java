@@ -132,8 +132,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     public @NotNull AssignmentInsightModel getInsight(@NotNull UserEntity user)
     {
-        String uploadPath = getUploadPath(user.getId());
-        File file = new File(uploadPath);
+        File file = new File(getUploadPath(user.getId()));
         File[] files = file.listFiles();
 
         AssessmentModel assessment = getAssessment(user).map(AssessmentEntity::toModel).orElse(null);
@@ -145,6 +144,22 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
         String[] paths = Arrays.stream(files).map(File::getName).toArray(String[]::new);
         return new AssignmentInsightModel(user.getLoginName(), true, paths, assessment);
+    }
+
+    public @NotNull File[] loadAssignmentFiles(long user)
+    {
+        return Objects.requireNonNullElse(new File(getUploadPath(user)).listFiles(), new File[0]);
+    }
+
+    public @NotNull Optional<File> loadAssignmentFile(long user, @NotNull String file)
+    {
+        File couldBe = loadFileSave(getUploadPath(user), file);
+        if(!couldBe.exists() || !couldBe.isDirectory() || !couldBe.canRead())
+        {
+            return Optional.empty();
+        }
+
+        return Optional.of(couldBe);
     }
 
     // method not allowed when submitHomework is false

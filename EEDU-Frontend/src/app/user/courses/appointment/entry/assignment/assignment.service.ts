@@ -18,6 +18,10 @@ export class AssignmentService {
         private readonly _appointmentService: AppointmentService) {
     }
 
+    public downloadAssignment(appointment: bigint, user: bigint, file: string): void {
+        //TODO
+    }
+
     public get nextAssignments(): readonly AssignmentModel[] {
         return this._appointmentService.nextAppointments.filter(
             (appointment: AppointmentEntryModel): boolean => !!appointment.assignment
