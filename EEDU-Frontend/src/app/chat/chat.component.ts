@@ -68,7 +68,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getAllChats() {
-        return this.http.get<ChatModel[]>(`http://${environment.backendUrl}/api/v1/chat/getChatList`, {
+        return this.http.get<ChatModel[]>(`${environment.backendUrl}/chat/getChatList`, {
             withCredentials: true
         }).subscribe(models => {
             this.chatList = models;
@@ -100,7 +100,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getChat(chatId: number) {
-        this.http.post<MessageModel[]>(`http://${environment.backendUrl}/api/v1/chat/get/chat`, chatId, {
+        this.http.post<MessageModel[]>(`${environment.backendUrl}/chat/get/chat`, chatId, {
             withCredentials: true
         }).subscribe(model => {
             this.currentChatHistory = model;

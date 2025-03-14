@@ -40,7 +40,7 @@ export class ChatCreationComponent {
     }
 
     private getAllUsers() {
-        this.http.get<ReducedUserModel[]>(`http://${environment.backendUrl}/api/v1/user/all/reduced`, { withCredentials: true })
+        this.http.get<ReducedUserModel[]>(`${environment.backendUrl}/user/all/reduced`, { withCredentials: true })
             .subscribe(list => {
                 this.originalUserList = [...list];
                 this.userList = list;
@@ -62,7 +62,7 @@ export class ChatCreationComponent {
 
     public createChat(userId: bigint) {
         let chatUsers = [this.userService.getUserData.id, userId]
-        return this.http.post<ChatModel>(`http://${environment.backendUrl}/api/v1/chat/create`, chatUsers, {
+        return this.http.post<ChatModel>(`${environment.backendUrl}/chat/create`, chatUsers, {
             withCredentials: true
         }).subscribe(model => {
             console.log(model);

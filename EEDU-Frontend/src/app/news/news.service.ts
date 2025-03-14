@@ -31,7 +31,7 @@ export class NewsService implements OnInit {
             pageIndex = 0;
         }
 
-        return this.http.get<PostModel[]>(`http://${environment.backendUrl}/api/v1/blog/get/list?pageNumber=${pageIndex}`, {
+        return this.http.get<PostModel[]>(`${environment.backendUrl}/blog/get/list?pageNumber=${pageIndex}`, {
             withCredentials: true
         }).pipe(
             tap((list) => {
@@ -43,14 +43,14 @@ export class NewsService implements OnInit {
 
     public getCount(): Observable<bigint>
     {
-        return this.http.get<bigint>(`http://${environment.backendUrl}/api/v1/blog/get/length`, {
+        return this.http.get<bigint>(`${environment.backendUrl}/blog/get/length`, {
             withCredentials: true
         });
     }
 
     public getArticle(id: number): Observable<PostModel>
     {
-        return this.http.get<PostModel>(`http://${environment.backendUrl}/api/v1/blog/get/${id}`, {
+        return this.http.get<PostModel>(`${environment.backendUrl}/blog/get/${id}`, {
             withCredentials: true
         });
     }

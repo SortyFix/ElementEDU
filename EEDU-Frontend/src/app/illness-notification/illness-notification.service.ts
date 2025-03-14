@@ -9,7 +9,7 @@ import {Observable, Subscription} from "rxjs";
 })
 export class IllnessNotificationService {
     protected backendUrl = environment.backendUrl;
-    protected prefix: string = `http://${this.backendUrl}/api/v1/illness/me`;
+    protected prefix: string = `${this.backendUrl}/illness/me`;
 
     constructor(public http: HttpClient) { }
 

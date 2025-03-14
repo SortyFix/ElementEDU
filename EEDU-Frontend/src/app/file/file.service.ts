@@ -17,7 +17,7 @@ interface FileResponse {
  * https://blog.angular-university.io/angular-file-upload/
  */
 export class FileService {
-    URL_PREFIX: string = `http://${environment.backendUrl}/api/v1/file`;
+    URL_PREFIX: string = `${environment.backendUrl}/file`;
 
     public selectedFiles!: File[] | null;
 

@@ -49,7 +49,7 @@ export class ArticleCreationService {
     sendPostCreationRequest(formData: FormData) {
         console.log(formData);
         this.http
-            .post<PostModel>(`http://${environment.backendUrl}/api/v1/blog/post`, formData, {
+            .post<PostModel>(`${environment.backendUrl}/blog/post`, formData, {
                 withCredentials: true
             })
             .subscribe({

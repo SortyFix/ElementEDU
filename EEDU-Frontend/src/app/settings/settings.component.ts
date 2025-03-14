@@ -34,7 +34,8 @@ import {environment} from "../../environment/environment";
         MatButton,
         FormsModule,
         MatDivider,
-        MatExpansionModule
+        MatExpansionModule,
+        FullUserListComponent
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',

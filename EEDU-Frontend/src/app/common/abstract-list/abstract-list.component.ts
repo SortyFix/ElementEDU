@@ -35,6 +35,7 @@ export interface GeneralListInfo<T> {
     selector: 'list',
     imports: [MatChipSet, MatChip, MatExpansionPanel, MatAccordion, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelHeader, MatFormField, MatInput, MatLabel, NgIf, FormsModule, NgForOf, AllCheckBoxComponent, SingleCheckBoxComponent, NgComponentOutlet, MatList, MatListItem, NgTemplateOutlet,],
     templateUrl: './abstract-list.component.html',
+    standalone: true,
     styleUrl: './abstract-list.component.scss'
 })
 export class AbstractList<T> {
