@@ -11,7 +11,10 @@ import {UserService} from "../user/user.service";
 export class NewsService implements OnInit {
     constructor(public router: Router, public http: HttpClient, public userService: UserService) {
         console.log("Getting posts...")
-        this.getPosts();
+        this.getPosts().subscribe(posts => {
+            this.articleList = posts;
+            console.log(this.articleList);
+        });
     }
 
     articleList: PostModel[] = [];

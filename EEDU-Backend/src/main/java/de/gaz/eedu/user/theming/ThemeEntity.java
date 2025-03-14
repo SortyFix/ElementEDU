@@ -24,11 +24,6 @@ import java.util.Set;
     @Column(name = "widget_color_g") private byte widgetColorG;
     @Column(name = "widget_color_b") private byte widgetColorB;
 
-    @OneToMany(mappedBy = "themeEntity", cascade = {
-            CascadeType.REFRESH,
-            CascadeType.PERSIST
-    }) @JsonBackReference private Set<UserEntity> users;
-
     @Override @Contract(pure = true) public @NotNull ThemeModel toModel()
     {
         return new ThemeModel(getId(), getName(),

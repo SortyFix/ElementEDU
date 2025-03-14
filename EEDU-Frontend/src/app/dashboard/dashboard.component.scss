@@ -62,11 +62,12 @@ body {
 }
 
 .card {
+    width: 100%;
     color: var(--text-color);
     background: var(--widget-color);
     border-radius: 8px;
     padding: 20px;
-    text-align: center;
+    text-align: left;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;

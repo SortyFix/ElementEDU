@@ -23,7 +23,6 @@ public record ThemeCreateModel(String name, byte[] backgroundColor, byte[] widge
         themeEntity.setWidgetColorG(widgetColor[1]);
         themeEntity.setWidgetColorB(widgetColor[2]);
 
-        themeEntity.setUsers(new HashSet<>());
         return themeEntity;
     }
 

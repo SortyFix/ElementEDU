@@ -1,7 +1,6 @@
 package de.gaz.eedu.livechat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.gaz.eedu.livechat.DTO.WebsocketChatEdit;
 import de.gaz.eedu.livechat.chat.ChatModel;
 import de.gaz.eedu.livechat.chat.ChatService;
 import de.gaz.eedu.livechat.message.MessageModel;
