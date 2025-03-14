@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NewsService} from "../../news/news.service";
 import {PostModel} from "../../news/post-model";
-import {Observable} from "rxjs";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 

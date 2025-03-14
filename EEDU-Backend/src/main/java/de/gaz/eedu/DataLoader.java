@@ -3,7 +3,6 @@ package de.gaz.eedu;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
-import de.gaz.eedu.user.UserStatus;
 import de.gaz.eedu.user.group.GroupEntity;
 import de.gaz.eedu.user.group.GroupService;
 import de.gaz.eedu.user.group.model.GroupCreateModel;
@@ -34,7 +33,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {

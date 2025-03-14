@@ -1,7 +1,6 @@
 package de.gaz.eedu.livechat.chat;
 
 import de.gaz.eedu.entity.model.EntityModel;
-import de.gaz.eedu.entity.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

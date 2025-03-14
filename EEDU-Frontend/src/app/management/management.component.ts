@@ -22,8 +22,6 @@ import {IllnessNotificationStatus} from "../illness-notification/illness-notific
 import {ListItemInfo} from "../common/abstract-list/abstract-list.component";
 import {CourseModel} from "../user/courses/course-model";
 import {ClassRoomModel} from "../user/courses/classroom/class-room-model";
-import {RoomModel} from "../user/courses/room/room-model";
-import {SubjectModel} from "../user/courses/subject/subject-model";
 import {EntityListComponent} from "../entity/entity-list/entity-list.component";
 import {SubjectService} from "../user/courses/subject/subject.service";
 import {RoomService} from "../user/courses/room/room.service";

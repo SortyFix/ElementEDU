@@ -1,8 +1,6 @@
 package de.gaz.eedu.user.theming;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +8,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
 
 @Setter @Getter @Entity @Table(name = "theme_entity") public class ThemeEntity implements EntityModelRelation<Long, ThemeModel>
 {

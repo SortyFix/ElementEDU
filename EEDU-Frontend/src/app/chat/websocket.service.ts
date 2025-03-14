@@ -1,9 +1,9 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Stomp} from "@stomp/stompjs";
 import {AuthenticationService} from "../user/authentication/authentication.service";
 import {UserService} from "../user/user.service";
 import {HttpClient} from "@angular/common/http";
-import {map, merge, Observable} from "rxjs";
+import {Observable} from "rxjs";
 
 @Injectable({
     providedIn: 'root'

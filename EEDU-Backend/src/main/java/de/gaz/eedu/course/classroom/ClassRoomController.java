@@ -1,6 +1,5 @@
 package de.gaz.eedu.course.classroom;
 
-import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.classroom.model.ClassRoomCreateModel;
 import de.gaz.eedu.course.classroom.model.ClassRoomModel;
 import de.gaz.eedu.course.model.CourseModel;

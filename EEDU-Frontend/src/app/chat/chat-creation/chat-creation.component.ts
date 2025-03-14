@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ReducedUserModel} from "../../user/reduced-user-model";
 import {HttpClient} from "@angular/common/http";
 import {MatListSubheaderCssMatStyler} from "@angular/material/list";

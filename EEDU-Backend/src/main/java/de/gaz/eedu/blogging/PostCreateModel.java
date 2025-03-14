@@ -1,16 +1,8 @@
 package de.gaz.eedu.blogging;
 
 import de.gaz.eedu.entity.model.CreationModel;
-import de.gaz.eedu.file.FileCreateModel;
-import jakarta.validation.constraints.Null;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
-
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public record PostCreateModel(@NotNull String author, @NotNull String title, @Nullable String thumbnailURL, @NotNull String body,
                               @NotNull String[] editPrivileges, @NotNull String[] tags) implements CreationModel<Long, PostEntity>
