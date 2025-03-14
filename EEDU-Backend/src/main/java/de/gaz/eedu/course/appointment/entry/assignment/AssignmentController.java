@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@RestController
 @RequestMapping("/api/v1/course/appointment/assignment")
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)

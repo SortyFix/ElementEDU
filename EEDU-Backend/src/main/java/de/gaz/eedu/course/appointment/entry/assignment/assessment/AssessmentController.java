@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@RestController
 @RequestMapping("/api/v1/course/appointment/assignment/assessment")
 @RequiredArgsConstructor @Getter(AccessLevel.PROTECTED)
 public class AssessmentController extends EntityController<Long, AssessmentService, AssessmentModel, AssessmentCreateModel>

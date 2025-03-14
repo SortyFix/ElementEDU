@@ -165,7 +165,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
             throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "The maximum amount of files exceeded.");
         }
 
-        getCourse().getRepository().uploadBatch(uploadPath, files);
+        getCourse().getRepository().uploadBatch(uploadPath(user), files);
         log.info("User {} has uploaded files to appointment entry {}.", user, getId());
     }
 
@@ -208,7 +208,8 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
             return false;
         }
 
-        return new File(getCourse().getRepository().getFilePath(uploadPath(user.getId()))).exists();
+        File file = new File(getUploadPath(user.getId()));
+        return file.exists() && file.isDirectory();
     }
 
     private @NotNull String uploadPath(long user)

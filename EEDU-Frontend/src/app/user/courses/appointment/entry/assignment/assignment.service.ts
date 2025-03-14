@@ -13,7 +13,6 @@ import {environment} from "../../../../../../environment/environment";
 })
 export class AssignmentService {
 
-
     public constructor(private readonly _http: HttpClient,
         private readonly _fileService: FileService,
         private readonly _appointmentService: AppointmentService) {
@@ -56,7 +55,7 @@ export class AssignmentService {
 
     private get BACKEND_URL(): string
     {
-        return `${environment.backendUrl}/course/appointment`;
+        return `${environment.backendUrl}/course/appointment/assignment`;
     }
 
     private get http(): HttpClient {
