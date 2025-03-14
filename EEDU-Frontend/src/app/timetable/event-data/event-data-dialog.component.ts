@@ -10,8 +10,6 @@ import {MatGridList, MatGridTile} from "@angular/material/grid-list";
 import {MatButton} from "@angular/material/button";
 import {MatFormField, MatHint} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
-import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment-create-model";
 import {AssignmentTabComponent} from "./assignment-tab/assignment-tab.component";
 import {
     DateTimePickerComponent
@@ -28,6 +26,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {CourseService} from "../../user/courses/course.service";
 import {CourseModel} from "../../user/courses/course-model";
 import {GeneralCardComponent} from "../../common/general-card-component/general-card.component";
+import {AssignmentModel} from "../../user/courses/appointment/entry/assignment/assignment-model";
+import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry/assignment/assignment-create-model";
 
 @Component({
     standalone: true,

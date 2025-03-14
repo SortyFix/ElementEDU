@@ -28,6 +28,7 @@ public enum SystemPrivileges
     COURSE_CREATE,
     COURSE_ATTACH_USER,
     COURSE_DETACH_USER,
+    COURSE_ALTER_SUBJECT,
     COURSE_DELETE,
     COURSE_GET,
 

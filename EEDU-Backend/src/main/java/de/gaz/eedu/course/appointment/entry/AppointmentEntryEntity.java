@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.AppointmentService;
+import de.gaz.eedu.course.appointment.entry.assignment.assessment.AssessmentEntity;
+import de.gaz.eedu.course.appointment.entry.assignment.assessment.model.AssessmentModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentInsightModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentInsightModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
@@ -20,8 +22,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,9 +39,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 
 @Slf4j
 @Entity
@@ -55,8 +54,8 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     private Instant publish;
     @Column(name = "description", length = 1000) private String description;
 
-    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
-    @Cascade(CascadeType.ALL) private CourseEntity course;
+    @ManyToOne(cascade = CascadeType.ALL) @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
+    private CourseEntity course;
     @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
     private @Nullable FrequentAppointmentEntity frequentAppointment;
 
@@ -67,6 +66,9 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id")
     private @Nullable RoomEntity room;
+
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL) @JsonBackReference
+    private final Set<AssessmentEntity> assessments = new HashSet<>();
 
     /**
      * This constructor creates a new instance of this entity.
@@ -133,18 +135,22 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         String uploadPath = getUploadPath(user.getId());
         File file = new File(uploadPath);
         File[] files = file.listFiles();
+
+        AssessmentModel assessment = getAssessment(user).map(AssessmentEntity::toModel).orElse(null);
+
         if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
         {
-            return new AssignmentInsightModel(user.getLoginName(), false, new String[0]);
+            return new AssignmentInsightModel(user.getLoginName(), false, new String[0], assessment);
         }
 
         String[] paths = Arrays.stream(files).map(File::getName).toArray(String[]::new);
-        return new AssignmentInsightModel(user.getLoginName(), true, paths);
+        return new AssignmentInsightModel(user.getLoginName(), true, paths, assessment);
     }
 
     // method not allowed when submitHomework is false
     // bad gateway when any file is malicious
     // bad request when
+
     public void submitAssignment(long user, @NotNull MultipartFile... files) throws ResponseStatusException
     {
         if (!this.isAssignmentValid())
@@ -181,6 +187,12 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         log.info("User {} has deleted files from appointment entry {}.", user, getId());
 
         return allDeleted;
+    }
+
+    private @NotNull Optional<AssessmentEntity> getAssessment(@NotNull UserEntity user)
+    {
+        Predicate<AssessmentEntity> userEquals = current -> Objects.equals(user, current.getUser());
+        return getAssessments().stream().filter(userEquals).findFirst();
     }
 
     private @NotNull String getUploadPath(long user)

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environment/environment";
 import {CourseService} from "../course.service";
 import {map, Observable, tap} from "rxjs";
@@ -11,9 +11,6 @@ import {
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
-import {FileService} from "../../../file/file.service";
-import {AssignmentModel} from "./entry/assignment-model";
-import {AssignmentInsightModel, GenericAssignmentInsightModel} from "./entry/assignment-insight-model";
 
 @Injectable({
     providedIn: 'root'
@@ -22,14 +19,10 @@ export class AppointmentService {
 
     private readonly BACKEND_URL: string = `${environment.backendUrl}/course/appointment`;
 
-    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService, private readonly _fileService: FileService) { }
+    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService) { }
 
     public get nextAppointments(): readonly AppointmentEntryModel[] {
         return this.courseService.value.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime());
-    }
-
-    public get nextAssignments(): readonly AssignmentModel[] {
-        return this.nextAppointments.filter((appointment: AppointmentEntryModel): boolean => !!appointment.assignment).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel>appointment.assignment);
     }
 
     protected get http(): HttpClient {
@@ -38,31 +31,6 @@ export class AppointmentService {
 
     protected get courseService(): CourseService {
         return this._courseService;
-    }
-
-    public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/all`;
-        return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] => response.map((item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item))));
-    }
-
-    public fetchInsight(appointment: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status`;
-        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
-    }
-
-    public fetchUsersInsight(appointment: bigint, user: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/${user}`;
-        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
-    }
-
-    public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/submit`;
-        return this._fileService.uploadFiles(url, assignmentFiles);
-    }
-
-    public deleteAssignment(appointment: bigint, assignmentFiles: string[]): Observable<void> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/delete/${assignmentFiles.toString()}`;
-        return this.http.delete<void>(url, {withCredentials: true});
     }
 
     /**

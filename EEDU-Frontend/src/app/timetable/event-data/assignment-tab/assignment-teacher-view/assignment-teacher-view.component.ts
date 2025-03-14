@@ -1,11 +1,11 @@
 import {Component, Input, input, InputSignal} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {AppointmentEntryModel} from "../../../../user/courses/appointment/entry/appointment-entry-model";
-import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment-model";
 import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
-import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
-import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment-insight-model";
 import {MatList, MatListItem} from "@angular/material/list";
+import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
+import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
+import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
 
 @Component({
     selector: 'app-assignment-teacher-view',
@@ -27,15 +27,14 @@ export class AssignmentTeacherViewComponent {
 
     private _currentInsight: AssignmentInsightModel | null = null;
 
-
-    public constructor(private readonly _appointmentService: AppointmentService) {
+    public constructor(private readonly _assignmentService: AssignmentService) {
     }
 
     @Input()
     public set appointment(appointment: AppointmentEntryModel)
     {
         this._appointment = appointment;
-        this._appointmentService.fetchInsights(appointment.id).subscribe((response: AssignmentInsightModel[]): void =>
+        this._assignmentService.fetchInsights(appointment.id).subscribe((response: AssignmentInsightModel[]): void =>
         {
             this._assignmentInsightModels = response;
         })

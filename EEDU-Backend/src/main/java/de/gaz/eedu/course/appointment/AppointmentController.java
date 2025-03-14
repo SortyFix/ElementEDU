@@ -3,7 +3,6 @@ package de.gaz.eedu.course.appointment;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentInsightModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -17,9 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -54,42 +51,6 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
-    @PreAuthorize("hasRole('teacher')")
-    @GetMapping("/assignment/{appointment}/status/all")
-    public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)
-    {
-        return ResponseEntity.ok(getService().getInsight(appointment).toArray(AssignmentInsightModel[]::new));
-    }
-
-    @PreAuthorize("hasRole('teacher')")
-    @GetMapping("/assignment/{appointment}/status/{user}")
-    public @NotNull ResponseEntity<AssignmentInsightModel> submitStatus(@PathVariable long appointment, @PathVariable long user)
-    {
-        ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
-        return getService().getInsight(appointment, user).map(ResponseEntity::ok).orElse(notFound);
-    }
-
-    @PreAuthorize("hasRole('student')")
-    @GetMapping("/assignment/{appointment}/status")
-    public @NotNull ResponseEntity<AssignmentInsightModel> ownSubmitStatus(@AuthenticationPrincipal long userId, @PathVariable long appointment)
-    {
-        ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
-        return getService().getInsight(appointment, userId).map(ResponseEntity::ok).orElse(notFound);
-    }
-
-    @DeleteMapping("/assignment/{appointment}/delete/{files}")
-    public @NotNull ResponseEntity<Void> deleteAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @PathVariable @NotNull String[] files)
-    {
-        return empty(getService().deleteAssignment(userId, appointment, files) ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @PostMapping("/assignment/{appointment}/submit")
-    public @NotNull ResponseEntity<Void> submitAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @NotNull @RequestPart("file") MultipartFile[] files)
-    {
-        getService().submitAssignment(userId, appointment, files);
-        return empty(HttpStatus.CREATED);
-    }
-
     @PostMapping("/update/standalone/{appointment}") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
     public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
     {
@@ -102,7 +63,7 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
     {
         log.info("Received incoming request for unscheduling frequent appointment(s) {} from course {}.", appointments, course);
         boolean modified = getService().unscheduleFrequent(course, appointments);
-        return empty(modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
+        return empty(modified ? HttpStatus.OK : HttpStatus.CONFLICT);
     }
 
     @PostMapping("/{course}/schedule/standalone") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")

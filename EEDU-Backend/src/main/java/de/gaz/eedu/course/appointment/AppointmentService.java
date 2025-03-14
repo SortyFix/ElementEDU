@@ -4,6 +4,8 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseRepository;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentInsightModel;
 import de.gaz.eedu.course.appointment.entry.model.*;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentRepository;

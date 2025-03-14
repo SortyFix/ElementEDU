@@ -1,14 +1,14 @@
 import {CalendarEvent} from "angular-calendar";
-import {AssignmentModel, GenericAssignment} from "./assignment-model";
 import {GenericRoom, RoomModel} from "../../room/room-model";
+import {AssignmentModel, GenericAssignment} from "./assignment/assignment-model";
 
 export interface GenericAppointmentEntry {
     id: bigint,
     duration: number,
     description: string,
     attachedScheduled: bigint,
-    room: GenericRoom,
-    assignment: GenericAssignment
+    room?: GenericRoom,
+    assignment?: GenericAssignment
 }
 
 export class AppointmentEntryModel {

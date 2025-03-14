@@ -19,7 +19,8 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
         private readonly _http: HttpClient,
         private readonly _location: string,
         private readonly _defaultRequiredPrivileges: DefaultRequiredPrivileges,
-        private readonly _createDialog: ComponentType<AbstractSimpleCreateEntity>) {}
+        private readonly _createDialog: ComponentType<AbstractSimpleCreateEntity>
+    ) {}
 
 
     private _fetched: boolean = false

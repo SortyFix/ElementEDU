@@ -23,7 +23,9 @@ export class CreateGroupDialogComponent extends AbstractCreateEntity {
 
     public constructor(service: GroupService, dialogRef: DialogRef, formBuilder: FormBuilder, private readonly _privilegeService: PrivilegeService) {
         super(service, dialogRef, formBuilder, "Create Group");
-        this._privilegeService.value$.subscribe((value: PrivilegeModel[]): void => {this._privileges = value; });
+        this._privilegeService.value$.subscribe((value: PrivilegeModel[]): void => {
+            this._privileges = value;
+        });
     }
 
     private _privileges: readonly PrivilegeModel[] = [];
@@ -37,12 +39,13 @@ export class CreateGroupDialogComponent extends AbstractCreateEntity {
     }
 
     protected override get loading(): boolean {
-        return this._privilegeService.fetched;
+        return !this._privilegeService.fetched;
     }
 
     protected override getForm(formBuilder: FormBuilder): FormGroup {
         return formBuilder.group({
-            id: [null, Validators.required], privileges: [[]]
+            id: [null, Validators.required],
+            privileges: [[]]
         });
     }
 }
