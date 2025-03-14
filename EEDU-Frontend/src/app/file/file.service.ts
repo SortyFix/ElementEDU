@@ -2,6 +2,7 @@ import {HttpClient, HttpEvent} from "@angular/common/http";
 import {FileModel} from "./file-model";
 import {Observable} from "rxjs";
 import {Injectable} from '@angular/core';
+import {environment} from "../../environment/environment";
 
 interface FileResponse {
     blob: Uint8Array;
@@ -16,20 +17,11 @@ interface FileResponse {
  * https://blog.angular-university.io/angular-file-upload/
  */
 export class FileService {
-    URL_PREFIX: string = "http://localhost:8080/api/v1/file";
+    URL_PREFIX: string = `http://${environment.backendUrl}/api/v1/file`;
 
     public selectedFiles!: File[] | null;
 
     constructor(private http: HttpClient) { }
-
-    public uploadImageToPost()
-    {
-        this.uploadSelection("http://localhost:8080/api/v1/blog/post");
-    }
-
-    public testDownload(): void {
-        this.downloadFile(BigInt(1));
-    }
 
     // ------------------------------ UPLOAD -----------------------------------
     public uploadSelection(url: string, additionalData?: { [key: string]: any }): void {

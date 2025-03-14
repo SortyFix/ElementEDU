@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {PostCreateModel} from "./post-create-model";
 import {PostModel} from "../post-model";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../environment/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,7 @@ export class ArticleCreationService {
     sendPostCreationRequest(formData: FormData) {
         console.log(formData);
         this.http
-            .post<PostModel>('http://localhost:8080/api/v1/blog/post', formData, {
+            .post<PostModel>(`http://${environment.backendUrl}/api/v1/blog/post`, formData, {
                 withCredentials: true
             })
             .subscribe({

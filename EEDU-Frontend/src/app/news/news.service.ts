@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {Observable, tap} from "rxjs";
 import {UserService} from "../user/user.service";
+import {environment} from "../../environment/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class NewsService implements OnInit {
             pageIndex = 0;
         }
 
-        return this.http.get<PostModel[]>(`http://localhost:8080/api/v1/blog/get/list?pageNumber=${pageIndex}`, {
+        return this.http.get<PostModel[]>(`http://${environment.backendUrl}/api/v1/blog/get/list?pageNumber=${pageIndex}`, {
             withCredentials: true
         }).pipe(
             tap((list) => {
@@ -42,14 +43,14 @@ export class NewsService implements OnInit {
 
     public getCount(): Observable<bigint>
     {
-        return this.http.get<bigint>('http://localhost:8080/api/v1/blog/get/length', {
+        return this.http.get<bigint>(`http://${environment.backendUrl}/api/v1/blog/get/length`, {
             withCredentials: true
         });
     }
 
     public getArticle(id: number): Observable<PostModel>
     {
-        return this.http.get<PostModel>(`http://localhost:8080/api/v1/blog/get/${id}`, {
+        return this.http.get<PostModel>(`http://${environment.backendUrl}/api/v1/blog/get/${id}`, {
             withCredentials: true
         });
     }

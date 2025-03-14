@@ -17,6 +17,7 @@ import {
     MatExpansionModule,
 } from "@angular/material/expansion";
 import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-list.component";
+import {environment} from "../../environment/environment";
 
 @Component({
     selector: 'app-settings',
@@ -33,8 +34,7 @@ import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-
         MatButton,
         FormsModule,
         MatDivider,
-        MatExpansionModule,
-        FullUserListComponent
+        MatExpansionModule
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
@@ -130,7 +130,7 @@ export class SettingsComponent implements OnInit {
      * @returns Observable<ThemeEntity> carrying the full newly selected theme.
      */
     public setTheme(themeId: bigint): Observable<ThemeModel> {
-        const url: string = `http://localhost:8080/${this.THEME_URL}/me/theme/set`;
+        const url: string = `http://${environment.backendUrl}/${this.THEME_URL}/me/theme/set`;
         return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         }).pipe(map(model => {
@@ -148,7 +148,7 @@ export class SettingsComponent implements OnInit {
      *          id, name format.
      */
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
-        const url: string = `http://localhost:8080/${this.THEME_URL}/theme/all`;
+        const url: string = `http://${environment.backendUrl}/${this.THEME_URL}/theme/all`;
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
     }
 

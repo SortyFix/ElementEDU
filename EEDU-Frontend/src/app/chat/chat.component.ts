@@ -18,6 +18,7 @@ import {
     MatDrawer,
     MatDrawerContainer,
 } from "@angular/material/sidenav";
+import {environment} from "../../environment/environment";
 
 @Component({
   selector: 'app-chat',
@@ -67,7 +68,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getAllChats() {
-        return this.http.get<ChatModel[]>("http://localhost:8080/api/v1/chat/getChatList", {
+        return this.http.get<ChatModel[]>(`http://${environment.backendUrl}/api/v1/chat/getChatList`, {
             withCredentials: true
         }).subscribe(models => {
             this.chatList = models;
@@ -99,7 +100,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getChat(chatId: number) {
-        this.http.post<MessageModel[]>("http://localhost:8080/api/v1/chat/get/chat", chatId, {
+        this.http.post<MessageModel[]>(`http://${environment.backendUrl}/api/v1/chat/get/chat`, chatId, {
             withCredentials: true
         }).subscribe(model => {
             this.currentChatHistory = model;

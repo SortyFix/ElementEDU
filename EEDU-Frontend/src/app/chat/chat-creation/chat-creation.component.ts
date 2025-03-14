@@ -11,6 +11,7 @@ import {NgForOf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {UserService} from "../../user/user.service";
 import {ChatModel} from "../models/chat-model";
+import {environment} from "../../../environment/environment";
 
 @Component({
   selector: 'app-chat-creation',
@@ -39,7 +40,7 @@ export class ChatCreationComponent {
     }
 
     private getAllUsers() {
-        this.http.get<ReducedUserModel[]>("http://localhost:8080/api/v1/user/all/reduced", { withCredentials: true })
+        this.http.get<ReducedUserModel[]>(`http://${environment.backendUrl}/api/v1/user/all/reduced`, { withCredentials: true })
             .subscribe(list => {
                 this.originalUserList = [...list];
                 this.userList = list;
@@ -61,7 +62,7 @@ export class ChatCreationComponent {
 
     public createChat(userId: bigint) {
         let chatUsers = [this.userService.getUserData.id, userId]
-        return this.http.post<ChatModel>("http://localhost:8080/api/v1/chat/create", chatUsers, {
+        return this.http.post<ChatModel>(`http://${environment.backendUrl}/api/v1/chat/create`, chatUsers, {
             withCredentials: true
         }).subscribe(model => {
             console.log(model);
