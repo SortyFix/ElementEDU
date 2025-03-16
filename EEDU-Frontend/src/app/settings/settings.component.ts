@@ -51,8 +51,6 @@ export class SettingsComponent implements OnInit {
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
     public feedbackText = "";
 
-    public THEME_URL: string = "api/v1/user";
-
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
         this.themeForm.valueChanges.subscribe((selectedTheme) => {
@@ -131,7 +129,7 @@ export class SettingsComponent implements OnInit {
      * @returns Observable<ThemeEntity> carrying the full newly selected theme.
      */
     public setTheme(themeId: bigint): Observable<ThemeModel> {
-        const url: string = `http://${environment.backendUrl}/${this.THEME_URL}/me/theme/set`;
+        const url: string = `${environment.backendUrl}/user/me/theme/set`;
         return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         }).pipe(map(model => {
@@ -149,7 +147,7 @@ export class SettingsComponent implements OnInit {
      *          id, name format.
      */
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
-        const url: string = `http://${environment.backendUrl}/${this.THEME_URL}/theme/all`;
+        const url: string = `${environment.backendUrl}/user/theme/all`;
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
     }
 

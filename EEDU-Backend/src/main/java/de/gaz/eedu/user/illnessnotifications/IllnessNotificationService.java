@@ -65,7 +65,7 @@ import java.util.Set;
 
         FileEntity fileEntity = fileService.createEntity(new FileCreateModel(
                 "illness_notifications",
-                new String[] { "Management", "ADMINISTRATOR" },
+                new String[] { "Management", "ADMINISTRATOR", "ROLE_administrator", "USER_CREATE" },
                 new String[] { "illness_notification" }));
 
         try
