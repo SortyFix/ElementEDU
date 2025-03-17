@@ -81,9 +81,9 @@ export class FileService {
     }
 
     // ------------------------------ DOWNLOAD -----------------------------------
-    public async fetchFile(id: bigint, index?: number): Promise<FileResponse> {
+    public async fetchFile(id: bigint, identifier?: number | string): Promise<FileResponse> {
         console.log("Fetching file binaries...");
-        const url: string = index == null ? `${(this.URL_PREFIX)}/get/${id}` : `${(this.URL_PREFIX)}/get/${id}/${index}`
+        const url: string = identifier == null ? `${(this.URL_PREFIX)}/get/${id}` : `${(this.URL_PREFIX)}/get/${id}/${identifier}`
         const response: Response = await fetch(url, {
             method: 'GET',
             headers: {

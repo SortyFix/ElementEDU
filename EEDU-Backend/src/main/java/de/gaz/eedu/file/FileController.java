@@ -83,4 +83,16 @@ import java.util.function.Function;
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
+
+    @PreAuthorize("@verificationService.isFullyAuthenticated()") @GetMapping("/get/{fileId}/{fileName}") public ResponseEntity<ByteArrayResource> downloadFileWithName(
+            @AuthenticationPrincipal Long userId, @PathVariable Long fileId, @PathVariable String fileName) throws IOException
+    {
+        Function<FileEntity, Boolean> access = file -> file.hasAccess(userService.loadEntityByIDSafe(userId));
+        if (fileService.getRepository().findById(fileId).map(access).orElse(false))
+        {
+            return fileService.loadResourceByIdAndName(fileId, fileName);
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
 }

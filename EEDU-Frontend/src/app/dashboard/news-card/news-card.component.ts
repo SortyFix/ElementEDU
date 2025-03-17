@@ -5,8 +5,8 @@ import {NgForOf, NgIf} from "@angular/common";
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
 
 @Component({
-  selector: 'app-news-card',
-  standalone: true,
+    selector: 'app-news-card',
+    standalone: true,
     imports: [
         NgForOf,
         NgIf,
@@ -16,8 +16,8 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} f
         MatCardTitle,
         MatCardSubtitle
     ],
-  templateUrl: './news-card.component.html',
-  styleUrl: './news-card.component.scss'
+    templateUrl: './news-card.component.html',
+    styleUrl: './news-card.component.scss'
 })
 export class NewsCardComponent implements OnInit {
 
