@@ -4,6 +4,10 @@
 
 <ng-container *ngIf="!editing() && assignment?.description">
 
+    <p>
+        {{ assignment?.description }}
+    </p>
+
     <mat-form-field>
         <mat-label>Current User</mat-label>
         <mat-select #select>
@@ -17,34 +21,42 @@
     </mat-form-field>
 
     <ng-container *ngIf="select.value != null">
-        <div style="display: flex; gap: 4px">
-            <p>
-                {{ assignment?.description }}
-            </p>
-            <mat-divider *ngIf="select.value.submitted" [vertical]="true"></mat-divider>
-            <ul>
-                @for (file of toArray(select.value); track file) {
-                    <li>{{ file }}</li>
-                }
-            </ul>
-        </div>
 
-        <div *ngIf="select.value.submitted" style="display: flex; gap: 4px">
-            <mat-form-field appearance="outline" style="flex: 1">
-                <mat-label>Grade</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    step="0.1"
-                    min="1"
-                    max="6"
-                    required
-                />
-            </mat-form-field>
-            <mat-form-field style="flex: 3">
-                <mat-label>Feedback</mat-label>
-                <textarea matInput placeholder="Enter the feedback you would wish to share with the student"></textarea>
-            </mat-form-field>
+
+        <div *ngIf="select.value.submitted">
+            <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
+
+                <ul>
+                    @for (file of toArray(select.value); track file) {
+                        <li>{{ file }}</li>
+                    }
+                </ul>
+                <mat-form-field>
+                    <mat-label>Feedback</mat-label>
+                    <textarea
+                        matInput
+                        formControlName="feedback"
+                        placeholder="Enter the feedback you would wish to share with the student">
+                    </textarea>
+                </mat-form-field>
+                <div style="display: flex; justify-content: space-between">
+                    <div>
+                        <mat-checkbox #grade>
+                            Give Grade
+                        </mat-checkbox>
+                        <div *ngIf="grade.checked">
+                            <mat-slider  min="1" max="6" step="0.1">
+                                <input matSliderThumb value="3" formControlName="grade" #slider >
+                            </mat-slider>
+                            <span>{{ slider.value }}</span>
+                        </div>
+
+                    </div>
+
+                    <button mat-button color="primary" type="submit">Assess</button>
+                </div>
+
+            </form>
         </div>
     </ng-container>
 

@@ -9,12 +9,16 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {MatDivider} from "@angular/material/divider";
+import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {AssessmentService} from "../../../../user/courses/appointment/entry/assignment/assessment/assessment.service";
+import {UserService} from "../../../../user/user.service";
+import {MatSlider, MatSliderThumb} from "@angular/material/slider";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
-    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, MatDivider,],
+    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, MatSlider, MatSliderThumb, MatCheckbox,],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
 })
@@ -24,7 +28,31 @@ export class AssignmentTeacherViewComponent {
     private _assignmentInsightModels: readonly AssignmentInsightModel[] = [];
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
 
-    public constructor(private readonly _assignmentService: AssignmentService) {
+    private readonly _assessForm: FormGroup;
+
+    public constructor(
+        private readonly _assignmentService: AssignmentService,
+        private readonly _assessmentService: AssessmentService,
+        private readonly _userService: UserService,
+        formBuilder: FormBuilder) {
+        this._assessForm = formBuilder.group({
+            grade: [null],
+            feedback: [null]
+        })
+    }
+
+    protected get assessForm(): FormGroup {
+        return this._assessForm;
+    }
+
+    protected onAssess(): void
+    {
+        this._assessmentService.assess([{
+            appointment: Number(this.appointment?.id),
+            user: Number(this._userService.getUserData.id),
+            feedback: this.assessForm.get('feedback')?.value,
+            grade: this.assessForm.get('grade')?.value
+        }]).subscribe();
     }
 
     public get appointment(): AppointmentEntryModel | null {
