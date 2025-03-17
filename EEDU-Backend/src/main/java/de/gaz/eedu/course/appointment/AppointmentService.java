@@ -120,9 +120,8 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
         if (entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
         {
-            entity.setRoom(
-                    Objects.isNull(updateModel.room()) ? null :
-                            roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
+            entity.setRoom(Objects.isNull(updateModel.room()) ? null :
+                    roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
             );
         }
 

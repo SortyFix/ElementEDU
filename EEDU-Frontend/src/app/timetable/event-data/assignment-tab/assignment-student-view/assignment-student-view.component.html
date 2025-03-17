@@ -6,10 +6,15 @@
 
 <div *ngIf="insight">
     {{ insight.submitted }}
-    {{ insight.files }}
+    <mat-tree>
+        <mat-tree-node *ngFor="let file of insight.files; let i = index">
+            <mat-icon>description</mat-icon>
+            {{ file }}
+        </mat-tree-node>
+    </mat-tree>
 </div>
 
-<div *ngIf="assignment?.description">
+<div *ngIf="assignment?.description && (insight?.files?.length || 0) < 5" >
     <mat-list>
         <mat-list-item>
             <span matListItemTitle>Deadline:</span>
@@ -17,7 +22,7 @@
         </mat-list-item>
     </mat-list>
 
-    <form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" >
         <app-file-upload formControlName="files" (filesSelected)="onFileSelected($event)"></app-file-upload>
         <div *ngIf="canSubmit">
             <button mat-flat-button type="submit">Submit Homework</button>

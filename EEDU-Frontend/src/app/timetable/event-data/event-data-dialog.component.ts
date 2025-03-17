@@ -18,9 +18,7 @@ import {EventTileContentComponent} from "./event-tile-content/event-tile-content
 import {RoomTabComponent} from "./room-tab/room-tab.component";
 import {SelectionInput} from "../../common/selection-input/selection-input.component";
 import {
-    MAT_DIALOG_DATA,
-    MatDialogActions,
-    MatDialogContent,
+    MAT_DIALOG_DATA, MatDialogActions, MatDialogContent,
 } from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {CourseService} from "../../user/courses/course.service";
@@ -31,24 +29,7 @@ import {GenericAssignmentCreateModel} from "../../user/courses/appointment/entry
 
 @Component({
     standalone: true,
-    imports: [
-        ReactiveFormsModule,
-        NgIf,
-        MatHint,
-        MatGridList,
-        MatGridTile,
-        MatFormField,
-        MatInput,
-        MatButton,
-        AssignmentTabComponent,
-        DateTimePickerComponent,
-        EventTileContentComponent,
-        RoomTabComponent,
-        SelectionInput,
-        MatDialogContent,
-        MatDialogActions,
-        GeneralCardComponent
-    ],
+    imports: [ReactiveFormsModule, NgIf, MatHint, MatGridList, MatGridTile, MatFormField, MatInput, MatButton, AssignmentTabComponent, DateTimePickerComponent, EventTileContentComponent, RoomTabComponent, SelectionInput, MatDialogContent, MatDialogActions, GeneralCardComponent],
     templateUrl: './event-data-dialog.component.html',
     styleUrl: './event-data-dialog.component.scss'
 })
@@ -58,14 +39,10 @@ export class EventDataDialogComponent {
     private readonly _form: FormGroup;
     private readonly _rooms: RoomModel[] = [];
 
-    public constructor(
-        formBuilder: FormBuilder,
-        roomService: RoomService,
-        @Inject(MAT_DIALOG_DATA) data: { title: string, appointment: AppointmentEntryModel },
-        private readonly _appointmentService: AppointmentService,
-        private readonly _courseService: CourseService,
-        private readonly _matSnackBar: MatSnackBar,
-    ) {
+    public constructor(formBuilder: FormBuilder, roomService: RoomService, @Inject(MAT_DIALOG_DATA) data: {
+        title: string,
+        appointment: AppointmentEntryModel
+    }, private readonly _appointmentService: AppointmentService, private readonly _courseService: CourseService, private readonly _matSnackBar: MatSnackBar,) {
         roomService.value$.subscribe((rooms: RoomModel[]): void => {
             this._rooms.length = 0;
             this._rooms.push(...rooms);
@@ -76,18 +53,10 @@ export class EventDataDialogComponent {
         console.log(data.appointment)
 
         this._form = formBuilder.group({
-            description: [null],
-            room: [null],
-            assignment: [null],
-            publish: [null],
-            submitUntil: [null]
+            description: [null], room: [null], assignment: [null], publish: [null], submitUntil: [null]
         });
 
         this.appointment = data.appointment;
-    }
-
-    protected get course(): CourseModel {
-        return this._courseService.findCourseLazily(this.event.course) as CourseModel; // expect the course to exist
     }
 
     @Input() public set appointment(value: AppointmentEntryModel) {
@@ -107,15 +76,17 @@ export class EventDataDialogComponent {
         // Default values when creating a new assignment
         this.form.get('publish')?.setValue(new Date());
 
-        // TODO also include frequent appointments
         const appointments: readonly AppointmentEntryModel[] = this._appointmentService.nextAppointments;
         let start: Date = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7));
-        if(appointments.length !== 0)
-        {
+        if (appointments.length !== 0) {
             start = appointments[0].start;
         }
 
         this.form.get('submitUntil')?.setValue(start);
+    }
+
+    protected get course(): CourseModel {
+        return this._courseService.findCourseLazily(this.event.course) as CourseModel; // expect the course to exist
     }
 
     protected get title(): string {
@@ -140,18 +111,10 @@ export class EventDataDialogComponent {
         return this._form;
     }
 
-    protected get assignmentModel(): AssignmentModel {
-        return AssignmentModel.fromObject({
-            description: this.form.get('assignment')?.value,
-            publish: this.form.get('publish')?.value,
-            submitUntil: this.form.get('submitUntil')?.value
-        });
-    }
-
     private get assignmentCreateModel(): GenericAssignmentCreateModel {
+        // if the 'assignment' field is undefined, these field below will be ignored
         return {
             description: this.form.get("assignment")?.value,
-            // if the 'assignment' field is undefined, these will be ignored
             publish: (this.form.get('publish')?.value as Date),
             submitUntil: (this.form.get('submitUntil')?.value as Date)
         }
@@ -178,14 +141,17 @@ export class EventDataDialogComponent {
     }
 
     protected onSubmit(): void {
+        if (!this.anyEdit) {
+            return;
+        }
+
         this._appointmentService.updateAppointment(this.event.id, AppointmentUpdateModel.fromObject({
             description: this.form.get('description')?.value,
-            room: this.form.get('room')?.value,
-            // undefined means not updating  !!!
+            room: this.form.get('room')?.value, // undefined means not updating  !!!
             assignment: this.hasEdited('assignment') ? this.assignmentCreateModel : undefined
         })).subscribe((response: AppointmentEntryModel): void => {
             this.appointment = response;
-            this._matSnackBar.open("The changes have been saved!", "", { duration: 2000 });
+            this._matSnackBar.open("The changes have been saved!", "", {duration: 2000});
         });
     }
 }

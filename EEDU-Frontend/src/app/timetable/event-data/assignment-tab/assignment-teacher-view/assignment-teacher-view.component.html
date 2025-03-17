@@ -17,13 +17,44 @@
         </mat-select>
     </mat-form-field>
 
-    <ng-container *ngIf="select.value != null">
-        <p>Submitted {{ select.value.submitted }}</p>
+    <div>
+        <ng-container *ngIf="select.value != null">
+            <p>Submitted {{ select.value.submitted }}</p>
+            <div style="display: flex; gap: 4px">
+                <p>
+                    {{ assignment?.description }}
+                </p>
+                <mat-divider [vertical]="true"></mat-divider>
+                <ul>
+                    @for (file of toArray(select.value); track file)
+                    {
+                        <li>{{file}}</li>
+                    }
+                </ul>
+            </div>
 
-        <mat-list>
-            @for (file of toArray(select.value); track file) {
-                <mat-list-item>{{ file }}</mat-list-item>
-            }
-        </mat-list>
-    </ng-container>
+
+        </ng-container>
+
+    </div>
+
+    <div style="display: flex; gap: 4px">
+        <mat-form-field appearance="outline" style="flex: 1">
+            <mat-label>Grade</mat-label>
+            <input
+                matInput
+                type="number"
+                step="0.1"
+                min="1"
+                max="6"
+                required
+            />
+        </mat-form-field>
+        <mat-form-field style="flex: 3">
+            <mat-label>Feedback</mat-label>
+            <textarea matInput placeholder="Enter the feedback you would wish to share with the student"></textarea>
+        </mat-form-field>
+        <button mat-button color="primary">Assess</button>
+    </div>
+
 </ng-container>

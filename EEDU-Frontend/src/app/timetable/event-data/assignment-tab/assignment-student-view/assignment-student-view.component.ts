@@ -4,11 +4,12 @@ import {FileUploadComponent} from "../../../../common/file-upload/file-upload.co
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
 import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
 import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
+import {MatTree, MatTreeNode} from "@angular/material/tree";
 
 @Component({
     selector: 'app-assignment-student-view',
@@ -21,7 +22,10 @@ import {AssignmentModel} from "../../../../user/courses/appointment/entry/assign
         MatListItemTitle,
         MatListItem,
         NgIf,
-        MatIcon
+        MatIcon,
+        MatTree,
+        MatTreeNode,
+        NgForOf
     ],
     templateUrl: './assignment-student-view.component.html',
     styleUrl: './assignment-student-view.component.scss'
