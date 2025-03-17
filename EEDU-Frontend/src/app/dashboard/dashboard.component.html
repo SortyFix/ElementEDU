@@ -9,8 +9,10 @@
     </div>
 </div>
 <div class="card-container">
-    <div *ngFor="let card of cards" class="card">
-        <h3>{{ card.title }}</h3>
-        <p><ng-container *ngComponentOutlet="card.component"></ng-container></p>
+    <div *ngFor="let card of cards" class="card" (click)="navigateTo(card.route)">
+        <div style="height: 100%; width: 100%">
+            <h3>{{ card.title }}</h3>
+            <ng-container *ngComponentOutlet="card.component"></ng-container>
+        </div>
     </div>
 </div>

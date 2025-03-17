@@ -29,7 +29,6 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 
 export class AbstractComponent implements OnInit {
     private _mobile: boolean = false;
-    private _portrait: boolean = false;
 
     constructor(public websocketService: WebsocketService, public router: Router, public userService: UserService) {
     }
@@ -67,27 +66,16 @@ export class AbstractComponent implements OnInit {
         this._mobile = window.innerWidth <= 600;
     }
 
-    private isPortrait()
-    {
-        this._portrait = window.innerHeight > window.innerWidth;
-    }
-
     get mobile(): boolean {
         return this._mobile;
-    }
-
-    get portrait(): boolean {
-        return this._portrait;
     }
 
     @HostListener("window:resize") public onResize()
     {
         this.isMobile();
-        this.isPortrait();
     }
 
     ngOnInit(): void {
         this.isMobile();
-        this.isPortrait();
     }
 }

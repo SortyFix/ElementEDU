@@ -1,9 +1,7 @@
 package de.gaz.eedu.livechat.chat;
 
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import de.gaz.eedu.entity.model.EntityObject;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

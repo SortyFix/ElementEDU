@@ -17,6 +17,29 @@ import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {ManagementService} from "./management.service";
 import {IllnessNotificationStatus} from "../illness-notification/illness-notification-status";
+import {ListItemInfo} from "../common/abstract-list/abstract-list.component";
+import {CourseModel} from "../user/courses/course-model";
+import {ClassRoomModel} from "../user/courses/classroom/class-room-model";
+import {EntityListComponent} from "../entity/entity-list/entity-list.component";
+import {SubjectService} from "../user/courses/subject/subject.service";
+import {RoomService} from "../user/courses/room/room.service";
+import {ClassRoomService} from "../user/courses/classroom/class-room.service";
+import {CourseService} from "../user/courses/course.service";
+import {EntityService} from "../entity/entity-service";
+import {ListItemContent} from "../common/abstract-list/list-item-content";
+import {CourseListItemComponent} from "../user/courses/course-dialogs/course-list-item/course-list-item.component";
+import {ComponentType} from "@angular/cdk/overlay";
+import {CreateCourseComponent} from "../user/courses/course-dialogs/course-dialogs.component";
+import {DeleteDialogComponent} from "../common/delete-dialog/delete-dialog.component";
+import {
+    CreateSubjectComponent,
+    DeleteSubjectComponent
+} from "../user/courses/subject/subject-dialogs/subject-dialogs.component";
+import {
+    CreateClassRoomComponent,
+    DeleteClassRoomComponent
+} from "../user/courses/classroom/class-room-dialogs/class-room-dialogs.component";
+import {CreateRoomComponent, DeleteRoomComponent} from "../user/courses/room/room-dialogs/room-list.component";
 import {MatDialog} from "@angular/material/dialog";
 import {ManagementCourseSectionComponent} from "./management-course-section/management-course-section.component";
 import {ManagementUserSectionComponent} from "./management-user-section/management-user-section.component";

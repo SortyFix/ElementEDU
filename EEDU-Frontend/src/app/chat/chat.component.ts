@@ -18,6 +18,7 @@ import {
     MatDrawer,
     MatDrawerContainer,
 } from "@angular/material/sidenav";
+import {ChatService} from "./chat.service";
 
 @Component({
   selector: 'app-chat',
@@ -50,7 +51,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     notificationList: bigint[] = [];
     messageContent!: string;
 
-    constructor(public dialog: Dialog, public websocketService: WebsocketService, public http: HttpClient, public userService: UserService, private cdr: ChangeDetectorRef) {
+    constructor(public dialog: Dialog, public chatService: ChatService, public websocketService: WebsocketService, public http: HttpClient, public userService: UserService, private cdr: ChangeDetectorRef) {
     }
 
     public ngOnInit() {
@@ -67,9 +68,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getAllChats() {
-        return this.http.get<ChatModel[]>("http://localhost:8080/api/v1/chat/getChatList", {
-            withCredentials: true
-        }).subscribe(models => {
+        this.chatService.getAllChats().subscribe((models: ChatModel[]): void => {
             this.chatList = models;
             console.log(models);
         });
@@ -99,9 +98,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
 
     public getChat(chatId: number) {
-        this.http.post<MessageModel[]>("http://localhost:8080/api/v1/chat/get/chat", chatId, {
-            withCredentials: true
-        }).subscribe(model => {
+        this.chatService.getChat(chatId).subscribe(model => {
             this.currentChatHistory = model;
             console.log(this.currentChatHistory);
         });
