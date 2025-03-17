@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import {ThemeService} from "../theming/theme.service";
 import {UserService} from "../user/user.service";
 import {AppointmentCardComponent} from "./appointment-card/appointment-card.component";
 import {AssignmentCardComponent} from "./assignment-card/assignment-card.component";

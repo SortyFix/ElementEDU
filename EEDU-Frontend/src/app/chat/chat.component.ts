@@ -18,7 +18,6 @@ import {
     MatDrawer,
     MatDrawerContainer,
 } from "@angular/material/sidenav";
-import {environment} from "../../environment/environment";
 import {ChatService} from "./chat.service";
 
 @Component({
