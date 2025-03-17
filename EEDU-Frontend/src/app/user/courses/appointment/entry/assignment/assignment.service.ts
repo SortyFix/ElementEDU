@@ -7,6 +7,7 @@ import {AssignmentModel} from "./assignment-model";
 import {AppointmentService} from "../../appointment.service";
 import {AppointmentEntryModel} from "../appointment-entry-model";
 import {environment} from "../../../../../../environment/environment";
+import {AssessmentModel} from "./assessment/assessment-model";
 
 @Injectable({
     providedIn: 'root'
@@ -22,10 +23,12 @@ export class AssignmentService {
         //TODO
     }
 
-    public get nextAssignments(): readonly AssignmentModel[] {
-        return this._appointmentService.nextAppointments.filter(
-            (appointment: AppointmentEntryModel): boolean => !!appointment.assignment
-        ).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel>appointment.assignment);
+    public get nextAssignments(): Observable<readonly AssignmentModel[]> {
+        return this._appointmentService.nextAppointments.pipe(map((response: readonly AppointmentEntryModel[]): readonly AssignmentModel[] => {
+            return response.filter(
+                (appointment: AppointmentEntryModel): boolean => !!appointment.assignment
+            ).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel> appointment.assignment);
+        }));
     }
 
     public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {

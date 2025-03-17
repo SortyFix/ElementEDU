@@ -75,14 +75,16 @@ export class EventDataDialogComponent {
 
         // Default values when creating a new assignment
         this.form.get('publish')?.setValue(new Date());
+        this.form.get('submitUntil')?.setValue(new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7)));
 
-        const appointments: readonly AppointmentEntryModel[] = this._appointmentService.nextAppointments;
-        let start: Date = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7));
-        if (appointments.length !== 0) {
-            start = appointments[0].start;
-        }
-
-        this.form.get('submitUntil')?.setValue(start);
+        this._appointmentService.nextAppointments.subscribe((appointments: readonly AppointmentEntryModel[]): void =>
+        {
+            if(appointments.length === 0)
+            {
+                return;
+            }
+            this.form.get('submitUntil')?.setValue(appointments[0].start);
+        })
     }
 
     protected get course(): CourseModel {

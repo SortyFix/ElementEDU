@@ -80,7 +80,7 @@ export class CreateAppointmentComponent {
         formBuilder: FormBuilder
     ) {
 
-        courseService.value$.subscribe((value: CourseModel[]): any => this._courses = value);
+        courseService.ownCourses$.subscribe((value: CourseModel[]): any => this._courses = value);
         this._form = formBuilder.group({
             course: [undefined, Validators.required],
             selected: [0, Validators.required],

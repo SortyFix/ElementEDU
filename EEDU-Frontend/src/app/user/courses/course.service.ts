@@ -47,6 +47,10 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
         return this._fetchedOwn;
     }
 
+    public get ownCourses(): readonly CourseModel[] {
+        return this._ownCourses.value;
+    }
+
     public get ownCourses$(): Observable<CourseModel[]> {
         if (!this.fetchedOwn) {
             this.fetchOwnCourses.subscribe();

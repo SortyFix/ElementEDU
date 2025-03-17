@@ -7,8 +7,7 @@
     <mat-form-field>
         <mat-label>Current User</mat-label>
         <mat-select #select>
-            @for (insight of assignmentInsightModels; track assignmentInsightModels)
-            {
+            @for (insight of assignmentInsightModels; track assignmentInsightModels) {
                 <mat-option [value]="insight">
                     <mat-icon>{{ toIcon(insight) }}</mat-icon>
                     {{ insight.name }}
@@ -17,44 +16,37 @@
         </mat-select>
     </mat-form-field>
 
-    <div>
-        <ng-container *ngIf="select.value != null">
-            <p>Submitted {{ select.value.submitted }}</p>
-            <div style="display: flex; gap: 4px">
-                <p>
-                    {{ assignment?.description }}
-                </p>
-                <mat-divider [vertical]="true"></mat-divider>
-                <ul>
-                    @for (file of toArray(select.value); track file)
-                    {
-                        <li>{{file}}</li>
-                    }
-                </ul>
-            </div>
+    <ng-container *ngIf="select.value != null">
+        <div style="display: flex; gap: 4px">
+            <p>
+                {{ assignment?.description }}
+            </p>
+            <mat-divider *ngIf="select.value.submitted" [vertical]="true"></mat-divider>
+            <ul>
+                @for (file of toArray(select.value); track file) {
+                    <li>{{ file }}</li>
+                }
+            </ul>
+        </div>
 
+        <div *ngIf="select.value.submitted" style="display: flex; gap: 4px">
+            <mat-form-field appearance="outline" style="flex: 1">
+                <mat-label>Grade</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    max="6"
+                    required
+                />
+            </mat-form-field>
+            <mat-form-field style="flex: 3">
+                <mat-label>Feedback</mat-label>
+                <textarea matInput placeholder="Enter the feedback you would wish to share with the student"></textarea>
+            </mat-form-field>
+        </div>
+    </ng-container>
 
-        </ng-container>
-
-    </div>
-
-    <div style="display: flex; gap: 4px">
-        <mat-form-field appearance="outline" style="flex: 1">
-            <mat-label>Grade</mat-label>
-            <input
-                matInput
-                type="number"
-                step="0.1"
-                min="1"
-                max="6"
-                required
-            />
-        </mat-form-field>
-        <mat-form-field style="flex: 3">
-            <mat-label>Feedback</mat-label>
-            <textarea matInput placeholder="Enter the feedback you would wish to share with the student"></textarea>
-        </mat-form-field>
-        <button mat-button color="primary">Assess</button>
-    </div>
 
 </ng-container>

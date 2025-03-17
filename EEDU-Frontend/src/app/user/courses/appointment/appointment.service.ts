@@ -21,8 +21,11 @@ export class AppointmentService {
 
     constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService) { }
 
-    public get nextAppointments(): readonly AppointmentEntryModel[] {
-        return this.courseService.value.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime());
+    public get nextAppointments(): Observable<readonly AppointmentEntryModel[]> {
+        const currentDate: Date = new Date();
+        return this.courseService.ownCourses$.pipe(map((courses: CourseModel[]): AppointmentEntryModel[] => {
+            return courses.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > currentDate).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime())
+        }));
     }
 
     protected get http(): HttpClient {

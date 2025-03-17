@@ -11,9 +11,17 @@ import {AssignmentModel} from "../../user/courses/appointment/entry/assignment/a
 })
 export class AssignmentCardComponent {
 
-    public constructor(private readonly _assignmentService: AssignmentService) {}
+    private _assignments: readonly AssignmentModel[] = [];
+
+    public constructor(assignmentService: AssignmentService)
+    {
+        assignmentService.nextAssignments.subscribe((assignment: readonly AssignmentModel[]): void =>
+        {
+            this._assignments = assignment;
+        })
+    }
 
     protected get assignments(): readonly AssignmentModel[] {
-        return this._assignmentService.nextAssignments.slice(0, 5);
+        return this._assignments.slice(0, 5);
     }
 }
