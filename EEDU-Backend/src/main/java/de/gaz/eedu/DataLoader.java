@@ -118,10 +118,10 @@ import java.util.stream.Collectors;
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel defaultDark = new ThemeCreateModel("defaultDark",
+        ThemeCreateModel defaultDark = new ThemeCreateModel("Dark",
                 new byte[]{Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5},
                 new byte[]{Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10});
-        ThemeCreateModel defaultLight = new ThemeCreateModel("defaultLight",
+        ThemeCreateModel defaultLight = new ThemeCreateModel("Light",
                 new byte[]{Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255},
                 new byte[]{Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235});
 
