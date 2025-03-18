@@ -6,6 +6,11 @@ import {AccountType} from "../../../user/account-type";
 import {UserService} from "../../../user/user.service";
 import {AssignmentStudentViewComponent} from "./assignment-student-view/assignment-student-view.component";
 import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignment-teacher-view.component";
+import {EventTileContentComponent} from "../event-tile-content/event-tile-content.component";
+import {MatFormField} from "@angular/material/form-field";
+import {
+    DateTimePickerComponent
+} from "../../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
 
 @Component({
     selector: 'app-assignment-tab',
@@ -16,6 +21,9 @@ import {AssignmentTeacherViewComponent} from "./assignment-teacher-view/assignme
         NgIf,
         AssignmentStudentViewComponent,
         AssignmentTeacherViewComponent,
+        EventTileContentComponent,
+        MatFormField,
+        DateTimePickerComponent,
     ],
     templateUrl: './assignment-tab.component.html',
     styleUrl: './assignment-tab.component.scss'
@@ -29,7 +37,17 @@ export class AssignmentTabComponent {
 
     public constructor(private readonly _userService: UserService) {}
 
-    protected get accountType(): AccountType {
+    protected get isTeacher(): boolean
+    {
+        return this.accountType === AccountType.TEACHER;
+    }
+
+    protected get isStudent(): boolean
+    {
+        return this.accountType === AccountType.STUDENT;
+    }
+
+    private get accountType(): AccountType {
         return this._userService.getUserData.accountType;
     }
 }

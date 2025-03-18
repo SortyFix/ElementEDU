@@ -1,6 +1,7 @@
 package de.gaz.eedu.course.appointment.entry.assignment;
 
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,4 +32,12 @@ public record AssignmentCreateModel(@Nullable String description, @NotNull Long 
         return Instant.ofEpochMilli(publish);
     }
 
+    @Contract(pure = true) @Override public @NotNull String toString()
+    {
+        return "AssignmentCreateModel{" +
+                "description='" + description + '\'' +
+                ", submitUntil=" + submitUntil +
+                ", publish=" + publish +
+                '}';
+    }
 }

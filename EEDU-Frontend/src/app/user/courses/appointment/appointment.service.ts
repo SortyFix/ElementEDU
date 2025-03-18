@@ -11,6 +11,7 @@ import {
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
+import {AssignmentCreateModel} from "./entry/assignment/assignment-create-model";
 
 @Injectable({
     providedIn: 'root'
@@ -55,13 +56,55 @@ export class AppointmentService {
         } => current.toPacket), {withCredentials: true}).pipe(map((response: any[]): AppointmentEntryModel[] => response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))), tap({next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)}));
     }
 
-    public updateAppointment(appointment: bigint, updateModel: AppointmentUpdateModel): Observable<AppointmentEntryModel> {
-        const url = `${this.BACKEND_URL}/update/standalone/${appointment}`
-        return this.http.post<any>(url, updateModel.toPacket, {withCredentials: true}).pipe(map((response: any): AppointmentEntryModel => {
-            const updated: AppointmentEntryModel = AppointmentEntryModel.fromObject(response);
-            this.pushAppointment([updated])
-            return updated;
-        }));
+    public setDescription(appointment: bigint, description?: string | null): Observable<void>
+    {
+        if(!description)
+        {
+            return this.unsetDescription(appointment);
+        }
+
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/set/description/${description}`
+        return this.http.put<void>(url, null, { withCredentials: true });
+    }
+
+    public unsetDescription(appointment: bigint): Observable<void>
+    {
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/unset/description`
+        return this.http.delete<void>(url, { withCredentials: true });
+    }
+
+    public setRoom(appointment: bigint, room?: string | null): Observable<void>
+    {
+        if(!room)
+        {
+            return this.unsetRoom(appointment);
+        }
+
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/set/room/${room}`
+        return this.http.put<void>(url, null, { withCredentials: true });
+    }
+
+    public unsetRoom(appointment: bigint): Observable<void>
+    {
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/unset/room`
+        return this.http.delete<void>(url, { withCredentials: true });
+    }
+
+    public setAssignment(appointment: bigint, assignment?: AssignmentCreateModel | null): Observable<void>
+    {
+        if(!assignment)
+        {
+            return this.unsetAssignment(appointment);
+        }
+
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/set/assignment`
+        return this.http.put<void>(url, assignment.toPacket(), { withCredentials: true });
+    }
+
+    public unsetAssignment(appointment: bigint): Observable<void>
+    {
+        const url = `${this.BACKEND_URL}/update/standalone/${appointment}/unset/assignment`
+        return this.http.delete<void>(url, { withCredentials: true });
     }
 
     /**

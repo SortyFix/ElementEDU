@@ -101,7 +101,7 @@ export class CourseModel {
             return;
         }
 
-        this._appointmentEntries = [...this._appointmentEntries, appointment]
+        this._appointmentEntries = [...this._appointmentEntries, appointment];
     }
 
     public attachFrequentAppointment(frequentAppointmentModel: FrequentAppointmentModel): void {

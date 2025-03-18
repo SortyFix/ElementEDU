@@ -47,8 +47,7 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
 {
     private final FileService fileService;
     private final FrequentAppointmentRepository repository;
-    @Getter(AccessLevel.PUBLIC)
-    private final AppointmentEntryRepository entryRepository;
+    @Getter(AccessLevel.PUBLIC) private final AppointmentEntryRepository entryRepository;
     private final CourseRepository courseRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
@@ -69,22 +68,6 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
 
         // This allows me to encode both the course id and the timestamp into a single id
         return (entity.getId() << 48) | ((timeStamp / 100) & 0xFFFFFFFFFFFFL);
-    }
-
-    @Contract(pure = true)
-    private static boolean setAssignment(@NotNull AppointmentEntryEntity entity, @Nullable AssignmentCreateModel assignment)
-    {
-        if (Objects.isNull(assignment))
-        {
-            return true;
-        }
-
-        if (Objects.isNull(assignment.description()))
-        {
-            return entity.unsetAssignment();
-        }
-
-        return entity.setAssignment(assignment);
     }
 
     public @NotNull List<AssignmentInsightModel> getInsight(long appointment)
@@ -109,33 +92,38 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         });
     }
 
-    public @NotNull AppointmentEntryModel update(long appointmentId, @NotNull AppointmentUpdateModel updateModel)
+    public boolean setAssignment(long appointment, @NotNull AssignmentCreateModel assignment)
     {
-        AppointmentEntryEntity entity = getEntryRepository().findById(appointmentId).orElseThrow(entityUnknown(appointmentId));
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+        return entity.setAssignment(this, assignment);
+    }
 
-        int hash = entity.hashCode();
-        entity.setDescription(updateModel.description());
+    public boolean unsetAssignment(long appointment)
+    {
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+        return entity.unsetAssignment(this);
+    }
 
-        // doesn't the id match the room id, or is the room id not null
-        Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
-        if (entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
-        {
-            entity.setRoom(Objects.isNull(updateModel.room()) ? null :
-                    roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
-            );
-        }
+    public boolean setDescription(long appointment, @NotNull String description)
+    {
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+        return entity.setDescription(this, description);
+    }
 
-        if (!setAssignment(entity, updateModel.assignment()))
-        {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Assignment could not be updated");
-        }
+    public boolean unsetDescription(long appointment)
+    {
+        return getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment)).unsetDescription(this);
+    }
 
-        if (Objects.equals(hash, entity.hashCode()))
-        {
-            getEntryRepository().save(entity);
-        }
+    public boolean setRoom(long appointment, @NotNull String room)
+    {
+        AppointmentEntryEntity entity = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+        return entity.setRoom(this, getRoomRepository().findById(room).orElseThrow(entityUnknown(room)));
+    }
 
-        return entity.toModel();
+    public boolean unsetRoom(long appointment)
+    {
+        return getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment)).unsetRoom(this);
     }
 
     public boolean unscheduleFrequent(long courseId, @NotNull Long... entities)
@@ -233,17 +221,20 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
     {
         try
         {
-            AppointmentEntryEntity entry = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+            AppointmentEntryEntity entry = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(
+                    appointment));
             return getFileService().sendSingle(entry.loadAssignmentFile(user, file).orElseThrow(() ->
             {
                 String message = String.format("Could not find file %s in appointment: %s", file, appointment);
                 return new IOException(message);
             }));
-        }
-        catch (java.io.IOException exception)
+        } catch (java.io.IOException exception)
         {
             String message = "An exception occurred while trying to prepare downloading assignment: %s";
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format(message, file), exception);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format(message, file),
+                    exception);
         }
     }
 

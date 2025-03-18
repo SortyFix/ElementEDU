@@ -114,7 +114,7 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
         });
     }
 
-    protected pushCreated(response: T[]): void {
+    protected pushCreated(response: readonly T[]): void {
         this._subject.next([...this.value, ...response]);
     }
 

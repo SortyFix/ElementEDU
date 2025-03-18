@@ -1,5 +1,16 @@
-<app-assignment-teacher-view *ngIf="accountType === AccountType.TEACHER" [appointment]="appointment" [editing]="editing()">
-    <ng-content></ng-content>
-</app-assignment-teacher-view>
+<app-event-tile-content #eventTile>
+    <app-assignment-teacher-view *ngIf="isTeacher" [appointment]="appointment" [editing]="eventTile.editing">
+        <form [formGroup]="updateForm" (ngSubmit)="onUpdate()">
+            <mat-form-field appearance="outline" class="form-field">
+                <textarea formControlName="description" matInput style="height: 120px;"></textarea>
+            </mat-form-field>
 
-<app-assignment-student-view *ngIf="accountType === AccountType.STUDENT" [appointment]="appointment"></app-assignment-student-view>
+            <div *ngIf="updateForm.get('description')?.value">
+                <app-date-time-picker formControlName="publish" label="publish"></app-date-time-picker>
+                <app-date-time-picker formControlName="submitUntil" label="deadline"></app-date-time-picker>
+            </div>
+        </form>
+    </app-assignment-teacher-view>
+    <app-assignment-student-view *ngIf="isStudent" [appointment]="appointment"></app-assignment-student-view>
+</app-event-tile-content>
+

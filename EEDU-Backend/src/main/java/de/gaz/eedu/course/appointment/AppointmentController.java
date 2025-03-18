@@ -1,8 +1,8 @@
 package de.gaz.eedu.course.appointment;
 
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -41,21 +41,60 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
     @PreAuthorize("hasRole('teacher')")
     public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
     {
-        log.info(
-                "Received incoming request for scheduling frequent appointment(s) {} in course {}.",
-                appointments,
-                course);
+        String message = "Received incoming request for scheduling frequent appointment(s) {} in course {}.";
+        log.info(message, appointments, course);
 
         Set<InternalFrequentAppointmentCreateModel> internal = toInternalCreateModel(course, appointments).collect(Collectors.toUnmodifiableSet());
         Stream<FrequentAppointmentEntity> entities = getService().createEntity(internal).stream();
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
     }
 
-    @PostMapping("/update/standalone/{appointment}") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
-    public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
+    @PutMapping("/update/standalone/{appointment}/set/description/{description}") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> setDescription(@PathVariable long appointment, @NotNull @PathVariable String description)
     {
-        log.info("Received incoming request for altering the appointment {} with the updated data {}.", appointment, updateModel);
-        return ResponseEntity.ok(getService().update(appointment, updateModel));
+        String message = "Received incoming request for altering the appointment {} with the updated description {}.";
+        log.info(message, appointment, description);
+        return empty(getService().setDescription(appointment, description) ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+    @DeleteMapping("/update/standalone/{appointment}/unset/description")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> unsetDescription(@PathVariable long appointment)
+    {
+        log.info("Received incoming request for altering the appointment {} by unsetting description.", appointment);
+        return empty(getService().unsetRoom(appointment) ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+    @PutMapping("/update/standalone/{appointment}/set/room/{room}")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> setRoom(@PathVariable long appointment, @NotNull @PathVariable String room)
+    {
+        log.info("Received incoming request for altering the appointment {} with the updated room {}.", appointment, room);
+        return empty(getService().setRoom(appointment, room) ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+    @DeleteMapping("/update/standalone/{appointment}/unset/room")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> unsetRoom(@PathVariable long appointment)
+    {
+        log.info("Received incoming request for altering the appointment {} by unsetting room.", appointment);
+        return empty(getService().unsetRoom(appointment) ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+    @PutMapping("/update/standalone/{appointment}/set/assignment")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> setAssignment(@PathVariable long appointment, @NotNull AssignmentCreateModel assignment)
+    {
+        log.info("Received incoming request for altering the appointment {} with the updated assignment {}.", appointment, appointment);
+        return empty(getService().setAssignment(appointment, assignment) ? HttpStatus.OK : HttpStatus.CONFLICT);
+    }
+
+    @PostMapping("/update/standalone/{appointment}/unset/assignment")
+    @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<Void> unsetAssignment(@PathVariable long appointment)
+    {
+        log.info("Received incoming request for altering the appointment {} by unsetting assignment.", appointment);
+        return empty(getService().unsetAssignment(appointment) ? HttpStatus.OK : HttpStatus.CONFLICT);
     }
 
     @PostMapping("/{course}/unschedule/frequent") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")

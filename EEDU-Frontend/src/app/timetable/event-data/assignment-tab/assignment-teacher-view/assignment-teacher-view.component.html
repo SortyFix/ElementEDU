@@ -1,64 +1,70 @@
-<ng-container *ngIf="editing()">
-    <ng-content></ng-content>
-</ng-container>
 
-<ng-container *ngIf="!editing() && assignment?.description">
+@if (editing())
+{
 
-    <p>
-        {{ assignment?.description }}
-    </p>
+}
+@else
+{
+    <ng-container *ngIf="!editing() && assignment?.description">
 
-    <mat-form-field>
-        <mat-label>Current User</mat-label>
-        <mat-select #select>
-            @for (insight of assignmentInsightModels; track assignmentInsightModels) {
-                <mat-option [value]="insight">
-                    <mat-icon>{{ toIcon(insight) }}</mat-icon>
-                    {{ insight.name }}
-                </mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
+        <p>
+            {{ assignment?.description }}
+        </p>
 
-    <ng-container *ngIf="select.value != null">
+        <mat-form-field>
+            <mat-label>Current User</mat-label>
+            <mat-select #select>
+                @for (insight of assignmentInsightModels; track assignmentInsightModels) {
+                    <mat-option [value]="insight">
+                        <mat-icon>{{ toIcon(insight) }}</mat-icon>
+                        {{ insight.name }}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <ng-container *ngIf="select.value != null">
 
 
-        <div *ngIf="select.value.submitted">
-            <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
+            <div *ngIf="select.value.submitted">
+                <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
 
-                <ul>
-                    @for (file of toArray(select.value); track file) {
-                        <li>{{ file }}</li>
-                    }
-                </ul>
-                <mat-form-field>
-                    <mat-label>Feedback</mat-label>
-                    <textarea
-                        matInput
-                        formControlName="feedback"
-                        placeholder="Enter the feedback you would wish to share with the student">
+                    <ul>
+                        @for (file of toArray(select.value); track file) {
+                            <li>{{ file }}</li>
+                        }
+                    </ul>
+                    <mat-form-field>
+                        <mat-label>Feedback</mat-label>
+                        <textarea
+                            matInput
+                            formControlName="feedback"
+                            placeholder="Enter the feedback you would wish to share with the student">
                     </textarea>
-                </mat-form-field>
-                <div style="display: flex; justify-content: space-between">
-                    <div>
-                        <mat-checkbox #grade>
-                            Give Grade
-                        </mat-checkbox>
-                        <div *ngIf="grade.checked">
-                            <mat-slider  min="1" max="6" step="0.1">
-                                <input matSliderThumb value="3" formControlName="grade" #slider >
-                            </mat-slider>
-                            <span>{{ slider.value }}</span>
+                    </mat-form-field>
+                    <div style="display: flex; justify-content: space-between">
+                        <div>
+                            <mat-checkbox #grade>
+                                Give Grade
+                            </mat-checkbox>
+                            <div *ngIf="grade.checked">
+                                <mat-slider  min="1" max="6" step="0.1">
+                                    <input matSliderThumb value="3" formControlName="grade" #slider >
+                                </mat-slider>
+                                <span>{{ slider.value }}</span>
+                            </div>
+
                         </div>
 
+                        <button mat-button color="primary" type="submit">Assess</button>
                     </div>
 
-                    <button mat-button color="primary" type="submit">Assess</button>
-                </div>
+                </form>
+            </div>
+        </ng-container>
 
-            </form>
-        </div>
+
     </ng-container>
 
+}
 
-</ng-container>

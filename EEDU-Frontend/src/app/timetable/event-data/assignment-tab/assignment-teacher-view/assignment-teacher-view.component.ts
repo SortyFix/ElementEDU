@@ -5,7 +5,6 @@ import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry
 import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
-import {MatOption, MatSelect} from "@angular/material/select";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
@@ -14,11 +13,18 @@ import {AssessmentService} from "../../../../user/courses/appointment/entry/assi
 import {UserService} from "../../../../user/user.service";
 import {MatSlider, MatSliderThumb} from "@angular/material/slider";
 import {MatCheckbox} from "@angular/material/checkbox";
+import {
+    DateTimePickerComponent
+} from "../../../../user/courses/appointment/create-appointment/date-time-picker/date-time-picker.component";
+import {MatOption} from "@angular/material/autocomplete";
+import {MatSelect} from "@angular/material/select";
+import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
+import {AssignmentCreateModel} from "../../../../user/courses/appointment/entry/assignment/assignment-create-model";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
-    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, MatSlider, MatSliderThumb, MatCheckbox,],
+    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, MatSlider, MatSliderThumb, MatCheckbox, DateTimePickerComponent,],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
 })
@@ -28,17 +34,41 @@ export class AssignmentTeacherViewComponent {
     private _assignmentInsightModels: readonly AssignmentInsightModel[] = [];
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
 
+    private readonly _updateForm: FormGroup;
     private readonly _assessForm: FormGroup;
 
     public constructor(
+        private readonly _appointmentService: AppointmentService,
         private readonly _assignmentService: AssignmentService,
         private readonly _assessmentService: AssessmentService,
         private readonly _userService: UserService,
         formBuilder: FormBuilder) {
+
+        this._updateForm = formBuilder.group({
+            description: [],
+            submitUntil: [],
+            publish: []
+        });
+
         this._assessForm = formBuilder.group({
             grade: [null],
             feedback: [null]
         })
+    }
+
+    protected get updateForm(): FormGroup {
+        return this._updateForm;
+    }
+
+    protected onUpdate(): void
+    {
+        if(!this.appointment)
+        {
+            return;
+        }
+
+        const createModel: AssignmentCreateModel = AssignmentCreateModel.fromObject(this.updateForm.value);
+        this._appointmentService.setAssignment(this.appointment.id, createModel).subscribe();
     }
 
     protected get assessForm(): FormGroup {
@@ -64,7 +94,24 @@ export class AssignmentTeacherViewComponent {
         this._assignmentService.fetchInsights(appointment.id).subscribe((response: AssignmentInsightModel[]): void =>
         {
             this._assignmentInsightModels = response;
-        })
+        });
+
+        this.updateForm.get('description')?.setValue(appointment.assignment?.description);
+        this.updateForm.get('publish')?.setValue(appointment.assignment?.publish || new Date());
+        this.updateForm.get('submitUntil')?.setValue(appointment.assignment?.submitUntil);
+        if(!this.appointment?.assignment?.submitUntil)
+        {
+            this._appointmentService.nextAppointments.subscribe((appointments: readonly AppointmentEntryModel[]): void =>
+            {
+                if(appointments.length === 0)
+                {
+                    return;
+                }
+
+                this.updateForm.get('submitUntil')?.setValue(appointments[0].start);
+            });
+        }
+
     }
 
     protected get assignmentInsightModels(): readonly AssignmentInsightModel[] {
