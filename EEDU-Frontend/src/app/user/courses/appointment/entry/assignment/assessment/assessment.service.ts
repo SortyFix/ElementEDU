@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../../../../environment/environment";
-import {GenericAssessmentCreateModel} from "./assessment-create-model";
+import {
+    AssessmentCreateModel,
+    AssessmentCreateModelPacket,
+} from "./assessment-create-model";
 import {BehaviorSubject, map, Observable, OperatorFunction} from "rxjs";
 import {AssessmentModel, GenericAssessment} from "./assessment-model";
 
@@ -23,10 +26,10 @@ export class AssessmentService {
         return `${environment.backendUrl}/course/appointment/assignment/assessment`;
     }
 
-    public assess(obj: GenericAssessmentCreateModel[]): Observable<AssessmentModel[]>
+    public assess(obj: AssessmentCreateModel[]): Observable<AssessmentModel[]>
     {
         const url: string = `${this.BACKEND_URL}/create`;
-        return this.http.post<GenericAssessment[]>(url, obj, { withCredentials: true }).pipe(
+        return this.http.post<GenericAssessment[]>(url, obj.map((current: AssessmentCreateModel): AssessmentCreateModelPacket => current.toPacket), { withCredentials: true }).pipe(
             map((response: GenericAssessment[]): AssessmentModel[] =>
                 response.map((item: GenericAssessment): AssessmentModel =>
                 {
@@ -55,6 +58,7 @@ export class AssessmentService {
     }
 
     private pushAssessment(obj: AssessmentModel): void {
+
         let replaced: boolean = false;
         this.value.map((item: AssessmentModel): AssessmentModel => {
             if (item.id !== obj.id) {

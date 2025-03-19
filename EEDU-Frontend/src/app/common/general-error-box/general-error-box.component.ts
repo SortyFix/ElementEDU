@@ -9,6 +9,7 @@ import {NgIf} from "@angular/common";
     styleUrl: './general-error-box.component.scss'
 })
 export class GeneralErrorBoxComponent {
+    public readonly icon: InputSignal<string> = input<string>('warning');
     public readonly message: InputSignal<string> = input<string>('');
     public readonly subMessage: InputSignal<string | null> = input<string | null>(null);
 }

@@ -113,7 +113,6 @@ CREATE TABLE IF NOT EXISTS assessment_entity
     id             BIGINT PRIMARY KEY NOT NULL,
     appointment_id BIGINT             NOT NULL,
     user_id        BIGINT             NOT NULL,
-    grade          FLOAT              NULL,
     feedback       VARCHAR(200)       NULL,
     FOREIGN KEY (appointment_id) REFERENCES appointment_entry_entity (id),
     FOREIGN KEY (user_id) REFERENCES user_entity (id)

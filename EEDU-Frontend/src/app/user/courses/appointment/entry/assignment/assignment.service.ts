@@ -7,7 +7,6 @@ import {AssignmentModel} from "./assignment-model";
 import {AppointmentService} from "../../appointment.service";
 import {AppointmentEntryModel} from "../appointment-entry-model";
 import {environment} from "../../../../../../environment/environment";
-import {AssessmentModel} from "./assessment/assessment-model";
 
 @Injectable({
     providedIn: 'root'
@@ -42,7 +41,9 @@ export class AssignmentService {
 
     public fetchInsight(appointment: bigint): Observable<AssignmentInsightModel> {
         const url: string = `${this.BACKEND_URL}/${appointment}/status`;
-        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
+        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(
+            map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response))
+        );
     }
 
     public fetchUsersInsight(appointment: bigint, user: bigint): Observable<AssignmentInsightModel> {

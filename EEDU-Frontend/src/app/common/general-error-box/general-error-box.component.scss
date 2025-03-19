@@ -8,6 +8,11 @@
 
 .error-icon {
     margin-bottom: 16px;
+
+    .actual-icon
+    {
+        font-size: 64px; height: 64px; width: 64px;
+    }
 }
 
 .error-message p strong {

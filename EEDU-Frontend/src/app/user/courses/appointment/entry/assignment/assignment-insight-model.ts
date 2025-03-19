@@ -1,23 +1,38 @@
+import {AssessmentModel, GenericAssessment} from "./assessment/assessment-model";
+import {GenericReducedUserModel, ReducedUserModel} from "../../../../reduced-user-model";
+
 export interface GenericAssignmentInsightModel {
-    name: string,
+    user: GenericReducedUserModel,
     submitted: boolean,
-    files: string[]
+    files: readonly string[],
+    assessment?: GenericAssessment
 }
 
 export class AssignmentInsightModel {
 
     public constructor(
-        private readonly _name: string,
+        private readonly _user: ReducedUserModel,
         private readonly _submitted: boolean,
-        private readonly _files: readonly string[]
+        private readonly _files: readonly string[],
+        private readonly _assessment: AssessmentModel | null
     ) {}
 
     public static fromObject(obj: GenericAssignmentInsightModel): AssignmentInsightModel {
-        return new AssignmentInsightModel(obj.name, obj.submitted, obj.files);
+        return new AssignmentInsightModel(
+            ReducedUserModel.fromObject(obj.user),
+            obj.submitted,
+            obj.files,
+            obj.assessment ? AssessmentModel.fromObject(obj.assessment) : null
+        );
     }
 
-    public get name(): string {
-        return this._name;
+    public static pushAssessment(assignment: AssignmentInsightModel, assessment: AssessmentModel): AssignmentInsightModel
+    {
+        return new AssignmentInsightModel(assignment.user, assignment.submitted, assignment.files, assessment);
+    }
+
+    public get user(): ReducedUserModel {
+        return this._user;
     }
 
     public get submitted(): boolean {
@@ -26,5 +41,9 @@ export class AssignmentInsightModel {
 
     public get files(): readonly string[] {
         return this._files;
+    }
+
+    public get assessment(): AssessmentModel | null {
+        return this._assessment;
     }
 }

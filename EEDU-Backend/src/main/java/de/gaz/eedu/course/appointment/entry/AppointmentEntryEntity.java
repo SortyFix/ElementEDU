@@ -16,6 +16,7 @@ import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -67,7 +68,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id")
     private @Nullable RoomEntity room;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL) @JsonBackReference
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL) @JsonBackReference
     private final Set<AssessmentEntity> assessments = new HashSet<>();
 
     /**
@@ -136,14 +137,15 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         File[] files = file.listFiles();
 
         AssessmentModel assessment = getAssessment(user).map(AssessmentEntity::toModel).orElse(null);
+        ReducedUserModel reducedUserModel = user.toReducedModel();
 
         if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
         {
-            return new AssignmentInsightModel(user.getLoginName(), false, new String[0], assessment);
+            return new AssignmentInsightModel(reducedUserModel, false, new String[0], assessment);
         }
 
         String[] paths = Arrays.stream(files).map(File::getName).toArray(String[]::new);
-        return new AssignmentInsightModel(user.getLoginName(), true, paths, assessment);
+        return new AssignmentInsightModel(reducedUserModel, true, paths, assessment);
     }
 
     public @NotNull File[] loadAssignmentFiles(long user)
@@ -175,7 +177,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
         String uploadPath = getUploadPath(user);
         File[] file = new File(uploadPath).listFiles();
-        if (file != null && (file.length + files.length) > 5)
+        if (file != null && (file.length + files.length) > 3)
         {
             throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "The maximum amount of files exceeded.");
         }

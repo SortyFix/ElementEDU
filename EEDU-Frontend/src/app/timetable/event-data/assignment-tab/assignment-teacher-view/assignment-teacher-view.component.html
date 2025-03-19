@@ -10,37 +10,51 @@
 
     <mat-form-field>
         <mat-label>Current User</mat-label>
-        <mat-select #select>
-            @for (insight of assignmentInsightModels; track assignmentInsightModels) {
+        <mat-select #select (valueChange)="currentInsight = select.value">
+            @for (insight of assignmentInsight; track assignmentInsight) {
                 <mat-option [value]="insight">
                     <mat-icon>{{ toIcon(insight) }}</mat-icon>
-                    {{ insight.name }}
+                    {{ insight.user.name }}
                 </mat-option>
             }
         </mat-select>
     </mat-form-field>
 
-    <ng-container *ngIf="select.value != null">
+    <ng-container *ngIf="currentInsight != null">
 
-
-        <div *ngIf="select.value.submitted">
+        <div *ngIf="currentInsight.submitted">
             <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
                 <ul>
-                    @for (file of toArray(select.value); track file) {
+                    @for (file of currentInsight.files; track file) {
                         <li>{{ file }}</li>
                     }
                 </ul>
 
-                <mat-form-field>
-                    <mat-label>Feedback</mat-label>
-                    <textarea
-                        matInput
-                        formControlName="feedback"
-                        placeholder="Enter the feedback you would wish to share with the student">
+                <div *ngIf="currentInsight.assessment === null">
+                    <mat-form-field>
+                        <mat-label>Feedback</mat-label>
+                        <textarea
+                            matInput
+                            formControlName="feedback"
+                            placeholder="Enter the feedback you would wish to share with the student">
                     </textarea>
-                </mat-form-field>
-                <button mat-button color="primary" type="submit">Assess</button>
+                    </mat-form-field>
+                    <button mat-button color="primary" type="submit">Assess</button>
+                </div>
+
+                <div *ngIf="currentInsight.assessment !== null">
+                    <p>{{ currentInsight.assessment.feedback }}</p>
+                </div>
+
             </form>
+        </div>
+
+        <div *ngIf="!currentInsight.submitted">
+            <general-error-box
+                [icon]="toIcon(currentInsight)"
+                message="Nothing has been submitted."
+                [subMessage]="'The user ' + currentInsight.user.name + ' has not submitted anything yet'">
+            </general-error-box>
         </div>
     </ng-container>
 </ng-container>
