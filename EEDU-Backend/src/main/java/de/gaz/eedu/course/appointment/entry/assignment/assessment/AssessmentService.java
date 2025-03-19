@@ -63,20 +63,6 @@ public class AssessmentService extends EntityService<Long, AssessmentRepository,
     }
 
     @Transactional
-    public @NotNull AssessmentModel setGrade(long assessment, @Nullable Float grade)
-    {
-        AssessmentEntity assessmentEntity = loadEntityByIDSafe(assessment);
-
-        if (Objects.equals(assessmentEntity.getGrade(), grade))
-        {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
-        }
-
-        assessmentEntity.setGrade(grade);
-        return saveEntity(assessmentEntity).toModel();
-    }
-
-    @Transactional
     public @NotNull AssessmentModel setFeedback(long assessment, @Nullable String feedback)
     {
         AssessmentEntity assessmentEntity = loadEntityByIDSafe(assessment);

@@ -25,12 +25,12 @@
 
         <div *ngIf="select.value.submitted">
             <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
-
                 <ul>
                     @for (file of toArray(select.value); track file) {
                         <li>{{ file }}</li>
                     }
                 </ul>
+
                 <mat-form-field>
                     <mat-label>Feedback</mat-label>
                     <textarea
@@ -39,26 +39,8 @@
                         placeholder="Enter the feedback you would wish to share with the student">
                     </textarea>
                 </mat-form-field>
-                <div style="display: flex; justify-content: space-between">
-                    <div>
-                        <mat-checkbox #grade>
-                            Give Grade
-                        </mat-checkbox>
-                        <div *ngIf="grade.checked">
-                            <mat-slider  min="1" max="6" step="0.1">
-                                <input matSliderThumb value="3" formControlName="grade" #slider >
-                            </mat-slider>
-                            <span>{{ slider.value }}</span>
-                        </div>
-
-                    </div>
-
-                    <button mat-button color="primary" type="submit">Assess</button>
-                </div>
-
+                <button mat-button color="primary" type="submit">Assess</button>
             </form>
         </div>
     </ng-container>
-
-
 </ng-container>

@@ -42,14 +42,14 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
     }
 
     public get value(): T[] {
-        return this.value$.value;
+        return this._subject.value;
     }
 
-    public get value$(): BehaviorSubject<T[]> {
+    public get value$(): Observable<T[]> {
         if (!this.fetched) {
             this.fetchAll.subscribe();
         }
-        return this._subject;
+        return this._subject.asObservable();
     }
 
     public get fetchAll(): Observable<T[]> {
@@ -101,7 +101,7 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
     }
 
     public update(): void {
-        this.value$.next([...this.value]);
+        this._subject.next([...this.value]);
     }
 
     protected toPackets(models: C[]): any[] {
@@ -114,11 +114,11 @@ export abstract class EntityService<P, T extends { id: P }, G, C> {
         });
     }
 
-    protected pushCreated(response: T[]): void {
+    protected pushCreated(response: readonly T[]): void {
         this._subject.next([...this.value, ...response]);
     }
 
     protected postDelete(id: P[]): void {
-        this.value$.next(this.value.filter(((value: T): boolean => !id.includes(value.id))));
+        this._subject.next(this.value.filter(((value: T): boolean => !id.includes(value.id))));
     }
 }

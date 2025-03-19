@@ -11,6 +11,7 @@ import {
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
+import {UserService} from "../../user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +20,10 @@ export class AppointmentService {
 
     private readonly BACKEND_URL: string = `${environment.backendUrl}/course/appointment`;
 
-    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService) { }
+    constructor(
+        private readonly _http: HttpClient,
+        private readonly _courseService: CourseService,
+        private readonly _userService: UserService) { }
 
     public get nextAppointments(): Observable<readonly AppointmentEntryModel[]> {
         const currentDate: Date = new Date();
@@ -92,7 +96,12 @@ export class AppointmentService {
 
     private pushAppointment(objects: AppointmentEntryModel[]): void {
         for (const appointment of objects) {
-            this.courseService.findCourseLazily(appointment.course)?.attachAppointment(appointment);
+            if(this.hasFetchCoursePrivilege)
+            {
+                this.courseService.findCourseLazily(appointment.course)?.attachAppointment(appointment);
+            }
+
+            this.courseService.findOwnCourseLazily(appointment.course)?.attachAppointment(appointment);
         }
 
         this.courseService.update();
@@ -100,9 +109,24 @@ export class AppointmentService {
 
     private pushFrequent(course: bigint, objects: FrequentAppointmentModel[]) {
         for (const appointment of objects) {
-            this.courseService.findCourseLazily(course)?.attachFrequentAppointment(appointment);
+            if(this.hasFetchCoursePrivilege)
+            {
+                this.courseService.findCourseLazily(course)?.attachFrequentAppointment(appointment);
+            }
+
+            this.courseService.findOwnCourseLazily(course)?.attachFrequentAppointment(appointment);
         }
 
         this.courseService.update();
+    }
+
+    private get hasFetchCoursePrivilege(): boolean
+    {
+        const privilege: string | null = this._courseService.privileges.fetchPrivilege;
+        if(!privilege)
+        {
+            return true;
+        }
+        return this._userService.getUserData.hasPrivilege(privilege)
     }
 }

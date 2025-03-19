@@ -35,20 +35,6 @@ public class AssessmentController extends EntityController<Long, AssessmentServi
     }
 
     @PreAuthorize("hasRole('teacher')")
-    @PutMapping("/{assessment}/set/grade/{grade}")
-    public @NotNull ResponseEntity<AssessmentModel> setGrade(@PathVariable long assessment, @PathVariable float grade)
-    {
-        return ResponseEntity.ok(getService().setGrade(assessment, grade));
-    }
-
-    @PreAuthorize("hasRole('teacher')")
-    @PutMapping("/{assessment}/unset/grade")
-    public @NotNull ResponseEntity<AssessmentModel> unsetGrade(@PathVariable long assessment)
-    {
-        return ResponseEntity.ok(getService().setGrade(assessment, null));
-    }
-
-    @PreAuthorize("hasRole('teacher')")
     @Override @PostMapping("/create")
     public @NotNull ResponseEntity<AssessmentModel[]> create(@NotNull @RequestBody AssessmentCreateModel[] model) throws CreationException
     {

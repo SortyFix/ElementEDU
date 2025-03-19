@@ -27,8 +27,6 @@ public class AssessmentEntity implements EntityModelRelation<Long, AssessmentMod
     private UserEntity user;
 
     @Column(length = 200) private String feedback;
-    private Float grade;
-
     public AssessmentEntity(long id, @NotNull AppointmentEntryEntity appointment, @NotNull UserEntity user)
     {
         this.id = id;
@@ -38,6 +36,6 @@ public class AssessmentEntity implements EntityModelRelation<Long, AssessmentMod
 
     @Override public @NotNull AssessmentModel toModel()
     {
-        return new AssessmentModel(getId(), getGrade(), getFeedback());
+        return new AssessmentModel(getId(), getFeedback());
     }
 }

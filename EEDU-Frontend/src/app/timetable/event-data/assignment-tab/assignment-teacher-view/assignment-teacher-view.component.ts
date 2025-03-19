@@ -12,13 +12,11 @@ import {MatInput} from "@angular/material/input";
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {AssessmentService} from "../../../../user/courses/appointment/entry/assignment/assessment/assessment.service";
 import {UserService} from "../../../../user/user.service";
-import {MatSlider, MatSliderThumb} from "@angular/material/slider";
-import {MatCheckbox} from "@angular/material/checkbox";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
-    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, MatSlider, MatSliderThumb, MatCheckbox,],
+    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
 })
@@ -36,7 +34,6 @@ export class AssignmentTeacherViewComponent {
         private readonly _userService: UserService,
         formBuilder: FormBuilder) {
         this._assessForm = formBuilder.group({
-            grade: [null],
             feedback: [null]
         })
     }
@@ -51,7 +48,6 @@ export class AssignmentTeacherViewComponent {
             appointment: Number(this.appointment?.id),
             user: Number(this._userService.getUserData.id),
             feedback: this.assessForm.get('feedback')?.value,
-            grade: this.assessForm.get('grade')?.value
         }]).subscribe();
     }
 

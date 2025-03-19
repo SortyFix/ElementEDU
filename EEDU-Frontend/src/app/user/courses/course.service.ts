@@ -105,6 +105,10 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
         return this.findCourse(this.value, id);
     }
 
+    public findOwnCourseLazily(id: bigint): CourseModel | null {
+        return this.findCourse(this.ownCourses, id);
+    }
+
     /**
      * Finds a {@link CourseModel} by its id from a given list of courses.
      *
@@ -116,11 +120,11 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
      * @returns the matching {@link CourseModel} if found, otherwise undefined.
      * @public
      */
-    public findCourse(courses: CourseModel[], id: bigint): CourseModel | null {
+    public findCourse(courses: readonly CourseModel[], id: bigint): CourseModel | null {
         return courses.find((course: CourseModel): boolean => course.id === id) || null;
     }
 
-    protected override pushCreated(response: CourseModel[]): void {
+    protected override pushCreated(response: readonly CourseModel[]): void {
         super.pushCreated(response);
         this._ownCourses.next([...this._ownCourses.value, ...response]);
     }
@@ -128,5 +132,11 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
     protected override postDelete(id: bigint[]): void {
         super.postDelete(id);
         this._ownCourses.next(this._ownCourses.value.filter((value: CourseModel): boolean => !id.includes(value.id)));
+    }
+
+
+    override update(): void {
+        super.update();
+        this._ownCourses.next([...this.ownCourses])
     }
 }

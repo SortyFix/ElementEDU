@@ -1,7 +1,6 @@
 export interface GenericAssessment
 {
     id: bigint;
-    grade: number;
     feedback?: string
 }
 
@@ -11,7 +10,6 @@ export class AssessmentModel {
 
     public constructor(
         private _id: bigint,
-        private _grade: number,
         private _feedback: string | null
     ) {}
 
@@ -19,7 +17,6 @@ export class AssessmentModel {
     {
         return new AssessmentModel(
             obj.id,
-            obj.grade,
             obj.feedback || null,
         )
     }
@@ -36,10 +33,6 @@ export class AssessmentModel {
     public get user(): bigint
     {
         return this.id & AssessmentModel.BIT_MASK;
-    }
-
-    public get grade(): number {
-        return this._grade;
     }
 
     public get feedback(): string | null {

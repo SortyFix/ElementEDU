@@ -44,12 +44,6 @@ export class AssessmentService {
         return this.http.put<GenericAssessment>(url, { withCredentials: true }).pipe(this.translateAndPush);
     }
 
-    public updateGrade(id: bigint, grade: number): Observable<AssessmentModel>
-    {
-        const url: string = `${this.BACKEND_URL}/${id}/set/grade/${grade}`;
-        return this.http.put<GenericAssessment>(url, { withCredentials: true }).pipe(this.translateAndPush);
-    }
-
     private get translateAndPush(): OperatorFunction<GenericAssessment, AssessmentModel>
     {
         return map((response: GenericAssessment): AssessmentModel =>

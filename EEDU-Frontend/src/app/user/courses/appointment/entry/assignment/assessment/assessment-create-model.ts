@@ -2,7 +2,6 @@ export interface GenericAssessmentCreateModel
 {
     appointment: number;
     user: number;
-    grade: number;
     feedback?: string;
 }
 
@@ -11,7 +10,6 @@ export class AssessmentCreateModel
     public constructor(
         private readonly _appointment: number,
         private readonly _user: number,
-        private readonly _grade: number,
         private readonly _feedback: string | null,
     ) {}
 
@@ -19,7 +17,6 @@ export class AssessmentCreateModel
         return new AssessmentCreateModel(
             obj.appointment,
             obj.user,
-            obj.grade,
             obj.feedback || null,
         )
     }
@@ -30,10 +27,6 @@ export class AssessmentCreateModel
 
     public get user(): number {
         return this._user;
-    }
-
-    public get grade(): number {
-        return this._grade;
     }
 
     public get feedback(): string | null {
