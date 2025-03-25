@@ -71,6 +71,11 @@ export class TimetableComponent implements OnInit, OnDestroy {
     }
 
     private set selectedEvent(value: CalendarEvent | undefined) {
+        if(value?.meta.eventData instanceof FrequentAppointmentModel)
+        {
+            this.createEvent(value?.start, value?.meta.eventData as FrequentAppointmentModel);
+        }
+
         this._selectedEvent = value;
     }
 
@@ -150,14 +155,10 @@ export class TimetableComponent implements OnInit, OnDestroy {
         this.document.body.classList.remove(this.CALENDAR_THEME_CLASS)
     }
 
-    protected createEvent(): void {
-        if (!this.selectedEvent) {
-            return;
-        }
+    protected createEvent(start: Date,  eventData: FrequentAppointmentModel): void {
 
-        const frequentData: FrequentAppointmentModel = this.selectedEvent.meta.eventData as FrequentAppointmentModel;
-        this._appointmentService.createAppointment(frequentData.course.id, [AppointmentCreateModel.fromObject({
-            start: this.selectedEvent.start, room: frequentData.room, duration: frequentData.duration,
+        this._appointmentService.createAppointment(eventData.course.id, [AppointmentCreateModel.fromObject({
+            start: start, room: eventData.room, duration: eventData.duration,
         })]).subscribe((createdEvent: AppointmentEntryModel[]): void => {
             this.selectedEvent = this.events.find((current: CalendarEvent): boolean => {
                 return typeof current.id === 'number' && BigInt(current.id) === createdEvent[0].id;
