@@ -53,11 +53,11 @@ import java.util.Set;
                 LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond(),
                 expirationTime,
                 fileId)));
-
         return true;
     }
 
-    public @Nullable Long uploadNotification(@Nullable MultipartFile file){
+    public @Nullable Long uploadNotification(@Nullable MultipartFile file) throws MaliciousFileException
+    {
         if(!(file != null && !file.isEmpty()))
         {
             return null;
@@ -68,15 +68,8 @@ import java.util.Set;
                 new String[] { "Management", "ADMINISTRATOR", "ROLE_administrator", "USER_CREATE" },
                 new String[] { "illness_notification" }));
 
-        try
-        {
-            fileEntity.uploadBatch("", file);
-            return fileEntity.getId();
-        }
-        catch (MaliciousFileException e)
-        {
-            throw new RuntimeException(e);
-        }
+        fileEntity.uploadBatch("", file);
+        return fileEntity.getId();
     }
 
     @Transactional

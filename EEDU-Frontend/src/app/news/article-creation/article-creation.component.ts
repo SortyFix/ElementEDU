@@ -12,6 +12,7 @@ import {MatIcon} from "@angular/material/icon";
 import {NgForOf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {ArticleCreationService} from "./article-creation.service";
+import {FileUploadComponent} from "../../common/file-upload/file-upload.component";
 
 @Injectable({
     providedIn: 'root'
@@ -36,7 +37,8 @@ import {ArticleCreationService} from "./article-creation.service";
         MatChipGrid,
         MatChipInput,
         NgForOf,
-        MatStepperNext
+        MatStepperNext,
+        FileUploadComponent
     ],
   templateUrl: './article-creation.component.html',
   styleUrl: './article-creation.component.scss'

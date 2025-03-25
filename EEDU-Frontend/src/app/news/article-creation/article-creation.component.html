@@ -10,7 +10,7 @@
             <mat-label>Title</mat-label>
             <input matInput maxlength="40" formControlName="title" required>
         </mat-form-field>
-        <button mat-flat-button matStepperNext>Set title</button>
+        <button mat-flat-button class="step-buttons" matStepperNext>Set title</button>
     </mat-step>
     <mat-step [formGroup]="authorFormGroup">
         <ng-template matStepLabel><strong>Specify an author</strong></ng-template>
@@ -18,7 +18,7 @@
             <mat-label>Author</mat-label>
             <input matInput formControlName="author" required>
         </mat-form-field>
-        <button mat-flat-button matStepperNext>Set author</button>
+        <button mat-flat-button class="step-buttons" matStepperNext>Set author</button>
     </mat-step>
     <mat-step [formGroup]="bodyFormGroup">
         <ng-template matStepLabel><strong>Write the article body</strong></ng-template>
@@ -27,12 +27,12 @@
             <textarea matInput formControlName="body" required></textarea>
             <mat-hint>Hint: ElementEDU uses markdown to style your articles. (max. 65000 characters)</mat-hint>
         </mat-form-field>
-        <button mat-flat-button matStepperNext>Set body</button>
+        <button mat-flat-button class="step-buttons" matStepperNext>Set body</button>
     </mat-step>
     <mat-step>
         <ng-template matStepLabel><strong>Upload article thumbnail</strong></ng-template>
         <app-file-upload-button (imagesUploaded)="onFileSelected($event)"></app-file-upload-button>
-        <button mat-flat-button matStepperNext>Next</button>
+        <button mat-flat-button class="step-buttons" matStepperNext>Next</button>
     </mat-step>
     <mat-step [formGroup]="publishFormGroup">
         <mat-form-field>
