@@ -1,5 +1,6 @@
 package de.gaz.eedu.user.theming;
 
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.exception.NameOccupiedException;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -64,6 +65,16 @@ public class ThemeController
         ThemeCreateModel fallbackTheme = new ThemeCreateModel("fallback", new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF}, new byte[]{(byte) 0xFF, (byte) 0xFF, (byte) 0xFF});
         // Return fallback theme if theme cannot be loaded
         return ResponseEntity.ok(fallbackTheme.toEntity(new ThemeEntity()).toModel());
+    }
+
+    @PreAuthorize("@verificationService.isFullyAuthenticated()")
+    @GetMapping("/theme/get/{themeId}") public ResponseEntity<ThemeModel> getTheme(@AuthenticationPrincipal Long id, @NotNull @PathVariable Long themeId){
+        if(userService.loadEntityById(id).isPresent())
+        {
+            return ResponseEntity.ok(themeService.getRepository().findById(themeId).orElseThrow(() -> new EntityUnknownException(themeId)).toModel());
+        }
+
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     /**

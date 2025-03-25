@@ -30,7 +30,6 @@ public class IllnessNotificationManagementController
         return illnessNotificationManagementService.getNotificationsOfDate(date);
     }
 
-
     @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).USER_CREATE.toString())")
     @GetMapping("/get-pending")
     public ResponseEntity<List<IllnessNotificationModel>> getPendingNotifications()

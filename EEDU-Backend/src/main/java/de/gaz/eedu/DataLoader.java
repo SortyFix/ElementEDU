@@ -1,5 +1,6 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -125,11 +126,13 @@ import java.util.stream.Collectors;
                 new byte[]{Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255},
                 new byte[]{Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235});
 
+        String defaultThemeName = "Dark";
+
         return getThemeService().createEntity(Set.of(defaultDark, defaultLight)).stream().filter(theme ->
         {
             // Dark will be set as default
-            return Objects.equals(theme.getName(), "defaultDark");
-        }).findFirst().orElseThrow();
+            return Objects.equals(theme.getName(), defaultThemeName);
+        }).findFirst().orElseThrow(() -> new EntityUnknownException(defaultThemeName));
     }
 
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity)

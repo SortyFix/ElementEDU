@@ -109,7 +109,7 @@ export class SettingsComponent implements OnInit {
      *
      * @param parsedUserData Parsed object representation of the userData JSON retrieved from local storage
      */
-    public processSettings(parsedUserData: any) {
+    public processSettings(parsedUserData: any): void {
         const theme$: Observable<ThemeModel> = this.setTheme(this.selectedTheme);
         console.log(theme$);
         const observables: Observable<ThemeModel>[] = [theme$]; // add further observables along the way
@@ -137,6 +137,27 @@ export class SettingsComponent implements OnInit {
                 model.backgroundColorR + 128, model.backgroundColorG + 128, model.backgroundColorB + 128,
                 model.widgetColorR + 128, model.widgetColorG + 128, model.widgetColorB + 128);
         }));
+    }
+
+    /**
+     * Creates a cookie containing the received theme data.
+     *
+     * @param themeId - The theme to receive
+     */
+    public setThemeLocally(): void
+    {
+        this.getTheme(this.selectedTheme).subscribe((themeModel: ThemeModel): void => {
+            let themeModelJson: string = JSON.stringify(themeModel);
+            document.cookie = `theme=${themeModelJson}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+        });
+    }
+
+    public getTheme(themeId: bigint): Observable<ThemeModel> {
+        const url: string = `${environment.backendUrl}/user/theme/get/${themeId}`;
+
+        return this.http.get<ThemeModel>(url, {
+            withCredentials: true
+        });
     }
 
     /**
