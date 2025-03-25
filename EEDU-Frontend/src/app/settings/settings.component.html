@@ -30,4 +30,4 @@
     <mat-label>Feedback</mat-label>
     <textarea matInput [(ngModel)]="feedbackText"></textarea>
 </mat-form-field>
-<button mat-flat-button class="feedback-button" (click)="openEmail(feedbackText)">Send feedback...</button> <br> <br> <br>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="openEmail(feedbackText)">Send feedback...</button> <br> <br> <br>

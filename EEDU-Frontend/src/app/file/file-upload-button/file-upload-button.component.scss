@@ -1,9 +1,9 @@
 .upload-container {
     text-align: center;
     padding: 20px;
-    border: 1px solid #cccccc;
+    border: 1px dashed var(--text-color);
     border-radius: 8px;
-    background-color: #f8f8f8;
+    background-color: var(--background-color);
     max-width: 400px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -11,14 +11,14 @@
 
 .upload-container p {
     font-size: 16px;
-    color: #333;
+    color: var(--text-color);
 }
 
-button {
+.button {
     padding: 10px 20px;
     font-size: 14px;
-    background-color: #00796b;
-    color: white;
+    background-color: var(--widget-color);
+    color: var(--text-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;

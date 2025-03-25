@@ -4,7 +4,7 @@
 
     <div *ngIf="loaded && values.length == 0" class="empty-list-content">
         <mat-icon class="empty-list-icon">folder_open</mat-icon>
-        <button (click)="addPressed.emit()" mat-flat-button>Create first entry</button>
+        <button (click)="addPressed.emit()" class="create-entry-button" mat-flat-button>Create first entry</button>
     </div>
 
     <list
