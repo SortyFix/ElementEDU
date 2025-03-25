@@ -162,6 +162,19 @@ mat-mdc-paginator {
     color: var(--text-color) !important;
 }
 
+.cdk-overlay-pane {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-mdc-autocomplete-panel {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-mdc-option {
+    background-color: var(--widget-color) !important;
+    color: var(--text-color) !important;
+}
+
 // WHY TWO UNDERSCORES
 .mdc-button__label {
     color: var(--text-color);
