@@ -66,10 +66,9 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
         return empty(modified ? HttpStatus.OK : HttpStatus.CONFLICT);
     }
 
-    @PostMapping("/{course}/schedule/standalone") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
-    public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel)
+    @PutMapping("/{course}/schedule/standalone") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<AppointmentEntryModel[]> scheduleAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel)
     {
-
         List<AppointmentEntryModel> createdEntities = getService().createAppointment(course, Set.of(createModel));
         return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
     }

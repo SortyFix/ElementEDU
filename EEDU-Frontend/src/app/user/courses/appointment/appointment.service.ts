@@ -54,7 +54,7 @@ export class AppointmentService {
      */
     public createAppointment(course: bigint, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]> {
         const url = `${this.BACKEND_URL}/${course}/schedule/standalone`
-        return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel): {
+        return this.http.put<any[]>(url, createModel.map((current: AppointmentCreateModel): {
             start: number, duration: number, description?: string, assignment?: AppointmentCreateModel
         } => current.toPacket), {withCredentials: true}).pipe(map((response: any[]): AppointmentEntryModel[] => response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))), tap({next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)}));
     }
