@@ -13,6 +13,16 @@
     background-color: rgba(255, 255, 255, 0.6);
 }
 
+.mat-mdc-card-content {
+    color: black !important;
+    background-color: white !important;
+}
+
+.mat-mdc-card-header {
+    color: black !important;
+    background-color: white !important;
+}
+
 mat-card {
     margin: 0;
     position: absolute;
