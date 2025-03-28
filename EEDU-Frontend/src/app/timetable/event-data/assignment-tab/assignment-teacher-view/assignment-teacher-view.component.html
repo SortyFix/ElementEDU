@@ -24,11 +24,8 @@
 
         <div *ngIf="currentInsight.submitted">
             <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
-                <ul>
-                    @for (file of currentInsight.files; track file) {
-                        <li>{{ file }}</li>
-                    }
-                </ul>
+
+                <app-insight-list [insight]="currentInsight"></app-insight-list>
 
                 <div *ngIf="currentInsight.assessment === null">
                     <mat-form-field>
@@ -41,11 +38,6 @@
                     </mat-form-field>
                     <button mat-button color="primary" type="submit">Assess</button>
                 </div>
-
-                <div *ngIf="currentInsight.assessment !== null">
-                    <p>{{ currentInsight.assessment.feedback }}</p>
-                </div>
-
             </form>
         </div>
 

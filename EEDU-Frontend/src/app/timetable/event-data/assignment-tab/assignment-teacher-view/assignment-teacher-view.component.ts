@@ -17,11 +17,12 @@ import {
     AssessmentCreateModel
 } from "../../../../user/courses/appointment/entry/assignment/assessment/assessment-create-model";
 import {GeneralErrorBoxComponent} from "../../../../common/general-error-box/general-error-box.component";
+import {InsightListComponent} from "../insight-list/insight-list.component";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
-    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, GeneralErrorBoxComponent],
+    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, GeneralErrorBoxComponent, InsightListComponent],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
 })

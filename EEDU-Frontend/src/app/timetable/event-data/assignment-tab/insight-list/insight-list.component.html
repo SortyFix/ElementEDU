@@ -1,0 +1,11 @@
+<div *ngIf="insight() && insight()!.submitted">
+    <ul>
+        @for (file of insight()!.files || []; track file) {
+            <li>{{ file }}</li>
+        }
+    </ul>
+
+    <ng-container *ngIf="insight()!.assessment?.feedback">
+        <p>{{ insight()!.assessment?.feedback }}</p>
+    </ng-container>
+</div>

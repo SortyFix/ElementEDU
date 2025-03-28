@@ -4,10 +4,6 @@
     <mat-icon svgIcon>assignment_turned_in</mat-icon>
 </div>
 
-<div *ngIf="insight">
-    {{ insight.submitted }}
-</div>
-
 <div *ngIf="assignment?.description && (insight?.files?.length || 0) < 3" >
     <mat-list>
         <mat-list-item>
@@ -23,3 +19,5 @@
         </div>
     </form>
 </div>
+
+<app-insight-list [insight]="insight"></app-insight-list>

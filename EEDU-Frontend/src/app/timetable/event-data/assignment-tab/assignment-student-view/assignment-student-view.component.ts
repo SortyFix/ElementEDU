@@ -9,6 +9,7 @@ import {MatIcon} from "@angular/material/icon";
 import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
 import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
 import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
+import {InsightListComponent} from "../insight-list/insight-list.component";
 
 @Component({
     selector: 'app-assignment-student-view',
@@ -22,6 +23,7 @@ import {AssignmentModel} from "../../../../user/courses/appointment/entry/assign
         MatListItem,
         NgIf,
         MatIcon,
+        InsightListComponent,
     ],
     templateUrl: './assignment-student-view.component.html',
     styleUrl: './assignment-student-view.component.scss'
@@ -34,8 +36,8 @@ export class AssignmentStudentViewComponent implements AfterViewInit {
     private _insight?: AssignmentInsightModel;
 
 
-    protected get insight(): AssignmentInsightModel | undefined {
-        return this._insight;
+    protected get insight(): AssignmentInsightModel | null {
+        return this._insight || null;
     }
 
     public constructor(private readonly _assignmentService: AssignmentService, form: FormBuilder) {
