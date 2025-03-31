@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {NgForOf} from "@angular/common";
 import {MatButton} from "@angular/material/button";
-import {ArticleCreationComponent} from "../../news/article-creation/article-creation.component";
 import {ArticleCreationService} from "../../news/article-creation/article-creation.service";
 
 @Component({

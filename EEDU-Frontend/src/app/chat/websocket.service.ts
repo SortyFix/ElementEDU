@@ -1,9 +1,10 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Stomp} from "@stomp/stompjs";
 import {AuthenticationService} from "../user/authentication/authentication.service";
 import {UserService} from "../user/user.service";
 import {HttpClient} from "@angular/common/http";
-import {map, merge, Observable} from "rxjs";
+import {Observable} from "rxjs";
+import {environment} from "../../environment/environment";
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +21,7 @@ export class WebsocketService {
 
     private connect(onConnectCallback: () => void) {
         this.authenticateWebsocket().subscribe(token => {
-            const socket = new WebSocket(`ws://localhost:8080/ws-endpoint?token=${token}`);
+            const socket = new WebSocket(`${environment.websocketUrl}?token=${token}`);
             this.stompClient = Stomp.over(socket);
             this.stompClient.connect({}, (frame: any): void => {
                 this.listen('test');
@@ -51,7 +52,7 @@ export class WebsocketService {
 
 
     private authenticateWebsocket(): Observable<string> {
-        return this.http.get<string>('http://localhost:8080/api/v1/chat/authenticate', {
+        return this.http.get<string>(`${environment.backendUrl}/chat/authenticate`, {
             withCredentials: true,
             responseType: "text" as "json"
         });

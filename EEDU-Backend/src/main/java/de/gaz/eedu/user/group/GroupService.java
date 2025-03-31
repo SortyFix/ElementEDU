@@ -88,7 +88,6 @@ public class GroupService extends EntityService<String, GroupRepository, GroupEn
     @Transactional public boolean attachGroups(long userId, @NotNull String[] groups) throws GroupUnprocessableException
     {
         validateGroups(groups);
-
         GroupEntity[] entities = loadEntityById(Arrays.asList(groups)).toArray(GroupEntity[]::new);
         return getUserService().loadEntityByIDSafe(userId).attachGroups(getUserService(), entities);
     }

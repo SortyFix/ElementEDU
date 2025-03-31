@@ -26,7 +26,8 @@ public class CourseController extends EntityController<Long, CourseService, Cour
 {
     private final CourseService service;
 
-    @GetMapping("/{course}/subject/{subject}")
+    @PutMapping("/{course}/subject/{subject}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_ALTER_SUBJECT.toString())")
     public @NotNull ResponseEntity<Void> setSubject(@PathVariable long course, @PathVariable String subject)
     {
         log.info("Received incoming request for setting the subject of course {} to {}.", course, subject);

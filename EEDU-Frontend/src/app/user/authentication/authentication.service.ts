@@ -64,7 +64,7 @@ export class AuthenticationService {
         const url = `${this.BACKEND_URL}/user/login` + (advanced ? "/advanced" : "");
         // send credential in case of advanced login
         return this.http.post<string>(url, data, {
-            responseType: "text" as "json", withCredentials: true
+            responseType: 'text' as 'json', withCredentials: true
         }).pipe(map((token: string): void => {this._loginData = new LoginData(data.loginName, token)}));
     }
 

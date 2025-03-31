@@ -4,12 +4,7 @@
     <mat-icon svgIcon>assignment_turned_in</mat-icon>
 </div>
 
-<div *ngIf="insight">
-    {{ insight.submitted }}
-    {{ insight.files }}
-</div>
-
-<div *ngIf="assignment?.description">
+<div *ngIf="assignment?.description && (insight?.files?.length || 0) < 3" >
     <mat-list>
         <mat-list-item>
             <span matListItemTitle>Deadline:</span>
@@ -17,10 +12,12 @@
         </mat-list-item>
     </mat-list>
 
-    <form (ngSubmit)="onSubmit()" [formGroup]="form">
-        <app-file-upload formControlName="files" (filesSelected)="onFileSelected($event)"></app-file-upload>
+    <form (ngSubmit)="onSubmit()" [formGroup]="form" >
+        <app-file-upload [maxFiles]="3" formControlName="files" (filesSelected)="onFileSelected($event)"></app-file-upload>
         <div *ngIf="canSubmit">
             <button mat-flat-button type="submit">Submit Homework</button>
         </div>
     </form>
 </div>
+
+<app-insight-list [insight]="insight"></app-insight-list>

@@ -1,5 +1,6 @@
 package de.gaz.eedu;
 
+import de.gaz.eedu.exception.EntityUnknownException;
 import de.gaz.eedu.user.AccountType;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.UserService;
@@ -35,11 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
-@Slf4j
-@Getter(AccessLevel.PROTECTED)
-public class DataLoader implements CommandLineRunner
+@Component @RequiredArgsConstructor @Slf4j @Getter(AccessLevel.PROTECTED) public class DataLoader implements CommandLineRunner
 {
     private final UserService userService;
     private final GroupService groupService;
@@ -132,20 +129,20 @@ public class DataLoader implements CommandLineRunner
 
     private @NotNull ThemeEntity createDefaultTheme()
     {
-        ThemeCreateModel defaultDark = new ThemeCreateModel(
-                "defaultDark",
+        ThemeCreateModel defaultDark = new ThemeCreateModel("Dark",
                 new byte[]{Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5, Byte.MIN_VALUE + 5},
                 new byte[]{Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10, Byte.MIN_VALUE + 10});
-        ThemeCreateModel defaultLight = new ThemeCreateModel(
-                "defaultLight",
+        ThemeCreateModel defaultLight = new ThemeCreateModel("Light",
                 new byte[]{Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255, Byte.MIN_VALUE + 255},
                 new byte[]{Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235, Byte.MIN_VALUE + 235});
+
+        String defaultThemeName = "Dark";
 
         return getThemeService().createEntity(Set.of(defaultDark, defaultLight)).stream().filter(theme ->
         {
             // Dark will be set as default
-            return Objects.equals(theme.getName(), "defaultDark");
-        }).findFirst().orElseThrow();
+            return Objects.equals(theme.getName(), defaultThemeName);
+        }).findFirst().orElseThrow(() -> new EntityUnknownException(defaultThemeName));
     }
 
     private @NotNull UserEntity createDefaultUser(@NotNull ThemeEntity themeEntity)

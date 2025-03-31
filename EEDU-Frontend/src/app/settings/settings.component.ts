@@ -17,6 +17,7 @@ import {
     MatExpansionModule,
 } from "@angular/material/expansion";
 import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-list.component";
+import {environment} from "../../environment/environment";
 
 @Component({
     selector: 'app-settings',
@@ -49,8 +50,6 @@ export class SettingsComponent implements OnInit {
     public currentThemeName: string = this.getUserData().theme.name;
     themeForm = new FormControl<SimpleThemeEntity | null>(null, Validators.required);
     public feedbackText = "";
-
-    public THEME_URL: string = "api/v1/user";
 
     ngOnInit(): void {
         this.themes = this.fetchAllThemes();
@@ -110,7 +109,7 @@ export class SettingsComponent implements OnInit {
      *
      * @param parsedUserData Parsed object representation of the userData JSON retrieved from local storage
      */
-    public processSettings(parsedUserData: any) {
+    public processSettings(parsedUserData: any): void {
         const theme$: Observable<ThemeModel> = this.setTheme(this.selectedTheme);
         console.log(theme$);
         const observables: Observable<ThemeModel>[] = [theme$]; // add further observables along the way
@@ -130,7 +129,7 @@ export class SettingsComponent implements OnInit {
      * @returns Observable<ThemeEntity> carrying the full newly selected theme.
      */
     public setTheme(themeId: bigint): Observable<ThemeModel> {
-        const url: string = `http://localhost:8080/${this.THEME_URL}/me/theme/set`;
+        const url: string = `${environment.backendUrl}/user/me/theme/set`;
         return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         }).pipe(map(model => {
@@ -141,6 +140,27 @@ export class SettingsComponent implements OnInit {
     }
 
     /**
+     * Creates a cookie containing the received theme data.
+     *
+     * @param themeId - The theme to receive
+     */
+    public setThemeLocally(): void
+    {
+        this.getTheme(this.selectedTheme).subscribe((themeModel: ThemeModel): void => {
+            let themeModelJson: string = JSON.stringify(themeModel);
+            document.cookie = `theme=${themeModelJson}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+        });
+    }
+
+    public getTheme(themeId: bigint): Observable<ThemeModel> {
+        const url: string = `${environment.backendUrl}/user/theme/get/${themeId}`;
+
+        return this.http.get<ThemeModel>(url, {
+            withCredentials: true
+        });
+    }
+
+    /**
      * Fetches all themes as a SimpleThemeEntity array observable. Typically used for
      * a theme selection dropdown.
      *
@@ -148,7 +168,7 @@ export class SettingsComponent implements OnInit {
      *          id, name format.
      */
     public fetchAllThemes() : Observable<SimpleThemeEntity[]> {
-        const url: string = `http://localhost:8080/${this.THEME_URL}/theme/all`;
+        const url: string = `${environment.backendUrl}/user/theme/all`;
         return this.http.get<SimpleThemeEntity[]>(url, {withCredentials: true});
     }
 

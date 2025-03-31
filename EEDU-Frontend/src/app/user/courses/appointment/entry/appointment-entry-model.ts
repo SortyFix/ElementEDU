@@ -1,14 +1,14 @@
 import {CalendarEvent} from "angular-calendar";
-import {AssignmentModel, GenericAssignment} from "./assignment-model";
 import {GenericRoom, RoomModel} from "../../room/room-model";
+import {AssignmentModel, GenericAssignment} from "./assignment/assignment-model";
 
 export interface GenericAppointmentEntry {
     id: bigint,
     duration: number,
     description: string,
     attachedScheduled: bigint,
-    room: GenericRoom,
-    assignment: GenericAssignment
+    room?: GenericRoom,
+    assignment?: GenericAssignment
 }
 
 export class AppointmentEntryModel {
@@ -72,6 +72,20 @@ export class AppointmentEntryModel {
     }
 
     public asEvent(name: string): CalendarEvent {
+
+        const currentDate: Date = new Date();
+        let color: string = '#1f3eda';
+
+        if(this.start < currentDate) {
+            color = '#888';
+        }
+
+        if(this.assignment)
+        {
+            const tomorrow: Date = new Date(currentDate.getTime() + 1000 * 60 * 60 * 24);
+            color = tomorrow > this.assignment.submitUntil ? '#d00' : '#da5410'
+        }
+
         return {
             id: Number(this.id),
             title: name,
@@ -82,8 +96,8 @@ export class AppointmentEntryModel {
                 afterEnd: false
             },
             color: {
-                primary: '#f00',
-                secondary: '#0f0',
+                primary: color,
+                secondary: '#fff',
             },
             draggable: false,
             meta: {

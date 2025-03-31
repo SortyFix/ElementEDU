@@ -37,6 +37,6 @@ public class RoomController extends EntityController<String, RoomService, RoomMo
     }
 
     @GetMapping("/get/all")
-    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).ROOM_GET.toString())") @Override
+    @PreAuthorize("hasRole('teacher') or hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).ROOM_GET.toString())") @Override
     public @NotNull ResponseEntity<Set<RoomModel>> fetchAll() {return super.fetchAll();}
 }

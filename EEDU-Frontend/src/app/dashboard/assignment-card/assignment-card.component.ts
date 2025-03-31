@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
-import {AppointmentService} from "../../user/courses/appointment/appointment.service";
+import {AssignmentService} from "../../user/courses/appointment/entry/assignment/assignment.service";
+import {AssignmentModel} from "../../user/courses/appointment/entry/assignment/assignment-model";
 
 @Component({
   selector: 'app-assignment-card',
@@ -11,9 +11,17 @@ import {AppointmentService} from "../../user/courses/appointment/appointment.ser
 })
 export class AssignmentCardComponent {
 
-    public constructor(private readonly _appointmentService: AppointmentService) {}
+    private _assignments: readonly AssignmentModel[] = [];
+
+    public constructor(assignmentService: AssignmentService)
+    {
+        assignmentService.nextAssignments.subscribe((assignment: readonly AssignmentModel[]): void =>
+        {
+            this._assignments = assignment;
+        })
+    }
 
     protected get assignments(): readonly AssignmentModel[] {
-        return this._appointmentService.nextAssignments.slice(0, 5);
+        return this._assignments.slice(0, 5);
     }
 }

@@ -7,10 +7,10 @@ import {AccountType} from "../../account-type";
 @Component({
     selector: 'app-full-user-list',
     imports: [
-        AbstractList,
         AbstractList
     ],
     templateUrl: './full-user-list.component.html',
+    standalone: true,
     styleUrl: './full-user-list.component.scss'
 })
 export class FullUserListComponent {

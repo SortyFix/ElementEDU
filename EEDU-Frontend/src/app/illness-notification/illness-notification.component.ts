@@ -13,9 +13,9 @@ import {MatIcon} from "@angular/material/icon";
 import {NgForOf, NgIf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {ReducedIllnessNotificationModel} from "./model/reduced-illness-notification-model";
-import {Observable, Subscription} from "rxjs";
 import {IllnessNotificationStatus} from "./illness-notification-status";
 import {FileUploadComponent} from "../common/file-upload/file-upload.component";
+import {IllnessNotificationService} from "./illness-notification.service";
 
 @Component({
   selector: 'app-illness-notification',
@@ -43,25 +43,18 @@ import {FileUploadComponent} from "../common/file-upload/file-upload.component";
 export class IllnessNotificationComponent implements OnInit {
     selectedFile: File | null = null;
 
-    prefix: string = "http://localhost:8080/api/v1/illness/me";
     reason!: string;
     until!: Date | null;
 
     illnessNotifications!: ReducedIllnessNotificationModel[];
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private service: IllnessNotificationService) {}
 
     ngOnInit(): void {
-        this.getOwnSickNotes().subscribe(list => {
+        this.service.getOwnSickNotes().subscribe(list => {
             this.illnessNotifications = list.sort(model => Number(model.id));
             console.log(this.illnessNotifications);
         })
-    }
-
-    getOwnSickNotes(): Observable<ReducedIllnessNotificationModel[]> {
-        return this.http.get<ReducedIllnessNotificationModel[]>(`${this.prefix}/my-notifications`, {
-            withCredentials: true
-        });
     }
 
     onFilesSelected(files: FileList): void {
@@ -92,7 +85,7 @@ export class IllnessNotificationComponent implements OnInit {
         this.until = event.value;
     }
 
-    onRequestSent(): Subscription | undefined {
+    onRequestSent(): void {
         console.log(this.until);
         if (!this.until)
         {
@@ -114,8 +107,6 @@ export class IllnessNotificationComponent implements OnInit {
 
         formData.append("file", this.selectedFile);
 
-        return this.http.post(`${this.prefix}/excuse`, formData, {
-            withCredentials: true
-        }).subscribe(() => location.reload());
+        this.service.sendSickNoteRequest(formData);
     }
 }

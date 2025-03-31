@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environment/environment";
 import {CourseService} from "../course.service";
 import {map, Observable, tap} from "rxjs";
@@ -11,9 +11,7 @@ import {
 import {FrequentAppointmentModel} from "./frequent/frequent-appointment-model";
 import {AppointmentUpdateModel} from "./entry/appointment-update-model";
 import {CourseModel} from "../course-model";
-import {FileService} from "../../../file/file.service";
-import {AssignmentModel} from "./entry/assignment-model";
-import {AssignmentInsightModel, GenericAssignmentInsightModel} from "./entry/assignment-insight-model";
+import {UserService} from "../../user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -22,14 +20,16 @@ export class AppointmentService {
 
     private readonly BACKEND_URL: string = `${environment.backendUrl}/course/appointment`;
 
-    constructor(private readonly _http: HttpClient, private readonly _courseService: CourseService, private readonly _fileService: FileService) { }
+    constructor(
+        private readonly _http: HttpClient,
+        private readonly _courseService: CourseService,
+        private readonly _userService: UserService) { }
 
-    public get nextAppointments(): readonly AppointmentEntryModel[] {
-        return this.courseService.value.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > new Date()).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime());
-    }
-
-    public get nextAssignments(): readonly AssignmentModel[] {
-        return this.nextAppointments.filter((appointment: AppointmentEntryModel): boolean => !!appointment.assignment).map((appointment: AppointmentEntryModel): AssignmentModel => <AssignmentModel>appointment.assignment);
+    public get nextAppointments(): Observable<readonly AppointmentEntryModel[]> {
+        const currentDate: Date = new Date();
+        return this.courseService.ownCourses$.pipe(map((courses: CourseModel[]): AppointmentEntryModel[] => {
+            return courses.flatMap((course: CourseModel): readonly AppointmentEntryModel[] => course.appointmentEntries).filter((appointment: AppointmentEntryModel): boolean => appointment.start > currentDate).sort((a: AppointmentEntryModel, b: AppointmentEntryModel): number => a.start.getTime() - b.start.getTime())
+        }));
     }
 
     protected get http(): HttpClient {
@@ -38,31 +38,6 @@ export class AppointmentService {
 
     protected get courseService(): CourseService {
         return this._courseService;
-    }
-
-    public fetchInsights(appointment: bigint): Observable<AssignmentInsightModel[]> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/all`;
-        return this.http.get<GenericAssignmentInsightModel[]>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel[]): AssignmentInsightModel[] => response.map((item: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(item))));
-    }
-
-    public fetchInsight(appointment: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status`;
-        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
-    }
-
-    public fetchUsersInsight(appointment: bigint, user: bigint): Observable<AssignmentInsightModel> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/status/${user}`;
-        return this.http.get<GenericAssignmentInsightModel>(url, {withCredentials: true}).pipe(map((response: GenericAssignmentInsightModel): AssignmentInsightModel => AssignmentInsightModel.fromObject(response)));
-    }
-
-    public submitAssignment(appointment: bigint, assignmentFiles: File[]): Observable<HttpEvent<any>> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/submit`;
-        return this._fileService.uploadFiles(url, assignmentFiles);
-    }
-
-    public deleteAssignment(appointment: bigint, assignmentFiles: string[]): Observable<void> {
-        const url: string = `${this.BACKEND_URL}/assignment/${appointment}/delete/${assignmentFiles.toString()}`;
-        return this.http.delete<void>(url, {withCredentials: true});
     }
 
     /**
@@ -79,7 +54,7 @@ export class AppointmentService {
      */
     public createAppointment(course: bigint, createModel: AppointmentCreateModel[]): Observable<AppointmentEntryModel[]> {
         const url = `${this.BACKEND_URL}/${course}/schedule/standalone`
-        return this.http.post<any[]>(url, createModel.map((current: AppointmentCreateModel): {
+        return this.http.put<any[]>(url, createModel.map((current: AppointmentCreateModel): {
             start: number, duration: number, description?: string, assignment?: AppointmentCreateModel
         } => current.toPacket), {withCredentials: true}).pipe(map((response: any[]): AppointmentEntryModel[] => response.map((item: any): AppointmentEntryModel => AppointmentEntryModel.fromObject(item))), tap({next: (response: AppointmentEntryModel[]): void => this.pushAppointment(response)}));
     }
@@ -121,7 +96,12 @@ export class AppointmentService {
 
     private pushAppointment(objects: AppointmentEntryModel[]): void {
         for (const appointment of objects) {
-            this.courseService.findCourseLazily(appointment.course)?.attachAppointment(appointment);
+            if(this.hasFetchCoursePrivilege)
+            {
+                this.courseService.findCourseLazily(appointment.course)?.attachAppointment(appointment);
+            }
+
+            this.courseService.findOwnCourseLazily(appointment.course)?.attachAppointment(appointment);
         }
 
         this.courseService.update();
@@ -129,9 +109,24 @@ export class AppointmentService {
 
     private pushFrequent(course: bigint, objects: FrequentAppointmentModel[]) {
         for (const appointment of objects) {
-            this.courseService.findCourseLazily(course)?.attachFrequentAppointment(appointment);
+            if(this.hasFetchCoursePrivilege)
+            {
+                this.courseService.findCourseLazily(course)?.attachFrequentAppointment(appointment);
+            }
+
+            this.courseService.findOwnCourseLazily(course)?.attachFrequentAppointment(appointment);
         }
 
         this.courseService.update();
+    }
+
+    private get hasFetchCoursePrivilege(): boolean
+    {
+        const privilege: string | null = this._courseService.privileges.fetchPrivilege;
+        if(!privilege)
+        {
+            return true;
+        }
+        return this._userService.getUserData.hasPrivilege(privilege)
     }
 }

@@ -5,23 +5,24 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseService;
 import de.gaz.eedu.course.appointment.AppointmentService;
+import de.gaz.eedu.course.appointment.entry.assignment.assessment.AssessmentEntity;
+import de.gaz.eedu.course.appointment.entry.assignment.assessment.model.AssessmentModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentCreateModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentInsightModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentInsightModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.room.RoomEntity;
 import de.gaz.eedu.entity.model.EntityModelRelation;
 import de.gaz.eedu.file.FileEntity;
 import de.gaz.eedu.user.UserEntity;
+import de.gaz.eedu.user.model.ReducedUserModel;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,9 +40,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 
 @Slf4j
 @Entity
@@ -55,8 +55,8 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     private Instant publish;
     @Column(name = "description", length = 1000) private String description;
 
-    @ManyToOne @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
-    @Cascade(CascadeType.ALL) private CourseEntity course;
+    @ManyToOne(cascade = CascadeType.ALL) @JoinColumn(name = "course_appointment_id", nullable = false) @JsonBackReference
+    private CourseEntity course;
     @ManyToOne @JoinColumn(name = "frequent_appointment_id") @JsonBackReference
     private @Nullable FrequentAppointmentEntity frequentAppointment;
 
@@ -67,6 +67,9 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     @ManyToOne @JsonManagedReference @JoinColumn(name = "room_id", referencedColumnName = "id")
     private @Nullable RoomEntity room;
+
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL) @JsonBackReference
+    private final Set<AssessmentEntity> assessments = new HashSet<>();
 
     /**
      * This constructor creates a new instance of this entity.
@@ -130,21 +133,41 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
     public @NotNull AssignmentInsightModel getInsight(@NotNull UserEntity user)
     {
-        String uploadPath = getUploadPath(user.getId());
-        File file = new File(uploadPath);
+        File file = new File(getUploadPath(user.getId()));
         File[] files = file.listFiles();
+
+        AssessmentModel assessment = getAssessment(user).map(AssessmentEntity::toModel).orElse(null);
+        ReducedUserModel reducedUserModel = user.toReducedModel();
+
         if (!hasSubmitted(user) || !file.isDirectory() || Objects.isNull(files) || files.length == 0)
         {
-            return new AssignmentInsightModel(user.getLoginName(), false, new String[0]);
+            return new AssignmentInsightModel(reducedUserModel, false, new String[0], assessment);
         }
 
         String[] paths = Arrays.stream(files).map(File::getName).toArray(String[]::new);
-        return new AssignmentInsightModel(user.getLoginName(), true, paths);
+        return new AssignmentInsightModel(reducedUserModel, true, paths, assessment);
+    }
+
+    public @NotNull File[] loadAssignmentFiles(long user)
+    {
+        return Objects.requireNonNullElse(new File(getUploadPath(user)).listFiles(), new File[0]);
+    }
+
+    public @NotNull Optional<File> loadAssignmentFile(long user, @NotNull String file)
+    {
+        File couldBe = loadFileSave(getUploadPath(user), file);
+        if(!couldBe.exists() || !couldBe.isDirectory() || !couldBe.canRead())
+        {
+            return Optional.empty();
+        }
+
+        return Optional.of(couldBe);
     }
 
     // method not allowed when submitHomework is false
     // bad gateway when any file is malicious
     // bad request when
+
     public void submitAssignment(long user, @NotNull MultipartFile... files) throws ResponseStatusException
     {
         if (!this.isAssignmentValid())
@@ -154,12 +177,12 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
 
         String uploadPath = getUploadPath(user);
         File[] file = new File(uploadPath).listFiles();
-        if (file != null && (file.length + files.length) > 5)
+        if (file != null && (file.length + files.length) > 3)
         {
             throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "The maximum amount of files exceeded.");
         }
 
-        getCourse().getRepository().uploadBatch(uploadPath, files);
+        getCourse().getRepository().uploadBatch(uploadPath(user), files);
         log.info("User {} has uploaded files to appointment entry {}.", user, getId());
     }
 
@@ -183,6 +206,12 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         return allDeleted;
     }
 
+    private @NotNull Optional<AssessmentEntity> getAssessment(@NotNull UserEntity user)
+    {
+        Predicate<AssessmentEntity> userEquals = current -> Objects.equals(user, current.getUser());
+        return getAssessments().stream().filter(userEquals).findFirst();
+    }
+
     private @NotNull String getUploadPath(long user)
     {
         FileEntity repository = getCourse().getRepository();
@@ -196,7 +225,8 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
             return false;
         }
 
-        return new File(getCourse().getRepository().getFilePath(uploadPath(user.getId()))).exists();
+        File file = new File(getUploadPath(user.getId()));
+        return file.exists() && file.isDirectory();
     }
 
     private @NotNull String uploadPath(long user)

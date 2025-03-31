@@ -1,1 +1,12 @@
-<p>news-card works!</p>
+<div class="post-list">
+    <div *ngFor="let x of postList" class="post-item">
+        <div class="post-header">
+            <h3 class="post-title">{{ x.title }}</h3>
+            <p class="post-author">by {{ x.author }}</p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="postList.length == 0">
+    No articles yet!
+</div>

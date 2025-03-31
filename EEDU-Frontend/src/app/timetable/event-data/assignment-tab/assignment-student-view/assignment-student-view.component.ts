@@ -6,9 +6,10 @@ import {MatButton} from "@angular/material/button";
 import {MatList, MatListItem, MatListItemLine, MatListItemTitle} from "@angular/material/list";
 import {NgIf} from "@angular/common";
 import {MatIcon} from "@angular/material/icon";
-import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment-model";
-import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
-import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment-insight-model";
+import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
+import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
+import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
+import {InsightListComponent} from "../insight-list/insight-list.component";
 
 @Component({
     selector: 'app-assignment-student-view',
@@ -21,7 +22,8 @@ import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry
         MatListItemTitle,
         MatListItem,
         NgIf,
-        MatIcon
+        MatIcon,
+        InsightListComponent,
     ],
     templateUrl: './assignment-student-view.component.html',
     styleUrl: './assignment-student-view.component.scss'
@@ -34,16 +36,16 @@ export class AssignmentStudentViewComponent implements AfterViewInit {
     private _insight?: AssignmentInsightModel;
 
 
-    protected get insight(): AssignmentInsightModel | undefined {
-        return this._insight;
+    protected get insight(): AssignmentInsightModel | null {
+        return this._insight || null;
     }
 
-    public constructor(private readonly _appointmentService: AppointmentService, form: FormBuilder) {
+    public constructor(private readonly _assignmentService: AssignmentService, form: FormBuilder) {
         this._form = form.group({files: [[], Validators.required]});
     }
 
     public ngAfterViewInit(): void {
-        this._appointmentService.fetchInsight(this.appointment.id).subscribe((insights: AssignmentInsightModel): void => {
+        this._assignmentService.fetchInsight(this.appointment.id).subscribe((insights: AssignmentInsightModel): void => {
             this._insight = insights;
         });
     }
@@ -65,7 +67,7 @@ export class AssignmentStudentViewComponent implements AfterViewInit {
         }
         // --
 
-        this._appointmentService.submitAssignment(this.appointment.id, fileArray).subscribe((): void => {});
+        this._assignmentService.submitAssignment(this.appointment.id, fileArray).subscribe((): void => {});
     }
 
     protected onFileSelected(event: FileList): void {

@@ -21,7 +21,6 @@
         .mat-icon {
             transform: scale(4);
             padding: 30px;
-            -webkit-text-fill-color: var(--widget-color);
         }
 
         button {
@@ -29,6 +28,9 @@
         }
     }
 
+    .create-entry-button {
+        background-color: var(--widget-color);
+    }
     .paginator-tools {
         border-top: solid 1px rgba(50, 50, 50, 0.1);;
         display: flex;

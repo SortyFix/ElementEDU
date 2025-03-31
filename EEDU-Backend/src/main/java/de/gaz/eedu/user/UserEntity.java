@@ -247,7 +247,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
 
         if(!Collections.disjoint(this.getGroups(), entities))
         {
-            throw new StateTransitionException("The user already has group(s).");
+            throw new StateTransitionException("The user already is part in any of the given group(s).");
         }
 
         return this.groups.addAll(entities);
@@ -271,7 +271,7 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
      * @param ids         The IDs of the groups to be detached.
      * @return true if a group was successfully detached and the user entity was saved, false otherwise.
      */
-    public boolean detachGroups(@NotNull UserService userService, @NotNull String... ids)
+    public boolean detachGroups(@NotNull UserService userService, @NotNull String... ids) throws StateTransitionException
     {
         return saveEntityIfPredicateTrue(userService, ids, this::detachGroups);
     }
@@ -292,6 +292,13 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
     public boolean detachGroups(@NotNull String... ids)
     {
         List<String> detachGroupIds = Arrays.asList(ids);
+        Set<String> allGroups = this.groups.stream().map(GroupEntity::getId).collect(Collectors.toSet());
+
+        if(!allGroups.containsAll(detachGroupIds))
+        {
+            throw new StateTransitionException("The user already is not part of some given group(s).");
+        }
+
         return this.groups.removeIf(groupEntity -> detachGroupIds.contains(groupEntity.getId()));
     }
 

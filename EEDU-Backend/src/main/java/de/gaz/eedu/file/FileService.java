@@ -99,6 +99,19 @@ import java.util.zip.ZipOutputStream;
         return zipAndSend(files);
     }
 
+    public @NotNull ResponseEntity<ByteArrayResource> loadResourceByIdAndName(@NotNull Long id, @NotNull String fileName) throws IOException
+    {
+        File directory = getDirectoryFromId(id);
+        File[] files = directory.listFiles((dir, name) -> name.equals(fileName));
+
+        if (files == null || files.length == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return sendSingle(files[0]);
+    }
+
+
     public ResponseEntity<ByteArrayResource> zipAndSend(@NotNull File[] files)
     {
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")

@@ -104,6 +104,93 @@ mat-mdc-paginator {
     background-color: rgba(255, 255, 255, .1);
 }
 
+.mat-calendar-table {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-calendar-content {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-calendar-header {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-calendar {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-calendar-controls {
+    color: var(--text-color) !important;
+}
+
+.stepper-header {
+    background-color: var(--widget-color) !important;
+    color: var(--text-color) !important;
+}
+
+.mat-step-header {
+    background-color: var(--widget-color) !important;
+    color: var(--text-color) !important;
+}
+
+.ng-star-inserted {
+    color: var(--text-color) !important;
+}
+
+.mat-mdc-card {
+    background-color: var(--widget-color);
+}
+.mat-mdc-card-content {
+    background-color: var(--widget-color);
+}
+
+.mat-mdc-card-header {
+    background-color: var(--widget-color);
+}
+
+.mat-mdc-card-actions {
+    background-color: var(--widget-color) !important;
+    color: var(--text-color) !important;
+}
+
+.mat-mdc-tab {
+    color: var(--text-color) !important;
+}
+
+.mdc-tab__text-label {
+    color: var(--text-color) !important;
+}
+
+.cdk-overlay-pane {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-mdc-autocomplete-panel {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-mdc-option {
+    background-color: var(--widget-color) !important;
+    color: var(--text-color) !important;
+}
+
+// WHY TWO UNDERSCORES
+.mdc-button__label {
+    color: var(--text-color);
+}
+
+.mat-icon {
+    -webkit-text-fill-color: var(--text-color);
+}
+
+.mat-vertical-content {
+    background-color: var(--widget-color) !important;
+}
+
+.mat-step {
+    background-color: var(--widget-color) !important;
+}
 textarea::placeholder {
     color: var(--text-color);
 }

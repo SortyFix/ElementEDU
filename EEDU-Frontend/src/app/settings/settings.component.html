@@ -12,7 +12,8 @@
         </mat-option>
     </mat-select>
 </mat-form-field> <br>
-<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes</button> <br> <br>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="saveSettings()">Save changes on server</button> <br> <br>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="setThemeLocally()">Save changes locally</button> <br> <br>
 
 <mat-divider></mat-divider>
 
@@ -29,4 +30,4 @@
     <mat-label>Feedback</mat-label>
     <textarea matInput [(ngModel)]="feedbackText"></textarea>
 </mat-form-field>
-<button mat-flat-button class="feedback-button" (click)="openEmail(feedbackText)">Send feedback...</button> <br> <br> <br>
+<button mat-button [style.color]="user.theme.getTextColor('background', false)" (click)="openEmail(feedbackText)">Send feedback...</button> <br> <br> <br>

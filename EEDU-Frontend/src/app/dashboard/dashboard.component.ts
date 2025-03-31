@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import {ThemeService} from "../theming/theme.service";
 import {UserService} from "../user/user.service";
 import {AppointmentCardComponent} from "./appointment-card/appointment-card.component";
 import {AssignmentCardComponent} from "./assignment-card/assignment-card.component";
@@ -7,6 +6,7 @@ import {NewsCardComponent} from "./news-card/news-card.component";
 import {ChatCardComponent} from "./chat-card/chat-card.component";
 import {MatIcon} from "@angular/material/icon";
 import {NgComponentOutlet, NgForOf} from "@angular/common";
+import {Router, RouterLink} from "@angular/router";
 
 @Component({
     selector: 'app-dashboard',
@@ -14,23 +14,28 @@ import {NgComponentOutlet, NgForOf} from "@angular/common";
     imports: [
         MatIcon,
         NgForOf,
-        NgComponentOutlet
+        NgComponentOutlet,
+        RouterLink
     ],
     standalone: true,
     styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-    constructor(public themeService: ThemeService, public userService: UserService) {
+    constructor(public userService: UserService, public router: Router) {
     }
 
     cards = [
-        { title: 'Next appointments', content: 'This is the content of card 1.', component: AppointmentCardComponent },
-        { title: 'Homework', content: 'This is the content of card 2.', component: AssignmentCardComponent },
-        { title: 'Latest news', content: 'This is the content of card 3.', component: NewsCardComponent },
-        { title: 'Latest contacts', content: 'This is the content of card 4.', component: ChatCardComponent }
+        { title: 'Next appointments', component: AppointmentCardComponent, route: 'timetable' },
+        { title: 'Homework', component: AssignmentCardComponent, route: 'timetable'},
+        { title: 'Latest news', component: NewsCardComponent, route: 'news' },
+        { title: 'Latest contacts', component: ChatCardComponent, route: 'chat' }
     ];
 
     public get user() {
         return this.userService.getUserData;
+    }
+
+    public navigateTo(route: string): void {
+        this.router.navigate([route]);
     }
 }

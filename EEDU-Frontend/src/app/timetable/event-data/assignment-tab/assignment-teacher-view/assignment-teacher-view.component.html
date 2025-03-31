@@ -4,14 +4,49 @@
 
 <ng-container *ngIf="!editing() && assignment?.description">
 
-    <general-selection-input [values]="assignmentInsightModels" (valueChange)="valueUpdate($event)"></general-selection-input>
-    <ng-container *ngIf="currentInsight != null">
-        <p>Submitted {{ currentInsight.submitted }}</p>
+    <p>
+        {{ assignment?.description }}
+    </p>
 
-        <mat-list>
-            @for (file of currentInsight.files; track file) {
-                <mat-list-item>{{ file }}</mat-list-item>
+    <mat-form-field>
+        <mat-label>Current User</mat-label>
+        <mat-select #select (valueChange)="currentInsight = select.value">
+            @for (insight of assignmentInsight; track assignmentInsight) {
+                <mat-option [value]="insight">
+                    <mat-icon>{{ toIcon(insight) }}</mat-icon>
+                    {{ insight.user.name }}
+                </mat-option>
             }
-        </mat-list>
+        </mat-select>
+    </mat-form-field>
+
+    <ng-container *ngIf="currentInsight != null">
+
+        <div *ngIf="currentInsight.submitted">
+            <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
+
+                <app-insight-list [insight]="currentInsight"></app-insight-list>
+
+                <div *ngIf="currentInsight.assessment === null">
+                    <mat-form-field>
+                        <mat-label>Feedback</mat-label>
+                        <textarea
+                            matInput
+                            formControlName="feedback"
+                            placeholder="Enter the feedback you would wish to share with the student">
+                    </textarea>
+                    </mat-form-field>
+                    <button mat-button color="primary" type="submit">Assess</button>
+                </div>
+            </form>
+        </div>
+
+        <div *ngIf="!currentInsight.submitted">
+            <general-error-box
+                [icon]="toIcon(currentInsight)"
+                message="Nothing has been submitted."
+                [subMessage]="'The user ' + currentInsight.user.name + ' has not submitted anything yet'">
+            </general-error-box>
+        </div>
     </ng-container>
 </ng-container>

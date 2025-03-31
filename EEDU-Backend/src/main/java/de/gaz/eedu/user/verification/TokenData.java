@@ -2,6 +2,7 @@ package de.gaz.eedu.user.verification;
 
 import de.gaz.eedu.user.verification.authority.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.jetbrains.annotations.Contract;
@@ -37,7 +38,8 @@ public record TokenData(@Nullable Claims parent, long userId, boolean advanced, 
                 userId,
                 advanced,
                 restrictedClaims,
-                Stream.of(claimHolder).collect(Collectors.toMap(ClaimHolder::key, ClaimHolder::content)));
+                Stream.of(claimHolder).collect(Collectors.toMap(ClaimHolder::key, ClaimHolder::content))
+        );
     }
 
     private static void validate(@NotNull Set<String> keys, Set<String> elements) throws InvalidTokenException
@@ -59,13 +61,40 @@ public record TokenData(@Nullable Claims parent, long userId, boolean advanced, 
         // get rid of this, will be generated with next thing
         additionalClaims.remove("sub");
         additionalClaims.remove("iat");
-        additionalClaims.remove("exo");
+        additionalClaims.remove("exp");
 
         validate(additionalClaims.keySet(), restricted);
 
         long userId = claims.get("userId", Long.class);
         boolean advanced = claims.get("advanced", Boolean.class);
         return new TokenData(claims, userId, advanced, restricted, additionalClaims);
+    }
+
+    @Contract("_, _ -> new")
+    public static @NotNull TokenData purgeClaims(@NotNull TokenData tokenData, String @NotNull ... keys) throws InvalidTokenException
+    {
+        for (String key : keys)
+        {
+            tokenData.deleteRestrictedClaim(key);
+        }
+
+        return new TokenData(
+                tokenData.getParent().map((claims) -> removeClaims(claims, keys)).orElse(tokenData.parent()),
+                tokenData.userId(),
+                tokenData.advanced(),
+                tokenData.restrictedClaims(),
+                tokenData.additionalClaims()
+        );
+    }
+
+    private static Claims removeClaims(@NotNull Claims parent, @NotNull String @NotNull ... keys)
+    {
+        ClaimsBuilder claimsBuilder = Jwts.claims().add(parent);
+        for (String key : keys)
+        {
+            claimsBuilder.delete(key);
+        }
+        return claimsBuilder.build();
     }
 
     @Contract("_, _ -> new")
@@ -101,7 +130,7 @@ public record TokenData(@Nullable Claims parent, long userId, boolean advanced, 
 
     public boolean deleteRestrictedClaim(@NotNull String key)
     {
-        return restrictedClaims().remove(key) && removeClaim(key);
+        return restrictedClaims().remove(key) || removeClaim(key);
     }
 
     public boolean unrestrictedClaim(@NotNull String key)

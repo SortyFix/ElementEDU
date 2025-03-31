@@ -108,6 +108,16 @@ CREATE TABLE IF NOT EXISTS user_entity
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
 );
 
+CREATE TABLE IF NOT EXISTS assessment_entity
+(
+    id             BIGINT PRIMARY KEY NOT NULL,
+    appointment_id BIGINT             NOT NULL,
+    user_id        BIGINT             NOT NULL,
+    feedback       VARCHAR(200)       NULL,
+    FOREIGN KEY (appointment_id) REFERENCES appointment_entry_entity (id),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
+);
+
 CREATE TABLE IF NOT EXISTS credential_entity
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
