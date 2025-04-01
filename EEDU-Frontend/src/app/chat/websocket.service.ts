@@ -32,6 +32,12 @@ export class WebsocketService {
         })
     }
 
+    public getUTCString(days: number): string {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+        return date.toUTCString();
+    }
+
     public onConnected(): Promise<void> {
         return this.isConnected;
     }

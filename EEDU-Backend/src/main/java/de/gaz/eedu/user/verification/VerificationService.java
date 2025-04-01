@@ -165,6 +165,15 @@ public class VerificationService
         return credentialToken(type, tokenData, methods);
     }
 
+    public @NotNull GeneratedToken websocketToken(long userId, @NotNull Boolean remember)
+    {
+        TokenData token = new TokenData(
+                null, userId, false, Collections.emptySet(), Collections.emptyMap()
+        );
+        return remember ? generateKey(JwtTokenType.WEBSOCKET, getExpiry(Duration.ofDays(14)), token) :
+                generateKey(JwtTokenType.WEBSOCKET, getExpiry(Duration.ofMinutes(10)), token);
+    }
+
     /**
      * Retrieves the distinct enabled two-factor authentication methods set by a user.
      * <p>
@@ -197,14 +206,6 @@ public class VerificationService
             }
             default -> throw new IllegalArgumentException("Unsupported token type");
         }
-    }
-
-    public @NotNull GeneratedToken websocketToken(long userId)
-    {
-        TokenData token = new TokenData(
-                null, userId, false, Collections.emptySet(), Collections.emptyMap()
-        );
-        return generateKey(JwtTokenType.WEBSOCKET, getExpiry(Duration.ofMinutes(10)), token);
     }
 
     public @NotNull GeneratedToken authorizeToken(@NotNull TokenData tokenData)

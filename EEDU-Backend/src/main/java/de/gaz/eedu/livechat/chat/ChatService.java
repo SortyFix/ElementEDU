@@ -72,8 +72,8 @@ public class ChatService extends EntityService<Long, ChatRepository, ChatEntity,
         return chatRepository.findAllByUsersIn(userIDs, (long) userIDs.size());
     }
 
-    public @NotNull GeneratedToken generateWebsocketToken(long userId) {
-        return verificationService.websocketToken(userId);
+    public @NotNull GeneratedToken generateWebsocketToken(long userId, @NotNull Boolean remember) {
+        return verificationService.websocketToken(userId, remember);
     }
 
     /**

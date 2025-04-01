@@ -18,6 +18,8 @@ import {
 } from "@angular/material/expansion";
 import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-list.component";
 import {environment} from "../../environment/environment";
+import {CookieHelpers} from "../user/cookie/cookie-helpers";
+import {CookieOptions} from "../user/cookie/cookie-options";
 
 @Component({
     selector: 'app-settings',
@@ -42,7 +44,7 @@ import {environment} from "../../environment/environment";
     encapsulation: ViewEncapsulation.None
 })
 export class SettingsComponent implements OnInit {
-    constructor(public userService: UserService, public http: HttpClient) {
+    constructor(public userService: UserService, public http: HttpClient, public cookieHelpers: CookieHelpers) {
     }
 
     public themes!: Observable<SimpleThemeEntity[]>;
@@ -141,14 +143,14 @@ export class SettingsComponent implements OnInit {
 
     /**
      * Creates a cookie containing the received theme data.
-     *
-     * @param themeId - The theme to receive
      */
     public setThemeLocally(): void
     {
         this.getTheme(this.selectedTheme).subscribe((themeModel: ThemeModel): void => {
             let themeModelJson: string = JSON.stringify(themeModel);
-            document.cookie = `theme=${themeModelJson}; max-age=${60 * 60 * 24 * 365}; path=/;`;
+            let options: CookieOptions = new CookieOptions();
+            options.maxAge = 60 * 60 * 24 * 365;
+            this.cookieHelpers.createCookie("theme", themeModelJson, options);
         });
     }
 

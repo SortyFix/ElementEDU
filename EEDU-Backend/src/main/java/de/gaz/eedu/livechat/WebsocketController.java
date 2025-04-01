@@ -43,7 +43,13 @@ public class WebsocketController
     @GetMapping("/authenticate")
     public @NotNull ResponseEntity<String> authenticate(@AuthenticationPrincipal long userId)
     {
-        return ResponseEntity.ok(chatService.generateWebsocketToken(userId).jwt());
+        return ResponseEntity.ok(chatService.generateWebsocketToken(userId, false).jwt());
+    }
+
+    @GetMapping("/authenticate/remember")
+    public @NotNull ResponseEntity<String> authenticateAndRemember(@AuthenticationPrincipal long userId)
+    {
+        return ResponseEntity.ok(chatService.generateWebsocketToken(userId, true).jwt());
     }
 
     @MessageMapping("/send")
