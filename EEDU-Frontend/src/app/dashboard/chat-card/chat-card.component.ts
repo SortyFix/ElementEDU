@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {NgForOf, NgIf} from "@angular/common";
 import {ChatService} from "../../chat/chat.service";
 import {ChatModel} from "../../chat/models/chat-model";
-import {ChatComponent} from "../../chat/chat.component";
 
 @Component({
   selector: 'app-chat-card',

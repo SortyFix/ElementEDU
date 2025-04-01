@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {AppointmentService} from "../../user/courses/appointment/appointment.service";
 import {AppointmentEntryModel} from "../../user/courses/appointment/entry/appointment-entry-model";
 import {NgForOf, NgIf} from "@angular/common";

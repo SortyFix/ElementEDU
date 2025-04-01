@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import {AssignmentModel} from "../../user/courses/appointment/entry/assignment-model";
-import {AppointmentService} from "../../user/courses/appointment/appointment.service";
 import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {UserService} from "../../user/user.service";
