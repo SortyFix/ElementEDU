@@ -28,7 +28,7 @@ export class NewsCardComponent implements OnInit {
 
     ngOnInit(): void {
         this.newsService.getPosts().subscribe(posts => {
-            this.postList = posts.splice(0, 6);
+            this.postList = posts.splice(0, 4);
             console.log(this.postList);
         });
     }

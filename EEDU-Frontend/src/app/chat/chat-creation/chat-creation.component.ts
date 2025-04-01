@@ -64,7 +64,8 @@ export class ChatCreationComponent {
         let chatUsers = [this.userService.getUserData.id, userId]
         return this.http.post<ChatModel>(`${environment.backendUrl}/chat/create`, chatUsers, {
             withCredentials: true
-        }).subscribe(model => {
+        }).subscribe((model: ChatModel): void => {
+            location.reload();
             console.log(model);
         });
     }

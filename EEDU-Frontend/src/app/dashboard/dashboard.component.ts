@@ -26,16 +26,19 @@ export class DashboardComponent {
 
     cards = [
         { title: 'Next appointments', component: AppointmentCardComponent, route: 'timetable' },
-        { title: 'Homework', component: AssignmentCardComponent, route: 'timetable'},
+        { title: 'User', component: AssignmentCardComponent },
         { title: 'Latest news', component: NewsCardComponent, route: 'news' },
-        { title: 'Latest contacts', component: ChatCardComponent, route: 'chat' }
+        { title: 'Contacts', component: ChatCardComponent, route: 'chat' }
     ];
 
     public get user() {
         return this.userService.getUserData;
     }
 
-    public navigateTo(route: string): void {
-        this.router.navigate([route]);
+    public navigateTo(route: string | undefined): void {
+        if(route)
+        {
+            this.router.navigate([route]);
+        }
     }
 }

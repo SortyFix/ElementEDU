@@ -24,6 +24,7 @@ import {CookieOptions} from "../user/cookie/cookie-options";
 @Component({
     selector: 'app-settings',
     standalone: true,
+    providers: [CookieHelpers],
     imports: [
         MatFormField,
         MatInputModule,

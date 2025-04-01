@@ -1,8 +1,8 @@
 <div class="post-list">
-    <div *ngFor="let x of appointments" class="post-item">
-        <div class="post-header">
-            <h3 class="post-title">{{ x.description }}</h3>
-            <p class="post-author">by {{ x.start }}</p>
+    <div *ngFor="let x of appointments" class="appointment-item">
+        <div class="header">
+            <h3 class="primary">{{ x.description }}</h3>
+            <p class="secondary">{{ getDateString(x) }}</p>
         </div>
     </div>
 </div>

@@ -19,4 +19,9 @@ export class AppointmentCardComponent {
     protected get appointments(): readonly AppointmentEntryModel[] {
         return this._appointmentService.nextAppointments.slice(0, 5);
     }
+
+    protected getDateString(model: AppointmentEntryModel)
+    {
+        return model.start.toLocaleDateString("en-GB");
+    }
 }

@@ -1,1 +1,13 @@
-<p>homework-card works!</p>
+<div class="profile-wrapper">
+    <div class="compact-profile">
+        <div class="avatar-container">
+            <mat-icon class="profile-avatar">account_circle</mat-icon>
+        </div>
+        <h4 class="profile-name">{{ getUserData().firstName }} {{ getUserData().lastName }}</h4>
+        <p class="profile-meta">{{ getUserData().loginName }}, ID: {{ getUserData().id }}</p>
+        <button mat-button (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sign Out</span>
+        </button>
+    </div>
+</div>
