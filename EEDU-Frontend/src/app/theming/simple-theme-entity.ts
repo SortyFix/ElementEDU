@@ -1,6 +1,3 @@
-import {CookieHelpers} from "../user/cookie/cookie-helpers";
-import {ThemeModel} from "./theme-model";
-
 export class SimpleThemeEntity {
     public readonly id: bigint;
     public readonly name: string;
