@@ -11,12 +11,6 @@ export class CookieOptions {
     path: string | null = null;
 
     public toInjectableString() {
-        return `${this.secure ? "Secure;" : ""}
-                ${this.httpOnly ? "HttpOnly;" : ""}
-                SameSite=${this.sameSite};
-                ${this.partitioned ? "Partitioned;" : ""}
-                ${this.expires ? `Expires=${this.expires};` : ""}
-                ${this.maxAge ? `Max-Age=${this.maxAge};` : ""}
-                ${this.domain ? `Domain=${this.domain};` : ""}`;
+        return `${this.secure ? "Secure;" : ""}${this.httpOnly ? "HttpOnly;" : ""}SameSite=${this.sameSite};${this.partitioned ? "Partitioned;" : ""}${this.expires ? `Expires=${this.expires};` : ""}${this.maxAge ? `Max-Age=${this.maxAge};` : ""}${this.domain ? `Domain=${this.domain};` : ""}`;
     }
 }

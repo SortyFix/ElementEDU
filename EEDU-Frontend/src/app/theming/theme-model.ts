@@ -1,3 +1,5 @@
+import {CookieHelpers} from "../user/cookie/cookie-helpers";
+
 export class ThemeModel {
     constructor(public readonly id: bigint,
                 public readonly name: string,
@@ -28,6 +30,13 @@ export class ThemeModel {
      */
     public get getBackgroundColor(): string
     {
+        let cookieHelpers: CookieHelpers = new CookieHelpers();
+        const cookieValue: string | null = cookieHelpers.getCookieValue("theme");
+        if(cookieValue != null)
+        {
+            const themeModel: ThemeModel = ThemeModel.fromObject(JSON.parse(cookieValue));
+            return `rgb(${themeModel.backgroundColorR + 128}, ${themeModel.backgroundColorG + 128}, ${themeModel.backgroundColorB + 128})`
+        }
         return `rgb(${this.backgroundColorR + 128}, ${this.backgroundColorG + 128}, ${this.backgroundColorB + 128})`
     }
 
@@ -37,6 +46,13 @@ export class ThemeModel {
      */
     public get getWidgetColor(): string
     {
+        let cookieHelpers: CookieHelpers = new CookieHelpers();
+        const cookieValue: string | null = cookieHelpers.getCookieValue("theme");
+        if(cookieValue != null)
+        {
+            const themeModel: ThemeModel = ThemeModel.fromObject(JSON.parse(cookieValue));
+            return `rgb(${themeModel.widgetColorR + 128}, ${themeModel.widgetColorG + 128}, ${themeModel.widgetColorB + 128})`
+        }
         return `rgb(${this.widgetColorR + 128}, ${this.widgetColorG + 128}, ${this.widgetColorB + 128})`
     }
 
@@ -73,14 +89,33 @@ export class ThemeModel {
      */
     public getTextColor(type: 'background' | 'widget', isTitle: boolean): string
     {
+        let cookieHelpers: CookieHelpers = new CookieHelpers();
+        const cookieValue: string | null = cookieHelpers.getCookieValue("theme");
+
         let r, g, b: number;
         switch (type) {
             case "background":
+                if(cookieValue != null)
+                {
+                    const themeModel: ThemeModel = ThemeModel.fromObject(JSON.parse(cookieValue));
+                    r = themeModel.backgroundColorR + 128;
+                    g = themeModel.backgroundColorG + 128;
+                    b = themeModel.backgroundColorB + 128;
+                    break;
+                }
                 r = this.backgroundColorR + 128;
                 g = this.backgroundColorG + 128;
                 b = this.backgroundColorB + 128;
                 break;
             case "widget":
+                if(cookieValue != null)
+                {
+                    const themeModel: ThemeModel = ThemeModel.fromObject(JSON.parse(cookieValue));
+                    r = themeModel.widgetColorR + 128;
+                    g = themeModel.widgetColorG + 128;
+                    b = themeModel.widgetColorB + 128;
+                    break;
+                }
                 r = this.widgetColorR + 128;
                 g = this.widgetColorG + 128;
                 b = this.widgetColorB + 128;

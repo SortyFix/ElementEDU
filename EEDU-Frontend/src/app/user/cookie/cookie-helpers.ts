@@ -12,7 +12,7 @@ export class CookieHelpers {
      */
     public createCookie(name: string, value: string, options: CookieOptions): string
     {
-        const cookie: string  = `${name}=${encodeURIComponent(value)}; ${options.toInjectableString()}`
+        const cookie: string  = `${name}=${value}; ${options.toInjectableString()}`
         document.cookie = cookie;
         return cookie;
     }

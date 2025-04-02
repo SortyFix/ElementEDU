@@ -78,6 +78,19 @@ export class SettingsComponent implements OnInit {
         }
     }
 
+    public get getCurrentThemeName(): string {
+        const cookieHelpers: CookieHelpers = new CookieHelpers();
+        const cookieValue: string | null = cookieHelpers.getCookieValue('theme');
+        if(cookieValue != null)
+        {
+            console.log(cookieHelpers.getCookieValue('theme'));
+            const themeModel: ThemeModel = ThemeModel.fromObject(JSON.parse(cookieValue));
+            console.log(themeModel);
+            return `${themeModel.name} (as cookie)`;
+        }
+        return this.currentThemeName;
+    }
+
     public get user(): UserModel {
         return this.userService.getUserData;
     }
@@ -133,6 +146,7 @@ export class SettingsComponent implements OnInit {
      */
     public setTheme(themeId: bigint): Observable<ThemeModel> {
         const url: string = `${environment.backendUrl}/user/me/theme/set`;
+        this.cookieHelpers.removeCookie('theme');
         return this.http.put<ThemeModel>(url, themeId, {
             withCredentials: true
         }).pipe(map(model => {
@@ -151,7 +165,7 @@ export class SettingsComponent implements OnInit {
             let themeModelJson: string = JSON.stringify(themeModel);
             let options: CookieOptions = new CookieOptions();
             options.maxAge = 60 * 60 * 24 * 365;
-            this.cookieHelpers.createCookie("theme", themeModelJson, options);
+            console.log(this.cookieHelpers.createCookie("theme", themeModelJson, options));
         });
     }
 
