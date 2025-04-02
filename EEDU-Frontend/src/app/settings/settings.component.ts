@@ -16,7 +16,6 @@ import {MatDivider} from "@angular/material/divider";
 import {
     MatExpansionModule,
 } from "@angular/material/expansion";
-import {FullUserListComponent} from "../user/user-list/full-user-list/full-user-list.component";
 import {environment} from "../../environment/environment";
 import {CookieHelpers} from "../user/cookie/cookie-helpers";
 import {CookieOptions} from "../user/cookie/cookie-options";
@@ -37,8 +36,7 @@ import {CookieOptions} from "../user/cookie/cookie-options";
         MatButton,
         FormsModule,
         MatDivider,
-        MatExpansionModule,
-        FullUserListComponent
+        MatExpansionModule
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
