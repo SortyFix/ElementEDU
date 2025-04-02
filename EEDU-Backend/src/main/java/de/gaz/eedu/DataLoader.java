@@ -96,13 +96,12 @@ import java.util.stream.Collectors;
     private void setPassword(@NotNull UserEntity userEntity, @NotNull String randomPassword)
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
-        int bitMask = CredentialMethod.bitMask(password);
-        CredentialCreateModel credential = new CredentialCreateModel(
+        getCredentialService().createEntity(Set.of(new CredentialCreateModel(
                 userEntity.getId(),
                 password,
-                bitMask,
-                randomPassword);
-        getCredentialService().createEntity(Set.of(credential));
+                CredentialMethod.bitMask(password, CredentialMethod.TOTP),
+                randomPassword
+        )));
     }
 
     private void createDefaultPrivileges()
