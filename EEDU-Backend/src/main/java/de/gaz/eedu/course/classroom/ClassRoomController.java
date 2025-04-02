@@ -27,6 +27,7 @@ public class ClassRoomController extends EntityController<String, ClassRoomServi
     private final ClassRoomService service;
 
     @PostMapping("{course}/link/{classroom}")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).CLASS_LINK_COURSE.toString())")
     public @NotNull ResponseEntity<Void> linkClass(@PathVariable long course, @PathVariable String classroom)
     {
         log.info("Received incoming request for linking the class {} to course {}.", classroom, course);
@@ -34,7 +35,9 @@ public class ClassRoomController extends EntityController<String, ClassRoomServi
         return empty(getService().linkClass(course, classroom) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
     }
 
-    @PostMapping("{course}/unlink") public @NotNull ResponseEntity<Void> unlinkClass(@PathVariable long course)
+    @PostMapping("{course}/unlink")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).CLASS_UNLINK_CLASS.toString())")
+    public @NotNull ResponseEntity<Void> unlinkClass(@PathVariable long course)
     {
         log.info("Received incoming request for unlinking the current class from course {}.", course);
         return empty(getService().unlinkClass(course) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
@@ -59,18 +62,24 @@ public class ClassRoomController extends EntityController<String, ClassRoomServi
     {
         return super.delete(id);
     }
-
     @GetMapping("/get/{id}")
-    @PreAuthorize("@verificationService.isFullyAuthenticated()")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).CLASS_GET.toString())")
     @Override public @NotNull ResponseEntity<ClassRoomModel> getData(@NotNull @PathVariable String id)
     {
         return super.getData(id);
     }
 
     @GetMapping("/get/all")
-    @PreAuthorize("@verificationService.isFullyAuthenticated()")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).COURSE_GET.toString())")
     @Override public @NotNull ResponseEntity<Set<ClassRoomModel>> fetchAll()
     {
         return super.fetchAll();
+    }
+
+    @GetMapping("/get")
+    @PreAuthorize("@verificationService.fullyAuthenticated()")
+    public @NotNull ResponseEntity<ClassRoomModel[]> getOwn(@AuthenticationPrincipal long user)
+    {
+        return ResponseEntity.ok(getService().loadClassesByUser(user).toArray(new ClassRoomModel[0]));
     }
 }

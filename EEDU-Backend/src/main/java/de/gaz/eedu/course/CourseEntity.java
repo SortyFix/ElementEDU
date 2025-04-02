@@ -49,12 +49,14 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
             name = "course_users", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
+    @Getter(AccessLevel.PRIVATE)
     private final Set<UserEntity> users = new HashSet<>();
     @OneToMany(mappedBy = "course", orphanRemoval = true) @JsonManagedReference @Getter(AccessLevel.NONE) @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private final Set<FrequentAppointmentEntity> frequentAppointments = new HashSet<>();
     @OneToMany(mappedBy = "course") @JsonManagedReference @Getter(AccessLevel.NONE) @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private final Set<AppointmentEntryEntity> appointments = new HashSet<>();
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Setter(AccessLevel.NONE) private Long id; // ID is final
+    @Column(length = 50, nullable = false)
     private String name;
     @ManyToOne @JsonManagedReference @JoinColumn(name = "class_room_id", referencedColumnName = "id")
     @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE) private @Nullable ClassRoomEntity classRoom;
@@ -95,6 +97,12 @@ public class CourseEntity implements EntityModelRelation<Long, CourseModel>
             AccountType accountType = user.getAccountType();
             return Objects.equals(accountType, AccountType.TEACHER);
         }).findFirst();
+    }
+
+    public boolean isPart(@NotNull UserEntity user)
+    {
+        boolean isTeacher = this.getTeacher().map((teacher) -> Objects.equals(teacher, user)).orElse(false);
+        return isTeacher || this.getStudents().contains(user);
     }
 
     public boolean setTeacher(@NotNull CourseService courseService, @NotNull UserEntity teacher) throws AccountTypeMismatch

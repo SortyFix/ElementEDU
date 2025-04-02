@@ -4,20 +4,24 @@ import {AppointmentEntryModel} from "../../user/courses/appointment/entry/appoin
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-appointment-card',
-  standalone: true,
-    imports: [
-        NgForOf,
-        NgIf
-    ],
-  templateUrl: './appointment-card.component.html',
-  styleUrl: './appointment-card.component.scss'
+    selector: 'app-appointment-card',
+    standalone: true,
+    imports: [NgForOf, NgIf],
+    templateUrl: './appointment-card.component.html',
+    styleUrl: './appointment-card.component.scss'
 })
 export class AppointmentCardComponent {
-    public constructor(private readonly _appointmentService: AppointmentService) {}
+
+    public constructor(appointmentService: AppointmentService) {
+        appointmentService.nextAppointments.subscribe((appointments: readonly AppointmentEntryModel[]): void => {
+            this._appointments = appointments;
+        });
+    }
+
+    private _appointments: readonly AppointmentEntryModel[] = [];
 
     protected get appointments(): readonly AppointmentEntryModel[] {
-        return this._appointmentService.nextAppointments.slice(0, 5);
+        return this._appointments;
     }
 
     protected getDateString(model: AppointmentEntryModel)

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.subject.model.SubjectModel;
 import de.gaz.eedu.entity.model.EntityModelRelation;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +42,7 @@ public class SubjectEntity implements EntityModelRelation<String, SubjectModel>
     @JsonBackReference @OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE)
     // delete courses if subject is deleted.
     private final Set<CourseEntity> courses = new HashSet<>();
+    @Column(length = 50, nullable = false)
     @Id @Getter @Setter(AccessLevel.NONE) private String id;
 
     @Override public @NotNull SubjectModel toModel()

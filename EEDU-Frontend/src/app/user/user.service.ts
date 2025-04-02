@@ -6,6 +6,7 @@ import {ReducedUserModel} from "./reduced-user-model";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {UserCreateModel} from "./user-create-model";
 import {EntityService} from "../entity/entity-service";
+import {CreateUserDialogComponent} from "./create-user-dialog/create-user-dialog.component";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,17 @@ export class UserService extends EntityService<bigint, UserModel, GenericUser, U
 
     public constructor(http: HttpClient, private _snackBar: MatSnackBar)
     {
-        super(http, 'user')
+        super(http, 'user',{
+            createPrivilege: "USER_CREATE",
+            deletePrivilege: "USER_DELETE",
+            fetchPrivilege: "USER_OTHERS_GET"
+        }, CreateUserDialogComponent);
+    }
+
+    protected override sort(input: UserModel[]): UserModel[] {
+        return input.sort((o1: UserModel, o2: UserModel): number => {
+            return o1.lastName.localeCompare(o2.lastName);
+        });
     }
 
     /**

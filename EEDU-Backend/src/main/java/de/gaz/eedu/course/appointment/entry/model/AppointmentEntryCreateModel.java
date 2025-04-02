@@ -1,6 +1,7 @@
 package de.gaz.eedu.course.appointment.entry.model;
 
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
 import de.gaz.eedu.entity.model.CreationModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @import "angular-calendar/scss/angular-calendar";
 
 .calendar-theme {
@@ -59,5 +60,10 @@
         border-color: $border-color;
     }
 }
+
+@include mat.card-overrides((
+    subtitle-text-color: color-mix(in srgb, var(--text-color) 50%, transparent),
+    elevated-container-color: var(--background-color)
+));
 
 

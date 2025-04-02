@@ -1,0 +1,31 @@
+<form (ngSubmit)="onSubmit($event)" [formGroup]="form">
+    <abstract-general-card [loading]="false" title="{{ title() }}">
+        <mat-card-content>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <mat-chip-grid #reactiveChipGrid aria-label="Enter reactive form keywords" formControlName="id">
+                    @for (keyword of chips(); track keyword) {
+                        <mat-chip-row (removed)="remove(keyword)">
+                            {{ keyword }}
+                            <button matChipRemove aria-label="'remove reactive form' + keyword">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip-row>
+                    }
+                </mat-chip-grid>
+                <input (matChipInputTokenEnd)="add($event)" [matChipInputFor]="reactiveChipGrid" matInput type="text"/>
+                <mat-icon matSuffix matTooltip="Add items by typing and pressing Enter, and remove them by clicking the x icon.">help</mat-icon>
+            </mat-form-field>
+
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="form.invalid"
+                    color="primary" mat-stroked-button type="submit">
+                Submit
+            </button>
+        </mat-card-actions>
+    </abstract-general-card>
+</form>
+

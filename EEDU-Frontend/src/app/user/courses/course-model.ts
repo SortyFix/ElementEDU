@@ -47,6 +47,11 @@ export class CourseModel {
         return this.ownStudents;
     }
 
+    public isOwnStudent(student: ReducedUserModel): boolean
+    {
+        return this.ownStudents.includes(student);
+    }
+
     public get ownStudents(): readonly ReducedUserModel[] {
         return this._students;
     }

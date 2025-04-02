@@ -40,11 +40,20 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long>
             "LEFT JOIN FETCH c.frequentAppointments " +
             "LEFT JOIN FETCH c.appointments " +
             "LEFT JOIN FETCH c.subject " +
-            "LEFT JOIN FETCH c.users u " +
             "LEFT JOIN FETCH c.repository rE " +
             "LEFT JOIN FETCH rE.privilege " +
             "LEFT JOIN FETCH rE.tags " +
-            "WHERE :userId IN (SELECT u.id FROM c.users u)"
+            "WHERE :userId IN (SELECT u.id FROM c.users u) " +
+            "UNION " +
+            "SELECT c FROM CourseEntity c " +
+            "LEFT JOIN FETCH c.classRoom " +
+            "LEFT JOIN FETCH c.frequentAppointments " +
+            "LEFT JOIN FETCH c.appointments " +
+            "LEFT JOIN FETCH c.subject " +
+            "LEFT JOIN FETCH c.repository rE " +
+            "LEFT JOIN FETCH rE.privilege " +
+            "LEFT JOIN FETCH rE.tags " +
+            "WHERE :userId IN (SELECT u.id FROM c.classRoom.users u)"
     ) @NotNull @Unmodifiable Set<CourseEntity> findAllByUserId(long userId);
 
     boolean existsByNameIn(@NotNull Collection<String> names);

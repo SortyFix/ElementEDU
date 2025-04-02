@@ -3,7 +3,6 @@ package de.gaz.eedu.course.appointment;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryCreateModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentEntryModel;
 import de.gaz.eedu.course.appointment.entry.model.AppointmentUpdateModel;
-import de.gaz.eedu.course.appointment.entry.model.AssignmentInsightModel;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentCreateModel;
 import de.gaz.eedu.course.appointment.frequent.model.FrequentAppointmentModel;
@@ -17,9 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -41,7 +38,7 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
     }
 
     @PostMapping("/{course}/schedule/frequent")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
+    @PreAuthorize("hasRole('teacher')")
     public @NotNull ResponseEntity<FrequentAppointmentModel[]> scheduleFrequentAppointment(@PathVariable long course, @NotNull @RequestBody FrequentAppointmentCreateModel... appointments)
     {
         log.info(
@@ -49,61 +46,29 @@ public class AppointmentController extends EntityController<Long, AppointmentSer
                 appointments,
                 course);
 
-        Set<InternalFrequentAppointmentCreateModel> internal = toInternalCreateModel(course, appointments).collect(
-                Collectors.toUnmodifiableSet());
+        Set<InternalFrequentAppointmentCreateModel> internal = toInternalCreateModel(course, appointments).collect(Collectors.toUnmodifiableSet());
         Stream<FrequentAppointmentEntity> entities = getService().createEntity(internal).stream();
         return ResponseEntity.ok(entities.map(FrequentAppointmentEntity::toModel).toArray(FrequentAppointmentModel[]::new));
-    }
-
-    @GetMapping("/submit/assignment/{appointment}/status")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
-    public @NotNull ResponseEntity<AssignmentInsightModel[]> submitStatus(@PathVariable long appointment)
-    {
-        return ResponseEntity.ok(getService().getInsight(appointment).toArray(AssignmentInsightModel[]::new));
-    }
-
-    @PostMapping("/submit/assignment/{appointment}/status/{user}")
-    @PreAuthorize("@verificationService.isFullyAuthenticated() && hasRole('teacher')")
-    public @NotNull ResponseEntity<AssignmentInsightModel> submitStatus(@PathVariable long appointment, @PathVariable long user)
-    {
-        ResponseEntity<AssignmentInsightModel> notFound = ResponseEntity.notFound().build();
-        return getService().getInsight(appointment, user).map(ResponseEntity::ok).orElse(notFound);
-    }
-
-    @PostMapping("/submit/assignment/{appointment}")
-    public @NotNull HttpStatus submitAssignment(@AuthenticationPrincipal long userId, @PathVariable long appointment, @NotNull @RequestPart(
-            "file"
-    ) MultipartFile[] files)
-    {
-        getService().submitAssignment(userId, appointment, files);
-        return HttpStatus.OK;
     }
 
     @PostMapping("/update/standalone/{appointment}") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
     public @NotNull ResponseEntity<AppointmentEntryModel> updateAppointment(@PathVariable long appointment, @NotNull @RequestBody AppointmentUpdateModel updateModel)
     {
-        log.info(
-                "Received incoming request for updating the appointment {} with the updated data {}.",
-                appointment,
-                updateModel);
+        log.info("Received incoming request for altering the appointment {} with the updated data {}.", appointment, updateModel);
         return ResponseEntity.ok(getService().update(appointment, updateModel));
     }
 
     @PostMapping("/{course}/unschedule/frequent") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
-    public @NotNull HttpStatus unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
+    public @NotNull ResponseEntity<Void> unscheduleAppointment(@PathVariable long course, @NotNull Long... appointments)
     {
-        log.info(
-                "Received incoming request for unscheduling frequent appointment(s) {} from course {}.",
-                appointments,
-                course);
+        log.info("Received incoming request for unscheduling frequent appointment(s) {} from course {}.", appointments, course);
         boolean modified = getService().unscheduleFrequent(course, appointments);
-        return modified ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return empty(modified ? HttpStatus.OK : HttpStatus.CONFLICT);
     }
 
-    @PostMapping("/{course}/schedule/standalone") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
-    public @NotNull ResponseEntity<AppointmentEntryModel[]> setAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel)
+    @PutMapping("/{course}/schedule/standalone") @PreAuthorize("hasRole('teacher') or hasRole('administrator')")
+    public @NotNull ResponseEntity<AppointmentEntryModel[]> scheduleAppointment(@PathVariable long course, @RequestBody @NotNull AppointmentEntryCreateModel... createModel)
     {
-
         List<AppointmentEntryModel> createdEntities = getService().createAppointment(course, Set.of(createModel));
         return ResponseEntity.ok(createdEntities.toArray(AppointmentEntryModel[]::new));
     }

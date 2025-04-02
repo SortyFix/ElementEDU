@@ -1,0 +1,54 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <abstract-general-card [loading]="loading" title="{{ title }}">
+        <mat-card-content>
+            <div style="display: flex; gap: 4px">
+                <mat-form-field appearance="outline">
+                    <mat-label>first Name</mat-label>
+                    <input formControlName="firstName" (input)="updateLoginName()" matInput type="text"/>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>last Name</mat-label>
+                    <input formControlName="lastName" (input)="updateLoginName()" matInput type="text"/>
+                </mat-form-field>
+            </div>
+
+
+            <mat-form-field appearance="outline">
+                <mat-label>login Name</mat-label>
+                <input formControlName="loginName" (input)="onLoginNameEdited()" matInput type="text"/>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Account Type</mat-label>
+                <mat-select formControlName="accountType">
+                    @for (type of accountTypes; track type) {
+                        <mat-option [value]="type">{{ type.toLowerCase() }}</mat-option>
+                    }
+                </mat-select>
+                <mat-icon
+                    *ngIf="administratorSelected" matSuffix
+                    matTooltip="If the user is set administrator, they will automatically be granted full access to the system. This can potentially cause significant damage to the system. Only proceed if you trust them.">
+                    warning
+                </mat-icon>
+            </mat-form-field>
+
+            <mat-checkbox class="checkbox-margin" formControlName="enabled">Instantly enable the account.</mat-checkbox>
+
+            <general-selection-input
+                *ngIf="loading || groups.length > 0"
+                label="Assign groups" formControlName="groups"
+                [values]="groups"
+                [allowNull]="true"
+                [multiple]="true">
+            </general-selection-input>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit"
+                    color="primary" mat-stroked-button type="submit">
+                Submit
+            </button>
+        </mat-card-actions>
+    </abstract-general-card>
+</form>

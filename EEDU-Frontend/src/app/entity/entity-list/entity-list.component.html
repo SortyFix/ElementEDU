@@ -2,24 +2,57 @@
 
     <mat-progress-bar *ngIf="!loaded" mode="indeterminate"></mat-progress-bar>
 
-    <div *ngIf="loaded && values.length == 0" class="empty-list-content">
-        <mat-icon class="empty-list-icon">folder_open</mat-icon>
-        <button (click)="addPressed.emit()" class="create-entry-button" mat-flat-button>Create first entry</button>
-    </div>
-
-    <list
-        #list
-        *ngIf="loaded && values.length > 0"
-        [height]="300"
-        [itemInfo]="itemInfo()"
-        [selectionType]="SelectionType.MULTIPLE" [values]="values">
-        <div style="margin-left: auto">
-            <button (click)="deletePressed.emit(list.selected)" *ngIf="list.selected.length > 0" mat-icon-button>
-                <mat-icon>delete</mat-icon>
-            </button>
-            <button (click)="addPressed.emit()" mat-icon-button>
-                <mat-icon>add</mat-icon>
-            </button>
+    @if (hasPrivilege(service()!.privileges.fetchPrivilege)) {
+        <div *ngIf="loaded && values.length == 0" class="empty-list-content">
+            <mat-icon class="empty-list-icon">folder_open</mat-icon>
+            <button (click)="openCreateDialog()" class="create-entry-button" mat-flat-button>Create first entry</button>
         </div>
-    </list>
+
+        <list
+            #list
+            *ngIf="loaded && values.length > 0"
+            [height]="480"
+            [itemInfo]="itemInfo()"
+            [selectionType]="SelectionType.MULTIPLE"
+            [values]="pagedValues">
+            <div style="margin-left: auto">
+                <button
+                    *ngIf="list.selected.length > 0 && hasPrivilege(service()!.privileges.deletePrivilege)"
+                    (click)="deletePressed.emit(list.selected)" mat-icon-button>
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <button
+                    *ngIf="hasPrivilege(service()!.privileges.createPrivilege)"
+                    (click)="openCreateDialog()" mat-icon-button>
+                    <mat-icon>add</mat-icon>
+                </button>
+                <button mat-icon-button>
+                    <mat-icon>filter_list</mat-icon>
+                </button>
+            </div>
+        </list>
+
+        <div *ngIf="loaded && pagedValues.length > 10 && paginatorRequired" class="scrollable-button">
+            <p class="mat-caption">You can scroll here</p>
+            <mat-icon>keyboard_double_arrow_down</mat-icon>
+        </div>
+
+        <div *ngIf="paginatorRequired" class="paginator-tools">
+            <mat-checkbox [checked]="!paginatorEnabled" (click)="togglePaginator()">Disable Paginator</mat-checkbox>
+            <mat-paginator
+                [disabled]="!paginatorEnabled"
+                [length]="values.length"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="[5, 10, 25]"
+                (page)="onPageChange($event)">
+            </mat-paginator>
+        </div>
+    } @else {
+        <div class="empty-list-content">
+            <general-error-box
+                message="You do not have the privileges to access this data"
+                subMessage="If you belive this is wrong contact your system administrator.">
+            </general-error-box>
+        </div>
+    }
 </div>

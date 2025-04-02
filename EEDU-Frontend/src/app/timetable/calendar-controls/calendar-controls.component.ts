@@ -70,10 +70,10 @@ export class CalendarControlsComponent {
     protected get title(): string {
         switch (this._viewType) {
             case CalendarView.Month:
-                return this.viewDate.toLocaleDateString('de-DE', {month: 'long', year: 'numeric'});
+                return this.viewDate.toLocaleDateString('en-GB', {month: 'long', year: 'numeric'});
 
             case CalendarView.Day:
-                return this.viewDate.toLocaleDateString('de-DE', {
+                return this.viewDate.toLocaleDateString('en-GB', {
                     weekday: 'long',
                     month: 'long',
                     day: 'numeric',
@@ -89,10 +89,10 @@ export class CalendarControlsComponent {
                 startOfWeek.setDate(this.viewDate.getDate() + daysToMonday); // Go to Monday
                 endOfWeek.setDate(startOfWeek.getDate() + 6); // Go to Sunday (end of the week)
 
-                return `${startOfWeek.toLocaleDateString('de-DE', {
+                return `${startOfWeek.toLocaleDateString('en-GB', {
                     month: 'short',
                     day: 'numeric'
-                })} – ${endOfWeek.toLocaleDateString('de-DE', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+                })} – ${endOfWeek.toLocaleDateString('en-GB', {month: 'short', day: 'numeric', year: 'numeric'})}`;
         }
     }
 

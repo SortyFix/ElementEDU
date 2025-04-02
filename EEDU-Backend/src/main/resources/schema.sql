@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS file_entity_tags
 -- Classes, Courses and Subjects --
 CREATE TABLE IF NOT EXISTS class_room_entity
 (
-    id VARCHAR(255) PRIMARY KEY NOT NULL
+    id VARCHAR(20) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS subject_entity
@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS room_entity
 CREATE TABLE IF NOT EXISTS course_entity
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name          VARCHAR(255) NOT NULL,
+    name          VARCHAR(50) NOT NULL,
     subject_id    VARCHAR(50)  NOT NULL,
     repository_id BIGINT       NOT NULL,
-    class_room_id VARCHAR(255) NULL,
+    class_room_id VARCHAR(20) NULL,
     FOREIGN KEY (subject_id) REFERENCES subject_entity (id),
     FOREIGN KEY (repository_id) REFERENCES file_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
@@ -103,9 +103,19 @@ CREATE TABLE IF NOT EXISTS user_entity
     locked         BIT          NOT NULL,
     theme_id       BIGINT       NULL,
     status         TINYINT      NULL,
-    class_room_id  VARCHAR(255) NULL,
+    class_room_id  VARCHAR(20) NULL,
     FOREIGN KEY (theme_id) REFERENCES theme_entity (id),
     FOREIGN KEY (class_room_id) REFERENCES class_room_entity (id)
+);
+
+CREATE TABLE IF NOT EXISTS assessment_entity
+(
+    id             BIGINT PRIMARY KEY NOT NULL,
+    appointment_id BIGINT             NOT NULL,
+    user_id        BIGINT             NOT NULL,
+    feedback       VARCHAR(200)       NULL,
+    FOREIGN KEY (appointment_id) REFERENCES appointment_entry_entity (id),
+    FOREIGN KEY (user_id) REFERENCES user_entity (id)
 );
 
 CREATE TABLE IF NOT EXISTS credential_entity

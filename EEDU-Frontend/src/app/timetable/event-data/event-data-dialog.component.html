@@ -1,4 +1,4 @@
-<app-general-card [title]="title" [loading]="false">
+<abstract-general-card [title]="title" [loading]="false">
     <form (ngSubmit)="onSubmit()" [formGroup]="form">
         <mat-dialog-content>
             <div class="data-container">
@@ -78,6 +78,6 @@
             <button *ngIf="anyEdit" [disabled]="!anyEdit" mat-flat-button type="submit">Save Changes</button>
         </mat-dialog-actions>
     </form>
-</app-general-card>
+</abstract-general-card>
 
 
