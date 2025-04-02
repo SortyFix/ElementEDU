@@ -99,13 +99,6 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
         {
             Path normalizedPath = filePath.toRealPath(LinkOption.NOFOLLOW_LINKS);
 
-            // some security is crucial
-            if (!normalizedPath.startsWith(uploadPath))
-            {
-                String errorMessage = String.format("File %s is outside the allowed directory.", fileName);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-            }
-
             File file = normalizedPath.toFile();
             if (!file.exists())
             {
@@ -156,7 +149,7 @@ public class AppointmentEntryEntity implements EntityModelRelation<Long, Appoint
     public @NotNull Optional<File> loadAssignmentFile(long user, @NotNull String file)
     {
         File couldBe = loadFileSave(getUploadPath(user), file);
-        if(!couldBe.exists() || !couldBe.isDirectory() || !couldBe.canRead())
+        if(!couldBe.exists() || couldBe.isDirectory() || !couldBe.canRead())
         {
             return Optional.empty();
         }

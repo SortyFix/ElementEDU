@@ -19,7 +19,10 @@ export class AssignmentService {
     }
 
     public downloadAssignment(appointment: bigint, user: bigint, file: string): void {
-        //TODO
+        const url: string = `${this.BACKEND_URL}/${appointment}/download/${user}/${file}`;
+        this._fileService.fetchFile(1n, undefined, url).then((value: { blob: Uint8Array; fileName: string; }): void => {
+            this._fileService.triggerDownload(value.blob, value.fileName);
+        });
     }
 
     public get nextAssignments(): Observable<readonly AssignmentModel[]> {

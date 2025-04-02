@@ -25,7 +25,7 @@
         <div *ngIf="currentInsight.submitted">
             <form [formGroup]="assessForm" (ngSubmit)="onAssess()">
 
-                <app-insight-list [insight]="currentInsight"></app-insight-list>
+                <app-insight-list [insight]="currentInsight" [appointment]="appointment"></app-insight-list>
 
                 <div *ngIf="currentInsight.assessment === null">
                     <mat-form-field>

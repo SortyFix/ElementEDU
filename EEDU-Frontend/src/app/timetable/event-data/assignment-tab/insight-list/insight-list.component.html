@@ -1,7 +1,9 @@
 <div *ngIf="insight() && insight()!.submitted">
-    <ul>
+    <ul style="text-underline: black; color: blue !important;">
         @for (file of insight()!.files || []; track file) {
-            <li>{{ file }}</li>
+            <li style="display: flex; vertical-align: center; gap: 10px">{{ file }}
+                <mat-icon (click)="downloadFile(file)" style="cursor: pointer">download</mat-icon>
+            </li>
         }
     </ul>
 
