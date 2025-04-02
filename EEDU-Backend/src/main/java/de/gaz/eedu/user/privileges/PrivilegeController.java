@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * Controller for managing privilege-related operations for user groups.
  * <p>
@@ -98,5 +100,12 @@ public class PrivilegeController extends EntityController<String, PrivilegeServi
     @Override public @NotNull ResponseEntity<PrivilegeModel> getData(@PathVariable @NotNull String id)
     {
         return super.getData(id);
+    }
+
+    @GetMapping("/get/all")
+    @PreAuthorize("hasAuthority(T(de.gaz.eedu.user.privileges.SystemPrivileges).PRIVILEGE_GET.toString())")
+    @Override public @NotNull ResponseEntity<Set<PrivilegeModel>> fetchAll()
+    {
+        return super.fetchAll();
     }
 }

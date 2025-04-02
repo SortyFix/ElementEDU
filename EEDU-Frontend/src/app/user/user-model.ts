@@ -18,7 +18,8 @@ export interface GenericUser {
 }
 
 export class UserModel {
-    constructor(
+
+    public constructor(
         private readonly _id: bigint,
         private readonly _firstName: string,
         private readonly _lastName: string,
@@ -90,6 +91,6 @@ export class UserModel {
     }
 
     public hasPrivilege(privilege: string): boolean {
-        return this.groups && this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
+        return this.groups.some((group: GroupModel): boolean => group.hasPrivilege(privilege))
     }
 }

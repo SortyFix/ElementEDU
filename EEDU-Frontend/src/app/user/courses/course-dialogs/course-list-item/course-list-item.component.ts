@@ -3,7 +3,9 @@ import {ListItemContent} from "../../../../common/abstract-list/list-item-conten
 import {CourseModel} from "../../course-model";
 import {MatIcon} from "@angular/material/icon";
 import {MatButton} from "@angular/material/button";
-import {MatChip, MatChipSet} from "@angular/material/chips";
+import {MatChip, MatChipAvatar, MatChipSet} from "@angular/material/chips";
+import {icons} from "../../../../../environment/styles";
+import {NgIf} from "@angular/common";
 
 @Component({
     imports: [
@@ -11,8 +13,10 @@ import {MatChip, MatChipSet} from "@angular/material/chips";
         MatButton,
         MatChipSet,
         MatChip,
+        MatChipAvatar,
+        NgIf,
     ],
     templateUrl: './course-list-item.component.html',
     styleUrl: './course-list-item.component.scss'
 })
-export class CourseListItemComponent extends ListItemContent<CourseModel> {}
+export class CourseListItemComponent extends ListItemContent<CourseModel> {protected readonly icons = icons;}

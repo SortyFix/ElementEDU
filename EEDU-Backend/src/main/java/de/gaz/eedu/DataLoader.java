@@ -12,6 +12,7 @@ import de.gaz.eedu.user.privileges.PrivilegeEntity;
 import de.gaz.eedu.user.privileges.PrivilegeService;
 import de.gaz.eedu.user.privileges.SystemPrivileges;
 import de.gaz.eedu.user.privileges.model.PrivilegeCreateModel;
+import de.gaz.eedu.user.privileges.model.PrivilegeModel;
 import de.gaz.eedu.user.theming.ThemeCreateModel;
 import de.gaz.eedu.user.theming.ThemeEntity;
 import de.gaz.eedu.user.theming.ThemeService;
@@ -49,8 +50,8 @@ import java.util.stream.Collectors;
 
     @Override @Transactional public void run(@NotNull String... args)
     {
-
-        if (userService.getRepository().findByLoginName("root").isEmpty())
+        createDefaultPrivileges();
+        if (getUserService().getRepository().findByLoginName("root").isEmpty())
         {
             createDefaultUser();
         }
@@ -71,11 +72,10 @@ import java.util.stream.Collectors;
     {
         String randomPassword = randomPassword();
 
-        createDefaultPrivileges();
         createDefaultGroup();
 
         // skip adding root user when testing
-        if(Objects.equals(getEnvironment().getActiveProfiles()[0], "test")) { return; }
+        if (Objects.equals(getEnvironment().getActiveProfiles()[0], "test")) {return;}
 
         UserEntity userEntity = createDefaultUser(createDefaultTheme());
         setPassword(userEntity, randomPassword);
@@ -97,13 +97,23 @@ import java.util.stream.Collectors;
     {
         CredentialMethod password = CredentialMethod.PASSWORD;
         int bitMask = CredentialMethod.bitMask(password);
-        CredentialCreateModel credential = new CredentialCreateModel(userEntity.getId(), password, bitMask, randomPassword);
+        CredentialCreateModel credential = new CredentialCreateModel(
+                userEntity.getId(),
+                password,
+                bitMask,
+                randomPassword);
         getCredentialService().createEntity(Set.of(credential));
     }
 
     private void createDefaultPrivileges()
     {
-        getPrivilegeService().createEntity(Arrays.stream(SystemPrivileges.values()).map(privilege ->
+        Set<String> existingPrivileges = getPrivilegeService().findAll().stream().map(PrivilegeModel::id).collect(
+                Collectors.toUnmodifiableSet());
+        getPrivilegeService().createEntity(Arrays.stream(SystemPrivileges.values()).filter(current ->
+        {
+            String privilegeName = current.toString();
+            return !existingPrivileges.contains(privilegeName);
+        }).map(privilege ->
         {
             String privilegeName = privilege.toString();
             return new PrivilegeCreateModel(privilegeName);
@@ -112,9 +122,9 @@ import java.util.stream.Collectors;
 
     private void createDefaultGroup()
     {
-        getGroupService().createEntity(AccountType.groupSet().stream().map(
-                (currentGroup) -> new GroupCreateModel(currentGroup, new String[0])
-        ).collect(Collectors.toSet()));
+        getGroupService().createEntity(AccountType.groupSet().stream().map((currentGroup) -> new GroupCreateModel(
+                currentGroup,
+                new String[0])).collect(Collectors.toSet()));
     }
 
     private @NotNull ThemeEntity createDefaultTheme()
@@ -141,10 +151,8 @@ import java.util.stream.Collectors;
                 "root", // first id
                 "root", // last id
                 "root", // login id
-                AccountType.ADMINISTRATOR,
-                true, // enabled
-                themeEntity.getId(),
-                new String[] {  } // groups
+                AccountType.ADMINISTRATOR, true, // enabled
+                themeEntity.getId(), new String[]{} // groups
         ))).getFirst());
     }
 

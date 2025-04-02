@@ -41,7 +41,7 @@ public class GroupController extends EntityController<String, GroupService, Grou
     public @NotNull ResponseEntity<Void> attachGroups(@PathVariable long user, @PathVariable @NotNull String... groups)
     {
         log.info("Received incoming request for attaching group(s) {} to user {}.", groups, user);
-        return empty(getService().attachGroups(user, groups) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
+        return empty(getService().attachGroups(user, groups) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
 
@@ -50,7 +50,7 @@ public class GroupController extends EntityController<String, GroupService, Grou
     public @NotNull ResponseEntity<Void> detachGroups(@PathVariable long user, @PathVariable @NotNull String... groups)
     {
         log.info("Received incoming request for detaching group(s) {} to user {}.", groups, user);
-        return empty(getService().detachGroups(user, groups) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED);
+        return empty(getService().detachGroups(user, groups) ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/create")

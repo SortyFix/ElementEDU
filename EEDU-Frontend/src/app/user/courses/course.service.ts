@@ -5,6 +5,7 @@ import {CourseCreateModel} from "./course-create-model";
 import {ReducedUserModel} from "../reduced-user-model";
 import {HttpClient} from "@angular/common/http";
 import {EntityService} from "../../entity/entity-service";
+import {CreateCourseDialogComponent} from "./create-course-dialog/create-course-dialog.component";
 
 /**
  * Service for managing {@link CourseModel} instances.
@@ -22,7 +23,19 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
     private _fetchedOwn: boolean = false;
     private readonly _ownCourses: BehaviorSubject<CourseModel[]> = new BehaviorSubject<CourseModel[]>([]);
 
-    public constructor(http: HttpClient) { super(http, 'course'); }
+    public constructor(http: HttpClient) {
+        super(http, 'course', {
+            createPrivilege: "COURSE_CREATE",
+            deletePrivilege: "COURSE_DELETE",
+            fetchPrivilege: "COURSE_GET"
+        }, CreateCourseDialogComponent);
+    }
+
+    protected override sort(input: CourseModel[]): CourseModel[] {
+        return input.sort((o1: CourseModel, o2: CourseModel): number => {
+            return o1.name.localeCompare(o2.name);
+        });
+    }
 
     public override translate(obj: GenericCourse): CourseModel {
         return CourseModel.fromObject(obj, (): Observable<readonly CourseModel[]> => {
@@ -32,6 +45,10 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
 
     public get fetchedOwn(): boolean {
         return this._fetchedOwn;
+    }
+
+    public get ownCourses(): readonly CourseModel[] {
+        return this._ownCourses.value;
     }
 
     public get ownCourses$(): Observable<CourseModel[]> {
@@ -88,6 +105,10 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
         return this.findCourse(this.value, id);
     }
 
+    public findOwnCourseLazily(id: bigint): CourseModel | null {
+        return this.findCourse(this.ownCourses, id);
+    }
+
     /**
      * Finds a {@link CourseModel} by its id from a given list of courses.
      *
@@ -99,11 +120,11 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
      * @returns the matching {@link CourseModel} if found, otherwise undefined.
      * @public
      */
-    public findCourse(courses: CourseModel[], id: bigint): CourseModel | null {
+    public findCourse(courses: readonly CourseModel[], id: bigint): CourseModel | null {
         return courses.find((course: CourseModel): boolean => course.id === id) || null;
     }
 
-    protected override pushCreated(response: CourseModel[]): void {
+    protected override pushCreated(response: readonly CourseModel[]): void {
         super.pushCreated(response);
         this._ownCourses.next([...this._ownCourses.value, ...response]);
     }
@@ -111,5 +132,11 @@ export class CourseService extends EntityService<bigint, CourseModel, GenericCou
     protected override postDelete(id: bigint[]): void {
         super.postDelete(id);
         this._ownCourses.next(this._ownCourses.value.filter((value: CourseModel): boolean => !id.includes(value.id)));
+    }
+
+
+    override update(): void {
+        super.update();
+        this._ownCourses.next([...this.ownCourses])
     }
 }

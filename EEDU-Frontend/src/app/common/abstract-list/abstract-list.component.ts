@@ -15,6 +15,7 @@ import {AllCheckBoxComponent} from "./checkboxes/all-check-box.component";
 import {SingleCheckBoxComponent} from "./checkboxes/single-check-box.component";
 import {ListItemContent} from "./list-item-content";
 import {MatList, MatListItem} from "@angular/material/list";
+import {AccessibilityService} from "../../accessibility.service";
 
 // noinspection JSUnusedGlobalSymbols
 export enum SelectionType {
@@ -25,6 +26,7 @@ export interface ListItemInfo<T> {
     title: (value: T) => string;
     icon?: (value: T) => string;
     chips?: (value: T) => string[];
+    content?: Type<ListItemContent<T>>;
 }
 
 export interface GeneralListInfo<T> {
@@ -42,7 +44,6 @@ export class AbstractList<T> {
 
     public readonly itemInfo: InputSignal<ListItemInfo<T> | null> = input<ListItemInfo<T> | null>(null);
 
-    public readonly componentContent: InputSignal<Type<ListItemContent<T>> | null> = input<Type<ListItemContent<T>> | null>(null);
     public readonly generalListInfo: InputSignal<GeneralListInfo<T> | null> = input<GeneralListInfo<T> | null>(null);
     public readonly selectionType: InputSignal<SelectionType> = input<SelectionType>(SelectionType.SINGLE);
     public readonly height: InputSignal<number | undefined> = input<number | undefined>();
@@ -50,6 +51,8 @@ export class AbstractList<T> {
     private readonly _selection: Set<T> = new Set<T>();
 
     private _values: readonly T[] = [];
+
+    public constructor(private readonly _accessibilityService: AccessibilityService) {}
 
     @Input() public set values(value: readonly T[]) {
         this._values = value as readonly T[];
@@ -71,14 +74,17 @@ export class AbstractList<T> {
         return this._values;
     }
 
-    protected get hasChips(): boolean { return !!this.itemInfo()!.chips; }
+    protected get hasChips(): boolean
+    {
+        return !this._accessibilityService.mobile && !!this.itemInfo()!.chips;
+    }
 
     protected get hasContent(): boolean {
-        return !!this.componentContent();
+        return !!this.itemInfo()?.content;
     }
 
     protected get content(): Type<any> {
-        return this.componentContent()!;
+        return this.itemInfo()!.content!;
     }
 
     protected get partiallySelected(): boolean {
@@ -152,4 +158,6 @@ export class AbstractList<T> {
     protected unselectAll(): void {
         this._selection.clear();
     }
+
+    protected readonly SelectionType = SelectionType;
 }

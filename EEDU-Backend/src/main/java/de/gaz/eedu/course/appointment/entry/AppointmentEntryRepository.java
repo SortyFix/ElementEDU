@@ -13,9 +13,10 @@ public interface AppointmentEntryRepository extends JpaRepository<AppointmentEnt
 
     @Query(
             "SELECT a FROM AppointmentEntryEntity a " +
-                    "LEFT JOIN FETCH a.room r " +
-                    "LEFT JOIN FETCH a.course c " +
-                    "WHERE a.id = :id"
+            "LEFT JOIN FETCH a.room r " +
+            "LEFT JOIN FETCH a.course c " +
+            "LEFT JOIN FETCH a.assessments ase " +
+            "WHERE a.id = :id"
     )
     @Override @NotNull Optional<AppointmentEntryEntity> findById(@NotNull Long id);
 }

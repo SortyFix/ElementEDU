@@ -1,7 +1,10 @@
 <p>Users:</p>
 <mat-chip-set>
     @for (student of entry()?.students; track student.id) {
-        <mat-chip>{{ student.name }}</mat-chip>
+        <mat-chip>
+            <mat-icon *ngIf="!entry()!.isOwnStudent(student)" matChipAvatar>{{ icons.classroom }}</mat-icon>
+            {{ student.name }}
+        </mat-chip>
     }
 </mat-chip-set>
 

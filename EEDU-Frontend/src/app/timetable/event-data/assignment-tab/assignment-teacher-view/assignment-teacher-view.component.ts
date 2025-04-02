@@ -1,43 +1,99 @@
 import {Component, Input, input, InputSignal} from '@angular/core';
 import {NgIf} from "@angular/common";
 import {AppointmentEntryModel} from "../../../../user/courses/appointment/entry/appointment-entry-model";
-import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment-model";
-import {SelectionInput} from "../../../../common/selection-input/selection-input.component";
-import {AppointmentService} from "../../../../user/courses/appointment/appointment.service";
-import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment-insight-model";
-import {MatList, MatListItem} from "@angular/material/list";
+import {AssignmentInsightModel} from "../../../../user/courses/appointment/entry/assignment/assignment-insight-model";
+import {AssignmentService} from "../../../../user/courses/appointment/entry/assignment/assignment.service";
+import {AssignmentModel} from "../../../../user/courses/appointment/entry/assignment/assignment-model";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatOption, MatSelect} from "@angular/material/select";
+import {MatIcon} from "@angular/material/icon";
+import {MatButton} from "@angular/material/button";
+import {MatInput} from "@angular/material/input";
+import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {AssessmentService} from "../../../../user/courses/appointment/entry/assignment/assessment/assessment.service";
+import {UserService} from "../../../../user/user.service";
+import {AssessmentModel} from "../../../../user/courses/appointment/entry/assignment/assessment/assessment-model";
+import {
+    AssessmentCreateModel
+} from "../../../../user/courses/appointment/entry/assignment/assessment/assessment-create-model";
+import {GeneralErrorBoxComponent} from "../../../../common/general-error-box/general-error-box.component";
+import {InsightListComponent} from "../insight-list/insight-list.component";
 
 @Component({
     selector: 'app-assignment-teacher-view',
     standalone: true,
-    imports: [
-        NgIf,
-        SelectionInput,
-        MatList,
-        MatListItem
-    ],
+    imports: [NgIf, MatLabel, MatFormField, MatSelect, MatOption, MatIcon, MatButton, MatInput, ReactiveFormsModule, GeneralErrorBoxComponent, InsightListComponent],
     templateUrl: './assignment-teacher-view.component.html',
     styleUrl: './assignment-teacher-view.component.scss'
 })
 export class AssignmentTeacherViewComponent {
 
     private _appointment: AppointmentEntryModel | null = null;
-    private _assignmentInsightModels: readonly AssignmentInsightModel[] = [];
+    private _assignmentInsight: readonly AssignmentInsightModel[] = [];
+    private _insight: AssignmentInsightModel | null = null;
     public readonly editing: InputSignal<boolean> = input<boolean>(false);
 
-    private _currentInsight: AssignmentInsightModel | null = null;
+    private readonly _assessForm: FormGroup;
 
-
-    public constructor(private readonly _appointmentService: AppointmentService) {
+    public constructor(
+        private readonly _assignmentService: AssignmentService,
+        private readonly _assessmentService: AssessmentService,
+        private readonly _userService: UserService,
+        formBuilder: FormBuilder) {
+        this._assessForm = formBuilder.group({
+            feedback: [null]
+        })
     }
 
-    @Input()
-    public set appointment(appointment: AppointmentEntryModel)
+    protected get assessForm(): FormGroup {
+        return this._assessForm;
+    }
+
+    protected set currentInsight(assignmentInsight: AssignmentInsightModel)
     {
-        this._appointment = appointment;
-        this._appointmentService.fetchInsights(appointment.id).subscribe((response: AssignmentInsightModel[]): void =>
+        this._insight = assignmentInsight;
+    }
+
+    protected get currentInsight(): AssignmentInsightModel | null
+    {
+        return this._insight;
+    }
+
+    protected onAssess(): void
+    {
+        if(!this.currentInsight)
         {
-            this._assignmentInsightModels = response;
+            return;
+        }
+
+        const insight: AssignmentInsightModel = this.currentInsight;
+        this._assessmentService.assess([AssessmentCreateModel.fromObject({
+            appointment: Number(this.appointment?.id),
+            user: insight.user.id,
+            feedback: this.assessForm.get('feedback')?.value,
+        })]).subscribe((assessmentModel: readonly AssessmentModel[]): void => {
+            this._assignmentInsight.map((current: AssignmentInsightModel): AssignmentInsightModel => {
+
+                if(current === insight)
+                {
+                    const newInsight: AssignmentInsightModel = AssignmentInsightModel.pushAssessment(current, assessmentModel[0]);
+                    if(this.currentInsight === insight)
+                    {
+                        this.currentInsight = newInsight;
+                    }
+                    return newInsight;
+                }
+
+                return current;
+            })
+        });
+    }
+
+    @Input() public set appointment(appointment: AppointmentEntryModel) {
+        this._appointment = appointment;
+        this._assignmentService.fetchInsights(appointment.id).subscribe((response: AssignmentInsightModel[]): void =>
+        {
+            this._assignmentInsight = response;
         })
     }
 
@@ -45,19 +101,18 @@ export class AssignmentTeacherViewComponent {
         return this._appointment;
     }
 
-    protected get assignmentInsightModels(): readonly AssignmentInsightModel[] {
-        return this._assignmentInsightModels;
+    protected get assignmentInsight(): readonly AssignmentInsightModel[] {
+        return this._assignmentInsight;
     }
 
     protected get assignment(): AssignmentModel | null {
         return this.appointment!.assignment || null;
     }
 
-    protected valueUpdate(event: readonly AssignmentInsightModel[] | AssignmentInsightModel): void {
-        this._currentInsight = event as AssignmentInsightModel
-    }
-
-    protected get currentInsight(): AssignmentInsightModel | null {
-        return this._currentInsight;
+    protected toIcon(insight: AssignmentInsightModel): 'assignment_turned_in' | 'assignment_late' | 'pending' {
+        if (this.assignment?.submitUntil.getTime() && (this.assignment?.submitUntil.getTime()) < new Date().getTime()) {
+            return insight.submitted ? 'assignment_turned_in' : 'assignment_late';
+        }
+        return insight.submitted ? 'assignment_turned_in' : 'pending';
     }
 }

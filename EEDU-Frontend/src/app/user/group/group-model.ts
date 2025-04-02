@@ -1,4 +1,4 @@
-import {GenericPrivilege, PrivilegeModel} from "./privilege-model";
+import {GenericPrivilege, PrivilegeModel} from "./privilege/privilege-model";
 
 export interface GenericGroup {
     id: string;

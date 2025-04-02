@@ -5,13 +5,21 @@ import {HttpClient} from "@angular/common/http";
 import {CourseService} from "../course.service";
 import {CourseModel} from "../course-model";
 import {EntityService} from "../../../entity/entity-service";
+import {CreateSubjectDialogComponent} from "./create-subject-dialog/create-subject-dialog.component";
 
 @Injectable({
     providedIn: 'root'
 })
 export class SubjectService extends EntityService<string, SubjectModel, GenericSubject, GenericSubject> {
 
-    public constructor(http: HttpClient, private readonly _courseService: CourseService) { super(http, 'course/subject') }
+    public constructor(http: HttpClient, private readonly _courseService: CourseService)
+    {
+        super(http, 'course/subject', {
+            createPrivilege: "SUBJECT_CREATE",
+            deletePrivilege: "SUBJECT_DELETE",
+            fetchPrivilege: "SUBJECT_GET"
+        }, CreateSubjectDialogComponent);
+    }
 
     public override translate(obj: GenericSubject): SubjectModel {
         return SubjectModel.fromObject(obj, (): Observable<readonly CourseModel[]> => this.fetchCoursesLazily([obj.id]));

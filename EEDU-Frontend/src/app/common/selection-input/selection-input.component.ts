@@ -78,13 +78,13 @@ const type: Type<SelectionInput<any>> = forwardRef((): typeof SelectionInput => 
         MatAutocomplete,
         MatOption,
         FormsModule,
+        MatIcon,
         MatLabel,
         NgIf,
         MatChipGrid,
         MatChipRow,
-        MatIcon,
         MatChipInput,
-        MatChipRemove
+        MatChipRemove,
     ],
     providers: [
         { provide: NG_VALUE_ACCESSOR, useExisting: type, multi: true },
@@ -185,6 +185,11 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
             return;
         }
 
+        if(Array.isArray(value)) {
+            this.selectedValues.set(value as T[]);
+            return;
+        }
+
         this.currentValue.set(this.toName(value));
     }
 
@@ -254,11 +259,6 @@ export class SelectionInput<T extends {name: string} | { id: string }> implement
     protected add(event: MatChipInputEvent): string {
 
         const value: T[] = this.filter((event.value || '').trim());
-        if(value.length != 1)
-        {
-            return event.value;
-        }
-
         this.value = value[0];
         return '';
     }

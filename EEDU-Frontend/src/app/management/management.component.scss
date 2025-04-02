@@ -2,7 +2,9 @@
     color: var(--text-color);
 }
 
-.course-component-icon { margin-right: 8px; }
+.lazily-loaded-tabs, .management-section {
+    margin: 1px;
+}
 
 .notification-list {
     color: var(--text-color);

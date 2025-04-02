@@ -1,4 +1,8 @@
-import {AssignmentCreateModel, AssignmentCreatePacket, GenericAssignmentCreateModel} from "./assignment-create-model";
+import {
+    AssignmentCreateModel,
+    AssignmentCreatePacket,
+    GenericAssignmentCreateModel
+} from "./assignment/assignment-create-model";
 
 export interface GenericAppointmentUpdate {
     description: string;

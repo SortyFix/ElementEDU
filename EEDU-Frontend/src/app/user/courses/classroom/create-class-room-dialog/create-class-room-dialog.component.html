@@ -1,0 +1,56 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <abstract-general-card [loading]="loading" title="{{ title }}">
+        <ng-container *ngIf="!eligibleTeacher">
+            <general-error-box message="No eligible tutor could be discovered." subMessage="A tutor is required to set up a class."></general-error-box>
+            <mat-card-content style="text-align: center">
+                <button mat-button mat-dialog-close type="button" class="close-button">Close Dialog</button>
+            </mat-card-content>
+        </ng-container>
+
+        <ng-container *ngIf="eligibleTeacher">
+            <mat-card-content>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Class Name</mat-label>
+                    <input formControlName="id" matInput type="text" maxlength="20" #input/>
+                    <mat-hint align="end">{{input.value.length}}/{{input.maxLength}}</mat-hint>
+                </mat-form-field>
+
+                <general-selection-input
+                    [values]="teacher"
+                    [disabled]="teacher.length === 1"
+                    formControlName="tutor"
+                    label="Select Tutor"
+                    placeholder="Enter the tutor you wish to set for this class">
+                </general-selection-input>
+
+                <general-selection-input
+                    [multiple]="true"
+                    [allowNull]="true"
+                    [values]="students"
+                    formControlName="students"
+                    label="Select Students"
+                    placeholder="Enter a students name and press enter">
+                </general-selection-input>
+
+                <general-selection-input
+                    *ngIf="loading || courses.length > 0"
+                    [values]="courses"
+                    [multiple]="true"
+                    [allowNull]="true"
+                    formControlName="courses"
+                    label="Select Courses"
+                    placeholder="Enter a course this class should be added to and press enter">
+                </general-selection-input>
+
+            </mat-card-content>
+            <mat-card-actions align="end">
+                <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+                <button [disabled]="!canSubmit"
+                        color="primary" mat-stroked-button type="submit">
+                    Submit
+                </button>
+            </mat-card-actions>
+        </ng-container>
+    </abstract-general-card>
+</form>

@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <app-general-card [loading]="loading" title="Create new Appointment">
+    <abstract-general-card [loading]="loading" title="Create new Appointment">
         <mat-card-content class="content-wrapper">
             <general-selection-input
                 [values]="courses"
@@ -32,5 +32,5 @@
             <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
             <button [disabled]="!canSubmit()" mat-stroked-button type="submit">Submit</button>
         </mat-card-actions>
-    </app-general-card>
+    </abstract-general-card>
 </form>

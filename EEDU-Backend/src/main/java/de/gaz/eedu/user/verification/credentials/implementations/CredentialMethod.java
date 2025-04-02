@@ -15,7 +15,7 @@ public enum CredentialMethod
     PASSWORD(new PasswordCredential(new BCryptPasswordEncoder()), false),
     EMAIL(new EmailCredential(), true),
     SMS(new SMSCredential(), true),
-    TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA1)), true);
+    TOTP(new TOTPCredential(new TOPTHandler(HashingAlgorithm.SHA256)), true);
 
     private final Credential credential;
     private final boolean enablingRequired;

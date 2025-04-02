@@ -1,0 +1,23 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <abstract-general-card [loading]="loading" title="{{ title }}">
+        <mat-card-content>
+            <mat-form-field appearance="outline">
+                <mat-label>Group Name</mat-label>
+                <input formControlName="id" matInput type="text"/>
+            </mat-form-field>
+
+            <general-selection-input
+                *ngIf="loading || privileges.length > 0"
+                [values]="privileges"
+                [allowNull]="true"
+                [multiple]="true"
+                label="Select Privileges"
+                formControlName="privileges">
+            </general-selection-input>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button class="close-button" mat-button mat-dialog-close type="button">Cancel</button>
+            <button [disabled]="!canSubmit" mat-stroked-button type="submit">Submit</button>
+        </mat-card-actions>
+    </abstract-general-card>
+</form>
