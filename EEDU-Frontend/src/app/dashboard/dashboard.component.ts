@@ -6,7 +6,7 @@ import {NewsCardComponent} from "./news-card/news-card.component";
 import {ChatCardComponent} from "./chat-card/chat-card.component";
 import {MatIcon} from "@angular/material/icon";
 import {NgComponentOutlet, NgForOf} from "@angular/common";
-import {Router, RouterLink} from "@angular/router";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-dashboard',
@@ -14,8 +14,7 @@ import {Router, RouterLink} from "@angular/router";
     imports: [
         MatIcon,
         NgForOf,
-        NgComponentOutlet,
-        RouterLink
+        NgComponentOutlet
     ],
     standalone: true,
     styleUrls: ['./dashboard.component.scss']

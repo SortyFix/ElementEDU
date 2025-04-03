@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.gaz.eedu.livechat.chat.ChatModel;
 import de.gaz.eedu.livechat.chat.ChatService;
 import de.gaz.eedu.livechat.message.MessageModel;
-import de.gaz.eedu.livechat.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,6 @@ import java.util.List;
 public class WebsocketController
 {
     private final ChatService chatService;
-    private final MessageService messageService;
 
     @PostMapping("/create")
     @PreAuthorize("@verificationService.isFullyAuthenticated()")

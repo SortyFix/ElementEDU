@@ -3,22 +3,18 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {PostModel} from "../post-model";
 import {NewsService} from "../news.service";
 import {NgForOf, NgIf} from "@angular/common";
-import {MarkdownComponent} from "ngx-markdown";
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import {MatChip, MatChipSet} from "@angular/material/chips";
-import {FileUploadButtonComponent} from "../../file/file-upload-button/file-upload-button.component";
 
 @Component({
   selector: 'app-news-page',
   standalone: true,
     imports: [
         NgIf,
-        MarkdownComponent,
         MatChipSet,
         MatChip,
-        NgForOf,
-        FileUploadButtonComponent
+        NgForOf
     ],
   templateUrl: './news-page.component.html',
   styleUrl: './news-page.component.scss'

@@ -2,7 +2,7 @@ import {Component, ElementRef, Injectable, OnInit, ViewChild} from '@angular/cor
 import {HttpClient} from "@angular/common/http";
 import {PostModel} from "./post-model";
 import {MatGridList, MatGridTile} from "@angular/material/grid-list";
-import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {NewsService} from "./news.service";
 import {MatIcon} from "@angular/material/icon";
@@ -22,8 +22,7 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
         MatIcon,
         MatFabButton,
         NgIf,
-        MatPaginator,
-        NgOptimizedImage
+        MatPaginator
     ],
   templateUrl: './news.component.html',
   styleUrl: './news.component.scss'
@@ -101,9 +100,9 @@ export class NewsComponent implements OnInit {
 
     public openArticleCreation()
     {
-        let dialogRef = this.dialog.open(ArticleCreationComponent, {
+        this.dialog.open(ArticleCreationComponent, {
             width: "80%"
-        })
+        });
     }
 
     public thumbnailBlobExists(post: PostModel): boolean {

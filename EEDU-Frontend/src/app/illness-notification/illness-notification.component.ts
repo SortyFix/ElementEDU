@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
+import {MatFormField, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {
     MatDatepicker,
     MatDatepickerInput,
@@ -29,7 +29,6 @@ import {IllnessNotificationService} from "./illness-notification.service";
         MatInput,
         MatLabel,
         MatIcon,
-        MatHint,
         MatButton,
         MatSuffix,
         NgIf,
