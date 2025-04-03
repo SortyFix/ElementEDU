@@ -78,7 +78,6 @@ export class UserListComponent {
         return this._selected.size > 0 && !this.isSelected('all');
     }
 
-    // todo implement lazy loading
     protected get users(): UserModel[] {
         const userList: UserModel[] = this.userList();
 

@@ -418,7 +418,6 @@ export class DurationPickerComponent implements ControlValueAccessor, Validator 
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        //TODO
     }
 
     public validate(): { invalidTime: boolean } | null {

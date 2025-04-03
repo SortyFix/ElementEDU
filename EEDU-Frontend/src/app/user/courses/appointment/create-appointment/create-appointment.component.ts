@@ -88,7 +88,6 @@ export class CreateAppointmentComponent {
 
         this._roomService.value$.subscribe((value: RoomModel[]): void => {
             this._rooms = value;
-            //TODO get rid of loading var and replace with service fetched status
             this.loading = false;
         })
     }

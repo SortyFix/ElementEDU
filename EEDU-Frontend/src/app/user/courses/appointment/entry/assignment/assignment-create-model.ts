@@ -17,8 +17,6 @@ export class AssignmentCreateModel {
     public constructor(private _description: string, submitUntil: Date, publish: Date) {
         this._submitUntil = submitUntil.getTime();
         this._publish = publish.getTime();
-
-        //TODO validate millis
     }
 
     public get submitUntil(): number {

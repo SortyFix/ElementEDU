@@ -188,12 +188,12 @@ public class UserEntity implements UserDetails, EntityModelRelation<Long, UserMo
 
     @Override public boolean isAccountNonExpired()
     {
-        return false; // TODO maybe implement (low priority)
+        return false;
     }
 
     @Override public boolean isCredentialsNonExpired()
     {
-        return false; // TODO maybe implement (low priority)
+        return false;
     }
 
     /**

@@ -110,8 +110,6 @@ public class UserController extends EntityController<Long, UserService, UserMode
      *
      * @param id the unique identifier of the user whose reduced data is being retrieved.
      * @return a {@link ResponseEntity} containing the requested {@link UserModel}.
-     *
-     * //TODO discuss privileges
      */
     @GetMapping("/get/{id}/reduced")
     public @NotNull ResponseEntity<ReducedUserModel> getReducedData(@PathVariable @NotNull Long id)

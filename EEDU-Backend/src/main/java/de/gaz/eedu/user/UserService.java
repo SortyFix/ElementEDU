@@ -90,7 +90,6 @@ public class UserService extends EntityService<Long, UserRepository, UserEntity,
             entity.attachGroups(getGroupRepository().findAllById(ids).toArray(GroupEntity[]::new));
             return entity;
         })).toList()).stream().peek(user -> {
-            //TODO remove duplicate above
             GroupEntity accountType = getGroupRepository().findEntity(user.getAccountType().toString()).orElseThrow();
             user.setTypeGroup(accountType);
         }).toList();
