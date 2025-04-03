@@ -13,6 +13,7 @@ import {NgForOf} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
 import {ArticleCreationService} from "./article-creation.service";
 import {FileUploadComponent} from "../../common/file-upload/file-upload.component";
+import {UserService} from "../../user/user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -45,7 +46,7 @@ import {FileUploadComponent} from "../../common/file-upload/file-upload.componen
 })
 export class ArticleCreationComponent {
 
-    constructor(public http: HttpClient, public articleCreationService: ArticleCreationService) {
+    constructor(public http: HttpClient, public articleCreationService: ArticleCreationService, public userService: UserService) {
     }
 
     private _formBuilder = inject(FormBuilder);

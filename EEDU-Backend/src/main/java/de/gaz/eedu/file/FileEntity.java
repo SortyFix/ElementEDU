@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import xyz.capybara.clamav.ClamavClient;
+import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,14 +172,13 @@ import java.util.Set;
     private boolean virusCheck(@NotNull InputStream inputStream)
     {
         return true;
+//
 //        try
 //        {
 //            ClamavClient client = new ClamavClient("localhost");
 //            return client.scan(inputStream) instanceof ScanResult.OK;
 //        }
 //        catch (ClamavException | IllegalStateException ignored) {
-//            System.out.println(ignored.getMessage());
-//            // TODO REMOVE LATER!!!!!!!!!!!!!!!!!!!!
 //            return true;
 //        }
     }

@@ -75,7 +75,7 @@
         <mat-dialog-actions style="display: flex; justify-content: space-between">
             <span></span>
             <span *ngIf="!anyEdit"></span>
-            <button *ngIf="anyEdit" [disabled]="!anyEdit" mat-flat-button type="submit">Save Changes</button>
+            <button *ngIf="anyEdit" [disabled]="!anyEdit" mat-flat-button class="card-submit-button" type="submit">Save Changes</button>
         </mat-dialog-actions>
     </form>
 </abstract-general-card>

@@ -46,11 +46,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    color: black !important;
 }
 
 .message-bubble-me {
     align-self: flex-end;
-    color: white;
+    color: white !important;
     background-color: black;
     box-shadow: 2px 1px 1px lightgray;
     border-radius: 15px;

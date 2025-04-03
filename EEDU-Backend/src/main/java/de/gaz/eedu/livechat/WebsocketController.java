@@ -53,7 +53,6 @@ public class WebsocketController
     }
 
     @MessageMapping("/send")
-    @PreAuthorize("@verificationService.isFullyAuthenticated()")
     public HttpStatus sendMessage(@NotNull String json)
     {
         try {

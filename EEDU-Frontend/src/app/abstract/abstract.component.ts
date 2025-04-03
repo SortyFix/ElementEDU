@@ -39,7 +39,6 @@ export class AbstractComponent implements OnInit {
         {title:'News', icon_name: 'newspaper', route: 'news'},
         {title:'Chat', icon_name: 'forum', route: 'chat'},
         {title:'Issue sick note', icon_name: 'disabled_by_default', route: 'illness-notification'},
-        // TODO: Make management exclusive
         {title:'Management', icon_name: 'design_services', route: 'management'},
         {title:'Settings', icon_name: 'settings', route: 'settings'}
     ]

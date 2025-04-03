@@ -139,7 +139,7 @@ mat-mdc-paginator {
 }
 
 .mat-mdc-card {
-    background-color: var(--widget-color);
+    background-color: var(--widget-color) !important;
 }
 .mat-mdc-card-content {
     background-color: var(--widget-color);

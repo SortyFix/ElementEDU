@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS post_entity
     author           VARCHAR(255)   NOT NULL,
     title            VARCHAR(255)   NOT NULL,
     thumbnailurl     VARCHAR(255),
-    body             VARCHAR(255) NOT NULL,
+    body             TEXT(65000) NOT NULL,
     time_of_creation BIGINT         NOT NULL
 );
 

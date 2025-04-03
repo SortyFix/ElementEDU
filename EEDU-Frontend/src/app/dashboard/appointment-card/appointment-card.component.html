@@ -1,8 +1,8 @@
 <div class="post-list">
     <div *ngFor="let x of appointments" class="appointment-item">
         <div class="header">
-            <h3 class="primary">{{ x.description }}</h3>
-            <p class="secondary">{{ getDateString(x) }}</p>
+            <h3 class="primary">{{ getDateString(x)}}, {{ x.start.toLocaleTimeString() }}</h3>
+            <p class="secondary">{{ x.description }}</p>
         </div>
     </div>
 </div>
