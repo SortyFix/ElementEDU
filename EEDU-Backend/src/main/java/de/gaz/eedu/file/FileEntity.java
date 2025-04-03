@@ -11,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import xyz.capybara.clamav.ClamavClient;
-import xyz.capybara.clamav.commands.scan.result.ScanResult;
 
 import java.io.File;
 import java.io.IOException;

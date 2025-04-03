@@ -3,8 +3,6 @@ import {AppointmentService} from "../../user/courses/appointment/appointment.ser
 import {AppointmentEntryModel} from "../../user/courses/appointment/entry/appointment-entry-model";
 import {NgForOf, NgIf} from "@angular/common";
 import {CourseService} from "../../user/courses/course.service";
-import {FormBuilder} from "@angular/forms";
-import {Observable} from "rxjs";
 
 @Component({
     selector: 'app-appointment-card',
