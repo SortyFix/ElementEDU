@@ -1,8 +1,0 @@
-@if (editing()) {
-    <ng-content></ng-content>
-} @else {
-    <div class="placeholder">
-        <span class="build">In Room</span>
-        <span class="room">{{ room()?.id || 'No room specified' }}</span>
-    </div>
-}

@@ -2,9 +2,9 @@ plugins {
     id "com.github.node-gradle.node" version "7.0.1"
 }
 
-final String nodejs = "23.6.1"
-final String npm = "11.0.0"
-final String angularVersion = "19.1.4"
+final String nodejs = "24.3.0"
+final String npm = "11.4.2"
+final String angularVersion = "20.0.4"
 
 node {
     version = nodejs
@@ -17,6 +17,13 @@ tasks.register("ngServe", NodeTask).configure {
     dependsOn("npmUpdate")
     script = file("node_modules/@angular/cli/bin/ng.js")
     args = ["serve"]
+}
+
+tasks.register("ngSetup", NodeTask).configure {
+    dependsOn("installAngularCli")
+    dependsOn("npmUpdate")
+    script = file("node_modules/@angular/cli/bin/ng.js")
+    args = ["new", "ElementEDU-Frontend"]
 }
 
 tasks.register("printVersion", NodeTask).configure {
