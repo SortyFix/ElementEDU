@@ -32,7 +32,7 @@ public class TOTPCredential implements Credential
     {
         UserEntity userEntity = credentialEntity.getUser();
         String secret = credentialEntity.getSecret();
-        return new TOTPData(userEntity.getLoginName(), secret, HashingAlgorithm.SHA1.getFriendlyName(), 6, 30);
+        return new TOTPData(userEntity.getLoginName(), secret, HashingAlgorithm.SHA256.getFriendlyName(), 6, 30);
     }
 
     @Override public boolean verify(@NotNull CredentialEntity credentialEntity, @NotNull String code)

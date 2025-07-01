@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Table(name = "class_room_entity")
 public class ClassRoomEntity implements EntityModelRelation<String, ClassRoomModel>
 {
+    @Column(length = 20, nullable = false)
     @Id @Setter(AccessLevel.NONE) private String id;
 
     @OneToMany(mappedBy = "classRoom") @JsonBackReference @Getter(AccessLevel.PRIVATE) private final Set<UserEntity> users = new HashSet<>();

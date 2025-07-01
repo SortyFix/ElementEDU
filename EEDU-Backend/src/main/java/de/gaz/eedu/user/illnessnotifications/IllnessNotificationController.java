@@ -20,7 +20,6 @@ import java.util.List;
     private final UserService userService;
     private final IllnessNotificationService illnessNotificationService;
 
-    // TODO: Only for parent accounts
     @PreAuthorize("@verificationService.isFullyAuthenticated()") @PostMapping("/excuse") public ResponseEntity<Boolean> excuseCurrentUser(
             @AuthenticationPrincipal Long id, @RequestParam("reason") @NotNull String reason,
             @RequestParam("expirationTime") @NotNull Long expirationTime, @RequestParam(value = "file") MultipartFile file)

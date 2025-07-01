@@ -4,6 +4,8 @@ import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.course.CourseRepository;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryRepository;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentCreateModel;
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentInsightModel;
 import de.gaz.eedu.course.appointment.entry.model.*;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentEntity;
 import de.gaz.eedu.course.appointment.frequent.FrequentAppointmentRepository;
@@ -14,8 +16,10 @@ import de.gaz.eedu.course.room.RoomRepository;
 import de.gaz.eedu.entity.EntityService;
 import de.gaz.eedu.exception.CreationException;
 import de.gaz.eedu.exception.EntityUnknownException;
+import de.gaz.eedu.file.FileService;
 import de.gaz.eedu.user.UserEntity;
 import de.gaz.eedu.user.repository.UserRepository;
+import io.jsonwebtoken.io.IOException;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,6 +45,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class AppointmentService extends EntityService<Long, FrequentAppointmentRepository, FrequentAppointmentEntity, FrequentAppointmentModel, InternalFrequentAppointmentCreateModel>
 {
+    private final FileService fileService;
     private final FrequentAppointmentRepository repository;
     @Getter(AccessLevel.PUBLIC)
     private final AppointmentEntryRepository entryRepository;
@@ -89,11 +96,15 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         }).orElse(Collections.emptyList());
     }
 
-    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user)
+    public @NotNull Optional<AssignmentInsightModel> getInsight(long appointment, long user) throws ResponseStatusException
     {
         return getEntryRepository().findById(appointment).map(entry ->
         {
             UserEntity userEntity = getUserRepository().findEntity(user).orElseThrow(entityUnknown(user));
+            if (!entry.getCourse().isPart(userEntity))
+            {
+                throw forbiddenThrowable();
+            }
             return entry.getInsight(userEntity);
         });
     }
@@ -109,9 +120,8 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
         Function<RoomEntity, Boolean> equals = (room -> !Objects.equals(updateModel.room(), room.getId()));
         if (entity.getRoom().map(equals).orElseGet(() -> Objects.nonNull(updateModel.room())))
         {
-            entity.setRoom(
-                    Objects.isNull(updateModel.room()) ? null :
-                            roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
+            entity.setRoom(Objects.isNull(updateModel.room()) ? null :
+                    roomRepository.findById(updateModel.room()).orElseThrow(entityUnknown(updateModel.room()))
             );
         }
 
@@ -194,9 +204,47 @@ public class AppointmentService extends EntityService<Long, FrequentAppointmentR
 
     public void submitAssignment(long user, long assignment, @NotNull MultipartFile[] files)
     {
-        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(assignment);
-        AppointmentEntryEntity entry = entryReference.orElseThrow(entityUnknown(assignment));
-        entry.submitAssignment(user, files);
+        getAppointmentEntry(assignment).submitAssignment(user, files);
+    }
+
+    public boolean deleteAssignment(long user, long assignment, @NotNull String[] files)
+    {
+        return getAppointmentEntry(assignment).deleteAssignment(user, files);
+    }
+
+    public void hasSubmitted(long user, long assignment, @NotNull MultipartFile[] files)
+    {
+        getAppointmentEntry(assignment).submitAssignment(user, files);
+    }
+
+    private AppointmentEntryEntity getAppointmentEntry(long id) throws EntityUnknownException
+    {
+        Optional<AppointmentEntryEntity> entryReference = getEntryRepository().findById(id);
+        return entryReference.orElseThrow(entityUnknown(id));
+    }
+
+    public @NotNull ResponseEntity<ByteArrayResource> downloadAssignments(long appointment, long user)
+    {
+        AppointmentEntryEntity entry = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+        return getFileService().zipAndSend(entry.loadAssignmentFiles(user));
+    }
+
+    public @NotNull ResponseEntity<ByteArrayResource> downloadAssignment(long appointment, long user, @NotNull String file)
+    {
+        try
+        {
+            AppointmentEntryEntity entry = getEntryRepository().findById(appointment).orElseThrow(entityUnknown(appointment));
+            return getFileService().sendSingle(entry.loadAssignmentFile(user, file).orElseThrow(() ->
+            {
+                String message = String.format("Could not find file %s in appointment: %s", file, appointment);
+                return new IOException(message);
+            }));
+        }
+        catch (java.io.IOException exception)
+        {
+            String message = "An exception occurred while trying to prepare downloading assignment: %s";
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format(message, file), exception);
+        }
     }
 
     /**

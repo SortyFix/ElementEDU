@@ -170,14 +170,13 @@ import java.util.Set;
     private boolean virusCheck(@NotNull InputStream inputStream)
     {
         return true;
+//
 //        try
 //        {
 //            ClamavClient client = new ClamavClient("localhost");
 //            return client.scan(inputStream) instanceof ScanResult.OK;
 //        }
 //        catch (ClamavException | IllegalStateException ignored) {
-//            System.out.println(ignored.getMessage());
-//            // TODO REMOVE LATER!!!!!!!!!!!!!!!!!!!!
 //            return true;
 //        }
     }

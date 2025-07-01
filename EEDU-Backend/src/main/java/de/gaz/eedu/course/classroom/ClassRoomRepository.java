@@ -1,6 +1,6 @@
 package de.gaz.eedu.course.classroom;
 
-import de.gaz.eedu.course.model.CourseModel;
+import de.gaz.eedu.course.CourseEntity;
 import de.gaz.eedu.user.model.ReducedUserModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -22,8 +22,11 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoomEntity, Stri
     @Query("SELECT COUNT(u) > 0 FROM CourseEntity c JOIN c.users u WHERE c.id = :courseId AND u.id = :userId")
     boolean existsUserInCourse(long userId, long courseId);
 
-    @Query("SELECT co FROM ClassRoomEntity c JOIN c.courses co WHERE c.id = :id")
-    @NotNull @Unmodifiable Set<CourseModel> findAllCoursesById(long id);
+    @Query("SELECT c FROM ClassRoomEntity c JOIN c.users u WHERE u.id = :id")
+    @NotNull @Unmodifiable Set<ClassRoomEntity> findAllByUserId(long id);
+
+    @Query("SELECT co FROM ClassRoomEntity c JOIN c.courses co WHERE co.id = :id")
+    @NotNull @Unmodifiable Set<CourseEntity> findAllCoursesById(long id);
 
     @Query(
             "SELECT new de.gaz.eedu.user.model.ReducedUserModel(u.id, u.firstName, u.lastName, u.accountType) " +

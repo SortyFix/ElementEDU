@@ -1,4 +1,4 @@
-package de.gaz.eedu.course.appointment.entry.model;
+package de.gaz.eedu.course.appointment.entry.assignment;
 
 import de.gaz.eedu.course.appointment.entry.AppointmentEntryEntity;
 import org.jetbrains.annotations.NotNull;

@@ -1,0 +1,9 @@
+<div class="error-content">
+    <div class="error-icon">
+        <mat-icon color="warn" class="actual-icon">{{ icon() }}</mat-icon>
+    </div>
+    <div class="error-message">
+        <p><strong>{{ message() }}</strong></p>
+        <p *ngIf="subMessage() != null" class="mat-caption">{{ subMessage() }}</p>
+    </div>
+</div>

@@ -9,7 +9,6 @@ public interface EntityObject<P>
 
     default boolean deleteManagedRelations() { return false; }
 
-    // TODO javadoc (delete safe)
     default boolean isDeletable()
     {
         return true;

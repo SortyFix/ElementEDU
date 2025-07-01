@@ -97,8 +97,8 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     @ValueSource(longs = {1, 2})
     @ParameterizedTest(name = "{index} => request={0}")
     public void testAttachGroup(long userID) {
-        GroupEntity groupEntity = getGroupService().loadEntityById("group0").orElseThrow(IllegalStateException::new);
-        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
+        GroupEntity groupEntity = getGroupService().loadEntityById("group0").orElseThrow();
+        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow();
 
         Runnable test = () -> test(Eval.eval(groupEntity, true, Validator.equals()), userEntity::attachGroups);
         if(userID == 1)
@@ -133,7 +133,12 @@ public class UserServiceTest extends ServiceTest<Long, UserService, UserEntity, 
     @ValueSource(longs = {1, 2})
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void testDetachGroup(long userID) {
-        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow(IllegalStateException::new);
-        test(Eval.eval("group0", userID == 1, Validator.equals()), userEntity::detachGroups);
+        UserEntity userEntity = getService().loadEntityById(userID).orElseThrow();
+        if(userID == 1)
+        {
+            test(Eval.eval("group0", true, Validator.equals()), userEntity::detachGroups);
+            return;
+        }
+        Assertions.assertThrowsExactly(StateTransitionException.class, () -> userEntity.detachGroups("group0"));
     }
 }

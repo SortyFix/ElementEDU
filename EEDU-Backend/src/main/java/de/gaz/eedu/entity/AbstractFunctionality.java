@@ -79,4 +79,9 @@ public class AbstractFunctionality
     {
         return new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
+
+    protected @NotNull ResponseStatusException forbiddenThrowable()
+    {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
 }

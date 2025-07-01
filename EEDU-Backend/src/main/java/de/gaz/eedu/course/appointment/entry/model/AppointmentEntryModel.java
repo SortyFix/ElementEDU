@@ -1,5 +1,6 @@
 package de.gaz.eedu.course.appointment.entry.model;
 
+import de.gaz.eedu.course.appointment.entry.assignment.AssignmentModel;
 import de.gaz.eedu.course.room.model.RoomModel;
 import de.gaz.eedu.entity.model.EntityModel;
 import org.jetbrains.annotations.NotNull;

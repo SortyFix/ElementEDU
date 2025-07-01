@@ -128,7 +128,7 @@ public class PostService extends EntityService<Long, PostRepository, PostEntity,
     {
         UserEntity userEntity = userService.loadEntityByIDSafe(userId);
         System.out.println(userEntity.getAuthorities());
-        // TODO: FIX ADMIN AUTHORITIES
+
         if(userEntity.hasAuthority(writePrivilege) || userEntity.hasRole("administrator"))
         {
             if(Objects.nonNull(thumbnail))
