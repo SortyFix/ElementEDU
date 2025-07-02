@@ -12,6 +12,6 @@ export abstract class EntityService<P, E extends Entity<P>> {
     ) {}
 
     protected get location(): string {
-        return `${environment.backendUrl}/api/v1/${this._location}`;
+        return `${environment.backendUrl}/${this._location}`;
     }
 }
